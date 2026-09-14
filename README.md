@@ -15,7 +15,8 @@ Multiplayer has no server of its own. The host's browser runs the game and the o
 1. The host opens https://silasedel.github.io/pinpoint/ and clicks **Create game**.
 2. The host clicks **Copy invite link** and sends it to friends. The invite link opens the game and joins the lobby automatically. Or send the 4-letter code and they click **Join game** on the same site.
 3. Everyone picks a name and a color (no two players can share a color). The host picks time and rounds and presses Start. A 30-second countdown gives people time to finish picking, or the host can start right away.
-4. Every round shows the same panorama to everyone. When all guesses are in, or time runs out, the map shows every pin in its player's color with distances, points, and running totals. The host advances rounds. 2 to 10 players.
+4. **Voice chat** is built in. The mic button in the bottom-left corner (or the M key) turns your microphone on; click again to mute. It's off until you turn it on, and everyone hears everyone who's live. A green ring shows who's talking.
+5. Every round shows the same panorama to everyone. When all guesses are in, or time runs out, the map shows every pin in its player's color with distances, points, and running totals. The host advances rounds. 2 to 10 players.
 
 Running from the launcher instead? It prints a temporary public link (via `cloudflared`) and a same-Wi-Fi address, either of which works the same way.
 
@@ -28,4 +29,5 @@ If two people are behind unusually strict networks the direct WebRTC connection 
 - **Maps** are Leaflet with Esri basemaps (National Geographic style, or satellite with labels), which carry English place names worldwide.
 - **Country reveal** uses BigDataCloud's free client reverse geocoder (OpenStreetMap Nominatim as fallback) so a far-off guess in the right country is called out as such.
 - **Scoring**: `5000 * e^(-distance_km / 1492.7)`. The solo leaderboard is per mode and lives in localStorage.
+- **Voice chat** is a WebRTC audio mesh: every pair of players holds one audio call, carrying a silent track until a mic is turned on, so unmuting just swaps the track.
 - **Multiplayer** is host-authoritative: the host finds the locations, sends them to everyone at start, collects guesses, scores them, and broadcasts each reveal.

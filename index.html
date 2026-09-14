@@ -132,6 +132,7 @@
   .hud-brand svg{width:30px;height:30px}
 
   .ctl{position:absolute;left:16px;bottom:16px;z-index:6;display:flex;gap:8px}
+  .ctl.shift{left:150px}
   .icon-btn{width:44px;height:44px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-size:18px;box-shadow:var(--shadow)}
   .icon-btn:hover{background:#f6f8f7}
 
@@ -199,7 +200,7 @@
   .friends-row{display:flex;gap:8px;flex-wrap:wrap}
   .friends-row input{flex:1;min-width:120px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;text-transform:uppercase;letter-spacing:.2em;font-weight:700;outline:none}
   .friends-row input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
-  #lobby{overflow:auto;padding:30px 20px}
+  #lobby{overflow:auto;padding:30px 20px 100px}
   .lobby-wrap{max-width:960px;margin:0 auto}
   .brand-row{display:flex;align-items:center;gap:12px}
   .lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
@@ -242,6 +243,15 @@
   .rrow .rt{color:var(--muted);font-size:12px;min-width:70px;text-align:right}
   .rrow .pos{color:var(--muted);width:20px;font-weight:700}
   .rrow.first .pos{color:#a06d00}
+  .mic{position:fixed;left:16px;bottom:16px;z-index:20;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);font-weight:700;font-size:14px}
+  .mic .ico{width:22px;height:22px;border-radius:50%;background:#cfd8d2;display:grid;place-items:center;font-size:12px}
+  .mic.live{background:#e63946;color:#fff;border-color:#e63946}
+  .mic.live .ico{background:#fff;color:#e63946}
+  .mic.live.talking{box-shadow:0 0 0 4px rgba(43,182,115,.55)}
+  .mic.busy{opacity:.6;cursor:wait}
+  .speaking .sw,.dotp.speaking{box-shadow:0 0 0 3px #2bb673!important}
+  .mic-lobby{display:flex;align-items:center;gap:10px;margin-top:22px;padding:12px 14px;border-radius:12px;background:#f6f8f7;border:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .mic-lobby b{color:var(--text)}
   @media (max-width:820px){ .lobby-grid{grid-template-columns:1fr} }
   .toast{position:fixed;left:50%;top:80px;transform:translateX(-50%);z-index:60;padding:10px 18px;border-radius:10px;background:var(--red);color:#fff;font-weight:600;box-shadow:var(--shadow)}
 
@@ -345,7 +355,7 @@
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup" style="color:var(--text)"><svg viewBox="0 0 64 64" style="width:34px;height:34px"><path d="M32 3C19 3 8.5 13.5 8.5 26.5 8.5 44 32 61 32 61s23.5-17 23.5-34.5C55.5 13.5 45 3 32 3z" fill="#1f9d55"/><circle cx="32" cy="26" r="13.5" fill="#fff"/><g fill="none" stroke="#1f9d55" stroke-width="2.2" stroke-linecap="round"><circle cx="32" cy="26" r="13.5"/><ellipse cx="32" cy="26" rx="5.5" ry="13.5"/><path d="M18.5 26h27M20.8 19h22.4M20.8 33h22.4"/></g></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="leaveBtn" style="margin-left:auto">Leave lobby</button></div>
     <div class="lobby-grid">
       <div class="card">
-        <div class="code-box"><small>Room code</small><b id="roomCode">····</b><div class="url" id="roomUrl"></div><div class="lobby-actions" style="justify-content:center;margin-top:10px"><button class="btn btn-secondary" id="copyLink" style="padding:10px 16px;font-size:13px">Copy invite link</button><button class="btn btn-secondary" id="copyCode" style="padding:10px 16px;font-size:13px">Copy code</button></div></div>
+        <div class="code-box"><small>Invite people with this code</small><b id="roomCode">····</b><div class="url" id="roomUrl"></div><div class="lobby-actions" style="justify-content:center;margin-top:10px"><button class="btn btn-secondary" id="copyLink" style="padding:10px 16px;font-size:13px">Copy invite link</button><button class="btn btn-secondary" id="copyCode" style="padding:10px 16px;font-size:13px">Copy code</button></div></div>
         <h2>Players <span id="pcount" style="color:var(--muted);font-weight:600;font-size:14px"></span></h2>
         <p class="lead">2–10 players. Everyone sees the same spots. Highest total after all rounds wins.</p>
         <div class="plist" id="plist"></div>
@@ -370,6 +380,7 @@
         <div class="name-row"><input id="mpName" maxlength="16" placeholder="Your name"></div>
         <div class="label">Color</div>
         <div class="swatches" id="swatches"></div>
+        <div class="mic-lobby"><span>🎤</span><div><b>Voice chat</b> is built in. Use the mic button in the corner to talk. It's off until you turn it on.</div></div>
       </div>
     </div>
   </div>
@@ -445,6 +456,7 @@
   </div>
 </div>
 
+<button class="mic" id="micBtn" hidden><span class="ico">🎤</span><span id="micTxt">Mic off</span></button>
 <canvas id="confetti" hidden></canvas>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
@@ -894,7 +906,8 @@ function mpHost(){
   const code=mkCode();
   mpSetup('host',code);
   mp.peer=new Peer('pinpoint-'+code,{debug:0});
-  mp.peer.on('open',id=>{ mp.me.id=id; mp.players[id]={id,name:mp.me.name,color:null,score:0,host:true}; renderLobby(); });
+  mp.peer.on('open',id=>{ mp.me.id=id; mp.players[id]={id,name:mp.me.name,color:null,score:0,host:true}; renderLobby(); voiceShow(); });
+  mp.peer.on('call',voiceIncoming);
   mp.peer.on('connection',conn=>{
     conn.on('open',()=>{
       if(mp.phase!=='lobby'){ conn.send({t:'reject',why:'Game already in progress'}); setTimeout(()=>conn.close(),500); return; }
@@ -916,8 +929,9 @@ function mpJoin(code){
   mpSetup('guest',code);
   $('roomUrl').textContent='Connecting…';
   mp.peer=new Peer({debug:0});
+  mp.peer.on('call',voiceIncoming);
   mp.peer.on('open',id=>{
-    mp.me.id=id;
+    mp.me.id=id; voiceShow();
     const conn=mp.peer.connect('pinpoint-'+code,{reliable:true});
     mp.host=conn;
     let opened=false;
@@ -934,7 +948,7 @@ function mpSetup(role,code){
   $('mpName').value=mp.me.name;
   $('roomCode').textContent=code;
   const local=location.hostname==='localhost'||location.hostname==='127.0.0.1';
-  $('roomUrl').textContent = local ? 'You opened the game at localhost, so friends can\'t reach this page. Use the public link the launcher printed (or the Wi-Fi address), then share the code.' : 'Friends: open '+location.origin+location.pathname+' and enter the code, or send them the invite link.';
+  $('roomUrl').textContent = local ? 'You opened the game at localhost, so friends can\'t reach this page. Use the public link the launcher printed (or the Wi-Fi address), then share the code.' : 'They open '+location.host+location.pathname.replace(/index\.html$/,'')+', press Join game, and type the code.';
   $('copyLink').hidden=local;
   $('hostPanel').hidden=role!=='host'; $('guestPanel').hidden=role!=='guest'; $('countdown').hidden=true;
   $('mpStartBtn').hidden=false; $('mpStartNow').hidden=true; $('mpCancel').hidden=true;
@@ -943,6 +957,7 @@ function mpSetup(role,code){
 function mpLeave(){
   if(mp.cd){ clearInterval(mp.cd); mp.cd=null; }
   if(mp.deadline){ clearTimeout(mp.deadline); mp.deadline=null; }
+  voiceStop();
   try{ mp.peer&&mp.peer.destroy(); }catch(e){}
   mp.role=null; mp.peer=null; mp.conns={}; mp.players={}; mp.host=null; mp.phase='lobby';
   $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
@@ -951,10 +966,10 @@ function mpBroadcast(m){ for(const c of Object.values(mp.conns)){ try{ c.send(m)
 function mpSend(m){ if(mp.role==='host') hostOnMessage(mp.me.id,m); else if(mp.host) { try{ mp.host.send(m); }catch(e){} } }
 
 /* ----- host side ----- */
-function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mpBroadcast({t:'lobby',players:playerList(),settings:mp.settings,cd:mp.cd?mp.cdLeft:null}); renderLobby(); }
+function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mpBroadcast({t:'lobby',players:playerList(),settings:mp.settings,cd:mp.cd?mp.cdLeft:null}); renderLobby(); voiceConnect(); }
 function hostDrop(id){
   delete mp.conns[id]; if(!mp.players[id]) return;
-  const name=mp.players[id].name||'A player'; delete mp.players[id];
+  const name=mp.players[id].name||'A player'; delete mp.players[id]; voiceDrop(id);
   if(mp.phase==='lobby') hostSync(); else { toast(name+' left'); mpBroadcast({t:'players',players:playerList()}); updateStrip(); hostCheckRound(); }
 }
 function hostOnMessage(from,m){
@@ -1016,7 +1031,7 @@ async function hostStartGame(){
 /* ----- guest side ----- */
 function guestOnMessage(m){
   if(m.t==='reject'){ toast(m.why); mpLeave(); show('menu'); return; }
-  if(m.t==='lobby'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; mp.settings=m.settings; const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; renderLobby(); }
+  if(m.t==='lobby'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; mp.settings=m.settings; const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; renderLobby(); voiceConnect(); }
   else if(m.t==='players'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; updateStrip(); }
   else if(m.t==='countdown'){ if(m.secs>0){ runCountdown(m.secs,()=>{}); } else { if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=false; $('countdown').textContent=m.msg||'Starting…'; } }
   else if(m.t==='cancel'){ if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=true; }
@@ -1055,7 +1070,7 @@ function mpSubmitGuess(){
 }
 function updateStrip(){
   const el=$('strip'); if(!mp.role) return;
-  el.innerHTML=playerList().map(p=>`<div class="dotp ${mp.guesses[p.id]!==undefined?'done':''}" style="background:${COLORS[p.color??0][0]}" title="${esc(p.name||'…')}">${mp.guesses[p.id]!==undefined?'✓':esc((p.name||'?')[0].toUpperCase())}</div>`).join('');
+  el.innerHTML=playerList().map(p=>`<div class="dotp ${mp.guesses[p.id]!==undefined?'done':''} ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}" style="background:${COLORS[p.color??0][0]}" title="${esc(p.name||'…')}">${mp.guesses[p.id]!==undefined?'✓':esc((p.name||'?')[0].toUpperCase())}</div>`).join('');
 }
 function updateWaitList(n,total){
   const ps=playerList(); const done=n!=null?n:ps.filter(p=>mp.guesses[p.id]!==undefined).length;
@@ -1065,7 +1080,7 @@ function updateWaitList(n,total){
 function renderLobby(){
   const ps=playerList();
   $('pcount').textContent=ps.length?`(${ps.length}/10)`:'';
-  $('plist').innerHTML=ps.length?ps.map(p=>`<div class="prow"><span class="sw" style="background:${p.color===null?'#cfd8d2':COLORS[p.color][0]}"></span><span class="pn">${esc(p.name||'(picking a name…)')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>';
+  $('plist').innerHTML=ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}"><span class="sw" style="background:${p.color===null?'#cfd8d2':COLORS[p.color][0]}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>';
   $('swatches').innerHTML=COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
     return `<div class="swatch ${mine?'mine':''} ${taken?'taken':''}" data-i="${i}" style="background:${c}" ${taken?`data-owner="${esc(owner.name||'taken')}"`:''} title="${n}">${mine?'✓':''}</div>`; }).join('');
   if(mp.role==='host'){ [...$('mpTimeSeg').children].forEach(b=>b.classList.toggle('on',+b.dataset.t===mp.settings.time)); [...$('mpRoundSeg').children].forEach(b=>b.classList.toggle('on',+b.dataset.r===mp.settings.rounds)); }
@@ -1129,6 +1144,89 @@ function showFinalMP(fin){
   if(iWon) setTimeout(confetti,900);
   $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span><span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
 }
+
+/* =========================================================
+   VOICE CHAT — one audio call per pair of players (mesh).
+   Everyone always has a track (silent until the mic is on),
+   so turning the mic on just swaps the track, no renegotiation dance.
+   ========================================================= */
+const voice={ calls:{}, micStream:null, on:false, busy:false, ctx:null, silent:null, audios:{}, meters:{}, speaking:{} };
+function audioCtx(){ if(!voice.ctx){ voice.ctx=new (window.AudioContext||window.webkitAudioContext)(); } if(voice.ctx.state==='suspended') voice.ctx.resume().catch(()=>{}); return voice.ctx; }
+function silentTrack(){
+  if(voice.silent&&voice.silent.readyState==='live') return voice.silent;
+  const ctx=audioCtx(); const dst=ctx.createMediaStreamDestination(); const osc=ctx.createOscillator(); const g=ctx.createGain(); g.gain.value=0; osc.connect(g); g.connect(dst); osc.start();
+  voice.silent=dst.stream.getAudioTracks()[0]; return voice.silent;
+}
+function currentTrack(){ return voice.on&&voice.micStream ? voice.micStream.getAudioTracks()[0] : silentTrack(); }
+function voiceShow(){ $('micBtn').hidden=!mp.role; $('resetBtn').parentElement.classList.toggle('shift',!!mp.role); renderMic(); }
+function voiceConnect(){
+  if(!mp.peer||!mp.me.id||mp.peer.destroyed) return;
+  for(const p of playerList()){
+    if(p.id===mp.me.id||voice.calls[p.id]) continue;
+    if(mp.me.id>p.id){ try{ const call=mp.peer.call(p.id,new MediaStream([currentTrack()])); if(call) attachCall(call); }catch(e){} }
+  }
+}
+function voiceIncoming(call){ if(!mp.role) return; if(voice.calls[call.peer]){ try{ voice.calls[call.peer].close(); }catch(e){} } try{ call.answer(new MediaStream([currentTrack()])); attachCall(call); }catch(e){} }
+function attachCall(call){
+  voice.calls[call.peer]=call;
+  call.on('stream',st=>playRemote(call.peer,st));
+  call.on('close',()=>voiceDrop(call.peer));
+  call.on('error',()=>voiceDrop(call.peer));
+}
+function voiceDrop(id){
+  const c=voice.calls[id]; delete voice.calls[id]; try{ c&&c.close(); }catch(e){}
+  const a=voice.audios[id]; if(a){ a.srcObject=null; a.remove(); delete voice.audios[id]; }
+  if(voice.meters[id]){ clearInterval(voice.meters[id].timer); delete voice.meters[id]; }
+  delete voice.speaking[id];
+}
+function playRemote(id,st){
+  let a=voice.audios[id];
+  if(!a){ a=document.createElement('audio'); a.autoplay=true; a.playsInline=true; a.style.display='none'; document.body.appendChild(a); voice.audios[id]=a; }
+  a.srcObject=st; a.play().catch(()=>{});
+  meter(id,st);
+}
+function meter(id,st){
+  if(voice.meters[id]){ clearInterval(voice.meters[id].timer); delete voice.meters[id]; }
+  try{
+    const ctx=audioCtx(); const src=ctx.createMediaStreamSource(st); const an=ctx.createAnalyser(); an.fftSize=512; src.connect(an);
+    const buf=new Uint8Array(an.fftSize);
+    const timer=setInterval(()=>{ an.getByteTimeDomainData(buf); let sum=0; for(let i=0;i<buf.length;i++){ const v=(buf[i]-128)/128; sum+=v*v; } const rms=Math.sqrt(sum/buf.length); setSpeaking(id,rms>0.02); },120);
+    voice.meters[id]={timer,src,an};
+  }catch(e){}
+}
+function setSpeaking(id,on){
+  if(!!voice.speaking[id]===on) return; voice.speaking[id]=on;
+  document.querySelectorAll(`[data-id="${id}"]`).forEach(el=>el.classList.toggle('speaking',on));
+  if(id===mp.me.id) $('micBtn').classList.toggle('talking',on);
+}
+async function toggleMic(){
+  if(voice.busy||!mp.role) return;
+  if(!voice.on){
+    voice.busy=true; renderMic();
+    try{ voice.micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}); }
+    catch(e){ voice.busy=false; renderMic(); toast(location.protocol==='https:'||location.hostname==='localhost'?'Microphone blocked. Allow the mic for this site and try again.':'Voice needs an https link (use the public link).'); return; }
+    voice.on=true; voice.busy=false; audioCtx(); meter(mp.me.id,voice.micStream);
+  } else {
+    voice.on=false; setSpeaking(mp.me.id,false);
+    if(voice.meters[mp.me.id]){ clearInterval(voice.meters[mp.me.id].timer); delete voice.meters[mp.me.id]; }
+    if(voice.micStream){ voice.micStream.getTracks().forEach(t=>t.stop()); voice.micStream=null; }
+  }
+  swapTracks(); renderMic();
+}
+function swapTracks(){
+  const t=currentTrack();
+  for(const c of Object.values(voice.calls)){ const pc=c.peerConnection; if(!pc) continue; const snd=pc.getSenders().find(x=>x.track&&x.track.kind==='audio')||pc.getSenders()[0]; if(snd) snd.replaceTrack(t).catch(()=>{}); }
+}
+function renderMic(){ const b=$('micBtn'); b.classList.toggle('live',voice.on); b.classList.toggle('busy',voice.busy); $('micTxt').textContent=voice.busy?'Asking for mic…':voice.on?'Mic on · click to mute':'Mic off · click to talk'; b.title=voice.on?'You are live. Click to mute.':'Click to talk to everyone in the game.'; }
+function voiceStop(){
+  for(const id of Object.keys(voice.calls)) voiceDrop(id);
+  if(voice.meters[mp.me.id]){ clearInterval(voice.meters[mp.me.id].timer); delete voice.meters[mp.me.id]; }
+  if(voice.micStream){ voice.micStream.getTracks().forEach(t=>t.stop()); voice.micStream=null; }
+  voice.on=false; voice.speaking={}; $('micBtn').hidden=true; $('micBtn').classList.remove('live','talking');
+}
+$('micBtn').addEventListener('click',toggleMic);
+setInterval(()=>{ if(mp.role) voiceConnect(); },8000);   // re-dial anyone whose audio call dropped
+document.addEventListener('keydown',e=>{ if(e.code==='KeyM'&&mp.role&&e.target.tagName!=='INPUT'){ e.preventDefault(); toggleMic(); } });
 
 /* ----- lobby controls ----- */
 function inviteLink(){ return location.origin+location.pathname+'?join='+mp.code; }
