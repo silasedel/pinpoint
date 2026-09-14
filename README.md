@@ -4,18 +4,20 @@ A single-file Street View geography game, solo or with friends. You get dropped 
 
 ## Play
 
-Double-click `run.command`. It starts the game server, opens a public link through a Cloudflare tunnel, and opens the game in your browser. Keep that window open while you play.
+**https://silasedel.github.io/pinpoint/** — that's it. Works on any phone or computer, nothing to install.
+
+Offline copy: double-click `run.command`. It serves the game locally, opens a temporary public link through a Cloudflare tunnel, and opens the game in your browser.
 
 ## Play with friends (anywhere)
 
 Multiplayer has no server of its own. The host's browser runs the game and the others connect to it directly with WebRTC (PeerJS handles the introductions), so friends can be on any Wi-Fi, in any city.
 
-1. The host double-clicks `run.command` and gets a **public link** like `https://some-words.trycloudflare.com/index.html`. (Needs `cloudflared`, which is installed: `brew install cloudflared`.) The link changes each launch, that's fine.
-2. The host clicks **Create game**, then **Copy invite link** and sends it to friends. The invite link opens the game and joins the lobby automatically. Or send the public link plus the 4-letter code and they click **Join game**.
+1. The host opens https://silasedel.github.io/pinpoint/ and clicks **Create game**.
+2. The host clicks **Copy invite link** and sends it to friends. The invite link opens the game and joins the lobby automatically. Or send the 4-letter code and they click **Join game** on the same site.
 3. Everyone picks a name and a color (no two players can share a color). The host picks time and rounds and presses Start. A 30-second countdown gives people time to finish picking, or the host can start right away.
 4. Every round shows the same panorama to everyone. When all guesses are in, or time runs out, the map shows every pin in its player's color with distances, points, and running totals. The host advances rounds. 2 to 10 players.
 
-Same Wi-Fi only? The launcher also prints a `http://10.x.x.x:8791/index.html` address that works without the tunnel.
+Running from the launcher instead? It prints a temporary public link (via `cloudflared`) and a same-Wi-Fi address, either of which works the same way.
 
 If two people are behind unusually strict networks the direct WebRTC connection can fail. That's rare on home Wi-Fi and phone data.
 
