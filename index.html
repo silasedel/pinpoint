@@ -384,7 +384,7 @@
         <div class="name-row"><input id="mpName" maxlength="16" placeholder="Your name"></div>
         <div class="label">Color</div>
         <div class="swatches" id="swatches"></div>
-        <div class="mic-lobby"><span>🎤</span><div><b>Voice chat</b> is built in. Use the mic button in the corner to talk. It's off until you turn it on.</div></div>
+        <div class="mic-lobby"><div><b>Voice chat</b> is built in. Use the mic button in the corner to talk. It's off until you turn it on.<br><label style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer"><input type="checkbox" id="spkMode"> I'm on speakers, not headphones (turns on echo cancelling)</label></div></div>
       </div>
     </div>
   </div>
@@ -1154,7 +1154,7 @@ function showFinalMP(fin){
    Everyone always has a track (silent until the mic is on),
    so turning the mic on just swaps the track, no renegotiation dance.
    ========================================================= */
-const voice={ calls:{}, micStream:null, sendStream:null, chain:null, on:false, busy:false, ctx:null, silent:null, audios:{}, meters:{}, speaking:{} };
+const voice={ calls:{}, micStream:null, on:false, busy:false, ctx:null, silent:null, audios:{}, meters:{}, speaking:{} };
 /* Ask the other side for full-band, high-bitrate Opus with no silence gating (defaults are narrow "phone call" speech). */
 const OPUS_PARAMS={minptime:'10',useinbandfec:'1',usedtx:'0',stereo:'0','sprop-stereo':'0',maxaveragebitrate:'128000',maxplaybackrate:'48000',cbr:'0'};
 function hifiSdp(sdp){
@@ -1169,10 +1169,12 @@ function boostSender(pc){
   try{ const snd=pc.getSenders().find(x=>x.track&&x.track.kind==='audio'); if(!snd) return; const p=snd.getParameters(); if(!p.encodings||!p.encodings.length) p.encodings=[{}];
     p.encodings[0].maxBitrate=128000; p.encodings[0].priority='high'; p.encodings[0].networkPriority='high'; snd.setParameters(p).catch(()=>{}); }catch(e){}
 }
-/* Mic EQ: cut rumble and low-mid mud, gentle mid scoop, presence and air on top, light compression. */
-function buildMicChain(raw){
+/* Listening EQ, applied to each incoming voice: cut rumble and low-mid mud, gentle mid scoop, presence and air, light compression. */
+let speakerMode=false; try{ speakerMode=localStorage.getItem('pp_spk')==='1'; }catch(e){}
+function micConstraints(){ return speakerMode ? {echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1} : {echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:1}; }
+function buildRxChain(st){
   const ctx=audioCtx();
-  const src=ctx.createMediaStreamSource(raw);
+  const src=ctx.createMediaStreamSource(st);
   const f=(type,freq,q,gain)=>{ const n=ctx.createBiquadFilter(); n.type=type; n.frequency.value=freq; if(q!=null) n.Q.value=q; if(gain!=null) n.gain.value=gain; return n; };
   const chain=[
     f('highpass',90,0.7),          // rumble, desk thumps
@@ -1182,10 +1184,10 @@ function buildMicChain(raw){
     f('highshelf',6500,null,3),    // air
   ];
   const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-22; comp.knee.value=10; comp.ratio.value=3; comp.attack.value=0.004; comp.release.value=0.15;
-  const gain=ctx.createGain(); gain.gain.value=1.35;
-  const dst=ctx.createMediaStreamDestination();
-  let node=src; for(const n of chain){ node.connect(n); node=n; } node.connect(comp); comp.connect(gain); gain.connect(dst);
-  return {stream:dst.stream, nodes:[src,...chain,comp,gain,dst]};
+  const gain=ctx.createGain(); gain.gain.value=1.6;
+  const an=ctx.createAnalyser(); an.fftSize=512;
+  let node=src; for(const n of chain){ node.connect(n); node=n; } node.connect(comp); comp.connect(gain); gain.connect(an); an.connect(ctx.destination);
+  return {analyser:an, nodes:[src,...chain,comp,gain,an]};
 }
 function audioCtx(){ if(!voice.ctx){ voice.ctx=new (window.AudioContext||window.webkitAudioContext)(); } if(voice.ctx.state==='suspended') voice.ctx.resume().catch(()=>{}); return voice.ctx; }
 function silentTrack(){
@@ -1193,7 +1195,7 @@ function silentTrack(){
   const ctx=audioCtx(); const dst=ctx.createMediaStreamDestination(); const osc=ctx.createOscillator(); const g=ctx.createGain(); g.gain.value=0; osc.connect(g); g.connect(dst); osc.start();
   voice.silent=dst.stream.getAudioTracks()[0]; return voice.silent;
 }
-function currentTrack(){ return voice.on&&voice.sendStream ? voice.sendStream.getAudioTracks()[0] : silentTrack(); }
+function currentTrack(){ return voice.on&&voice.micStream ? voice.micStream.getAudioTracks()[0] : silentTrack(); }
 function voiceShow(){ $('micBtn').hidden=!mp.role; $('resetBtn').parentElement.classList.toggle('shift',!!mp.role); renderMic(); }
 function voiceConnect(){
   if(!mp.peer||!mp.me.id||mp.peer.destroyed) return;
@@ -1205,30 +1207,35 @@ function voiceConnect(){
 function voiceIncoming(call){ if(!mp.role) return; if(voice.calls[call.peer]){ try{ voice.calls[call.peer].close(); }catch(e){} } try{ call.answer(new MediaStream([currentTrack()]),CALL_OPTS); attachCall(call); }catch(e){} }
 function attachCall(call){
   voice.calls[call.peer]=call;
-  call.on('stream',st=>{ playRemote(call.peer,st); if(call.peerConnection) boostSender(call.peerConnection); });
+  call.on('stream',st=>{ playRemote(call.peer,st); const pc=call.peerConnection; if(pc){ boostSender(pc); pc.getReceivers().forEach(r=>{ try{ r.jitterBufferTarget=180; }catch(e){} try{ r.playoutDelayHint=0.18; }catch(e){} }); } });
   call.on('close',()=>voiceDrop(call.peer));
   call.on('error',()=>voiceDrop(call.peer));
 }
 function voiceDrop(id){
   const c=voice.calls[id]; delete voice.calls[id]; try{ c&&c.close(); }catch(e){}
   const a=voice.audios[id]; if(a){ a.srcObject=null; a.remove(); delete voice.audios[id]; }
-  if(voice.meters[id]){ clearInterval(voice.meters[id].timer); delete voice.meters[id]; }
+  if(voice.meters[id]){ clearInterval(voice.meters[id].timer); try{ voice.meters[id].nodes.forEach(n=>n.disconnect()); }catch(e){} delete voice.meters[id]; }
   delete voice.speaking[id];
 }
 function playRemote(id,st){
   let a=voice.audios[id];
+  // The element keeps the remote track flowing; actual playback goes through the EQ chain when Web Audio is available.
   if(!a){ a=document.createElement('audio'); a.autoplay=true; a.playsInline=true; a.style.display='none'; document.body.appendChild(a); voice.audios[id]=a; }
-  a.srcObject=st; a.play().catch(()=>{});
-  meter(id,st);
-}
-function meter(id,st){
-  if(voice.meters[id]){ clearInterval(voice.meters[id].timer); delete voice.meters[id]; }
+  a.srcObject=st; a.muted=false; a.play().catch(()=>{});
+  if(voice.meters[id]){ clearInterval(voice.meters[id].timer); try{ voice.meters[id].nodes.forEach(n=>n.disconnect()); }catch(e){} delete voice.meters[id]; }
   try{
-    const ctx=audioCtx(); const src=ctx.createMediaStreamSource(st); const an=ctx.createAnalyser(); an.fftSize=512; src.connect(an);
-    const buf=new Uint8Array(an.fftSize);
-    const timer=setInterval(()=>{ an.getByteTimeDomainData(buf); let sum=0; for(let i=0;i<buf.length;i++){ const v=(buf[i]-128)/128; sum+=v*v; } const rms=Math.sqrt(sum/buf.length); setSpeaking(id,rms>0.02); },120);
-    voice.meters[id]={timer,src,an};
-  }catch(e){}
+    const rx=buildRxChain(st); a.muted=true;   // EQ'd playback via Web Audio
+    startMeter(id,rx.analyser,rx.nodes);
+  }catch(e){ a.muted=false; }
+}
+function startMeter(id,an,nodes){
+  const buf=new Uint8Array(an.fftSize);
+  const timer=setInterval(()=>{ an.getByteTimeDomainData(buf); let sum=0; for(let i=0;i<buf.length;i++){ const v=(buf[i]-128)/128; sum+=v*v; } setSpeaking(id,Math.sqrt(sum/buf.length)>0.02); },120);
+  voice.meters[id]={timer,nodes};
+}
+function meter(id,st){   // local mic level only (not played back)
+  if(voice.meters[id]){ clearInterval(voice.meters[id].timer); try{ voice.meters[id].nodes.forEach(n=>n.disconnect()); }catch(e){} delete voice.meters[id]; }
+  try{ const ctx=audioCtx(); const src=ctx.createMediaStreamSource(st); const an=ctx.createAnalyser(); an.fftSize=512; src.connect(an); startMeter(id,an,[src,an]); }catch(e){}
 }
 function setSpeaking(id,on){
   if(!!voice.speaking[id]===on) return; voice.speaking[id]=on;
@@ -1239,15 +1246,14 @@ async function toggleMic(){
   if(voice.busy||!mp.role) return;
   if(!voice.on){
     voice.busy=true; renderMic();
-    try{ voice.micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1,sampleRate:48000}}); }
+    try{ voice.micStream=await navigator.mediaDevices.getUserMedia({audio:micConstraints()}); }
     catch(e){ voice.busy=false; renderMic(); toast(location.protocol==='https:'||location.hostname==='localhost'?'Microphone blocked. Allow the mic for this site and try again.':'Voice needs an https link (use the public link).'); return; }
-    voice.chain=buildMicChain(voice.micStream); voice.sendStream=voice.chain.stream;
-    voice.on=true; voice.busy=false; meter(mp.me.id,voice.sendStream);
+    try{ voice.micStream.getAudioTracks()[0].contentHint='music'; }catch(e){}   // ask the encoder for fidelity, not phone-call speech mode
+    voice.on=true; voice.busy=false; meter(mp.me.id,voice.micStream);
   } else {
     voice.on=false; setSpeaking(mp.me.id,false);
     if(voice.meters[mp.me.id]){ clearInterval(voice.meters[mp.me.id].timer); delete voice.meters[mp.me.id]; }
     if(voice.micStream){ voice.micStream.getTracks().forEach(t=>t.stop()); voice.micStream=null; }
-    if(voice.chain){ try{ voice.chain.nodes.forEach(n=>n.disconnect()); }catch(e){} voice.chain=null; voice.sendStream=null; }
   }
   swapTracks(); renderMic();
 }
@@ -1260,10 +1266,11 @@ function voiceStop(){
   for(const id of Object.keys(voice.calls)) voiceDrop(id);
   if(voice.meters[mp.me.id]){ clearInterval(voice.meters[mp.me.id].timer); delete voice.meters[mp.me.id]; }
   if(voice.micStream){ voice.micStream.getTracks().forEach(t=>t.stop()); voice.micStream=null; }
-  if(voice.chain){ try{ voice.chain.nodes.forEach(n=>n.disconnect()); }catch(e){} voice.chain=null; voice.sendStream=null; }
   voice.on=false; voice.speaking={}; $('micBtn').hidden=true; $('micBtn').classList.remove('live','talking');
 }
 $('micBtn').addEventListener('click',toggleMic);
+$('spkMode').checked=speakerMode;
+$('spkMode').addEventListener('change',async()=>{ speakerMode=$('spkMode').checked; try{ localStorage.setItem('pp_spk',speakerMode?'1':'0'); }catch(e){} if(voice.on){ await toggleMic(); await toggleMic(); } });
 setInterval(()=>{ if(mp.role) voiceConnect(); },8000);   // re-dial anyone whose audio call dropped
 document.addEventListener('keydown',e=>{ if(e.code==='KeyM'&&mp.role&&e.target.tagName!=='INPUT'){ e.preventDefault(); toggleMic(); } });
 
