@@ -967,7 +967,13 @@ async function loadIce(){
   })();
   return iceReady;
 }
-function peerOpts(){ return {debug:1,config:{iceServers:ICE_SERVERS,iceCandidatePoolSize:2}}; }
+/* Keep PeerJS's own defaults (Google STUN + the PeerJS project's TURN relays) and only ADD servers on top.
+   Overriding the list drops their relay, which is what most cross-network games actually use. */
+function peerOpts(){
+  const o={debug:1};
+  if(turnOk){ const def=(new Peer()).options.config.iceServers; o.config={iceServers:def.concat(ICE_SERVERS.slice(1))}; }
+  return o;
+}
 loadIce();
 const diag={log:[],cands:{},ice:'',state:'',t0:0};
 function dlog(m){ const t=((Date.now()-diag.t0)/1000).toFixed(1); diag.log.push(t+'s '+m); if(diag.log.length>60) diag.log.shift(); console.log('[pinpoint]',m); }
@@ -992,7 +998,7 @@ function connStatus(){
 function connFailed(why){
   const box=$('connBox'); box.hidden=false; box.className='conn fail';
   const types=Object.keys(diag.cands).join(', ')||'none';
-  const relayNote = turnOk ? '' : ' No relay server is configured, so networks that block direct connections cannot join yet.';
+  const relayNote = '';
   box.innerHTML=`<b>Couldn't connect to the host.</b> ${esc(why)}<br><span style="font-size:12px">Network paths found: ${esc(types)}. If this keeps happening, one of the two networks blocks direct connections (some mobile carriers, schools and offices do).${relayNote} Send the host the debug info.</span><div class="row"><button class="btn btn-primary" id="retryJoin">Try again</button><button class="btn btn-secondary" id="copyDebug">Copy debug info</button><button class="btn btn-secondary" id="backMenu">Back</button></div>`;
   $('retryJoin').onclick=()=>{ const c=mp.code; mpLeave(); mpJoin(c); };
   $('copyDebug').onclick=()=>copyText(['Pinpoint debug','code '+mp.code,'ua '+navigator.userAgent,'ice '+diag.ice+' / '+diag.state,'candidates '+JSON.stringify(diag.cands),...diag.log].join('\n'),$('copyDebug'),'Copy debug info');
