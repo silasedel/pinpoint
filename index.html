@@ -971,7 +971,7 @@ async function loadIce(){
    Overriding the list drops their relay, which is what most cross-network games actually use. */
 function peerOpts(){
   const o={debug:1};
-  if(turnOk){ const def=(new Peer()).options.config.iceServers; o.config={iceServers:def.concat(ICE_SERVERS.slice(1))}; }
+  if(turnOk){ const tmp=new Peer(); const def=tmp.options.config.iceServers; tmp.destroy(); o.config={iceServers:def.concat(ICE_SERVERS.slice(1))}; }
   return o;
 }
 loadIce();
