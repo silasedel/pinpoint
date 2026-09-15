@@ -970,12 +970,15 @@ function renderView(band,heading,meta,out){
 async function buildCopyImage(pano){
   const meta=await panoMeta(pano);
   const band=await loadBand(pano,4,meta);            // zoom 4: 2048 px per 90°, plenty for 1200-wide views
-  const c=document.createElement('canvas'); c.width=VIEW_W*2; c.height=VIEW_H*2; const ctx=c.getContext('2d');
+  const GAP=28;   // white gutter so the four views read as four separate photos
+  const c=document.createElement('canvas'); c.width=VIEW_W*2+GAP*3; c.height=VIEW_H*2+GAP*3; const ctx=c.getContext('2d');
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height);
   const views=[[0,'North'],[90,'East'],[180,'South'],[270,'West']];
   for(let i=0;i<4;i++){
-    const [hd,name]=views[i]; const x=(i%2)*VIEW_W, y=Math.floor(i/2)*VIEW_H;
+    const [hd,name]=views[i]; const x=GAP+(i%2)*(VIEW_W+GAP), y=GAP+Math.floor(i/2)*(VIEW_H+GAP);
     ctx.putImageData(renderView(band,hd,meta,c),x,y);
     await new Promise(r=>setTimeout(r,0));
+    ctx.strokeStyle='#d5dcd8'; ctx.lineWidth=2; ctx.strokeRect(x-1,y-1,VIEW_W+2,VIEW_H+2);
     ctx.font='600 16px Inter, sans-serif'; const t=name+' · '+hd+'°'; const tw=ctx.measureText(t).width+14;
     ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(x+8,y+8,tw,24); ctx.fillStyle='#fff'; ctx.fillText(t,x+15,y+25);
   }
@@ -990,7 +993,7 @@ async function copyImagery(){
   try{
     if(navigator.clipboard&&window.ClipboardItem){
       await navigator.clipboard.write([new ClipboardItem({'image/png':build})]);   // promise form keeps Safari's gesture check happy
-      const blob=await build; $('copyTxt').textContent='Copied!'; toast(`Copied a ${VIEW_W*2}×${VIEW_H*2} PNG (${(blob.size/1048576).toFixed(1)} MB). Paste it anywhere.`);
+      const blob=await build; $('copyTxt').textContent='Copied!'; toast(`Copied 4 views as one PNG (${(blob.size/1048576).toFixed(1)} MB). Paste it anywhere.`);
     } else throw new Error('no clipboard');
   }catch(e){
     try{ const blob=await build; showImageModal(URL.createObjectURL(blob)); }catch(e2){ toast('Could not build the image: '+e2.message); }
