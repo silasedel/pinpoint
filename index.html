@@ -133,6 +133,18 @@
 
   .ctl{position:absolute;left:16px;bottom:16px;z-index:6;display:flex;gap:8px}
   .ctl.shift{left:150px}
+  .ctl .icon-btn.wide{width:auto;padding:0 14px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .ctl .icon-btn.wide svg{width:16px;height:16px}
+  .ctl .icon-btn.busy{opacity:.6;cursor:wait}
+  .copymenu{position:absolute;left:16px;bottom:70px;z-index:9;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;min-width:250px}
+  .copymenu.shift{left:150px}
+  .copymenu button{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:8px;background:none;font-size:13px;font-weight:600}
+  .copymenu button:hover{background:var(--green-soft);color:var(--green-dark)}
+  .copymenu button small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+  .copymenu .hd{padding:6px 12px 4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  #imgModal{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px}
+  #imgModal .box{background:#fff;border-radius:12px;padding:14px;max-width:min(96vw,1000px);max-height:94vh;overflow:auto;text-align:center}
+  #imgModal img{max-width:100%;height:auto;display:block;margin:0 auto 10px}
   .icon-btn{width:44px;height:44px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-size:18px;box-shadow:var(--shadow)}
   .icon-btn:hover{background:#f6f8f7}
 
@@ -425,6 +437,15 @@
 
   <div class="ctl">
     <button class="icon-btn" id="resetBtn" title="Return to start">↺</button>
+    <button class="icon-btn wide" id="copyBtn" title="Copy this location's imagery as a PNG, for pasting into an AI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="copyTxt">Copy for AI</span></button>
+  </div>
+  <div class="copymenu" id="copyMenu" hidden>
+    <div class="hd">Copy as PNG to clipboard</div>
+    <button data-mode="all">All-in-one<small>360° strip + north / east / south / west views (2048×2560)</small></button>
+    <button data-mode="pano">360° panorama only<small>Full equirectangular image (4096×2048)</small></button>
+    <button data-mode="grid">4 views only<small>2×2 grid, 90° each (2048×1536)</small></button>
+    <div class="hd">Single view</div>
+    <button data-mode="0">North</button><button data-mode="90">East</button><button data-mode="180">South</button><button data-mode="270">West</button>
   </div>
 
   <div class="mappanel" id="mappanel">
@@ -897,6 +918,62 @@ $('saveBtn').addEventListener('click',()=>{
 });
 $('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('saveBtn').click(); } });
 
+/* ---------- Copy imagery for AI (Street View tiles → canvas → PNG on the clipboard) ---------- */
+const SV_TILE=(pano,z,x,y)=>`https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid=${encodeURIComponent(pano)}&x=${x}&y=${y}&zoom=${z}&nbt=1&fover=2`;
+const SV_VIEW=(pano,yaw)=>`https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=${encodeURIComponent(pano)}&cb_client=maps_sv.tactile&w=1024&h=768&yaw=${yaw}&pitch=0&thumbfov=90`;
+async function fetchBitmap(url){ const r=await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return createImageBitmap(await r.blob()); }
+async function panoSize(pano){
+  try{ await gmapsReady; const {data}=await (svService||(svService=new google.maps.StreetViewService())).getPanorama({pano}); const ws=data.tiles&&data.tiles.worldSize; if(ws&&ws.width) return {w:ws.width,h:ws.height}; }catch(e){}
+  return {w:13312,h:6656};
+}
+async function buildEquirect(pano,zoom){
+  const full=await panoSize(pano); const maxZoom=Math.ceil(Math.log2(full.w/512)); const f=Math.pow(2,maxZoom-zoom);
+  const w=Math.round(full.w/f), h=Math.round(full.h/f); const cols=Math.ceil(w/512), rows=Math.ceil(h/512);
+  const c=document.createElement('canvas'); c.width=w; c.height=h; const ctx=c.getContext('2d');
+  const jobs=[]; for(let y=0;y<rows;y++) for(let x=0;x<cols;x++) jobs.push(fetchBitmap(SV_TILE(pano,zoom,x,y)).then(b=>ctx.drawImage(b,x*512,y*512)).catch(()=>{}));
+  await Promise.all(jobs); return c;
+}
+function label(ctx,text,x,y){ ctx.font='bold 34px Inter, sans-serif'; const w=ctx.measureText(text).width+28; ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(x,y,w,50); ctx.fillStyle='#fff'; ctx.fillText(text,x+14,y+36); }
+async function buildGrid(pano,ctx,ox,oy){
+  const views=[[0,'North'],[90,'East'],[180,'South'],[270,'West']];
+  await Promise.all(views.map(async([yaw,name],i)=>{ const b=await fetchBitmap(SV_VIEW(pano,yaw)); const x=ox+(i%2)*1024, y=oy+Math.floor(i/2)*768; ctx.drawImage(b,x,y,1024,768); label(ctx,name+' · '+yaw+'°',x+12,y+12); }));
+}
+async function buildCopyImage(pano,mode){
+  if(mode==='pano'){ return buildEquirect(pano,3); }
+  if(mode==='grid'){ const c=document.createElement('canvas'); c.width=2048; c.height=1536; await buildGrid(pano,c.getContext('2d'),0,0); return c; }
+  if(mode==='all'){
+    const c=document.createElement('canvas'); c.width=2048; c.height=2560; const ctx=c.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,c.width,c.height);
+    const [eq]=await Promise.all([buildEquirect(pano,3), buildGrid(pano,ctx,0,1024)]);
+    ctx.drawImage(eq,0,0,2048,1024); label(ctx,'360° panorama · left edge = north',12,12);
+    return c;
+  }
+  const yaw=+mode; const c=document.createElement('canvas'); c.width=1024; c.height=768; const b=await fetchBitmap(SV_VIEW(pano,yaw)); c.getContext('2d').drawImage(b,0,0); return c;
+}
+function canvasBlob(c){ return new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('toBlob failed')),'image/png')); }
+let copyBusy=false;
+async function copyImagery(mode){
+  if(copyBusy) return; const pano=state.current&&state.current.pano; if(!pano){ toast('No location loaded yet'); return; }
+  copyBusy=true; const btn=$('copyBtn'); btn.classList.add('busy'); $('copyTxt').textContent='Building…'; $('copyMenu').hidden=true;
+  const build=buildCopyImage(pano,mode).then(canvasBlob);
+  try{
+    if(navigator.clipboard&&window.ClipboardItem){
+      // Pass the promise itself so Safari accepts the write as part of the click gesture.
+      await navigator.clipboard.write([new ClipboardItem({'image/png':build})]);
+      const blob=await build; $('copyTxt').textContent='Copied!'; toast(`Copied PNG (${(blob.size/1048576).toFixed(1)} MB). Paste it into your AI.`);
+    } else throw new Error('no clipboard');
+  }catch(e){
+    try{ const blob=await build; showImageModal(URL.createObjectURL(blob)); }catch(e2){ toast('Could not build the image: '+e2.message); }
+  }
+  setTimeout(()=>{ $('copyTxt').textContent='Copy for AI'; },2000); btn.classList.remove('busy'); copyBusy=false;
+}
+function showImageModal(url){
+  const m=document.createElement('div'); m.id='imgModal'; m.innerHTML=`<div class="box"><img src="${url}"><div style="font-size:13px;color:var(--muted)">Your browser wouldn't copy automatically. Right-click the image and choose <b>Copy image</b>.</div><button class="btn btn-secondary" style="margin-top:10px">Close</button></div>`;
+  m.querySelector('button').onclick=()=>m.remove(); m.addEventListener('click',e=>{ if(e.target===m) m.remove(); }); document.body.appendChild(m);
+}
+$('copyBtn').addEventListener('click',e=>{ e.stopPropagation(); const m=$('copyMenu'); m.hidden=!m.hidden; m.classList.toggle('shift',$('resetBtn').parentElement.classList.contains('shift')); });
+$('copyMenu').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) copyImagery(b.dataset.mode); });
+document.addEventListener('click',e=>{ if(!e.target.closest('#copyMenu')) $('copyMenu').hidden=true; });
+
 /* ---------- Coordinate paste box ---------- */
 function parseCoords(text){
   let t=String(text||'').trim(); if(!t) return null;
@@ -1308,7 +1385,7 @@ function silentTrack(){
   voice.silent=dst.stream.getAudioTracks()[0]; return voice.silent;
 }
 function currentTrack(){ return voice.on&&voice.micStream ? voice.micStream.getAudioTracks()[0] : silentTrack(); }
-function voiceShow(){ $('micBtn').hidden=!mp.role; $('resetBtn').parentElement.classList.toggle('shift',!!mp.role); renderMic(); }
+function voiceShow(){ $('micBtn').hidden=!mp.role; $('resetBtn').parentElement.classList.toggle('shift',!!mp.role); $('copyMenu').classList.toggle('shift',!!mp.role); renderMic(); }
 function voiceConnect(){
   if(!mp.peer||!mp.me.id||mp.peer.destroyed) return;
   for(const p of playerList()){
