@@ -943,11 +943,32 @@ window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resu
 const COLORS=[['#e63946','Red'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#2bb673','Green'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#8e44ad','Purple'],['#e84393','Pink'],['#8d6e63','Brown'],['#111827','Black']];
 const mp={ role:null, peer:null, conns:{}, players:{}, me:{id:null,name:'',color:null}, code:'', host:null, settings:{time:60,rounds:5}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby' };
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ';
-/* ICE servers. STUN finds a direct path for most networks; a TURN relay (if configured) covers the rest. */
-const ICE_SERVERS=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302']}];
-const TURN=null;   // e.g. {urls:['turn:host:3478','turns:host:5349'],username:'…',credential:'…'}
-if(TURN) ICE_SERVERS.push(TURN);
-const PEER_OPTS={debug:1,config:{iceServers:ICE_SERVERS,iceCandidatePoolSize:2}};
+/* ICE servers. STUN finds a direct path for most networks; a TURN relay covers the ones that block it
+   (mobile carriers, some ISPs, schools, offices). TURN credentials come from a provider at load time. */
+const STUN=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun.cloudflare.com:3478']}];
+const TURN_CF={keyId:'',token:''};                 // Cloudflare Calls TURN key (rtc.live.cloudflare.com)
+const TURN_METERED={app:'',apiKey:''};            // or a metered.ca app
+const TURN_STATIC=null;                           // or {urls:[...],username:'',credential:''}
+let ICE_SERVERS=STUN.slice(), iceReady=null, turnOk=false;
+async function loadIce(){
+  if(iceReady) return iceReady;
+  iceReady=(async()=>{
+    try{
+      let extra=null;
+      if(TURN_CF.keyId){
+        const r=await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${TURN_CF.keyId}/credentials/generate-ice-servers`,{method:'POST',headers:{Authorization:'Bearer '+TURN_CF.token,'Content-Type':'application/json'},body:JSON.stringify({ttl:86400})});
+        const j=await r.json(); extra=j.iceServers?(Array.isArray(j.iceServers)?j.iceServers:[j.iceServers]):null;
+      } else if(TURN_METERED.app){
+        const r=await fetch(`https://${TURN_METERED.app}.metered.live/api/v1/turn/credentials?apiKey=${TURN_METERED.apiKey}`); const j=await r.json(); extra=Array.isArray(j)?j:null;
+      } else if(TURN_STATIC){ extra=[TURN_STATIC]; }
+      if(extra&&extra.length){ ICE_SERVERS=STUN.concat(extra); turnOk=true; }
+    }catch(e){ console.warn('TURN credentials unavailable',e); }
+    return ICE_SERVERS;
+  })();
+  return iceReady;
+}
+function peerOpts(){ return {debug:1,config:{iceServers:ICE_SERVERS,iceCandidatePoolSize:2}}; }
+loadIce();
 const diag={log:[],cands:{},ice:'',state:'',t0:0};
 function dlog(m){ const t=((Date.now()-diag.t0)/1000).toFixed(1); diag.log.push(t+'s '+m); if(diag.log.length>60) diag.log.shift(); console.log('[pinpoint]',m); }
 function watchPc(conn,label){
@@ -971,7 +992,8 @@ function connStatus(){
 function connFailed(why){
   const box=$('connBox'); box.hidden=false; box.className='conn fail';
   const types=Object.keys(diag.cands).join(', ')||'none';
-  box.innerHTML=`<b>Couldn't connect to the host.</b> ${esc(why)}<br><span style="font-size:12px">Network paths found: ${esc(types)}. If this keeps happening, one of the two networks blocks direct connections (some mobile carriers, schools and offices do). Send the host the debug info.</span><div class="row"><button class="btn btn-primary" id="retryJoin">Try again</button><button class="btn btn-secondary" id="copyDebug">Copy debug info</button><button class="btn btn-secondary" id="backMenu">Back</button></div>`;
+  const relayNote = turnOk ? '' : ' No relay server is configured, so networks that block direct connections cannot join yet.';
+  box.innerHTML=`<b>Couldn't connect to the host.</b> ${esc(why)}<br><span style="font-size:12px">Network paths found: ${esc(types)}. If this keeps happening, one of the two networks blocks direct connections (some mobile carriers, schools and offices do).${relayNote} Send the host the debug info.</span><div class="row"><button class="btn btn-primary" id="retryJoin">Try again</button><button class="btn btn-secondary" id="copyDebug">Copy debug info</button><button class="btn btn-secondary" id="backMenu">Back</button></div>`;
   $('retryJoin').onclick=()=>{ const c=mp.code; mpLeave(); mpJoin(c); };
   $('copyDebug').onclick=()=>copyText(['Pinpoint debug','code '+mp.code,'ua '+navigator.userAgent,'ice '+diag.ice+' / '+diag.state,'candidates '+JSON.stringify(diag.cands),...diag.log].join('\n'),$('copyDebug'),'Copy debug info');
   $('backMenu').onclick=()=>{ mpLeave(); show('menu'); };
@@ -980,11 +1002,12 @@ function mkCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.random()*CO
 function myName(){ try{ return localStorage.getItem('pp_name')||''; }catch(e){ return ''; } }
 function playerList(){ return Object.values(mp.players); }
 
-function mpHost(){
+async function mpHost(){
+  await loadIce();
   const code=mkCode();
   mpSetup('host',code);
   diag.t0=Date.now(); diag.log=[]; diag.cands={}; diag.ice=''; diag.state='';
-  mp.peer=new Peer('pinpoint-'+code,PEER_OPTS);
+  mp.peer=new Peer('pinpoint-'+code,peerOpts());
   mp.peer.on('open',id=>{ mp.me.id=id; mp.players[id]={id,name:mp.me.name,color:null,score:0,host:true}; renderLobby(); voiceShow(); });
   mp.peer.on('call',voiceIncoming);
   mp.peer.on('connection',conn=>{
@@ -1006,13 +1029,14 @@ function mpHost(){
   mp.peer.on('error',e=>{ dlog('peer error '+e.type); if(e.type==='unavailable-id'){ mpLeave(); mpHost(); } else { toast('Connection error: '+e.type); } });
   mp.peer.on('disconnected',()=>{ try{ mp.peer.reconnect(); }catch(e){} });
 }
-function mpJoin(code){
+async function mpJoin(code){
   code=code.toUpperCase().replace(/[^A-Z]/g,'');
   if(code.length!==4){ toast('Enter the 4-letter room code'); return; }
+  await loadIce();
   mpSetup('guest',code);
   diag.t0=Date.now(); diag.log=[]; diag.cands={}; diag.ice=''; diag.state='';
   $('roomUrl').textContent='Connecting…'; connStatus();
-  mp.peer=new Peer(PEER_OPTS);
+  mp.peer=new Peer(peerOpts());
   mp.peer.on('call',voiceIncoming);
   mp.peer.on('open',id=>{
     mp.me.id=id; voiceShow(); dlog('peer open '+id.slice(0,8));
