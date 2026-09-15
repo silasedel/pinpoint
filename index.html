@@ -441,8 +441,8 @@
   </div>
   <div class="copymenu" id="copyMenu" hidden>
     <div class="hd">Copy as PNG to clipboard</div>
-    <button data-mode="all">All-in-one<small>360° strip + north / east / south / west views (2048×2560)</small></button>
-    <button data-mode="pano">360° panorama only<small>Full equirectangular image (4096×2048)</small></button>
+    <button data-mode="all">All-in-one<small>360° strip + north / east / south / west views (1600×2000, ~6 MB)</small></button>
+    <button data-mode="pano">360° panorama only<small>Full equirectangular image (2560×1280)</small></button>
     <button data-mode="grid">4 views only<small>2×2 grid, 90° each (2048×1536)</small></button>
     <div class="hd">Single view</div>
     <button data-mode="0">North</button><button data-mode="90">East</button><button data-mode="180">South</button><button data-mode="270">West</button>
@@ -934,17 +934,17 @@ async function buildEquirect(pano,zoom){
   await Promise.all(jobs); return c;
 }
 function label(ctx,text,x,y){ ctx.font='bold 34px Inter, sans-serif'; const w=ctx.measureText(text).width+28; ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(x,y,w,50); ctx.fillStyle='#fff'; ctx.fillText(text,x+14,y+36); }
-async function buildGrid(pano,ctx,ox,oy){
+async function buildGrid(pano,ctx,ox,oy,vw=1024,vh=768){
   const views=[[0,'North'],[90,'East'],[180,'South'],[270,'West']];
-  await Promise.all(views.map(async([yaw,name],i)=>{ const b=await fetchBitmap(SV_VIEW(pano,yaw)); const x=ox+(i%2)*1024, y=oy+Math.floor(i/2)*768; ctx.drawImage(b,x,y,1024,768); label(ctx,name+' · '+yaw+'°',x+12,y+12); }));
+  await Promise.all(views.map(async([yaw,name],i)=>{ const b=await fetchBitmap(SV_VIEW(pano,yaw)); const x=ox+(i%2)*vw, y=oy+Math.floor(i/2)*vh; ctx.drawImage(b,x,y,vw,vh); label(ctx,name+' · '+yaw+'°',x+12,y+12); }));
 }
 async function buildCopyImage(pano,mode){
-  if(mode==='pano'){ return buildEquirect(pano,3); }
+  if(mode==='pano'){ const eq=await buildEquirect(pano,3); const c=document.createElement('canvas'); c.width=2560; c.height=1280; c.getContext('2d').drawImage(eq,0,0,2560,1280); return c; }
   if(mode==='grid'){ const c=document.createElement('canvas'); c.width=2048; c.height=1536; await buildGrid(pano,c.getContext('2d'),0,0); return c; }
   if(mode==='all'){
-    const c=document.createElement('canvas'); c.width=2048; c.height=2560; const ctx=c.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,c.width,c.height);
-    const [eq]=await Promise.all([buildEquirect(pano,3), buildGrid(pano,ctx,0,1024)]);
-    ctx.drawImage(eq,0,0,2048,1024); label(ctx,'360° panorama · left edge = north',12,12);
+    const c=document.createElement('canvas'); c.width=1600; c.height=2000; const ctx=c.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,c.width,c.height);
+    const [eq]=await Promise.all([buildEquirect(pano,3), buildGrid(pano,ctx,0,800,800,600)]);
+    ctx.drawImage(eq,0,0,1600,800); label(ctx,'360° panorama · left edge = north',12,12);
     return c;
   }
   const yaw=+mode; const c=document.createElement('canvas'); c.width=1024; c.height=768; const b=await fetchBitmap(SV_VIEW(pano,yaw)); c.getContext('2d').drawImage(b,0,0); return c;
