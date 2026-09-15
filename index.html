@@ -923,7 +923,7 @@ $('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDef
 
 /* ---------- Copy image: four 90° views (N/E/S/W) rendered from the high-zoom panorama tiles ---------- */
 const SV_TILE=(pano,z,x,y)=>`https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid=${encodeURIComponent(pano)}&x=${x}&y=${y}&zoom=${z}&nbt=1&fover=2`;
-const VIEW_W=1024, VIEW_H=768, VIEW_FOV=90;
+const VIEW_W=1200, VIEW_H=675, VIEW_FOV=90;   // 16:9, exactly 90° across so the four views tile into 360°
 async function fetchBitmap(url){ const r=await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return createImageBitmap(await r.blob()); }
 async function panoMeta(pano){
   let w=13312,h=6656,center=0;
@@ -979,8 +979,8 @@ async function buildCopyImage(pano){
     ctx.putImageData(renderView(band,hd,meta,c),x,y);
     await new Promise(r=>setTimeout(r,0));
     ctx.strokeStyle='#d5dcd8'; ctx.lineWidth=2; ctx.strokeRect(x-1,y-1,VIEW_W+2,VIEW_H+2);
-    ctx.font='600 16px Inter, sans-serif'; const t=name+' · '+hd+'°'; const tw=ctx.measureText(t).width+14;
-    ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(x+8,y+8,tw,24); ctx.fillStyle='#fff'; ctx.fillText(t,x+15,y+25);
+    ctx.font='600 18px Inter, sans-serif'; const t=name+' · '+hd+'°'; const tw=Math.round(ctx.measureText(t).width)+22; const lx=x+Math.round(VIEW_W/2-tw/2);
+    ctx.fillStyle='rgba(0,0,0,.6)'; ctx.beginPath(); ctx.roundRect(lx,y+10,tw,28,14); ctx.fill(); ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.fillText(t,x+VIEW_W/2,y+30); ctx.textAlign='left';
   }
   return c;
 }
