@@ -140,7 +140,14 @@
     background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column}
   .mappanel.open{width:min(720px,100vw);height:min(540px,calc(100vh - 90px))}
   #guessmap{flex:1;background:#bfd9e8}
-  .mapbar{display:flex;gap:8px;padding:8px;border-top:1px solid var(--line)}
+  .coordbar{display:flex;gap:6px;padding:8px 8px 0;border-top:1px solid var(--line)}
+  .coordbar input{flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:13px;outline:none;font-variant-numeric:tabular-nums}
+  .coordbar input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  .coordbar input.bad{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft);animation:shake .3s}
+  @keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+  .coordbar button{padding:0 14px;border-radius:8px;background:#eef2ef;font-weight:700;font-size:13px}
+  .coordbar button:hover{background:var(--green-soft);color:var(--green-dark)}
+  .mapbar{display:flex;gap:8px;padding:8px}
   .guess{flex:1;padding:12px;border-radius:8px;font-weight:800;letter-spacing:.03em;font-size:14px;color:#fff;background:var(--green)}
   .guess:hover{background:var(--green-dark)}
   .guess:disabled{background:#eef2ef;color:var(--muted);cursor:not-allowed}
@@ -416,6 +423,7 @@
 
   <div class="mappanel" id="mappanel">
     <div id="guessmap"></div>
+    <div class="coordbar"><input id="coordIn" placeholder="Paste coordinates: 48.8584, 2.2945 (or a Google Maps link)" autocomplete="off" spellcheck="false"><button id="coordGo" title="Drop the pin at these coordinates">Go</button></div>
     <div class="mapbar">
       <button class="guess" id="guessBtn" disabled>Place your pin</button>
       <button class="pin" id="pinBtn" title="Keep map open">📌</button>
@@ -685,7 +693,7 @@ function ensureGuessMap(){
     const panel=$('mappanel');
     const openMap=()=>{ if(panel.classList.contains('open')) return; panel.classList.add('open'); guessMap.invalidateSize();
       if(!state.fitDone){ state.fitDone=true; guessMap.fitBounds([[-55,-170],[72,180]],{animate:false}); } };
-    const closeMap=()=>{ if(panel.classList.contains('pinned')) return; panel.classList.remove('open'); guessMap.invalidateSize(); };
+    const closeMap=()=>{ if(panel.classList.contains('pinned')||document.activeElement===$('coordIn')) return; panel.classList.remove('open'); guessMap.invalidateSize(); };
     panel.addEventListener('mouseenter',openMap);
     panel.addEventListener('mouseleave',closeMap);
     panel.addEventListener('touchstart',openMap,{passive:true});
@@ -724,6 +732,7 @@ async function nextRound(){
   $('guessBtn').disabled=true; $('guessBtn').textContent='Place your pin';
   $('loading').classList.remove('fade'); $('loadingText').textContent='Finding a location…';
   if(guessMarker){ guessMarker.remove(); guessMarker=null; }
+  $('coordIn').value='';
   $('mappanel').classList.remove('open'); guessMap.invalidateSize();
   guessMap.setView([25,10],1,{animate:false});
   stopTimer(); $('timerPill').classList.remove('low');
@@ -881,6 +890,32 @@ $('saveBtn').addEventListener('click',()=>{
   renderBoard(entry.id);
 });
 $('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('saveBtn').click(); } });
+
+/* ---------- Coordinate paste box ---------- */
+function parseCoords(text){
+  let t=String(text||'').trim(); if(!t) return null;
+  const m=/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/.exec(t); if(m) return {lat:+m[1],lng:+m[2]};            // Google Maps URL  .../@48.85,2.29,15z
+  const q=/[?&](?:q|query|ll|center)=(-?\d+(?:\.\d+)?)(?:,|%2C)(-?\d+(?:\.\d+)?)/i.exec(t); if(q) return {lat:+q[1],lng:+q[2]};
+  const dms=/(\d+(?:\.\d+)?)[°\s]+(?:(\d+(?:\.\d+)?)['′\s]+)?(?:(\d+(?:\.\d+)?)["″\s]*)?\s*([NSEW])/gi;
+  const parts=[]; let d; while((d=dms.exec(t))){ let v=+d[1]+(+d[2]||0)/60+(+d[3]||0)/3600; if(/[SW]/i.test(d[4])) v=-v; parts.push({v,h:d[4].toUpperCase()}); }
+  if(parts.length===2){ const lat=parts.find(p=>'NS'.includes(p.h)), lng=parts.find(p=>'EW'.includes(p.h)); if(lat&&lng) return {lat:lat.v,lng:lng.v}; }
+  const nums=t.replace(/[°NSEW]/gi,' ').match(/-?\d+(?:\.\d+)?/g);
+  if(nums&&nums.length>=2){ let lat=+nums[0], lng=+nums[1]; if(/\d\s*S/i.test(t)) lat=-Math.abs(lat); if(/\d\s*W/i.test(t)) lng=-Math.abs(lng); return {lat,lng}; }
+  return null;
+}
+function applyCoords(){
+  const inp=$('coordIn'); const c=parseCoords(inp.value);
+  if(!c||!isFinite(c.lat)||!isFinite(c.lng)||Math.abs(c.lat)>90||Math.abs(c.lng)>180){ inp.classList.remove('bad'); void inp.offsetWidth; inp.classList.add('bad'); toast('Couldn\'t read those coordinates. Try "lat, lng" like 48.8584, 2.2945'); return; }
+  if(state.locked) return;
+  setGuess(c);
+  $('mappanel').classList.add('open'); guessMap.invalidateSize(); state.fitDone=true;
+  guessMap.flyTo([c.lat,c.lng],Math.max(guessMap.getZoom(),6),{duration:.8});
+  inp.value=`${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`; inp.blur();
+}
+$('coordGo').addEventListener('click',applyCoords);
+$('coordIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); applyCoords(); } if(e.key==='Escape') e.target.blur(); });
+$('coordIn').addEventListener('paste',()=>setTimeout(applyCoords,0));
+$('coordIn').addEventListener('input',()=>$('coordIn').classList.remove('bad'));
 
 /* ---------- Controls ---------- */
 $('guessBtn').addEventListener('click',()=>submitGuess(false));
