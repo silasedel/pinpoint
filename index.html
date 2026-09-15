@@ -233,6 +233,11 @@
   .countdown b{font-size:28px;display:block;color:#a06d00}
   .lobby-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
   .waiting{color:var(--muted);font-size:14px;font-weight:600;padding:12px 0}
+  .conn{margin-top:10px;padding:10px 12px;border-radius:10px;background:#f6f8f7;border:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.5}
+  .conn.ok{background:var(--green-soft);color:var(--green-dark);border-color:#bfe3cd}
+  .conn.fail{background:var(--red-soft);color:#8a2b2b;border-color:#f0c4c4}
+  .conn .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .conn .btn{padding:8px 12px;font-size:12px}
   .strip{display:flex;gap:6px;align-items:center}
   .strip .dotp{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800;opacity:.45;transition:opacity .2s,transform .2s}
   .strip .dotp.done{opacity:1;transform:scale(1.1)}
@@ -381,6 +386,7 @@
             <button class="btn btn-secondary" id="mpCancel" hidden>Cancel</button>
           </div>
         </div>
+        <div class="conn" id="connBox" hidden></div>
         <div id="guestPanel" class="waiting" hidden>Waiting for the host to start…</div>
         <div class="countdown" id="countdown" hidden></div>
       </div>
@@ -937,6 +943,39 @@ window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resu
 const COLORS=[['#e63946','Red'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#2bb673','Green'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#8e44ad','Purple'],['#e84393','Pink'],['#8d6e63','Brown'],['#111827','Black']];
 const mp={ role:null, peer:null, conns:{}, players:{}, me:{id:null,name:'',color:null}, code:'', host:null, settings:{time:60,rounds:5}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby' };
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ';
+/* ICE servers. STUN finds a direct path for most networks; a TURN relay (if configured) covers the rest. */
+const ICE_SERVERS=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302']}];
+const TURN=null;   // e.g. {urls:['turn:host:3478','turns:host:5349'],username:'…',credential:'…'}
+if(TURN) ICE_SERVERS.push(TURN);
+const PEER_OPTS={debug:1,config:{iceServers:ICE_SERVERS,iceCandidatePoolSize:2}};
+const diag={log:[],cands:{},ice:'',state:'',t0:0};
+function dlog(m){ const t=((Date.now()-diag.t0)/1000).toFixed(1); diag.log.push(t+'s '+m); if(diag.log.length>60) diag.log.shift(); console.log('[pinpoint]',m); }
+function watchPc(conn,label){
+  let tries=0; const iv=setInterval(()=>{
+    const pc=conn.peerConnection; if(!pc){ if(++tries>200) clearInterval(iv); return; }
+    clearInterval(iv);
+    dlog(label+': negotiating');
+    pc.addEventListener('icecandidate',e=>{ if(e.candidate){ const m=/ typ (\w+)/.exec(e.candidate.candidate); if(m) diag.cands[m[1]]=(diag.cands[m[1]]||0)+1; } });
+    pc.addEventListener('iceconnectionstatechange',()=>{ diag.ice=pc.iceConnectionState; dlog(label+': ice '+diag.ice); connStatus(); });
+    pc.addEventListener('connectionstatechange',()=>{ diag.state=pc.connectionState; dlog(label+': conn '+diag.state); connStatus(); });
+  },50);
+}
+function connStatus(){
+  if(mp.role!=='guest') return;
+  const box=$('connBox'); if(!mp.host){ box.hidden=true; return; }
+  if(mp.host.open){ box.className='conn ok'; box.innerHTML='Connected to the host ✓'+(diag.cands.relay?' (via relay)':''); box.hidden=false; setTimeout(()=>{ if(mp.host&&mp.host.open) box.hidden=true; },4000); return; }
+  box.hidden=false; box.className='conn';
+  const step = !mp.me.id ? 'Contacting the lobby service…' : !diag.ice ? 'Found the room, waiting for the host to answer…' : diag.ice==='checking' ? 'Host answered, opening a direct connection… (this can take up to 20 seconds)' : 'Connection state: '+diag.ice;
+  box.textContent=step;
+}
+function connFailed(why){
+  const box=$('connBox'); box.hidden=false; box.className='conn fail';
+  const types=Object.keys(diag.cands).join(', ')||'none';
+  box.innerHTML=`<b>Couldn't connect to the host.</b> ${esc(why)}<br><span style="font-size:12px">Network paths found: ${esc(types)}. If this keeps happening, one of the two networks blocks direct connections (some mobile carriers, schools and offices do). Send the host the debug info.</span><div class="row"><button class="btn btn-primary" id="retryJoin">Try again</button><button class="btn btn-secondary" id="copyDebug">Copy debug info</button><button class="btn btn-secondary" id="backMenu">Back</button></div>`;
+  $('retryJoin').onclick=()=>{ const c=mp.code; mpLeave(); mpJoin(c); };
+  $('copyDebug').onclick=()=>copyText(['Pinpoint debug','code '+mp.code,'ua '+navigator.userAgent,'ice '+diag.ice+' / '+diag.state,'candidates '+JSON.stringify(diag.cands),...diag.log].join('\n'),$('copyDebug'),'Copy debug info');
+  $('backMenu').onclick=()=>{ mpLeave(); show('menu'); };
+}
 function mkCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.random()*CODE_CHARS.length|0]; return c; }
 function myName(){ try{ return localStorage.getItem('pp_name')||''; }catch(e){ return ''; } }
 function playerList(){ return Object.values(mp.players); }
@@ -944,11 +983,16 @@ function playerList(){ return Object.values(mp.players); }
 function mpHost(){
   const code=mkCode();
   mpSetup('host',code);
-  mp.peer=new Peer('pinpoint-'+code,{debug:0});
+  diag.t0=Date.now(); diag.log=[]; diag.cands={}; diag.ice=''; diag.state='';
+  mp.peer=new Peer('pinpoint-'+code,PEER_OPTS);
   mp.peer.on('open',id=>{ mp.me.id=id; mp.players[id]={id,name:mp.me.name,color:null,score:0,host:true}; renderLobby(); voiceShow(); });
   mp.peer.on('call',voiceIncoming);
   mp.peer.on('connection',conn=>{
+    dlog('incoming connection from '+conn.peer.slice(0,8)); watchPc(conn,'in');
+    mp.pending=mp.pending||{}; mp.pending[conn.peer]=Date.now(); renderLobby();
+    const pendTimer=setTimeout(()=>{ if(mp.pending&&mp.pending[conn.peer]){ delete mp.pending[conn.peer]; renderLobby(); dlog('incoming '+conn.peer.slice(0,8)+' never opened'); } },30000);
     conn.on('open',()=>{
+      clearTimeout(pendTimer); if(mp.pending) delete mp.pending[conn.peer]; dlog('incoming '+conn.peer.slice(0,8)+' open');
       if(mp.phase!=='lobby'){ conn.send({t:'reject',why:'Game already in progress'}); setTimeout(()=>conn.close(),500); return; }
       if(playerList().length>=10){ conn.send({t:'reject',why:'Lobby is full'}); setTimeout(()=>conn.close(),500); return; }
       mp.conns[conn.peer]=conn;
@@ -959,27 +1003,29 @@ function mpHost(){
       hostSync();
     });
   });
-  mp.peer.on('error',e=>{ if(e.type==='unavailable-id'){ mpLeave(); mpHost(); } else { toast('Connection error: '+e.type); } });
+  mp.peer.on('error',e=>{ dlog('peer error '+e.type); if(e.type==='unavailable-id'){ mpLeave(); mpHost(); } else { toast('Connection error: '+e.type); } });
   mp.peer.on('disconnected',()=>{ try{ mp.peer.reconnect(); }catch(e){} });
 }
 function mpJoin(code){
   code=code.toUpperCase().replace(/[^A-Z]/g,'');
   if(code.length!==4){ toast('Enter the 4-letter room code'); return; }
   mpSetup('guest',code);
-  $('roomUrl').textContent='Connecting…';
-  mp.peer=new Peer({debug:0});
+  diag.t0=Date.now(); diag.log=[]; diag.cands={}; diag.ice=''; diag.state='';
+  $('roomUrl').textContent='Connecting…'; connStatus();
+  mp.peer=new Peer(PEER_OPTS);
   mp.peer.on('call',voiceIncoming);
   mp.peer.on('open',id=>{
-    mp.me.id=id; voiceShow();
+    mp.me.id=id; voiceShow(); dlog('peer open '+id.slice(0,8));
     const conn=mp.peer.connect('pinpoint-'+code,{reliable:true});
-    mp.host=conn;
+    mp.host=conn; watchPc(conn,'out'); connStatus();
     let opened=false;
-    conn.on('open',()=>{ opened=true; conn.send({t:'hello',name:mp.me.name}); });
+    conn.on('open',()=>{ opened=true; dlog('data channel open'); conn.send({t:'hello',name:mp.me.name}); connStatus(); });
     conn.on('data',guestOnMessage);
-    conn.on('close',()=>{ if(mp.role==='guest'){ toast('The host left the game'); mpLeave(); show('menu'); } });
-    setTimeout(()=>{ if(!opened && mp.role==='guest'){ toast('Could not find that lobby'); mpLeave(); show('menu'); } },8000);
+    conn.on('close',()=>{ if(mp.role==='guest'&&opened){ toast('The host left the game'); mpLeave(); show('menu'); } });
+    conn.on('error',e=>dlog('conn error '+(e&&e.type||e)));
+    setTimeout(()=>{ if(!opened && mp.role==='guest'){ dlog('timeout'); connFailed(diag.ice?'The direct connection did not open (state: '+diag.ice+').':'The host never answered. Make sure they are still in the lobby.'); } },25000);
   });
-  mp.peer.on('error',e=>{ if(mp.role==='guest'){ toast(e.type==='peer-unavailable'?'No lobby with that code':'Connection error: '+e.type); mpLeave(); show('menu'); } });
+  mp.peer.on('error',e=>{ dlog('peer error '+e.type); if(mp.role!=='guest') return; if(e.type==='peer-unavailable'){ connFailed('No lobby with that code. Check the letters, and make sure the host is still on the lobby screen.'); } else if(e.type==='network'||e.type==='server-error'||e.type==='socket-error'){ connFailed('Could not reach the lobby service ('+e.type+').'); } else { toast('Connection error: '+e.type); } });
 }
 function mpSetup(role,code){
   mp.role=role; mp.code=code; mp.conns={}; mp.players={}; mp.guesses={}; mp.phase='lobby'; mp.host=null; mp.cd=null;
@@ -998,7 +1044,7 @@ function mpLeave(){
   if(mp.deadline){ clearTimeout(mp.deadline); mp.deadline=null; }
   voiceStop();
   try{ mp.peer&&mp.peer.destroy(); }catch(e){}
-  mp.role=null; mp.peer=null; mp.conns={}; mp.players={}; mp.host=null; mp.phase='lobby';
+  mp.role=null; mp.peer=null; mp.conns={}; mp.players={}; mp.host=null; mp.phase='lobby'; mp.pending={}; $('connBox').hidden=true;
   $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
 }
 function mpBroadcast(m){ for(const c of Object.values(mp.conns)){ try{ c.send(m); }catch(e){} } }
@@ -1119,7 +1165,8 @@ function updateWaitList(n,total){
 function renderLobby(){
   const ps=playerList();
   $('pcount').textContent=ps.length?`(${ps.length}/10)`:'';
-  $('plist').innerHTML=ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}"><span class="sw" style="background:${p.color===null?'#cfd8d2':COLORS[p.color][0]}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>';
+  const pend=Object.keys(mp.pending||{}).filter(id=>!mp.players[id]);
+  $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}"><span class="sw" style="background:${p.color===null?'#cfd8d2':COLORS[p.color][0]}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
   $('swatches').innerHTML=COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
     return `<div class="swatch ${mine?'mine':''} ${taken?'taken':''}" data-i="${i}" style="background:${c}" ${taken?`data-owner="${esc(owner.name||'taken')}"`:''} title="${n}">${mine?'✓':''}</div>`; }).join('');
   if(mp.role==='host'){ [...$('mpTimeSeg').children].forEach(b=>b.classList.toggle('on',+b.dataset.t===mp.settings.time)); [...$('mpRoundSeg').children].forEach(b=>b.classList.toggle('on',+b.dataset.r===mp.settings.rounds)); }
