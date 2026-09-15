@@ -437,15 +437,7 @@
 
   <div class="ctl">
     <button class="icon-btn" id="resetBtn" title="Return to start">↺</button>
-    <button class="icon-btn wide" id="copyBtn" title="Copy this location's imagery as a PNG, for pasting into an AI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="copyTxt">Copy for AI</span></button>
-  </div>
-  <div class="copymenu" id="copyMenu" hidden>
-    <div class="hd">Copy as PNG to clipboard</div>
-    <button data-mode="all">All-in-one<small>360° strip + north / east / south / west views (1600×2000, ~6 MB)</small></button>
-    <button data-mode="pano">360° panorama only<small>Full equirectangular image (2560×1280)</small></button>
-    <button data-mode="grid">4 views only<small>2×2 grid, 90° each (2048×1536)</small></button>
-    <div class="hd">Single view</div>
-    <button data-mode="0">North</button><button data-mode="90">East</button><button data-mode="180">South</button><button data-mode="270">West</button>
+    <button class="icon-btn wide" id="copyBtn" title="Copy a PNG of this spot: north, east, south and west views in a 2×2 grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="copyTxt">Copy image</span></button>
   </div>
 
   <div class="mappanel" id="mappanel">
@@ -918,61 +910,87 @@ $('saveBtn').addEventListener('click',()=>{
 });
 $('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('saveBtn').click(); } });
 
-/* ---------- Copy imagery for AI (Street View tiles → canvas → PNG on the clipboard) ---------- */
+/* ---------- Copy image: four 90° views (N/E/S/W) rendered from the high-zoom panorama tiles ---------- */
 const SV_TILE=(pano,z,x,y)=>`https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid=${encodeURIComponent(pano)}&x=${x}&y=${y}&zoom=${z}&nbt=1&fover=2`;
-const SV_VIEW=(pano,yaw)=>`https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=${encodeURIComponent(pano)}&cb_client=maps_sv.tactile&w=1024&h=768&yaw=${yaw}&pitch=0&thumbfov=90`;
+const VIEW_W=1024, VIEW_H=768, VIEW_FOV=90;
 async function fetchBitmap(url){ const r=await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return createImageBitmap(await r.blob()); }
-async function panoSize(pano){
-  try{ await gmapsReady; const {data}=await (svService||(svService=new google.maps.StreetViewService())).getPanorama({pano}); const ws=data.tiles&&data.tiles.worldSize; if(ws&&ws.width) return {w:ws.width,h:ws.height}; }catch(e){}
-  return {w:13312,h:6656};
+async function panoMeta(pano){
+  let w=13312,h=6656,center=0;
+  try{ await gmapsReady; const {data}=await (svService||(svService=new google.maps.StreetViewService())).getPanorama({pano}); const t=data.tiles||{}; if(t.worldSize&&t.worldSize.width){ w=t.worldSize.width; h=t.worldSize.height; } if(typeof t.centerHeading==='number') center=t.centerHeading; }catch(e){}
+  return {w,h,center};
 }
-async function buildEquirect(pano,zoom){
-  const full=await panoSize(pano); const maxZoom=Math.ceil(Math.log2(full.w/512)); const f=Math.pow(2,maxZoom-zoom);
-  const w=Math.round(full.w/f), h=Math.round(full.h/f); const cols=Math.ceil(w/512), rows=Math.ceil(h/512);
-  const c=document.createElement('canvas'); c.width=w; c.height=h; const ctx=c.getContext('2d');
-  const jobs=[]; for(let y=0;y<rows;y++) for(let x=0;x<cols;x++) jobs.push(fetchBitmap(SV_TILE(pano,zoom,x,y)).then(b=>ctx.drawImage(b,x*512,y*512)).catch(()=>{}));
-  await Promise.all(jobs); return c;
+/* Fetch only the vertical band of the equirect that the views can see (pitch ±~40°). */
+async function loadBand(pano,zoom,meta){
+  const maxZoom=Math.ceil(Math.log2(meta.w/512)); const f=Math.pow(2,maxZoom-zoom);
+  const W=Math.round(meta.w/f), H=Math.round(meta.h/f); const cols=Math.ceil(W/512), rows=Math.ceil(H/512);
+  const vfov=2*Math.atan(Math.tan(VIEW_FOV/2*Math.PI/180)*VIEW_H/VIEW_W)*180/Math.PI;
+  const latTop=vfov/2+2, y0=Math.max(0,Math.floor((0.5-latTop/180)*H/512)), y1=Math.min(rows-1,Math.floor((0.5+latTop/180)*H/512));
+  const c=document.createElement('canvas'); c.width=W; c.height=(y1-y0+1)*512; const ctx=c.getContext('2d',{willReadFrequently:true});
+  const jobs=[]; for(let y=y0;y<=y1;y++) for(let x=0;x<cols;x++) jobs.push(fetchBitmap(SV_TILE(pano,zoom,x,y)).then(b=>ctx.drawImage(b,x*512,(y-y0)*512)).catch(()=>{}));
+  await Promise.all(jobs);
+  return {img:ctx.getImageData(0,0,W,c.height), W, H, yOff:y0*512};
 }
-function label(ctx,text,x,y){ ctx.font='bold 34px Inter, sans-serif'; const w=ctx.measureText(text).width+28; ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(x,y,w,50); ctx.fillStyle='#fff'; ctx.fillText(text,x+14,y+36); }
-async function buildGrid(pano,ctx,ox,oy,vw=1024,vh=768){
-  const views=[[0,'North'],[90,'East'],[180,'South'],[270,'West']];
-  await Promise.all(views.map(async([yaw,name],i)=>{ const b=await fetchBitmap(SV_VIEW(pano,yaw)); const x=ox+(i%2)*vw, y=oy+Math.floor(i/2)*vh; ctx.drawImage(b,x,y,vw,vh); label(ctx,name+' · '+yaw+'°',x+12,y+12); }));
-}
-async function buildCopyImage(pano,mode){
-  if(mode==='pano'){ const eq=await buildEquirect(pano,3); const c=document.createElement('canvas'); c.width=2560; c.height=1280; c.getContext('2d').drawImage(eq,0,0,2560,1280); return c; }
-  if(mode==='grid'){ const c=document.createElement('canvas'); c.width=2048; c.height=1536; await buildGrid(pano,c.getContext('2d'),0,0); return c; }
-  if(mode==='all'){
-    const c=document.createElement('canvas'); c.width=1600; c.height=2000; const ctx=c.getContext('2d'); ctx.fillStyle='#000'; ctx.fillRect(0,0,c.width,c.height);
-    const [eq]=await Promise.all([buildEquirect(pano,3), buildGrid(pano,ctx,0,800,800,600)]);
-    ctx.drawImage(eq,0,0,1600,800); label(ctx,'360° panorama · left edge = north',12,12);
-    return c;
+/* Rectilinear projection of one heading out of the equirect band, bilinear sampled. */
+function renderView(band,heading,meta,out){
+  const {img,W,H,yOff}=band; const src=img.data, bw=img.width, bh=img.height;
+  const o=out.getContext('2d').createImageData(VIEW_W,VIEW_H); const d=o.data;
+  const f=(VIEW_W/2)/Math.tan(VIEW_FOV/2*Math.PI/180); const cx=VIEW_W/2, cy=VIEW_H/2;
+  const lon0=(heading-meta.center)*Math.PI/180;
+  for(let py=0;py<VIEW_H;py++){
+    const dy=py+0.5-cy;
+    for(let px=0;px<VIEW_W;px++){
+      const dx=px+0.5-cx;
+      const yaw=Math.atan2(dx,f), pitch=Math.atan2(-dy,Math.sqrt(dx*dx+f*f));
+      let u=((lon0+yaw)/(2*Math.PI)+0.5); u-=Math.floor(u); const sx=u*W;
+      const sy=(0.5-pitch/Math.PI)*H-yOff;
+      const x0=Math.floor(sx), y0=Math.floor(sy), fx=sx-x0, fy=sy-y0;
+      const xa=x0%bw, xb=(x0+1)%bw, ya=Math.min(Math.max(y0,0),bh-1), yb=Math.min(Math.max(y0+1,0),bh-1);
+      const i00=(ya*bw+xa)*4, i10=(ya*bw+xb)*4, i01=(yb*bw+xa)*4, i11=(yb*bw+xb)*4;
+      const w00=(1-fx)*(1-fy), w10=fx*(1-fy), w01=(1-fx)*fy, w11=fx*fy;
+      const k=(py*VIEW_W+px)*4;
+      d[k]  =src[i00]*w00+src[i10]*w10+src[i01]*w01+src[i11]*w11;
+      d[k+1]=src[i00+1]*w00+src[i10+1]*w10+src[i01+1]*w01+src[i11+1]*w11;
+      d[k+2]=src[i00+2]*w00+src[i10+2]*w10+src[i01+2]*w01+src[i11+2]*w11;
+      d[k+3]=255;
+    }
   }
-  const yaw=+mode; const c=document.createElement('canvas'); c.width=1024; c.height=768; const b=await fetchBitmap(SV_VIEW(pano,yaw)); c.getContext('2d').drawImage(b,0,0); return c;
+  return o;
+}
+async function buildCopyImage(pano){
+  const meta=await panoMeta(pano);
+  const band=await loadBand(pano,4,meta);            // zoom 4: 2048 px per 90°, plenty for 1200-wide views
+  const c=document.createElement('canvas'); c.width=VIEW_W*2; c.height=VIEW_H*2; const ctx=c.getContext('2d');
+  const views=[[0,'North'],[90,'East'],[180,'South'],[270,'West']];
+  for(let i=0;i<4;i++){
+    const [hd,name]=views[i]; const x=(i%2)*VIEW_W, y=Math.floor(i/2)*VIEW_H;
+    ctx.putImageData(renderView(band,hd,meta,c),x,y);
+    await new Promise(r=>setTimeout(r,0));
+    ctx.font='600 16px Inter, sans-serif'; const t=name+' · '+hd+'°'; const tw=ctx.measureText(t).width+14;
+    ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fillRect(x+8,y+8,tw,24); ctx.fillStyle='#fff'; ctx.fillText(t,x+15,y+25);
+  }
+  return c;
 }
 function canvasBlob(c){ return new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('toBlob failed')),'image/png')); }
 let copyBusy=false;
-async function copyImagery(mode){
+async function copyImagery(){
   if(copyBusy) return; const pano=state.current&&state.current.pano; if(!pano){ toast('No location loaded yet'); return; }
-  copyBusy=true; const btn=$('copyBtn'); btn.classList.add('busy'); $('copyTxt').textContent='Building…'; $('copyMenu').hidden=true;
-  const build=buildCopyImage(pano,mode).then(canvasBlob);
+  copyBusy=true; const btn=$('copyBtn'); btn.classList.add('busy'); $('copyTxt').textContent='Building…';
+  const build=buildCopyImage(pano).then(canvasBlob);
   try{
     if(navigator.clipboard&&window.ClipboardItem){
-      // Pass the promise itself so Safari accepts the write as part of the click gesture.
-      await navigator.clipboard.write([new ClipboardItem({'image/png':build})]);
-      const blob=await build; $('copyTxt').textContent='Copied!'; toast(`Copied PNG (${(blob.size/1048576).toFixed(1)} MB). Paste it into your AI.`);
+      await navigator.clipboard.write([new ClipboardItem({'image/png':build})]);   // promise form keeps Safari's gesture check happy
+      const blob=await build; $('copyTxt').textContent='Copied!'; toast(`Copied a ${VIEW_W*2}×${VIEW_H*2} PNG (${(blob.size/1048576).toFixed(1)} MB). Paste it anywhere.`);
     } else throw new Error('no clipboard');
   }catch(e){
     try{ const blob=await build; showImageModal(URL.createObjectURL(blob)); }catch(e2){ toast('Could not build the image: '+e2.message); }
   }
-  setTimeout(()=>{ $('copyTxt').textContent='Copy for AI'; },2000); btn.classList.remove('busy'); copyBusy=false;
+  setTimeout(()=>{ $('copyTxt').textContent='Copy image'; },2000); btn.classList.remove('busy'); copyBusy=false;
 }
 function showImageModal(url){
   const m=document.createElement('div'); m.id='imgModal'; m.innerHTML=`<div class="box"><img src="${url}"><div style="font-size:13px;color:var(--muted)">Your browser wouldn't copy automatically. Right-click the image and choose <b>Copy image</b>.</div><button class="btn btn-secondary" style="margin-top:10px">Close</button></div>`;
   m.querySelector('button').onclick=()=>m.remove(); m.addEventListener('click',e=>{ if(e.target===m) m.remove(); }); document.body.appendChild(m);
 }
-$('copyBtn').addEventListener('click',e=>{ e.stopPropagation(); const m=$('copyMenu'); m.hidden=!m.hidden; m.classList.toggle('shift',$('resetBtn').parentElement.classList.contains('shift')); });
-$('copyMenu').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) copyImagery(b.dataset.mode); });
-document.addEventListener('click',e=>{ if(!e.target.closest('#copyMenu')) $('copyMenu').hidden=true; });
+$('copyBtn').addEventListener('click',()=>copyImagery());
 
 /* ---------- Coordinate paste box ---------- */
 function parseCoords(text){
@@ -1385,7 +1403,7 @@ function silentTrack(){
   voice.silent=dst.stream.getAudioTracks()[0]; return voice.silent;
 }
 function currentTrack(){ return voice.on&&voice.micStream ? voice.micStream.getAudioTracks()[0] : silentTrack(); }
-function voiceShow(){ $('micBtn').hidden=!mp.role; $('resetBtn').parentElement.classList.toggle('shift',!!mp.role); $('copyMenu').classList.toggle('shift',!!mp.role); renderMic(); }
+function voiceShow(){ $('micBtn').hidden=!mp.role; $('resetBtn').parentElement.classList.toggle('shift',!!mp.role); renderMic(); }
 function voiceConnect(){
   if(!mp.peer||!mp.me.id||mp.peer.destroyed) return;
   for(const p of playerList()){
