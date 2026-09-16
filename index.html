@@ -61,6 +61,11 @@
   .seg button{flex:1;padding:10px 6px;border-radius:8px;background:transparent;color:var(--muted);font-weight:600;font-size:14px;transition:.15s}
   .seg button:hover{color:var(--text)}
   .seg button.on{color:var(--green-dark);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:700}
+  .custom-row{display:flex;align-items:center;gap:12px;margin-top:10px;padding:10px 12px;border-radius:10px;background:#f6f8f7;border:1px solid var(--line)}
+  .custom-row input[type=range]{flex:1;accent-color:var(--green)}
+  .custom-row input[type=number]{width:74px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-weight:700;text-align:center;outline:none}
+  .custom-row input[type=number]:focus{border-color:var(--green)}
+  .custom-row span{font-size:13px;color:var(--muted);min-width:30px}
   .start{margin-top:26px;padding:16px;font-size:16px}
   .hint{margin-top:14px;font-size:13px;color:var(--muted);line-height:1.5}
   .kbd{display:inline-block;padding:1px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;background:#f6f8f7;font-size:12px;font-weight:600}
@@ -366,13 +371,17 @@
           <button data-t="30">30s</button>
           <button data-t="60" class="on">60s</button>
           <button data-t="0">No limit</button>
+          <button data-t="custom">Custom</button>
         </div>
+        <div class="custom-row" id="timeCustom" hidden><input type="range" min="1" max="180" value="45"><input type="number" min="1" max="180" value="45"><span>sec</span></div>
 
         <div class="label">Rounds</div>
         <div class="seg" id="roundSeg">
           <button data-r="5" class="on">5</button>
           <button data-r="10">10</button>
+          <button data-r="custom">Custom</button>
         </div>
+        <div class="custom-row" id="roundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
 
         <div class="fill"></div>
         <button class="btn btn-primary btn-block start" id="startBtn">Play solo</button>
@@ -414,9 +423,11 @@
         <div class="plist" id="plist"></div>
         <div id="hostPanel" hidden>
           <div class="label">Time per round</div>
-          <div class="seg" id="mpTimeSeg"><button data-t="10">10s</button><button data-t="30">30s</button><button data-t="60" class="on">60s</button><button data-t="0">No limit</button></div>
+          <div class="seg" id="mpTimeSeg"><button data-t="10">10s</button><button data-t="30">30s</button><button data-t="60" class="on">60s</button><button data-t="0">No limit</button><button data-t="custom">Custom</button></div>
+          <div class="custom-row" id="mpTimeCustom" hidden><input type="range" min="1" max="180" value="45"><input type="number" min="1" max="180" value="45"><span>sec</span></div>
           <div class="label">Rounds</div>
-          <div class="seg" id="mpRoundSeg"><button data-r="5" class="on">5</button><button data-r="10">10</button></div>
+          <div class="seg" id="mpRoundSeg"><button data-r="5" class="on">5</button><button data-r="10">10</button><button data-r="custom">Custom</button></div>
+          <div class="custom-row" id="mpRoundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
           <div class="lobby-actions">
             <button class="btn btn-primary" id="mpStartBtn">Start (30s to pick colors)</button>
             <button class="btn btn-secondary" id="mpStartNow" hidden>Start now</button>
@@ -685,7 +696,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260915-205339';
+const BUILD='20260915-223614';
 const state={ timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ return `${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -729,13 +740,21 @@ $('clearBoard').addEventListener('click',()=>{ if(confirm('Clear the leaderboard
 renderBoard();
 
 /* ---------- Menu ---------- */
-for(const seg of ['timeSeg','roundSeg']){
-  $(seg).addEventListener('click',e=>{
-    const b=e.target.closest('button'); if(!b) return;
-    [...$(seg).children].forEach(x=>x.classList.toggle('on',x===b));
-    if(seg==='timeSeg') state.timeLimit=+b.dataset.t; else state.totalRounds=+b.dataset.r;
-  });
+/* Preset + custom pickers. attr is 't' or 'r'; onChange gets the numeric value. */
+function picker(segId,customId,attr,min,max,onChange){
+  const seg=$(segId), row=$(customId), range=row.querySelector('input[type=range]'), num=row.querySelector('input[type=number]');
+  const clamp=v=>Math.min(max,Math.max(min,Math.round(+v)||min));
+  const mark=val=>{ const preset=[...seg.children].find(b=>b.dataset[attr]!=='custom'&&+b.dataset[attr]===val); [...seg.children].forEach(b=>b.classList.toggle('on',preset?b===preset:b.dataset[attr]==='custom')); row.hidden=!!preset; if(!preset){ range.value=val; num.value=val; } };
+  seg.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
+    if(b.dataset[attr]==='custom'){ [...seg.children].forEach(x=>x.classList.toggle('on',x===b)); row.hidden=false; onChange(clamp(num.value)); }
+    else { mark(+b.dataset[attr]); onChange(+b.dataset[attr]); } });
+  range.addEventListener('input',()=>{ num.value=range.value; onChange(clamp(range.value)); });
+  num.addEventListener('input',()=>{ const v=clamp(num.value); range.value=v; onChange(v); });
+  num.addEventListener('blur',()=>{ num.value=clamp(num.value); });
+  return {mark};
 }
+picker('timeSeg','timeCustom','t',1,180,v=>{ state.timeLimit=v; });
+picker('roundSeg','roundCustom','r',1,100,v=>{ state.totalRounds=v; });
 $('startBtn').addEventListener('click',startGame);
 $('againBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); } else if(!mp.role) startGame(); });
 $('menuBtn').addEventListener('click',()=>{ if(mp.role) mpLeave(); renderBoard(); show('menu'); });
@@ -1347,7 +1366,7 @@ function renderLobby(){
   $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}"><span class="sw" style="background:${p.color===null?'#cfd8d2':COLORS[p.color][0]}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
   $('swatches').innerHTML=COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
     return `<div class="swatch ${mine?'mine':''} ${taken?'taken':''}" data-i="${i}" style="background:${c}" ${taken?`data-owner="${esc(owner.name||'taken')}"`:''} title="${n}">${mine?'✓':''}</div>`; }).join('');
-  if(mp.role==='host'){ [...$('mpTimeSeg').children].forEach(b=>b.classList.toggle('on',+b.dataset.t===mp.settings.time)); [...$('mpRoundSeg').children].forEach(b=>b.classList.toggle('on',+b.dataset.r===mp.settings.rounds)); }
+  if(mp.role==='host'){ mpTimePick.mark(mp.settings.time); mpRoundPick.mark(mp.settings.rounds); }
   else $('guestPanel').textContent=`Waiting for the host to start… (${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`;
 }
 function mpToLobby(){
@@ -1555,8 +1574,8 @@ $('leaveBtn').addEventListener('click',()=>{ mpLeave(); show('menu'); });
 window.addEventListener('pagehide',()=>{ if(mp.role) mpLeave(); });
 $('mpName').addEventListener('input',()=>{ mp.me.name=$('mpName').value.trim().slice(0,16); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
 $('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return; const i=+sw.dataset.i; mpSend({t:'color',color:mp.me.color===i?null:i}); if(mp.role==='guest'){ mp.me.color=mp.me.color===i?null:i; } });
-$('mpTimeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; mp.settings.time=+b.dataset.t; hostSync(); });
-$('mpRoundSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; mp.settings.rounds=+b.dataset.r; hostSync(); });
+const mpTimePick=picker('mpTimeSeg','mpTimeCustom','t',1,180,v=>{ mp.settings.time=v; hostSync(); });
+const mpRoundPick=picker('mpRoundSeg','mpRoundCustom','r',1,100,v=>{ mp.settings.rounds=v; hostSync(); });
 $('mpStartBtn').addEventListener('click',()=>{ if(playerList().length<2){ toast('You need at least one more player'); return; } mpStartCountdown(30); });
 $('mpStartNow').addEventListener('click',()=>hostStartGame());
 $('mpCancel').addEventListener('click',()=>{ mp.locPromise=null; if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=true; $('mpStartBtn').hidden=false; $('mpStartNow').hidden=true; $('mpCancel').hidden=true; mpBroadcast({t:'cancel'}); });
