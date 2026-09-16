@@ -15,7 +15,7 @@ Under the main card there are six modes besides Classic. Each has its own Play b
 - **Blink**: the panorama is revealed through an eyelid that opens for about a second and shuts. 15 seconds to guess from the glimpse.
 - **Pixelated**: the panorama is rendered to a 128-pixel-wide canvas you drag around. Shapes and colors only.
 - **Stranded**: remote regions only, and any spot inside a town or city is rejected.
-- **Island Hopper**: islands only.
+- **Island Hopper**: a curated list of ~85 small islands (nothing much over 2,000 km²), so the coast is always near.
 - **'Murica**: the United States only.
 - **Concrete Jungle**: a random spot within a couple of miles of the center of one of ~100 big cities.
 

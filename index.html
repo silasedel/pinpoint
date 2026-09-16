@@ -617,7 +617,21 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.random()*(i+1)|
 function continentPlan(n){ const plan=[]; while(plan.length<n) plan.push(...shuffle(CONTINENTS.slice())); return plan.slice(0,n); }
 
 /* ---------- Game modes ---------- */
-const ISLANDS=['Iceland','Sicily','Sardinia','Crete','Malta','Madagascar','Réunion','Sri Lanka','Taiwan','Japan North','Japan South','Philippines North','Philippines South','Indonesia West','Java & Bali','Indonesia East','Borneo','New Zealand North','New Zealand South','Tasmania','Fiji','Bermuda','Puerto Rico','Hawaii','Faroe Islands','Galápagos','Isle of Man','Curaçao','Guam','American Samoa','New Caledonia','Vanuatu','Dominican Republic','Hong Kong','Singapore','Papua New Guinea','Ireland','England','Scotland','Wales','Greenland'];
+/* Small islands only (nothing bigger than roughly 2,000 km²), so the coast is never far away. [name, latMin, latMax, lngMin, lngMax] */
+const SMALL_ISLANDS=[
+ ['Malta',35.8,36.08,14.18,14.57],['Gozo',36,36.09,14.17,14.35],['Ibiza',38.83,39.12,1.2,1.62],['Menorca',39.8,40.09,3.8,4.32],['Madeira',32.63,32.88,-17.28,-16.66],['São Miguel, Azores',37.7,37.92,-25.86,-25.13],
+ ['Tenerife',28,28.59,-16.92,-16.11],['Lanzarote',28.83,29.24,-13.9,-13.4],['Fuerteventura',28.04,28.76,-14.52,-13.82],['Gran Canaria',27.73,28.18,-15.85,-15.35],['Jersey',49.16,49.27,-2.26,-2.01],['Guernsey',49.41,49.51,-2.68,-2.5],
+ ['Isle of Wight',50.57,50.77,-1.59,-1.07],['Isles of Scilly',49.88,49.98,-6.42,-6.25],['Isle of Man',54.05,54.42,-4.8,-4.3],['Orkney',58.85,59.15,-3.45,-2.7],['Shetland',59.85,60.55,-1.75,-1.05],['Isle of Skye',57.05,57.7,-6.75,-5.65],['Anglesey',53.13,53.43,-4.7,-4.03],
+ ['Faroe Islands',61.4,62.4,-7.6,-6.3],['Bornholm',54.98,55.3,14.65,15.2],['Gotland',56.9,57.95,18.1,19],['Öland',56.2,57.37,16.35,17.15],['Åland',59.95,60.35,19.5,20.3],['Saaremaa',57.9,58.6,21.8,23.2],['Texel',52.98,53.2,4.68,4.92],['Sylt',54.75,55.06,8.28,8.45],
+ ['Rügen',54.25,54.7,13.1,13.7],['Fehmarn',54.4,54.53,10.95,11.3],['Ærø',54.83,54.93,10.2,10.55],['Hvar',43.1,43.22,16.4,17.1],['Brač',43.25,43.4,16.4,16.95],['Korčula',42.88,43,16.65,17.2],['Krk',44.95,45.25,14.45,14.8],
+ ['Corfu',39.35,39.83,19.62,20.12],['Rhodes',35.87,36.47,27.7,28.25],['Santorini',36.33,36.48,25.35,25.48],['Mykonos',37.4,37.5,25.28,25.45],['Naxos',36.95,37.2,25.35,25.6],['Zakynthos',37.65,37.93,20.62,20.98],['Lesbos',39,39.4,25.85,26.6],
+ ['Elba',42.72,42.88,10.1,10.45],['Capri',40.53,40.57,14.18,14.27],['Ischia',40.7,40.77,13.85,13.97],['Mauritius',-20.53,-19.98,57.3,57.8],['Réunion',-21.4,-20.85,55.2,55.85],['Zanzibar',-6.47,-5.72,39.17,39.6],
+ ['Okinawa',26.07,26.88,127.63,128.33],['Jeju',33.19,33.57,126.15,126.95],['Penang',5.25,5.48,100.18,100.35],['Langkawi',6.22,6.45,99.65,99.9],['Phuket',7.75,8.2,98.25,98.45],['Koh Samui',9.42,9.6,99.93,100.08],['Boracay',11.94,12,121.9,121.96],
+ ['Guam',13.23,13.66,144.6,145],['Saipan',15.1,15.3,145.68,145.83],['Oahu',21.25,21.72,-158.3,-157.63],['Maui',20.57,21.03,-156.7,-155.97],['Kauai',21.87,22.24,-159.8,-159.28],['Bermuda',32.25,32.4,-64.9,-64.65],['St. Thomas',18.29,18.38,-65.05,-64.83],
+ ['Curaçao',12.05,12.4,-69.15,-68.75],['Aruba',12.4,12.63,-70.07,-69.85],['Bonaire',12.02,12.32,-68.42,-68.19],['Martinique',14.38,14.88,-61.23,-60.8],['Guadeloupe',15.95,16.52,-61.82,-61.16],['Barbados',13.04,13.34,-59.66,-59.42],['Cozumel',20.27,20.6,-87.05,-86.73],
+ ['Kangaroo Island',-36.07,-35.57,136.53,138.13],['Phillip Island',-38.53,-38.43,145.1,145.37],['Norfolk Island',-29.1,-29,167.9,168],['Lord Howe Island',-31.6,-31.5,159.03,159.11],['Waiheke',-36.85,-36.75,174.95,175.2],['Stewart Island',-47.05,-46.75,167.6,168.2],
+ ['Tutuila',-14.4,-14.15,-170.9,-170.5],['Efate',-17.85,-17.45,168.15,168.6],['Santa Cruz, Galápagos',-0.85,-0.4,-90.45,-90.15],['Svalbard',78.15,78.3,15.3,16.1],['Christmas Island',-10.57,-10.4,105.53,105.72],
+];
 const REMOTE=['Mongolia','Kazakhstan','Kyrgyzstan','Northern Territory','Western Australia','South Australia','Queensland','Botswana','Namibia','Lesotho','Iceland','Faroe Islands','Greenland','Alaska','Canada West','Canada East','Siberia West','Siberia East','Russian Far East','Argentina South','Chile South','Chile North','Bolivia','Peru','Madagascar','Nepal','Bhutan','Norway','Sweden','Finland','Tanzania','Zambia','Mozambique','Oman','Jordan','Tunisia','Mali','Chad','Sudan','Uzbekistan','Papua New Guinea','New Zealand South','Tasmania','USA West','Mexico North','Ethiopia'];
 const CITIES=[['Tokyo',35.68,139.76],['Osaka',34.69,135.5],['Seoul',37.56,126.98],['Taipei',25.04,121.56],['Hong Kong',22.32,114.17],['Singapore',1.3,103.85],['Bangkok',13.75,100.5],['Kuala Lumpur',3.15,101.7],['Jakarta',-6.2,106.85],['Manila',14.6,120.98],['Ho Chi Minh City',10.78,106.7],['Hanoi',21.03,105.85],['Mumbai',19.08,72.88],['Delhi',28.63,77.22],['Bengaluru',12.97,77.59],['Colombo',6.93,79.85],['Dhaka',23.73,90.41],['Dubai',25.2,55.27],['Doha',25.29,51.53],['Tel Aviv',32.08,34.78],['Istanbul',41.01,28.97],['Athens',37.98,23.73],['Rome',41.9,12.5],['Milan',45.46,9.19],['Naples',40.85,14.27],['Madrid',40.42,-3.7],['Barcelona',41.39,2.17],['Lisbon',38.72,-9.14],['Paris',48.86,2.35],['Lyon',45.76,4.84],['London',51.51,-0.13],['Manchester',53.48,-2.24],['Glasgow',55.86,-4.25],['Dublin',53.35,-6.26],['Amsterdam',52.37,4.9],['Brussels',50.85,4.35],['Berlin',52.52,13.4],['Hamburg',53.55,10.0],['Munich',48.14,11.58],['Vienna',48.21,16.37],['Zurich',47.38,8.54],['Prague',50.08,14.43],['Warsaw',52.23,21.01],['Kraków',50.06,19.94],['Budapest',47.5,19.04],['Bucharest',44.43,26.1],['Belgrade',44.8,20.47],['Stockholm',59.33,18.07],['Oslo',59.91,10.75],['Copenhagen',55.68,12.57],['Helsinki',60.17,24.94],['Moscow',55.75,37.62],['Saint Petersburg',59.93,30.32],['Kyiv',50.45,30.52],['New York',40.75,-73.98],['Chicago',41.88,-87.63],['Los Angeles',34.05,-118.25],['San Francisco',37.78,-122.42],['Seattle',47.61,-122.33],['Boston',42.36,-71.06],['Philadelphia',39.95,-75.16],['Washington',38.9,-77.03],['Miami',25.77,-80.19],['Houston',29.76,-95.37],['Dallas',32.78,-96.8],['Atlanta',33.75,-84.39],['Denver',39.74,-104.99],['Toronto',43.65,-79.38],['Montreal',45.5,-73.57],['Vancouver',49.28,-123.12],['Mexico City',19.43,-99.13],['Guadalajara',20.67,-103.35],['Bogotá',4.65,-74.08],['Lima',-12.05,-77.04],['Santiago',-33.45,-70.66],['Buenos Aires',-34.6,-58.38],['São Paulo',-23.55,-46.63],['Rio de Janeiro',-22.91,-43.2],['Montevideo',-34.9,-56.19],['Johannesburg',-26.2,28.04],['Cape Town',-33.92,18.42],['Nairobi',-1.29,36.82],['Lagos',6.52,3.38],['Accra',5.56,-0.2],['Tunis',36.8,10.18],['Sydney',-33.87,151.21],['Melbourne',-37.81,144.96],['Brisbane',-27.47,153.03],['Perth',-31.95,115.86],['Auckland',-36.85,174.76],['Almaty',43.24,76.89],['Tashkent',41.31,69.28],['Amman',31.95,35.93],['Cairo',30.05,31.24]];
 const MODES={
@@ -625,7 +639,7 @@ const MODES={
   blink:   {name:'Blink', desc:'A fixed, super-wide view opens for a blink and shuts. No looking around. Guess from what you glimpsed.', meta:'15s · one glimpse', time:15},
   pixel:   {name:'Pixelated', desc:'The whole world at 128 pixels wide. Drag to look around. Colors and shapes are all you get.', meta:'Heavily pixelated'},
   stranded:{name:'Stranded', desc:'Middle of nowhere. Dirt tracks, no towns, no signs, nobody coming.', meta:'Remote only', filter:n=>REMOTE.includes(n), radius:25000, remote:true},
-  islands: {name:'Island Hopper', desc:'Only islands. Volcanoes, reefs, fjords, and the odd sheep.', meta:'Islands only', filter:n=>ISLANDS.includes(n)},
+  islands: {name:'Island Hopper', desc:'Small islands only. The coast is never far. Volcanoes, reefs, harbours, and the odd sheep.', meta:'Small islands', places:SMALL_ISLANDS, radius:4000},
   murica:  {name:"'Murica", desc:'All 50 states, nothing else. Read the road signs and the license plates.', meta:'USA only', filter:n=>/^USA|^Alaska$|^Hawaii$/.test(n)},
   jungle:  {name:'Concrete Jungle', desc:'Big cities only. Skylines, storefronts, traffic and a hundred languages of signage.', meta:'Dense cities', city:true},
 };
@@ -642,13 +656,15 @@ async function findLocation(continent,mode){
   for(let round=0; round<12; round++){
     let pl, name, point;
     if(mode.city){ const c=CITIES[Math.random()*CITIES.length|0]; name=c[0]; point=()=>{ const r=Math.random()*0.035, a=Math.random()*Math.PI*2; return {lat:c[1]+r*Math.sin(a), lng:c[2]+r*Math.cos(a)/Math.cos(c[1]*Math.PI/180)}; }; }
+    else if(mode.places){ const recent=new Set(recentPlaces().concat(tried)); let pool=mode.places.filter(x=>!recent.has(x[0])); if(pool.length<3) pool=mode.places.filter(x=>!tried.includes(x[0])); pl=pool[Math.random()*pool.length|0]; name=pl[0]; point=()=>pointIn(pl); }
     else { pl=pickPlace(round<8?continent:null, tried, mode.filter); name=pl[0]; point=()=>pointIn(pl); }
     tried.push(name);
     const cont=pl?(CONTINENTS.find(c=>PLACES[c].includes(pl))||continent):null;
+    if(mode.places&&pl&&(pl[2]-pl[1])*(pl[4]-pl[3])>1.5) continue;
     for(let attempt=0; attempt<14; attempt++){
       const p=point();
       try{
-        const radius=mode.city?1500:(attempt<10?(mode.radius||20000):80000);
+        const radius=mode.city?1500:(attempt<10?(mode.radius||20000):(mode.places?12000:80000));
         const {data}=await svService.getPanorama({ location:p, radius, source: google.maps.StreetViewSource.OUTDOOR, preference: google.maps.StreetViewPreference.NEAREST });
         const loc=data&&data.location; if(!loc||!loc.pano||!loc.latLng) continue;
         if(!/google/i.test(data.copyright||'')) continue;     // official Google coverage only: photospheres block image copying
@@ -756,7 +772,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260915-232336';
+const BUILD='20260915-232753';
 const state={ mode:'classic', timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
