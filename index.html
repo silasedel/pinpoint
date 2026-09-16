@@ -506,6 +506,7 @@
 <canvas id="confetti" hidden></canvas>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.10.1/mqtt.min.js"></script>
 <script>
 /* =========================================================
    Locations: weighted bounding boxes over Street View coverage.
@@ -1060,158 +1061,154 @@ document.addEventListener('keydown',e=>{
 });
 window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resultMap&&resultMap.invalidateSize(); finalMap&&finalMap.invalidateSize(); });
 /* =========================================================
-   MULTIPLAYER — host-authoritative over WebRTC (PeerJS)
+   MULTIPLAYER — host-authoritative. Game messages travel through public MQTT brokers
+   (plain WebSockets, so they work on any network); WebRTC is used only for voice.
    ========================================================= */
 const COLORS=[['#e63946','Red'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#2bb673','Green'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#8e44ad','Purple'],['#e84393','Pink'],['#8d6e63','Brown'],['#111827','Black']];
-const mp={ role:null, peer:null, conns:{}, players:{}, me:{id:null,name:'',color:null}, code:'', host:null, settings:{time:60,rounds:5}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby' };
+const BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081'];
+const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpeer:null}, code:'', settings:{time:60,rounds:5}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby',
+           links:[], link:null, seen:{}, hb:null, hostSeen:0, joinTimer:null, brokerIdx:0 };
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ';
-/* ICE servers. STUN finds a direct path for most networks; a TURN relay covers the ones that block it
-   (mobile carriers, some ISPs, schools, offices). TURN credentials come from a provider at load time. */
-const STUN=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun.cloudflare.com:3478']}];
-const TURN_CF={keyId:'',token:''};                 // Cloudflare Calls TURN key (rtc.live.cloudflare.com)
-const TURN_METERED={app:'',apiKey:''};            // or a metered.ca app
-const TURN_STATIC=null;                           // or {urls:[...],username:'',credential:''}
-let ICE_SERVERS=STUN.slice(), iceReady=null, turnOk=false;
-async function loadIce(){
-  if(iceReady) return iceReady;
-  iceReady=(async()=>{
-    try{
-      let extra=null;
-      if(TURN_CF.keyId){
-        const r=await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${TURN_CF.keyId}/credentials/generate-ice-servers`,{method:'POST',headers:{Authorization:'Bearer '+TURN_CF.token,'Content-Type':'application/json'},body:JSON.stringify({ttl:86400})});
-        const j=await r.json(); extra=j.iceServers?(Array.isArray(j.iceServers)?j.iceServers:[j.iceServers]):null;
-      } else if(TURN_METERED.app){
-        const r=await fetch(`https://${TURN_METERED.app}.metered.live/api/v1/turn/credentials?apiKey=${TURN_METERED.apiKey}`); const j=await r.json(); extra=Array.isArray(j)?j:null;
-      } else if(TURN_STATIC){ extra=[TURN_STATIC]; }
-      if(extra&&extra.length){ ICE_SERVERS=STUN.concat(extra); turnOk=true; }
-    }catch(e){ console.warn('TURN credentials unavailable',e); }
-    return ICE_SERVERS;
-  })();
-  return iceReady;
-}
-/* Keep PeerJS's own defaults (Google STUN + the PeerJS project's TURN relays) and only ADD servers on top.
-   Overriding the list drops their relay, which is what most cross-network games actually use. */
-function peerOpts(){
-  const o={debug:1};
-  if(turnOk){ const tmp=new Peer(); const def=tmp.options.config.iceServers; tmp.destroy(); o.config={iceServers:def.concat(ICE_SERVERS.slice(1))}; }
-  return o;
-}
-loadIce();
-const diag={log:[],cands:{},ice:'',state:'',t0:0};
-function dlog(m){ const t=((Date.now()-diag.t0)/1000).toFixed(1); diag.log.push(t+'s '+m); if(diag.log.length>60) diag.log.shift(); console.log('[pinpoint]',m); }
-function watchPc(conn,label){
-  let tries=0; const iv=setInterval(()=>{
-    const pc=conn.peerConnection; if(!pc){ if(++tries>200) clearInterval(iv); return; }
-    clearInterval(iv);
-    dlog(label+': negotiating');
-    pc.addEventListener('icecandidate',e=>{ if(e.candidate){ const m=/ typ (\w+)/.exec(e.candidate.candidate); if(m) diag.cands[m[1]]=(diag.cands[m[1]]||0)+1; } });
-    pc.addEventListener('iceconnectionstatechange',()=>{ diag.ice=pc.iceConnectionState; dlog(label+': ice '+diag.ice); connStatus(); });
-    pc.addEventListener('connectionstatechange',()=>{ diag.state=pc.connectionState; dlog(label+': conn '+diag.state); connStatus(); });
-  },50);
-}
-function connStatus(){
-  if(mp.role!=='guest') return;
-  const box=$('connBox'); if(!mp.host){ box.hidden=true; return; }
-  if(mp.host.open){ box.className='conn ok'; box.innerHTML='Connected to the host ✓'+(diag.cands.relay?' (via relay)':''); box.hidden=false; setTimeout(()=>{ if(mp.host&&mp.host.open) box.hidden=true; },4000); return; }
-  box.hidden=false; box.className='conn';
-  const step = !mp.me.id ? 'Contacting the lobby service…' : !diag.ice ? 'Found the room, waiting for the host to answer…' : diag.ice==='checking' ? 'Host answered, opening a direct connection… (this can take up to 20 seconds)' : 'Connection state: '+diag.ice;
-  box.textContent=step;
-}
-function connFailed(why){
-  const box=$('connBox'); box.hidden=false; box.className='conn fail';
-  const types=Object.keys(diag.cands).join(', ')||'none';
-  const relayNote = '';
-  box.innerHTML=`<b>Couldn't connect to the host.</b> ${esc(why)}<br><span style="font-size:12px">Network paths found: ${esc(types)}. If this keeps happening, one of the two networks blocks direct connections (some mobile carriers, schools and offices do).${relayNote} Send the host the debug info.</span><div class="row"><button class="btn btn-primary" id="retryJoin">Try again</button><button class="btn btn-secondary" id="copyDebug">Copy debug info</button><button class="btn btn-secondary" id="backMenu">Back</button></div>`;
-  $('retryJoin').onclick=()=>{ const c=mp.code; mpLeave(); mpJoin(c); };
-  $('copyDebug').onclick=()=>copyText(['Pinpoint debug','code '+mp.code,'ua '+navigator.userAgent,'ice '+diag.ice+' / '+diag.state,'candidates '+JSON.stringify(diag.cands),...diag.log].join('\n'),$('copyDebug'),'Copy debug info');
-  $('backMenu').onclick=()=>{ mpLeave(); show('menu'); };
-}
 function mkCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.random()*CODE_CHARS.length|0]; return c; }
+function mkId(){ return Math.random().toString(36).slice(2,10); }
 function myName(){ try{ return localStorage.getItem('pp_name')||''; }catch(e){ return ''; } }
 function playerList(){ return Object.values(mp.players); }
+const T={ host:c=>`pinpoint/v2/${c}/h`, all:c=>`pinpoint/v2/${c}/a`, one:(c,id)=>`pinpoint/v2/${c}/p/${id}` };
+const diag={log:[],t0:0};
+function dlog(m){ const t=((Date.now()-diag.t0)/1000).toFixed(1); diag.log.push(t+'s '+m); if(diag.log.length>80) diag.log.shift(); console.log('[pinpoint]',m); }
+function pub(client,topic,msg){ try{ client.publish(topic,JSON.stringify(msg),{qos:0}); }catch(e){} }
 
+/* ---- broker links ---- */
+function openLink(url,will,onReady,onMsg){
+  const c=mqtt.connect(url,{connectTimeout:7000,reconnectPeriod:2000,keepalive:20,clean:true,clientId:'pp_'+mkId(),will:{topic:will.topic,payload:JSON.stringify(will.msg),qos:0,retain:false}});
+  const link={url,client:c,ready:false};
+  c.on('connect',()=>{ const first=!link.ready; link.ready=true; dlog('broker up '+url.split('/')[2]); onReady(link,first); });
+  c.on('message',(t,payload)=>{ let m; try{ m=JSON.parse(payload.toString()); }catch(e){ return; } onMsg(link,t,m); });
+  c.on('error',e=>dlog('broker error '+url.split('/')[2]+' '+(e&&e.message)));
+  c.on('offline',()=>{ link.ready=false; dlog('broker offline '+url.split('/')[2]); });
+  return link;
+}
+function closeLinks(){ for(const l of mp.links){ try{ l.client.end(true); }catch(e){} } mp.links=[]; mp.link=null; }
+
+/* ---- voice peer (best effort; the game never depends on it) ---- */
+function openVoicePeer(){
+  try{
+    const peer=new Peer({debug:0}); mp.peer=peer;
+    peer.on('open',id=>{ mp.me.vpeer=id; if(mp.role==='host'&&mp.players[mp.me.id]) mp.players[mp.me.id].vpeer=id; if(mp.role==='guest') mpSend({t:'vpeer',vpeer:id}); if(mp.role==='host') hostSync(); voiceShow(); voiceConnect(); });
+    peer.on('call',voiceIncoming);
+    peer.on('error',e=>dlog('voice peer error '+e.type));
+    peer.on('disconnected',()=>{ try{ peer.reconnect(); }catch(e){} });
+  }catch(e){ dlog('voice peer unavailable'); }
+}
+
+/* ---- host ---- */
 async function mpHost(){
-  await loadIce();
   const code=mkCode();
   mpSetup('host',code);
-  diag.t0=Date.now(); diag.log=[]; diag.cands={}; diag.ice=''; diag.state='';
-  mp.peer=new Peer('pinpoint-'+code,peerOpts());
-  mp.peer.on('open',id=>{ mp.me.id=id; mp.players[id]={id,name:mp.me.name,color:null,score:0,host:true}; renderLobby(); voiceShow(); });
-  mp.peer.on('call',voiceIncoming);
-  mp.peer.on('connection',conn=>{
-    dlog('incoming connection from '+conn.peer.slice(0,8)); watchPc(conn,'in');
-    mp.pending=mp.pending||{}; mp.pending[conn.peer]=Date.now(); renderLobby();
-    const pendTimer=setTimeout(()=>{ if(mp.pending&&mp.pending[conn.peer]){ delete mp.pending[conn.peer]; renderLobby(); dlog('incoming '+conn.peer.slice(0,8)+' never opened'); } },30000);
-    conn.on('open',()=>{
-      clearTimeout(pendTimer); if(mp.pending) delete mp.pending[conn.peer]; dlog('incoming '+conn.peer.slice(0,8)+' open');
-      if(mp.phase!=='lobby'){ conn.send({t:'reject',why:'Game already in progress'}); setTimeout(()=>conn.close(),500); return; }
-      if(playerList().length>=10){ conn.send({t:'reject',why:'Lobby is full'}); setTimeout(()=>conn.close(),500); return; }
-      mp.conns[conn.peer]=conn;
-      mp.players[conn.peer]={id:conn.peer,name:'',color:null,score:0,host:false};
-      conn.on('data',m=>hostOnMessage(conn.peer,m));
-      conn.on('close',()=>hostDrop(conn.peer));
-      conn.on('error',()=>hostDrop(conn.peer));
-      hostSync();
-    });
-  });
-  mp.peer.on('error',e=>{ dlog('peer error '+e.type); if(e.type==='unavailable-id'){ mpLeave(); mpHost(); } else { toast('Connection error: '+e.type); } });
-  mp.peer.on('disconnected',()=>{ try{ mp.peer.reconnect(); }catch(e){} });
+  mp.me.id='host';
+  mp.players['host']={id:'host',name:mp.me.name,color:null,score:0,host:true,vpeer:null};
+  renderLobby(); voiceShow();
+  // Connect to every broker so guests can reach us through whichever one works for them.
+  for(const url of BROKERS){
+    const link=openLink(url,{topic:T.all(code),msg:{t:'host-left'}},(l,first)=>{ l.client.subscribe(T.host(code),{qos:0}); if(first){ l.client.publish(T.all(code),JSON.stringify({t:'hb'}),{qos:0}); } },
+      (l,topic,m)=>{ if(topic===T.host(code)) hostOnMessage(m.id,m,l); });
+    mp.links.push(link);
+  }
+  mp.hb=setInterval(()=>{
+    mpBroadcast({t:'hb'});
+    const now=Date.now();
+    for(const p of playerList()){ if(p.host) continue; if(now-(mp.seen[p.id]||now)>25000){ dlog('dropping silent '+p.name); hostDrop(p.id); } }
+  },5000);
+  openVoicePeer();
 }
+/* ---- guest ---- */
 async function mpJoin(code){
   code=code.toUpperCase().replace(/[^A-Z]/g,'');
   if(code.length!==4){ toast('Enter the 4-letter room code'); return; }
-  await loadIce();
   mpSetup('guest',code);
-  diag.t0=Date.now(); diag.log=[]; diag.cands={}; diag.ice=''; diag.state='';
-  $('roomUrl').textContent='Connecting…'; connStatus();
-  mp.peer=new Peer(peerOpts());
-  mp.peer.on('call',voiceIncoming);
-  mp.peer.on('open',id=>{
-    mp.me.id=id; voiceShow(); dlog('peer open '+id.slice(0,8));
-    const conn=mp.peer.connect('pinpoint-'+code,{reliable:true});
-    mp.host=conn; watchPc(conn,'out'); connStatus();
-    let opened=false;
-    conn.on('open',()=>{ opened=true; dlog('data channel open'); conn.send({t:'hello',name:mp.me.name}); connStatus(); });
-    conn.on('data',guestOnMessage);
-    conn.on('close',()=>{ if(mp.role==='guest'&&opened){ toast('The host left the game'); mpLeave(); show('menu'); } });
-    conn.on('error',e=>dlog('conn error '+(e&&e.type||e)));
-    setTimeout(()=>{ if(!opened && mp.role==='guest'){ dlog('timeout'); connFailed(diag.ice?'The direct connection did not open (state: '+diag.ice+').':'The host never answered. Make sure they are still in the lobby.'); } },25000);
-  });
-  mp.peer.on('error',e=>{ dlog('peer error '+e.type); if(mp.role!=='guest') return; if(e.type==='peer-unavailable'){ connFailed('No lobby with that code. Check the letters, and make sure the host is still on the lobby screen.'); } else if(e.type==='network'||e.type==='server-error'||e.type==='socket-error'){ connFailed('Could not reach the lobby service ('+e.type+').'); } else { toast('Connection error: '+e.type); } });
+  mp.me.id=mkId();
+  $('roomUrl').textContent='Connecting…'; connStatus('Contacting the game…');
+  const tryBroker=(i)=>{
+    if(mp.role!=='guest') return;
+    if(i>=BROKERS.length){ connFailed('No game with that code. Check the letters, and make sure the host is still on the lobby screen.'); return; }
+    mp.brokerIdx=i; connStatus(`Contacting the game… (${i+1}/${BROKERS.length})`);
+    const link=openLink(BROKERS[i],{topic:T.host(code),msg:{t:'leave',id:mp.me.id}},(l,first)=>{
+      if(mp.link&&mp.link!==l) return;
+      l.client.subscribe([T.all(code),T.one(code,mp.me.id)],{qos:0},()=>{ pub(l.client,T.host(code),{t:'hello',id:mp.me.id,name:mp.me.name,vpeer:mp.me.vpeer}); });
+      if(first){ mp.joinTimer=setTimeout(()=>{ if(mp.link!==l){ try{ l.client.end(true); }catch(e){} mp.links=mp.links.filter(x=>x!==l); tryBroker(i+1); } },6000); }
+    },(l,topic,m)=>{
+      if(mp.link&&mp.link!==l) return;
+      if(!mp.link){ if(topic===T.one(code,mp.me.id)&&(m.t==='welcome'||m.t==='reject')){ clearTimeout(mp.joinTimer); mp.link=l; } else return; }
+      guestOnMessage(m);
+    });
+    mp.links.push(link);
+    // broker never connected at all → next one
+    setTimeout(()=>{ if(mp.role==='guest'&&!link.ready&&!mp.link){ try{ link.client.end(true); }catch(e){} mp.links=mp.links.filter(x=>x!==link); tryBroker(i+1); } },8000);
+  };
+  tryBroker(0);
+  mp.hb=setInterval(()=>{ if(mp.link){ mpSend({t:'hb'}); if(mp.hostSeen&&Date.now()-mp.hostSeen>30000){ toast('Lost the host'); mpLeave(); show('menu'); } } },5000);
+  openVoicePeer();
 }
 function mpSetup(role,code){
-  mp.role=role; mp.code=code; mp.conns={}; mp.players={}; mp.guesses={}; mp.phase='lobby'; mp.host=null; mp.cd=null;
-  mp.me={id:null,name:myName(),color:null};
+  closeLinks();
+  mp.role=role; mp.code=code; mp.players={}; mp.guesses={}; mp.phase='lobby'; mp.cd=null; mp.seen={}; mp.hostSeen=0; mp.pending={};
+  mp.me={id:null,name:myName(),color:null,vpeer:null};
+  diag.t0=Date.now(); diag.log=[];
   $('mpName').value=mp.me.name;
   $('roomCode').textContent=code;
-  const local=location.hostname==='localhost'||location.hostname==='127.0.0.1';
-  $('roomUrl').textContent = local ? 'You opened the game at localhost, so friends can\'t reach this page. Use the public link the launcher printed (or the Wi-Fi address), then share the code.' : 'They open '+location.host+location.pathname.replace(/index\.html$/,'')+', press Join game, and type the code.';
-  $('copyLink').hidden=local;
-  $('hostPanel').hidden=role!=='host'; $('guestPanel').hidden=role!=='guest'; $('countdown').hidden=true;
+  $('roomUrl').textContent='They open '+location.host+location.pathname.replace(/index\.html$/,'')+', press Join game, and type the code.';
+  $('copyLink').hidden=false;
+  $('hostPanel').hidden=role!=='host'; $('guestPanel').hidden=role!=='guest'; $('countdown').hidden=true; $('connBox').hidden=true;
   $('mpStartBtn').hidden=false; $('mpStartNow').hidden=true; $('mpCancel').hidden=true;
   show('lobby'); renderLobby();
 }
 function mpLeave(){
   if(mp.cd){ clearInterval(mp.cd); mp.cd=null; }
   if(mp.deadline){ clearTimeout(mp.deadline); mp.deadline=null; }
+  if(mp.hb){ clearInterval(mp.hb); mp.hb=null; }
+  if(mp.joinTimer){ clearTimeout(mp.joinTimer); mp.joinTimer=null; }
+  if(mp.role==='host') mpBroadcast({t:'host-left'}); else if(mp.link) mpSend({t:'leave',id:mp.me.id});
   voiceStop();
   try{ mp.peer&&mp.peer.destroy(); }catch(e){}
-  mp.role=null; mp.peer=null; mp.conns={}; mp.players={}; mp.host=null; mp.phase='lobby'; mp.pending={}; $('connBox').hidden=true;
+  setTimeout(closeLinks,200);
+  mp.role=null; mp.peer=null; mp.players={}; mp.phase='lobby'; mp.pending={}; mp.link=null; $('connBox').hidden=true;
   $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
 }
-function mpBroadcast(m){ for(const c of Object.values(mp.conns)){ try{ c.send(m); }catch(e){} } }
-function mpSend(m){ if(mp.role==='host') hostOnMessage(mp.me.id,m); else if(mp.host) { try{ mp.host.send(m); }catch(e){} } }
+function mpBroadcast(m){ for(const l of mp.links){ if(l.ready) pub(l.client,T.all(mp.code),m); } }
+function mpSendTo(id,m){ const p=mp.players[id]; const l=(p&&p.link)||mp.links.find(x=>x.ready); if(l) pub(l.client,T.one(mp.code,id),m); }
+function mpSend(m){ if(mp.role==='host') hostOnMessage('host',m,null); else if(mp.link){ m.id=mp.me.id; pub(mp.link.client,T.host(mp.code),m); } }
+function connStatus(text){ if(mp.role!=='guest') return; const box=$('connBox'); box.hidden=false; box.className='conn'; box.textContent=text; }
+function connFailed(why){
+  const box=$('connBox'); box.hidden=false; box.className='conn fail';
+  box.innerHTML=`<b>Couldn't join.</b> ${esc(why)}<div class="row"><button class="btn btn-primary" id="retryJoin">Try again</button><button class="btn btn-secondary" id="copyDebug">Copy debug info</button><button class="btn btn-secondary" id="backMenu">Back</button></div>`;
+  $('retryJoin').onclick=()=>{ const c=mp.code; mpLeave(); mpJoin(c); };
+  $('copyDebug').onclick=()=>copyText(['Pinpoint debug','code '+mp.code,'ua '+navigator.userAgent,...diag.log].join('\n'),$('copyDebug'),'Copy debug info');
+  $('backMenu').onclick=()=>{ mpLeave(); show('menu'); };
+}
 
 /* ----- host side ----- */
-function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mpBroadcast({t:'lobby',players:playerList(),settings:mp.settings,cd:mp.cd?mp.cdLeft:null}); renderLobby(); voiceConnect(); }
+function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,score:p.score,host:!!p.host,vpeer:p.vpeer||null})); }
+function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mpBroadcast({t:'lobby',players:pubPlayers(),settings:mp.settings,cd:mp.cd?mp.cdLeft:null}); renderLobby(); voiceConnect(); }
 function hostDrop(id){
-  delete mp.conns[id]; if(!mp.players[id]) return;
-  const name=mp.players[id].name||'A player'; delete mp.players[id]; voiceDrop(id);
-  if(mp.phase==='lobby') hostSync(); else { toast(name+' left'); mpBroadcast({t:'players',players:playerList()}); updateStrip(); hostCheckRound(); }
+  if(!mp.players[id]||id==='host') return;
+  const name=mp.players[id].name||'A player'; const vp=mp.players[id].vpeer; delete mp.players[id]; delete mp.seen[id]; if(vp) voiceDrop(vp);
+  if(mp.phase==='lobby') hostSync(); else { toast(name+' left'); mpBroadcast({t:'players',players:pubPlayers()}); updateStrip(); hostCheckRound(); }
 }
-function hostOnMessage(from,m){
+function hostOnMessage(from,m,link){
+  if(!from) return;
+  if(m.t==='hello'){
+    if(mp.players[from]){ mp.players[from].link=link||mp.players[from].link; mp.seen[from]=Date.now(); mpSendTo(from,{t:'welcome'}); hostSync(); return; }
+    if(mp.phase!=='lobby'){ mpSendTo(from,{t:'reject',why:'That game is already in progress.'}); return; }
+    if(playerList().length>=10){ mpSendTo(from,{t:'reject',why:'That game is full (10 players).'}); return; }
+    mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,score:0,host:false,vpeer:m.vpeer||null,link};
+    mp.seen[from]=Date.now(); dlog('joined '+from); mpSendTo(from,{t:'welcome'}); hostSync(); return;
+  }
   const pl=mp.players[from]; if(!pl) return;
-  if(m.t==='hello'||m.t==='name'){ pl.name=String(m.name||'').slice(0,16); if(mp.phase==='lobby') hostSync(); else mpBroadcast({t:'players',players:playerList()}); }
+  mp.seen[from]=Date.now(); if(link) pl.link=link;
+  if(m.t==='hb') return;
+  if(m.t==='leave'){ hostDrop(from); return; }
+  if(m.t==='vpeer'){ pl.vpeer=m.vpeer; hostSync(); return; }
+  if(m.t==='name'){ pl.name=String(m.name||'').slice(0,16); if(mp.phase==='lobby') hostSync(); else mpBroadcast({t:'players',players:pubPlayers()}); }
   else if(m.t==='color'){
     const c=m.color; const free=c===null||!playerList().some(p=>p.id!==from&&p.color===c);
     if(free) pl.color=c; hostSync();
@@ -1237,7 +1234,7 @@ function hostReveal(){
   mpBroadcast(rev); showResultMP(rev);
 }
 function mpHostNext(){
-  if(state.round>=state.totalRounds){ const fin={t:'final',players:playerList()}; mpBroadcast(fin); showFinalMP(fin); }
+  if(state.round>=state.totalRounds){ const fin={t:'final',players:pubPlayers()}; mpBroadcast(fin); showFinalMP(fin); }
   else { mpBroadcast({t:'round',i:state.round}); mpRound(); }
 }
 function mpStartCountdown(secs){
@@ -1261,13 +1258,17 @@ async function hostStartGame(){
   const locs=await mp.locPromise;
   const payload=locs.map(l=>({pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null}));
   mp.phase='round'; mp.starting=false;
-  mpBroadcast({t:'start',settings:mp.settings,locs:payload,players:playerList()});
+  mpBroadcast({t:'start',settings:mp.settings,locs:payload,players:pubPlayers()});
   mpStartGameLocal(mp.settings,locs);
 }
 
 /* ----- guest side ----- */
 function guestOnMessage(m){
-  if(m.t==='reject'){ toast(m.why); mpLeave(); show('menu'); return; }
+  mp.hostSeen=Date.now();
+  if(m.t==='welcome'){ $('connBox').className='conn ok'; $('connBox').textContent='Connected ✓'; $('connBox').hidden=false; setTimeout(()=>{ if(mp.role==='guest') $('connBox').hidden=true; },2500); return; }
+  if(m.t==='hb') return;
+  if(m.t==='host-left'){ toast('The host left the game'); mpLeave(); show('menu'); return; }
+  if(m.t==='reject'){ connFailed(m.why); return; }
   if(m.t==='lobby'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; mp.settings=m.settings; const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; renderLobby(); voiceConnect(); }
   else if(m.t==='players'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; updateStrip(); }
   else if(m.t==='countdown'){ if(m.secs>0){ runCountdown(m.secs,()=>{}); } else { if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=false; $('countdown').textContent=m.msg||'Starting…'; } }
@@ -1432,12 +1433,13 @@ function silentTrack(){
 function currentTrack(){ return voice.on&&voice.micStream ? voice.micStream.getAudioTracks()[0] : silentTrack(); }
 function voiceShow(){ $('micBtn').hidden=!mp.role; $('resetBtn').parentElement.classList.toggle('shift',!!mp.role); renderMic(); }
 function voiceConnect(){
-  if(!mp.peer||!mp.me.id||mp.peer.destroyed) return;
+  if(!mp.peer||!mp.me.vpeer||mp.peer.destroyed) return;
   for(const p of playerList()){
-    if(p.id===mp.me.id||voice.calls[p.id]) continue;
-    if(mp.me.id>p.id){ try{ const call=mp.peer.call(p.id,new MediaStream([currentTrack()]),CALL_OPTS); if(call) attachCall(call); }catch(e){} }
+    if(p.id===mp.me.id||!p.vpeer||voice.calls[p.vpeer]) continue;
+    if(mp.me.vpeer>p.vpeer){ try{ const call=mp.peer.call(p.vpeer,new MediaStream([currentTrack()]),CALL_OPTS); if(call) attachCall(call); }catch(e){} }
   }
 }
+function playerIdForVoice(vp){ if(vp===mp.me.vpeer) return mp.me.id; const p=playerList().find(x=>x.vpeer===vp); return p?p.id:vp; }
 function voiceIncoming(call){ if(!mp.role) return; if(voice.calls[call.peer]){ try{ voice.calls[call.peer].close(); }catch(e){} } try{ call.answer(new MediaStream([currentTrack()]),CALL_OPTS); attachCall(call); }catch(e){} }
 function attachCall(call){
   voice.calls[call.peer]=call;
@@ -1449,7 +1451,7 @@ function voiceDrop(id){
   const c=voice.calls[id]; delete voice.calls[id]; try{ c&&c.close(); }catch(e){}
   const a=voice.audios[id]; if(a){ a.srcObject=null; a.remove(); delete voice.audios[id]; }
   if(voice.meters[id]){ clearInterval(voice.meters[id].timer); try{ voice.meters[id].nodes.forEach(n=>n.disconnect()); }catch(e){} delete voice.meters[id]; }
-  delete voice.speaking[id];
+  delete voice.speaking[playerIdForVoice(id)];
 }
 function playRemote(id,st){
   let a=voice.audios[id];
@@ -1471,7 +1473,8 @@ function meter(id,st){   // local mic level only (not played back)
   if(voice.meters[id]){ clearInterval(voice.meters[id].timer); try{ voice.meters[id].nodes.forEach(n=>n.disconnect()); }catch(e){} delete voice.meters[id]; }
   try{ const ctx=audioCtx(); const src=ctx.createMediaStreamSource(st); const an=ctx.createAnalyser(); an.fftSize=512; src.connect(an); startMeter(id,an,[src,an]); }catch(e){}
 }
-function setSpeaking(id,on){
+function setSpeaking(vp,on){
+  const id=playerIdForVoice(vp);
   if(!!voice.speaking[id]===on) return; voice.speaking[id]=on;
   document.querySelectorAll(`[data-id="${id}"]`).forEach(el=>el.classList.toggle('speaking',on));
   if(id===mp.me.id) $('micBtn').classList.toggle('talking',on);
@@ -1483,10 +1486,10 @@ async function toggleMic(){
     try{ voice.micStream=await navigator.mediaDevices.getUserMedia({audio:micConstraints()}); }
     catch(e){ voice.busy=false; renderMic(); toast(location.protocol==='https:'||location.hostname==='localhost'?'Microphone blocked. Allow the mic for this site and try again.':'Voice needs an https link (use the public link).'); return; }
     try{ voice.micStream.getAudioTracks()[0].contentHint='music'; }catch(e){}   // ask the encoder for fidelity, not phone-call speech mode
-    voice.on=true; voice.busy=false; meter(mp.me.id,voice.micStream);
+    voice.on=true; voice.busy=false; meter(mp.me.vpeer||mp.me.id,voice.micStream);
   } else {
-    voice.on=false; setSpeaking(mp.me.id,false);
-    if(voice.meters[mp.me.id]){ clearInterval(voice.meters[mp.me.id].timer); delete voice.meters[mp.me.id]; }
+    voice.on=false; setSpeaking(mp.me.vpeer||mp.me.id,false);
+    const mk=mp.me.vpeer||mp.me.id; if(voice.meters[mk]){ clearInterval(voice.meters[mk].timer); delete voice.meters[mk]; }
     if(voice.micStream){ voice.micStream.getTracks().forEach(t=>t.stop()); voice.micStream=null; }
   }
   swapTracks(); renderMic();
@@ -1498,7 +1501,7 @@ function swapTracks(){
 function renderMic(){ const b=$('micBtn'); b.classList.toggle('live',voice.on); b.classList.toggle('busy',voice.busy); $('micTxt').textContent=voice.busy?'Asking for mic…':voice.on?'Mic on':'Mic off'; }
 function voiceStop(){
   for(const id of Object.keys(voice.calls)) voiceDrop(id);
-  if(voice.meters[mp.me.id]){ clearInterval(voice.meters[mp.me.id].timer); delete voice.meters[mp.me.id]; }
+  const mk=mp.me.vpeer||mp.me.id; if(voice.meters[mk]){ clearInterval(voice.meters[mk].timer); delete voice.meters[mk]; }
   if(voice.micStream){ voice.micStream.getTracks().forEach(t=>t.stop()); voice.micStream=null; }
   voice.on=false; voice.speaking={}; $('micBtn').hidden=true; $('micBtn').classList.remove('live','talking');
 }
@@ -1519,6 +1522,7 @@ $('hostBtn').addEventListener('click',()=>mpHost());
 $('joinBtn').addEventListener('click',()=>mpJoin($('joinCode').value));
 $('joinCode').addEventListener('keydown',e=>{ if(e.key==='Enter') mpJoin($('joinCode').value); });
 $('leaveBtn').addEventListener('click',()=>{ mpLeave(); show('menu'); });
+window.addEventListener('pagehide',()=>{ if(mp.role) mpLeave(); });
 $('mpName').addEventListener('input',()=>{ mp.me.name=$('mpName').value.trim().slice(0,16); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
 $('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return; const i=+sw.dataset.i; mpSend({t:'color',color:mp.me.color===i?null:i}); if(mp.role==='guest'){ mp.me.color=mp.me.color===i?null:i; } });
 $('mpTimeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; mp.settings.time=+b.dataset.t; hostSync(); });

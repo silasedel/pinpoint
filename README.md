@@ -10,7 +10,7 @@ Offline copy: double-click `run.command`. It serves the game locally, opens a te
 
 ## Play with friends (anywhere)
 
-Multiplayer has no server of its own. The host's browser runs the game and the others connect to it directly with WebRTC (PeerJS handles the introductions), so friends can be on any Wi-Fi, in any city.
+Multiplayer has no server of its own. The host's browser runs the game; messages between players travel through public MQTT brokers over WebSockets (three of them, with automatic failover), which works on any network. Voice uses direct WebRTC links between browsers.
 
 1. The host opens https://silasedel.github.io/pinpoint/ and clicks **Create game**.
 2. The host clicks **Copy invite link** and sends it to friends. The invite link opens the game and joins the lobby automatically. Or send the 4-letter code and they click **Join game** on the same site.
@@ -20,7 +20,7 @@ Multiplayer has no server of its own. The host's browser runs the game and the o
 
 Running from the launcher instead? It prints a temporary public link (via `cloudflared`) and a same-Wi-Fi address, either of which works the same way.
 
-If two people are behind unusually strict networks the direct WebRTC connection can fail. That's rare on home Wi-Fi and phone data.
+Game traffic never depends on a direct connection, so joining works from any network. Voice does use direct links, so on unusually strict networks two specific people may not hear each other.
 
 ## How it works
 
@@ -30,4 +30,5 @@ If two people are behind unusually strict networks the direct WebRTC connection 
 - **Country reveal** uses BigDataCloud's free client reverse geocoder (OpenStreetMap Nominatim as fallback) so a far-off guess in the right country is called out as such.
 - **Scoring**: `5000 * e^(-distance_km / 1492.7)`. The solo leaderboard is per mode and lives in localStorage.
 - **Voice chat** is a WebRTC audio mesh: every pair of players holds one audio call, carrying a silent track until a mic is turned on, so unmuting just swaps the track.
+- **Multiplayer transport** is MQTT over WebSockets via public brokers (EMQX, HiveMQ, Mosquitto), topics keyed by the room code. Heartbeats and last-will messages handle disconnects.
 - **Multiplayer** is host-authoritative: the host finds the locations, sends them to everyone at start, collects guesses, scores them, and broadcasts each reveal.
