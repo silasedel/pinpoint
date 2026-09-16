@@ -596,7 +596,7 @@
     <div class="legend" id="betLegend"></div>
   </div>
   <div id="passport" hidden>
-    <div class="ptitle">Passport <span>Every round is in the same country. Name it early for a bigger bonus. One try.</span></div>
+    <div class="ptitle">Passport <span>Every round is in the same country. Results won't show where you were until you stamp it. Name it early for a bigger bonus. One try.</span></div>
     <div class="prow2"><input id="ppIn" list="ppList" placeholder="Which country is this?" autocomplete="off"><datalist id="ppList"></datalist><button class="btn btn-primary" id="ppStamp">Stamp</button></div>
     <div class="ppstat" id="ppStat"></div>
   </div>
@@ -976,7 +976,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-013558';
+const BUILD='20260916-014017';
 const state={ mode:'classic', passport:null, bank:1000, bet:0, pick:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1209,21 +1209,22 @@ function showResult(r){
   if(!resultMap) resultMap=makeMap('resultmap');
   if(resultLayer) resultLayer.remove();
   resultLayer=L.layerGroup().addTo(resultMap);
-  plainStyle(resultMap,!!modeOf(state.mode).passport);
+  const hid=passportHidden();
+  plainStyle(resultMap,!!modeOf(state.mode).passport&&!hid);
   let line=null, casing=null;
   if(r.guess){
-    casing=L.polyline([r.guess,r.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
-    line=L.polyline([r.guess,r.truth],{color:'#1f9d55',weight:3,opacity:1}).addTo(resultLayer);
+    if(!hid){ casing=L.polyline([r.guess,r.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
+    line=L.polyline([r.guess,r.truth],{color:'#1f9d55',weight:3,opacity:1}).addTo(resultLayer); }
     L.marker(r.guess,{icon:guessIcon}).addTo(resultLayer);
   }
-  L.marker(r.truth,{icon:trueIcon}).addTo(resultLayer);
-  const fit=()=>{ resultMap.invalidateSize(); if(r.guess) resultMap.fitBounds(L.latLngBounds([r.guess,r.truth]),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(r.truth,5,{animate:false}); };
+  if(!hid) L.marker(r.truth,{icon:trueIcon}).addTo(resultLayer);
+  const fit=()=>{ resultMap.invalidateSize(); if(hid){ resultMap.setView(r.guess||[20,0],r.guess?4:2,{animate:false}); return; } if(r.guess) resultMap.fitBounds(L.latLngBounds([r.guess,r.truth]),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(r.truth,5,{animate:false}); };
   fit(); setTimeout(fit,150);
   if(line) setTimeout(()=>{ for(const pl of [casing,line]){ const el=pl.getElement(); if(!el) continue; const len=el.getTotalLength(); el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.classList.add('draw-line'); void el.getBoundingClientRect(); el.style.strokeDashoffset=0; } },350);
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(r.pts>=4000) pe.classList.add('great');
   setTimeout(()=>{ pe.classList.add('pop'); if(r.pts>=4500) confetti(); },1000);
 
-  $('distTxt').innerHTML = r.guess ? `Your guess was <b>${fmtDist(r.km)}</b> from the correct location.` : `You didn't place a pin. The location is marked with a flag.`;
+  $('distTxt').innerHTML = r.guess ? `Your guess was <b>${fmtDist(r.km)}</b> from the correct location.` : (hid?`You didn't place a pin.`:`You didn't place a pin. The location is marked with a flag.`);
   const busted=r.bet&&state.bank<=0;
   $('nextBtn').textContent = (state.round>=state.totalRounds||busted) ? 'See results' : 'Next round';
   $('ptsBar').style.width='0%';
@@ -1242,11 +1243,12 @@ function renderVerdict(r){
   const tp=r.loc.place, gp=r.guessPlace;
   const same=!!(tp&&gp&&tp.country===gp.country);
   let text,cls;
-  const hide=!!modeOf(state.mode).passport;
+  const hide=!!modeOf(state.mode).passport, hid=passportHidden();
   if(r.timedOut){ text="Time's up — no guess placed"; cls='bad'; }
-  else { [text,cls]=verdictFor(r.km,same); if(same&&r.km>=200) text=hide?'Right country':`Right country: ${tp.country}`; }
+  else { [text,cls]=verdictFor(r.km,same&&!hid); if(same&&!hid&&r.km>=200) text=hide?'Right country':`Right country: ${tp.country}`; }
   const v=$('verdict'); v.textContent=text; v.className='verdict '+cls;
   const parts=[];
+  if(hid){ $('placeTxt').innerHTML='<span>Location hidden until you stamp the country.</span>'; return; }
   if(tp) parts.push(`<span>📍 Location: <b>${esc(tp.region?tp.region+', ':'')}${hide?'???':esc(tp.country)}</b></span>`);
   if(gp) parts.push(hide?(gp.region?`<span>Your pin: <b>${esc(gp.region)}</b></span>`:''):`<span>Your pin: <b>${esc(gp.region?gp.region+', ':'')}${esc(gp.country)}</b></span>`);
   else if(r.guess && tp) parts.push(`<span>Your pin: <b>in the ocean</b></span>`);
@@ -1642,6 +1644,8 @@ function plainStyle(m,on){
 }
 
 /* ---------- Passport: one country all game; stamp it early for a bonus ---------- */
+/* Until you've used your stamp, round results hide the true location entirely: no flag, no line, no region. You get your points and the distance. */
+function passportHidden(){ return !!(modeOf(state.mode).passport&&state.passport&&!state.passport.stamp); }
 function stampBonus(round){ return Math.min(5000,1000*(state.totalRounds-round+1)); }
 function renderPassport(){
   const p=$('passport'); if(!state.passport){ p.hidden=true; return; } p.hidden=false;
@@ -2008,15 +2012,16 @@ function showResultMP(rev){
   if(!resultMap) resultMap=makeMap('resultmap');
   if(resultLayer) resultLayer.remove();
   resultLayer=L.layerGroup().addTo(resultMap);
-  plainStyle(resultMap,!!modeOf(state.mode).passport);
-  const pts=[rev.truth]; const lines=[];
+  const hid=passportHidden();
+  plainStyle(resultMap,!!modeOf(state.mode).passport&&!hid);
+  const pts=hid?[]:[rev.truth]; const lines=[];
   for(const r of rev.results){ if(!r.guess) continue; pts.push(r.guess);
-    L.polyline([r.guess,rev.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
-    lines.push(L.polyline([r.guess,rev.truth],{color:COLORS[r.color??0][0],weight:3,opacity:1}).addTo(resultLayer));
+    if(!hid){ L.polyline([r.guess,rev.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
+    lines.push(L.polyline([r.guess,rev.truth],{color:COLORS[r.color??0][0],weight:3,opacity:1}).addTo(resultLayer)); }
     L.marker(r.guess,{icon:colorIcon(COLORS[r.color??0][0])}).addTo(resultLayer).bindTooltip(r.name,{direction:'top',offset:[0,-40]});
   }
-  L.marker(rev.truth,{icon:trueIcon}).addTo(resultLayer);
-  const fit=()=>{ resultMap.invalidateSize(); if(pts.length>1) resultMap.fitBounds(L.latLngBounds(pts),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(rev.truth,5,{animate:false}); };
+  if(!hid) L.marker(rev.truth,{icon:trueIcon}).addTo(resultLayer);
+  const fit=()=>{ resultMap.invalidateSize(); if(pts.length>1) resultMap.fitBounds(L.latLngBounds(pts),{padding:[70,70],maxZoom:hid?5:12,animate:false}); else if(pts.length===1) resultMap.setView(pts[0],hid?4:5,{animate:false}); else resultMap.setView([20,0],2,{animate:false}); };
   fit(); setTimeout(fit,150);
   const mine=rev.results.find(r=>r.id===mp.me.id)||{pts:0,km:null,guess:null};
   const me={round:rev.round,guess:mine.guess,truth:rev.truth,km:mine.km,pts:mine.pts,bet:mine.bet||null,timedOut:!mine.guess,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng},guessPlace:null};
