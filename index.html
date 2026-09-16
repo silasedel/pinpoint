@@ -631,7 +631,7 @@ function haversine(a,b){
   return 2*R*Math.asin(Math.sqrt(s));
 }
 function scoreFor(km){ if(km<0.025) return 5000; return Math.round(5000*Math.exp(-km/1492.7)); }
-function fmtDist(km){ return km<1 ? `${Math.round(km*1000)} m` : km<100 ? `${km.toFixed(1)} km` : `${Math.round(km).toLocaleString()} km`; }
+function fmtDist(km){ const mi=km*0.621371; return mi<0.1 ? `${Math.round(mi*5280)} ft` : mi<100 ? `${mi.toFixed(1)} mi` : `${Math.round(mi).toLocaleString()} mi`; }
 function fmtTime(s){ if(s>=60) return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; return `${s}`; }
 function verdictFor(km,sameCountry){
   if(km<1)    return ['Pinpoint!','good'];
@@ -676,7 +676,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260915-203107';
+const BUILD='20260915-204519';
 const state={ timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ return `${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -825,8 +825,9 @@ function stopTimer(){ if(state.timer){ clearInterval(state.timer); state.timer=n
 function submitGuess(auto=false){
   if(state.locked) return;
   if(!state.guess && !auto) return;
-  state.locked=true; stopTimer();
-  if(mp.role){ mpSubmitGuess(); return; }
+  state.locked=true;
+  if(mp.role){ mpSubmitGuess(); return; }   // clock keeps running so you can see how long the others have
+  stopTimer();
   const truth={lat:state.current.lat,lng:state.current.lng};
   const km=state.guess?haversine(state.guess,truth):null;
   const pts=state.guess?scoreFor(km):0;
