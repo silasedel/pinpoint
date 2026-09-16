@@ -25,6 +25,10 @@ Picture tiles on the solo setup screen and in the lobby. Classic is selected by 
 - **Time Machine**: only captures from before 2010, pulled from each spot's imagery history.
 - **Snow Globe**: only captures from winter months in snowy regions.
 - **Countdown**: 30 seconds, and points are worth less the longer you wait (full value at the start, a quarter at zero).
+- **Altitude**: high regions only, each pick verified above 2,000 m via open-elevation.
+- **All In**: you start with 1,000 chips and must bet every round (1 to everything). Payout is stake × multiplier from the base score: 4,900+ pays 5×, 4,500+ 3×, 3,750+ 2×, 2,500+ returns the stake, 1,250+ returns half, below that loses it. Bankroll is the score; hit zero and the game ends.
+- **Odd One Out**: three still views and a map with two pins. Pick the view that has no pin.
+- **Two Truths and a Lie**: two still views and a map with three pins. Pick the pin that is the lie.
 
 All location picking asks Google for its own imagery only (`StreetViewSource.GOOGLE`), which is what makes country selection even; before that, user-uploaded photospheres were crowding out official coverage in Europe and the US.
 

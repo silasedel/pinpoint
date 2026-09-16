@@ -309,6 +309,42 @@
   .setup-wrap{max-width:960px;margin:0 auto}
   .brand-row .lockup{color:var(--text)}
   #game.gray .pano,#game.gray #pix{filter:grayscale(1)}
+  #bettray{position:absolute;left:16px;bottom:72px;z-index:7;width:400px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px}
+  #bettray .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  #bettray .bank{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  #bettray .bank b{display:block;font-size:20px;letter-spacing:0;color:var(--text);text-transform:none;font-variant-numeric:tabular-nums}
+  #bettray .pot{text-align:right}
+  #bettray .pot b{color:var(--green-dark)}
+  .chips{display:flex;gap:8px;margin-top:10px;align-items:center}
+  .chip-btn{width:46px;height:46px;border-radius:50%;border:4px dashed rgba(255,255,255,.85);box-shadow:0 2px 4px rgba(0,0,0,.35),inset 0 0 0 3px rgba(0,0,0,.15);color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center;text-shadow:0 1px 2px rgba(0,0,0,.5);transition:transform .1s}
+  .chip-btn:hover{transform:translateY(-3px)} .chip-btn:active{transform:scale(.94)}
+  .chip-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+  .chip-btn.c1{background:#f1f3f5;color:#333;text-shadow:none;border-color:#c8ccd0} .chip-btn.c5{background:#d7263d} .chip-btn.c25{background:#1f9d55} .chip-btn.c100{background:#222} .chip-btn.c500{background:#6f42c1}
+  .chips .sm{margin-left:auto;display:flex;gap:6px}
+  .chips .sm button{padding:8px 10px;border-radius:8px;background:#eef2ef;font-size:12px;font-weight:700}
+  .chips .sm button.allin{background:#fff4d6;color:#7a5200}
+  .potchips{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;min-height:14px}
+  .potchips i{width:12px;height:12px;border-radius:50%;border:2px dashed rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.4)}
+  #trio{position:absolute;inset:72px 0 0 0;z-index:4;background:#000;display:flex;gap:4px}
+  #trio .col{position:relative;flex:1;overflow:hidden;cursor:pointer;background:#111}
+  #trio .col canvas{width:100%;height:100%;object-fit:cover;display:block;transition:filter .2s,opacity .2s}
+  #trio .col .lbl{position:absolute;left:50%;top:14px;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-weight:800;font-size:20px;display:grid;place-items:center;border:2px solid rgba(255,255,255,.8)}
+  #trio .col .dev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;opacity:.8}
+  #trio.pickable .col:hover canvas{filter:brightness(1.08)}
+  #trio .col.on{outline:5px solid var(--green);outline-offset:-5px}
+  #trio .col.on .lbl{background:var(--green);border-color:#fff}
+  #trio .col.on::after{content:'Your pick';position:absolute;left:50%;bottom:16px;transform:translateX(-50%);padding:6px 12px;border-radius:99px;background:var(--green);color:#fff;font-weight:800;font-size:13px}
+  #tmap{position:absolute;left:0;right:0;bottom:0;z-index:8;height:64px;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(0,0,0,.35);transition:height .25s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+  #tmap.open{height:72vh}
+  #tmap .handle{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-weight:800;gap:12px;flex:none}
+  #tmap .handle .hint{color:var(--muted);font-weight:600;font-size:13px}
+  #tmap .handle .btn{padding:10px 18px;font-size:14px}
+  #triomap{flex:1;min-height:0;background:#bfd9e8}
+  .marker-num{width:34px;height:34px;border-radius:50%;background:#152219;color:#fff;font-weight:800;font-size:15px;display:grid;place-items:center;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.4);cursor:pointer;transition:transform .1s}
+  .marker-num:hover{transform:scale(1.1)}
+  .marker-num.on{background:var(--green)}
+  .marker-num.lie{background:var(--red)}
+  #game.trio .mappanel,#game.trio .ctl #copyBtn{display:none}
   .waiting{color:var(--muted);font-size:14px;font-weight:600;padding:12px 0}
   .conn{margin-top:10px;padding:10px 12px;border-radius:10px;background:#f6f8f7;border:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.5}
   .conn.ok{background:var(--green-soft);color:var(--green-dark);border-color:#bfe3cd}
@@ -501,6 +537,16 @@
   <div class="round-intro" id="roundIntro" hidden></div>
   <div id="blink" hidden><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="lid" fill="#000" fill-rule="evenodd" d=""/></svg></div>
   <div id="pix" hidden><canvas id="pixCanvas" width="128" height="72"></canvas><div class="dev" id="pixDev">Loading…</div></div>
+  <div id="trio" hidden></div>
+  <div id="tmap" hidden><div class="handle"><span id="tmapTitle">Map</span><span class="hint" id="tmapHint">Hover to open</span><button class="btn btn-primary" id="trioLock" disabled>Pick one first</button></div><div id="triomap"></div></div>
+  <div id="bettray" hidden>
+    <div class="row"><div class="bank">Bankroll<b id="bankLbl">1,000</b></div><div class="bank pot">Your bet<b id="betLbl">0</b></div></div>
+    <div class="chips">
+      <button class="chip-btn c1" data-v="1">1</button><button class="chip-btn c5" data-v="5">5</button><button class="chip-btn c25" data-v="25">25</button><button class="chip-btn c100" data-v="100">100</button><button class="chip-btn c500" data-v="500">500</button>
+      <span class="sm"><button id="betClear">Clear</button><button class="allin" id="betAll">All in</button></span>
+    </div>
+    <div class="potchips" id="potChips"></div>
+  </div>
   <div id="waitOverlay" hidden><div class="wbox"><b>Guess locked in</b><div id="waitTxt" style="color:var(--muted);font-size:14px"></div><div class="wlist" id="waitList"></div></div></div>
 
   <div class="hud">
@@ -649,6 +695,8 @@ const LANDMARKS=[['Eiffel Tower',48.8584,2.2945],['Arc de Triomphe',48.8738,2.29
 const OLD_COVERAGE=n=>/^USA|^Alaska$|^Hawaii$|^Canada|^Japan|^Australia|Western Australia|Northern Territory|Queensland|New South Wales|Victoria|South Australia|Tasmania|New Zealand|^France|^Spain|^Portugal|^Italy|Sicily|Sardinia|^England$|^Scotland$|^Wales$|^Netherlands$|^Switzerland$|^Czechia$|^Denmark$|^Sweden$|^Mexico/.test(n);
 const SNOW_NORTH=['Canada West','Canada East','Alaska','Norway','Sweden','Finland','Iceland','Faroe Islands','Svalbard','Greenland','Russia West','Russia Volga-Urals','Siberia West','Siberia East','Russian Far East','Mongolia','Kazakhstan','Kyrgyzstan','Japan North','Switzerland','Austria','Estonia','Latvia','Lithuania','Poland','Czechia','Slovakia','USA West','USA Central','USA East','Bhutan','Nepal','Ukraine'];
 const SNOW_SOUTH=['Argentina South','Chile South','New Zealand South','Tasmania'];
+/* Altitude: high regions; every pick is checked against an elevation service and must be above 2,000 m. */
+const HIGH=[['Bolivian Altiplano',-20,-15,-69.5,-66],['Peru Highlands',-16,-10,-76,-70],['Ecuador Highlands',-2.5,0.5,-79.2,-78],['Bogotá Highlands',4.3,5.9,-74.6,-73.5],['Chilean Altiplano',-24,-18,-70,-67.5],['Jujuy',-24.5,-22.5,-66.5,-65],['Mexican Highlands',19,19.9,-99.6,-98.5],['Colorado Rockies',37.5,40.5,-108,-105],['Wasatch',40.4,41,-111.8,-111.4],['Yellowstone',43.8,45,-111,-109.5],['Sierra Nevada',37.5,38.5,-119.8,-119],['Swiss Alps',45.9,46.6,7.2,10.3],['Tyrol',46.8,47.3,10,12.5],['Dolomites',46.3,46.7,11.4,12.3],['French Alps',44.9,45.9,6.4,7.1],['Andorra',42.45,42.65,1.45,1.75],['Nepal',27.4,28.3,84,86.5],['Bhutan',27.2,27.7,89.4,90.6],['Ladakh & Himachal',31.5,34.3,76.5,78.5],['Kyrgyzstan',41.2,42.7,74,78],['Almaty Mountains',42.9,43.25,76.8,77.3],['Ethiopian Highlands',8.5,10.2,37.5,39.5],['Lesotho',-30.2,-28.7,27.3,29.3],['Drakensberg',-29.7,-28.5,28.9,29.6],['Eastern Anatolia',38.5,40,41,44],['Caucasus',41.9,42.7,43.3,45.5],['Western Mongolia',46,50,88,96],['Rwanda',-2.5,-1.3,29.2,30],['Kenya Highlands',-1.5,0.5,35.5,37.5],['Mauna Kea',19.7,19.85,-155.55,-155.4],['Hehuanshan',24.1,24.2,121.2,121.35],['Japanese Alps',36.1,36.8,137.4,137.9]];
 /* Truly dense cores only: the picks stay within about three quarters of a mile of these points. */
 const DENSE=[['Manhattan',40.755,-73.985],['Downtown Chicago',41.882,-87.63],['Downtown Toronto',43.65,-79.382],['Downtown San Francisco',37.789,-122.401],['Central Tokyo',35.69,139.7],['Shinjuku',35.694,139.7],['Shibuya',35.659,139.7],['Osaka Umeda',34.702,135.497],['Seoul Gangnam',37.498,127.028],['Seoul Jongno',37.57,126.985],['Hong Kong Central',22.282,114.158],['Mong Kok',22.319,114.17],['Taipei Xinyi',25.034,121.565],['Singapore CBD',1.284,103.851],['Bangkok Silom',13.728,100.53],['Kuala Lumpur KLCC',3.157,101.712],['Jakarta Thamrin',-6.195,106.823],['Manila Makati',14.556,121.023],['Ho Chi Minh District 1',10.775,106.7],['Mumbai Fort',18.935,72.835],['Delhi Connaught Place',28.632,77.219],['Dubai Marina',25.08,55.14],['Istanbul Beyoğlu',41.036,28.978],['Paris Opéra',48.871,2.332],['London City',51.514,-0.09],['Madrid Sol',40.417,-3.703],['Barcelona Eixample',41.392,2.165],['Milan Duomo',45.464,9.19],['Berlin Mitte',52.52,13.405],['Vienna Innere Stadt',48.208,16.372],['Prague Old Town',50.087,14.42],['Warsaw Śródmieście',52.232,21.012],['Moscow Tverskaya',55.762,37.606],['Mexico City Centro',19.433,-99.14],['São Paulo Centro',-23.548,-46.638],['Buenos Aires Microcentro',-34.604,-58.38],['Santiago Centro',-33.44,-70.65],['Bogotá Centro',4.6,-74.075],['Lima Centro',-12.047,-77.031],['Johannesburg CBD',-26.205,28.04],['Nairobi CBD',-1.284,36.82],['Cairo Downtown',30.045,31.238],['Sydney CBD',-33.868,151.208],['Melbourne CBD',-37.814,144.963]];
 const MODES={
@@ -666,6 +714,10 @@ const MODES={
   timemachine:{name:'Time Machine', desc:'Only imagery from before 2010.', filter:OLD_COVERAGE, old:true},
   snow:     {name:'Snow Globe', desc:'Only winter imagery.', filter:n=>SNOW_NORTH.includes(n)||SNOW_SOUTH.includes(n), snow:true},
   countdown:{name:'Countdown', desc:'30 seconds. Every second costs you points.', time:30, countdown:true},
+  altitude: {name:'Altitude', desc:'Only places above 2,000 meters.', places:HIGH, radius:15000, alt:2000},
+  allin:    {name:'All In', desc:'Bet chips on every guess. Close pays 5×, far loses the stake.', bet:true},
+  oddone:   {name:'Odd One Out', desc:'Three views, two pins. Which view has no pin?', trio:3, pins:2},
+  twotruths:{name:'Two Truths and a Lie', desc:'Two views, three pins. Which pin is the lie?', trio:2, pins:3},
 };
 function modeOf(id){ return MODES[id]||MODES.classic; }
 
@@ -695,6 +747,7 @@ async function findLocation(continent,mode){
         const lat=loc.latLng.lat(), lng=loc.latLng.lng();
         let place=null;
         if(mode.remote && MILLION.some(c=>haversine({lat,lng},{lat:c[1],lng:c[2]})<60)) continue;   // nowhere near a big city
+        if(mode.alt){ const el=await elevationOf(lat,lng); if(el!=null && el<mode.alt) continue; }
         let pano=loc.pano, heading=Math.floor(Math.random()*360);
         if(mode.old||mode.snow){   // pick a historic capture of this spot that fits the mode
           const opts=(data.time||[]).map(e=>{ let d=null; for(const k of Object.keys(e)) if(e[k] instanceof Date) d=e[k]; return {pano:e.pano,d}; }).filter(e=>e.d);
@@ -713,6 +766,14 @@ async function findLocation(continent,mode){
   throw new Error('Could not find a Street View location. Try again.');
 }
 
+async function elevationOf(lat,lng){
+  try{ const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),5000); const r=await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${lat.toFixed(5)},${lng.toFixed(5)}`,{signal:ctl.signal}); clearTimeout(t); const j=await r.json(); return j.results&&j.results[0]?j.results[0].elevation:null; }catch(e){ return null; }
+}
+/* Trio modes need three spots per round: the main one plus two extras from anywhere. */
+async function findTrio(continent,mode){
+  const a=await findLocation(continent,{}); const b=await findLocation(null,{}); const c=await findLocation(null,{});
+  a.extra=[b,c]; a.lie=Math.floor(Math.random()*3); return a;
+}
 /* ---------- Reverse geocoding: BigDataCloud (built for browsers), OpenStreetMap as fallback ---------- */
 const NICE={'United States of America':'United States','United Kingdom of Great Britain and Northern Ireland':'United Kingdom','Russian Federation':'Russia','Korea (Republic of)':'South Korea','Viet Nam':'Vietnam','Iran (Islamic Republic of)':'Iran','Bolivia (Plurinational State of)':'Bolivia','Venezuela (Bolivarian Republic of)':'Venezuela','Tanzania, United Republic of':'Tanzania','Taiwan, Province of China':'Taiwan','Czechia':'Czech Republic','Türkiye':'Turkey','Lao People\'s Democratic Republic':'Laos','Moldova (Republic of)':'Moldova','North Macedonia':'North Macedonia'};
 async function placeOf(lat,lng){
@@ -806,8 +867,8 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-002611';
-const state={ mode:'classic', timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
+const BUILD='20260916-004457';
+const state={ mode:'classic', bank:1000, bet:0, pick:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
 
@@ -896,7 +957,8 @@ function ensureGuessMap(){
 }
 function resetGameState(){
   const m=modeOf(state.mode); $('modePill').hidden=state.mode==='classic'; $('modeLbl').textContent=m.name;
-  $('blink').hidden=true; stopPixel(); $('game').classList.toggle('gray',!!m.gray);
+  $('blink').hidden=true; stopPixel(); $('game').classList.toggle('gray',!!m.gray); $('game').classList.toggle('trio',!!m.trio);
+  $('bettray').hidden=!m.bet; state.bank=1000; state.bet=0; state.pick=null; $('trio').hidden=true; $('tmap').hidden=true; if(m.bet) renderBet();
   state.round=0; state.score=0; state.results=[]; state.locs=[]; state.guess=null; state.saved=false; preload.idx=-1; preload.promise=null;
   panos.forEach(f=>{ f.onload=null; f.src='about:blank'; });
   ensureGuessMap();
@@ -909,7 +971,7 @@ async function startGame(){
   $('startBtn').disabled=true; const __lbl=$('startBtn').textContent; $('startBtn').textContent='Loading…';
   show('game'); $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
   const plan=continentPlan(state.totalRounds);
-  (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{ state.locs[i]=await findLocation(plan[i],m); }catch(e){ state.locs[i]=e; } } })();
+  (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{ state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],m); }catch(e){ state.locs[i]=e; } } })();
   await nextRound();
   $('startBtn').disabled=false; $('startBtn').textContent=__lbl;
 }
@@ -921,14 +983,14 @@ async function waitForLoc(i){
 }
 
 async function nextRound(){
-  state.round++; state.guess=null; state.locked=false; state.fitDone=false;
+  state.round++; state.guess=null; state.locked=false; state.fitDone=false; state.pick=null; state.bet=0; if(modeOf(state.mode).bet) renderBet();
   show('game');
   $('roundLbl').textContent=`${state.round} / ${state.totalRounds}`;
   const last=state.results[state.results.length-1];
   if(last){ countUp($('scoreLbl'),state.score-last.pts,state.score,900); $('scorePill').classList.remove('pop'); void $('scorePill').offsetWidth; $('scorePill').classList.add('pop');
     if(last.pts>0){ const f=document.createElement('span'); f.className='floater'; f.textContent='+'+last.pts.toLocaleString(); $('scorePill').appendChild(f); setTimeout(()=>f.remove(),1400); } }
   else $('scoreLbl').textContent='0';
-  $('guessBtn').disabled=true; $('guessBtn').textContent='Place your pin';
+  $('guessBtn').disabled=true; $('guessBtn').textContent=modeOf(state.mode).bet?'Place your pin, then bet':'Place your pin';
   $('loading').classList.remove('fade'); $('loadingText').textContent='Finding a location…';
   if(guessMarker){ guessMarker.remove(); guessMarker=null; }
   $('coordIn').value='';
@@ -943,10 +1005,14 @@ async function nextRound(){
   state.current=loc;
   $('loadingText').textContent='Loading Street View…';
   const idx=state.round-1;
-  if(preload.idx===idx && preload.promise){ await preload.promise; }
-  else { await loadInto(panos[1-front],loc); }
-  swapFrames();
+  if(modeOf(state.mode).trio){ panos.forEach(f=>{ f.onload=null; f.src='about:blank'; }); }   // no panorama frame needed
+  else {
+    if(preload.idx===idx && preload.promise){ await preload.promise; }
+    else { await loadInto(panos[1-front],loc); }
+    swapFrames();
+  }
   if(state.mode==='pixel') startPixel(loc);
+  else if(modeOf(state.mode).trio){ startTrio(loc); }
   else if(state.mode==='blink'){
     $('blink').hidden=false; $('lid').setAttribute('d','M0 0H100V100H0Z');   // eye shut while the still renders
     $('loadingText').textContent='Get ready…';
@@ -958,14 +1024,15 @@ async function nextRound(){
   const ri=$('roundIntro'); ri.innerHTML=`<div>Round ${state.round} <span>/ ${state.totalRounds}</span></div>`; ri.hidden=false; setTimeout(()=>{ ri.hidden=true; },1100);
   if(state.mode==='blink'){ const r0=state.round; setTimeout(()=>{ if(state.round===r0&&!$('game').hidden){ runBlink(); startTimer(); } },1250); }   // intro first, then the glimpse and the clock together
   else startTimer();
-  preloadRound(idx+1);
+  if(!modeOf(state.mode).trio) preloadRound(idx+1);
 }
 
 function setGuess(latlng){
   const ll=L.latLng(latlng.lat, ((latlng.lng+180)%360+360)%360-180);
   state.guess=ll;
   if(guessMarker) guessMarker.setLatLng(ll); else guessMarker=L.marker(ll,{icon:mp.role?colorIcon(mp.me.color):guessIcon}).addTo(guessMap);
-  const gb=$('guessBtn'); if(gb.disabled){ gb.disabled=false; gb.textContent='Guess'; gb.classList.remove('ready'); void gb.offsetWidth; gb.classList.add('ready'); }
+  const gb=$('guessBtn'); if(gb.disabled&&!modeOf(state.mode).bet){ gb.disabled=false; gb.textContent='Guess'; gb.classList.remove('ready'); void gb.offsetWidth; gb.classList.add('ready'); }
+  if(modeOf(state.mode).bet) renderBet();
 }
 
 function startTimer(){
@@ -983,18 +1050,29 @@ function startTimer(){
 }
 function stopTimer(){ if(state.timer){ clearInterval(state.timer); state.timer=null; } if(!state.timeLimit){ $('timeFill').style.width='100%'; $('timeFill').className=''; } }
 
+function betMult(base){ return base>=4900?5:base>=4500?3:base>=3750?2:base>=2500?1:base>=1250?0.5:0; }
 function submitGuess(auto=false){
   if(state.locked) return;
-  if(!state.guess && !auto) return;
+  const m=modeOf(state.mode);
+  if(m.trio){ if(state.pick==null && !auto) return; }
+  else if(!state.guess && !auto) return;
+  if(m.bet){ if(state.bet<1) state.bet=Math.min(1,state.bank); }   // a bet is required every round
   state.locked=true;
   if(mp.role){ mpSubmitGuess(); return; }   // clock keeps running so you can see how long the others have
   stopTimer();
+  if(m.trio){
+    const ok=state.pick===state.current.lie; const pts=ok?5000:0; state.score+=pts;
+    const r={round:state.round,trio:true,pick:state.pick,lie:state.current.lie,ok,guess:null,truth:{lat:state.current.lat,lng:state.current.lng},km:null,pts,timedOut:auto&&state.pick==null,loc:state.current,guessPlace:null};
+    state.results.push(r); showResult(r); return;
+  }
   const truth={lat:state.current.lat,lng:state.current.lng};
   const km=state.guess?haversine(state.guess,truth):null;
-  const mult=modeOf(state.mode).countdown?countdownMult(state.timeLeft,state.timeLimit):1;
-  const pts=state.guess?Math.round(scoreFor(km)*mult):0;
-  state.score+=pts;
-  const r={round:state.round,guess:state.guess?{lat:state.guess.lat,lng:state.guess.lng}:null,truth,km,pts,timedOut:auto&&!state.guess,loc:state.current,guessPlace:null};
+  const mult=m.countdown?countdownMult(state.timeLeft,state.timeLimit):1;
+  let pts=state.guess?Math.round(scoreFor(km)*mult):0;
+  let bet=null;
+  if(m.bet){ const base=pts; const payout=Math.round(state.bet*betMult(base)); bet={stake:state.bet,mult:betMult(base),payout,base}; pts=payout-state.bet; state.bank+=pts; state.score=state.bank; }
+  else state.score+=pts;
+  const r={round:state.round,bet,guess:state.guess?{lat:state.guess.lat,lng:state.guess.lng}:null,truth,km,pts,timedOut:auto&&!state.guess,loc:state.current,guessPlace:null};
   state.results.push(r);
   showResult(r);
 }
@@ -1002,6 +1080,7 @@ function submitGuess(auto=false){
 /* ---------- Round result ---------- */
 function showResult(r){
   show('result'); $('roundRank').hidden=true; $('leaderLine').hidden=true; $('nextBtn').hidden=false; $('nextWait').hidden=true;
+  if(r.trio){ showTrioResult(r); return; }
   if(!resultMap) resultMap=makeMap('resultmap');
   if(resultLayer) resultLayer.remove();
   resultLayer=L.layerGroup().addTo(resultMap);
@@ -1019,9 +1098,11 @@ function showResult(r){
   setTimeout(()=>{ pe.classList.add('pop'); if(r.pts>=4500) confetti(); },1000);
 
   $('distTxt').innerHTML = r.guess ? `Your guess was <b>${fmtDist(r.km)}</b> from the correct location.` : `You didn't place a pin. The location is marked with a flag.`;
-  $('nextBtn').textContent = state.round>=state.totalRounds ? 'See results' : 'Next round';
-  $('ptsBar').style.width='0%'; countUp($('ptsNum'),0,r.pts,1000);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.pts/50)+'%'; }));
+  const busted=r.bet&&state.bank<=0;
+  $('nextBtn').textContent = (state.round>=state.totalRounds||busted) ? 'See results' : 'Next round';
+  $('ptsBar').style.width='0%';
+  if(r.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult} = ${r.bet.payout.toLocaleString()} · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,r.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.bet.mult/5*100)+'%'; })); }
+  else { $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; countUp($('ptsNum'),0,r.pts,1000); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.pts/50)+'%'; })); }
   renderVerdict(r);
   // Country info may still be loading; fill in when it arrives.
   const round=state.round;
@@ -1044,11 +1125,11 @@ function renderVerdict(r){
   else if(r.guess && tp) parts.push(`<span>Your pin: <b>in the ocean</b></span>`);
   $('placeTxt').innerHTML=parts.join('');
 }
-$('nextBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpHostNext(); return; } if(mp.role) return; if(state.round>=state.totalRounds) showFinal(); else nextRound(); });
+$('nextBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpHostNext(); return; } if(mp.role) return; if(state.round>=state.totalRounds||(modeOf(state.mode).bet&&state.bank<=0)) showFinal(); else nextRound(); });
 
-function countUp(el,from,to,ms){
+function countUp(el,from,to,ms,signed){
   const t0=performance.now();
-  (function step(t){ const k=Math.min(1,(t-t0)/ms); const e=1-Math.pow(1-k,3); el.textContent=Math.round(from+(to-from)*e).toLocaleString(); if(k<1) requestAnimationFrame(step); })(t0);
+  (function step(t){ const k=Math.min(1,(t-t0)/ms); const e=1-Math.pow(1-k,3); const v=Math.round(from+(to-from)*e); el.textContent=(signed&&v>0?'+':'')+v.toLocaleString(); if(k<1) requestAnimationFrame(step); })(t0);
 }
 
 /* ---------- Final ---------- */
@@ -1070,15 +1151,16 @@ function showFinal(){
   const fit=()=>{ finalMap.invalidateSize(); finalMap.fitBounds(L.latLngBounds(pts),{padding:[60,60]}); };
   fit(); setTimeout(fit,150);
 
-  $('finalMax').textContent=`/ ${max.toLocaleString()}`;
+  const isBet=modeOf(state.mode).bet;
+  $('finalMax').textContent=isBet?'chips (started with 1,000)':`/ ${max.toLocaleString()}`;
   $('finalBar').style.width='0%'; countUp($('finalNum'),0,state.score,1400);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('finalBar').style.width=(state.score/max*100)+'%'; }));
-  const pct=state.score/max;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('finalBar').style.width=(isBet?Math.min(100,state.score/5000*100):state.score/max*100)+'%'; }));
+  const pct=isBet?Math.min(1,state.score/5000):state.score/max;
   const fv=$('finalVerdict');
   fv.textContent = pct>=.95?'World class':pct>=.8?'Excellent':pct>=.6?'Solid':pct>=.4?'Getting there':'Keep exploring';
   fv.className='verdict '+(pct>=.6?'good':pct>=.3?'mid':'bad');
   if(pct>=.8) setTimeout(confetti,900);
-  $('roundChips').innerHTML=state.results.map(r=>`<div class="rchip ${r.pts>=4500?'top':''}">R${r.round} · ${r.loc.place?esc(r.loc.place.country):(r.guess?fmtDist(r.km):'no guess')}<b>${r.pts.toLocaleString()}</b></div>`).join('');
+  $('roundChips').innerHTML=state.results.map(r=>`<div class="rchip ${(r.trio?r.ok:r.pts>=4500)?'top':''}">R${r.round} · ${r.trio?(r.ok?'correct':'wrong'):(r.loc.place?esc(r.loc.place.country):(r.guess?fmtDist(r.km):'no guess'))}<b>${(r.bet&&r.pts>0?'+':'')+r.pts.toLocaleString()}</b></div>`).join('');
 
   // Leaderboard save
   state.saved=false; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false;
@@ -1236,6 +1318,89 @@ function drawPixel(){
   el.addEventListener('pointerup',()=>{ pix.drag=null; }); el.addEventListener('pointercancel',()=>{ pix.drag=null; });
   el.addEventListener('wheel',e=>{ e.preventDefault(); if(pix.fixed) return; pix.fov=Math.max(35,Math.min(110,pix.fov+e.deltaY*0.05)); drawPixel(); },{passive:false});
 })();
+
+/* ---------- All In: betting tray ---------- */
+function renderBet(){
+  $('bankLbl').textContent=state.bank.toLocaleString(); $('betLbl').textContent=state.bet.toLocaleString();
+  document.querySelectorAll('#bettray .chips .chip-btn').forEach(b=>{ b.disabled=state.locked||state.bet+(+b.dataset.v)>state.bank; });
+  const cls={1:'c1',5:'c5',25:'c25',100:'c100',500:'c500'}; let rest=state.bet; const parts=[]; for(const v of [500,100,25,5,1]){ while(rest>=v&&parts.length<60){ parts.push(cls[v]); rest-=v; } }
+  $('potChips').innerHTML=parts.map(c=>`<i class="chip-btn ${c}" style="width:12px;height:12px;border-width:2px;box-shadow:0 1px 2px rgba(0,0,0,.4)"></i>`).join('');
+  const gb=$('guessBtn');
+  if(!state.locked){ if(state.guess&&state.bet>=1){ gb.disabled=false; gb.textContent=`Bet ${state.bet.toLocaleString()} · lock in`; } else { gb.disabled=true; gb.textContent=state.guess?'Add chips to bet':(state.bet?'Place your pin':'Place your pin, then bet'); } }
+}
+document.querySelector('#bettray .chips').addEventListener('click',e=>{ const b=e.target.closest('.chip-btn'); if(!b||state.locked) return; const v=+b.dataset.v; if(state.bet+v<=state.bank){ state.bet+=v; renderBet(); } });
+$('betClear').addEventListener('click',()=>{ if(state.locked) return; state.bet=0; renderBet(); });
+$('betAll').addEventListener('click',()=>{ if(state.locked) return; state.bet=state.bank; renderBet(); });
+
+/* ---------- Trio modes: Odd One Out / Two Truths and a Lie ---------- */
+let trioMap=null, trioLayer=null;
+async function renderStillTo(c,pano,heading,fov,zoom){
+  const meta=await panoMeta(pano); const band=await loadBand(pano,zoom||3,meta,60);
+  const w=c.width,h=c.height; const ctx=c.getContext('2d'); const o=ctx.createImageData(w,h); const d=o.data; const {img,W:bw0,H:bh0,yOff}=band; const src=img.data, bw=img.width, bh=img.height;
+  const f=(w/2)/Math.tan(fov/2*Math.PI/180); const lon0=(heading-meta.center)*Math.PI/180;
+  for(let py=0;py<h;py++){ const dy=-(py+0.5-h/2); for(let px=0;px<w;px++){ const dx=px+0.5-w/2; const lon=Math.atan2(dx,f)+lon0; const lat=Math.atan2(dy,Math.sqrt(dx*dx+f*f)); let u=lon/(2*Math.PI)+0.5; u-=Math.floor(u); const sx=Math.min(bw-1,Math.floor(u*bw0)); const sy=Math.min(bh-1,Math.max(0,Math.floor((0.5-lat/Math.PI)*bh0-yOff))); const i=(sy*bw+sx)*4, k=(py*w+px)*4; d[k]=src[i]; d[k+1]=src[i+1]; d[k+2]=src[i+2]; d[k+3]=255; } }
+  ctx.putImageData(o,0,0);
+}
+function trioSet(loc){ return [loc,loc.extra[0],loc.extra[1]]; }
+const numIcon=(n,cls)=>L.divIcon({className:'',html:`<div class="marker-num ${cls||''}" data-n="${n}">${n}</div>`,iconSize:[34,34],iconAnchor:[17,17]});
+async function startTrio(loc){
+  const m=modeOf(state.mode); const set=trioSet(loc); const round=state.round;
+  const views=m.trio===3?[0,1,2]:[0,1,2].filter(i=>i!==loc.lie);          // Odd One Out shows all three; Two Truths hides the lie's view
+  const pins =m.pins===3?[0,1,2]:[0,1,2].filter(i=>i!==loc.lie);          // Two Truths pins all three; Odd One Out pins only the truths
+  const trio=$('trio'); trio.hidden=false; trio.classList.toggle('pickable',m.trio===3);
+  trio.innerHTML=views.map((i,k)=>`<div class="col" data-i="${i}"><canvas width="960" height="720"></canvas><div class="lbl">${String.fromCharCode(65+k)}</div><div class="dev">Loading…</div></div>`).join('');
+  $('tmap').hidden=false; $('tmap').classList.remove('open');
+  $('tmapTitle').textContent=m.trio===3?'Map · 2 pins':'Map · 3 pins'; $('tmapHint').textContent=m.trio===3?'Pick the view that has no pin':'Pick the pin that is the lie';
+  $('trioLock').disabled=true; $('trioLock').textContent='Pick one first';
+  if(!trioMap){ trioMap=makeMap('triomap'); }
+  if(trioLayer) trioLayer.remove(); trioLayer=L.layerGroup().addTo(trioMap);
+  const pts=[];
+  pins.forEach((i,k)=>{ const p=set[i]; pts.push([p.lat,p.lng]); const mk=L.marker([p.lat,p.lng],{icon:numIcon(k+1),zIndexOffset:1000}).addTo(trioLayer); mk._trioIdx=i; if(m.pins===3) mk.on('click',()=>trioPick(i)); });
+  setTimeout(()=>{ trioMap.invalidateSize(); trioMap.fitBounds(L.latLngBounds(pts),{padding:[60,60],maxZoom:6,animate:false}); },100);
+  await Promise.all(views.map(async i=>{ const col=trio.querySelector(`.col[data-i="${i}"]`); try{ await renderStillTo(col.querySelector('canvas'),set[i].pano,set[i].heading,90,3); }catch(e){} if(state.round===round){ const dv=col.querySelector('.dev'); if(dv) dv.remove(); } }));
+}
+function trioPick(i){
+  if(state.locked||!modeOf(state.mode).trio) return; state.pick=i;
+  document.querySelectorAll('#trio .col').forEach(c=>c.classList.toggle('on',+c.dataset.i===i));
+  if(trioLayer) trioLayer.eachLayer(mk=>{ const el=mk.getElement&&mk.getElement(); if(el){ const d=el.querySelector('.marker-num'); if(d) d.classList.toggle('on',mk._trioIdx===i); } });
+  $('trioLock').disabled=false; $('trioLock').textContent='Lock in';
+}
+$('trio').addEventListener('click',e=>{ const col=e.target.closest('.col'); if(col&&modeOf(state.mode).trio===3) trioPick(+col.dataset.i); });
+$('trioLock').addEventListener('click',()=>submitGuess(false));
+(function(){ const el=$('tmap'); const open=()=>{ el.classList.add('open'); setTimeout(()=>trioMap&&trioMap.invalidateSize(),260); }; el.addEventListener('mouseenter',open); el.addEventListener('mouseleave',()=>{ el.classList.remove('open'); setTimeout(()=>trioMap&&trioMap.invalidateSize(),260); }); el.addEventListener('touchstart',open,{passive:true}); })();
+function trioResultMap(loc,lie){
+  if(!resultMap) resultMap=makeMap('resultmap');
+  if(resultLayer) resultLayer.remove(); resultLayer=L.layerGroup().addTo(resultMap);
+  const set=trioSet(loc); const pts=[];
+  set.forEach((p,i)=>{ pts.push([p.lat,p.lng]); L.marker([p.lat,p.lng],{icon:numIcon(String.fromCharCode(65+i),i===lie?'lie':'')}).addTo(resultLayer).bindTooltip(i===lie?'The lie':'Real',{permanent:true,direction:'top',offset:[0,-18]}); });
+  const fit=()=>{ resultMap.invalidateSize(); resultMap.fitBounds(L.latLngBounds(pts),{padding:[70,70],maxZoom:6,animate:false}); }; fit(); setTimeout(fit,150);
+}
+function showTrioResult(r){
+  trioResultMap(r.loc,r.lie);
+  const v=$('verdict'); v.textContent=r.timedOut?"Time's up — no pick":(r.ok?'Correct!':`Nope. The lie was ${String.fromCharCode(65+r.lie)}`); v.className='verdict '+(r.ok?'good':'bad');
+  $('distTxt').innerHTML=r.ok?'You spotted the lie.':(r.pick!=null?`You picked ${String.fromCharCode(65+r.pick)}.`:'');
+  $('placeTxt').innerHTML='';
+  $('nextBtn').textContent = state.round>=state.totalRounds ? 'See results' : 'Next round';
+  $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; $('ptsBar').style.width='0%'; countUp($('ptsNum'),0,r.pts,900);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.pts/50)+'%'; }));
+  if(r.ok) setTimeout(confetti,700);
+}
+function showTrioResultMP(rev){
+  const loc={lat:rev.truth.lat,lng:rev.truth.lng,extra:rev.extra.map(e=>({lat:e.lat,lng:e.lng}))};
+  const mine=rev.results.find(r=>r.id===mp.me.id)||{pts:0,pick:null,ok:false};
+  state.results.push({round:rev.round,trio:true,pick:mine.pick,lie:rev.lie,ok:mine.ok,guess:null,truth:rev.truth,km:null,pts:mine.pts,loc:{place:rev.place,...loc},guessPlace:null}); state.score+=mine.pts;
+  trioResultMap(loc,rev.lie);
+  const v=$('verdict'); v.textContent=mine.pick==null?'No pick':(mine.ok?'Correct!':`Nope. The lie was ${String.fromCharCode(65+rev.lie)}`); v.className='verdict '+(mine.ok?'good':'bad');
+  $('distTxt').innerHTML=''; $('placeTxt').innerHTML='';
+  $('nextBtn').textContent = rev.round>=state.totalRounds ? 'See results' : 'Next round';
+  $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; $('ptsBar').style.width='0%'; countUp($('ptsNum'),0,mine.pts,900);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.pts/50)+'%'; }));
+  const overall=rev.results.slice().sort((a,b)=>b.total-a.total); const lead=overall[0]; const myPos=overall.findIndex(r=>r.id===mp.me.id)+1;
+  $('leaderLine').hidden=false; $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="background:${COLORS[lead.color??0][0]}"></span>🏆 ${esc(lead.name)} leads · ${lead.total.toLocaleString()}</span><span>You're <b>${myPos}</b> of ${overall.length}</span>`;
+  const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
+  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">picked ${r.pick!=null?String.fromCharCode(65+r.pick):'—'}</span><span class="rp">+${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} total</span></div>`).join('');
+  if(mine.ok) setTimeout(confetti,700);
+}
 
 /* ---------- Coordinate paste box ---------- */
 function parseCoords(text){
@@ -1430,7 +1595,7 @@ function hostOnMessage(from,m,link){
   }
   else if(m.t==='guess'){
     if(mp.phase!=='round' || mp.guesses[from]!==undefined) return;
-    mp.guesses[from]=m.guess?{lat:m.guess.lat,lng:m.guess.lng,left:m.left}:null;
+    mp.guesses[from]=m.guess?{lat:m.guess.lat,lng:m.guess.lng,left:m.left,bet:m.bet}:(m.pick!=null?{pick:m.pick,bet:m.bet}:(modeOf(mp.settings.mode).bet?{bet:m.bet||1}:null));
     mpBroadcast({t:'guessed',id:from,n:Object.keys(mp.guesses).length,total:playerList().length}); updateStrip(); updateWaitList();
     hostCheckRound();
   }
@@ -1444,9 +1609,13 @@ function hostReveal(){
   if(mp.phase!=='round') return;
   mp.phase='reveal'; if(mp.deadline){ clearTimeout(mp.deadline); mp.deadline=null; }
   const loc=state.locs[state.round-1]; const truth={lat:loc.lat,lng:loc.lng};
-  const cd=modeOf(mp.settings.mode).countdown;
-  const results=playerList().map(p=>{ const g=mp.guesses[p.id]||null; const km=g?haversine(g,truth):null; const pts=g?Math.round(scoreFor(km)*(cd?countdownMult(g.left||0,state.timeLimit):1)):0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:g?{lat:g.lat,lng:g.lng}:null,km,pts,total:p.score}; });
-  const rev={t:'reveal',round:state.round,truth,place:loc.place||null,results};
+  const mm=modeOf(mp.settings.mode); const cd=mm.countdown;
+  const results=playerList().map(p=>{ const g=mp.guesses[p.id]||null;
+    if(mm.trio){ const ok=!!g&&g.pick===loc.lie; const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:null,pick:g?g.pick:null,ok,km:null,pts,total:p.score}; }
+    const has=!!(g&&g.lat!=null); const km=has?haversine(g,truth):null; let pts=has?Math.round(scoreFor(km)*(cd?countdownMult(g.left||0,state.timeLimit):1)):0; let bet=null;
+    if(mm.bet){ const stake=Math.max(1,Math.min(p.score,(g&&g.bet)||1)); const mult=betMult(pts); const payout=Math.round(stake*mult); bet={stake,mult,payout,base:pts}; pts=payout-stake; }
+    p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:has?{lat:g.lat,lng:g.lng}:null,km,pts,bet,total:p.score}; });
+  const rev={t:'reveal',round:state.round,truth,place:loc.place||null,results,lie:loc.lie,extra:loc.extra?loc.extra.map(e=>({lat:e.lat,lng:e.lng})):null};
   mpBroadcast(rev); showResultMP(rev);
 }
 function mpHostNext(){
@@ -1458,7 +1627,7 @@ function findGameLocations(){
   if(mp.locPromise&&mp.locRounds===rounds) return mp.locPromise;
   mp.locRounds=rounds;
   const m=modeOf(mp.settings.mode);
-  mp.locPromise=(async()=>{ const plan=continentPlan(rounds); const locs=[]; for(let i=0;i<plan.length;i++){ try{ locs[i]=await findLocation(plan[i],m); }catch(e){ locs[i]=await findLocation(null,m); } } return locs; })();
+  mp.locPromise=(async()=>{ const plan=continentPlan(rounds); const locs=[]; for(let i=0;i<plan.length;i++){ try{ locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],m); }catch(e){ locs[i]=m.trio?await findTrio(null,m):await findLocation(null,m); } } return locs; })();
   return mp.locPromise;
 }
 async function hostStartGame(){
@@ -1473,8 +1642,9 @@ async function hostStartGame(){
   if(mp.me.color===null) mp.me.color=mp.players[mp.me.id].color;
   const locs=await findGameLocations();
   mp.locPromise=null;   // next game gets fresh spots
-  const payload=locs.map(l=>({pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null}));
+  const payload=locs.map(l=>({pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie}));
   mp.phase='round'; mp.starting=false;
+  if(modeOf(mp.settings.mode).bet) for(const p of playerList()) p.score=1000;
   mpBroadcast({t:'start',settings:mp.settings,locs:payload,players:pubPlayers()});
   mpStartGameLocal(mp.settings,locs);
 }
@@ -1521,7 +1691,7 @@ async function mpRound(){
 }
 function mpSubmitGuess(){
   const g=state.guess?{lat:state.guess.lat,lng:state.guess.lng}:null;
-  mpSend({t:'guess',guess:g,left:state.timeLeft});
+  mpSend({t:'guess',guess:g,left:state.timeLeft,bet:state.bet,pick:state.pick});
   $('waitOverlay').hidden=false; $('waitTxt').textContent=g?'Waiting for the others to guess…':"Time's up. Waiting for the others…"; updateWaitList();
 }
 function updateStrip(){
@@ -1553,6 +1723,7 @@ function mpToLobby(){
 /* ----- multiplayer result screens ----- */
 function showResultMP(rev){
   show('result'); $('nextBtn').hidden=mp.role!=='host'; $('nextWait').hidden=mp.role==='host'; $('roundRank').hidden=false;
+  if(rev.lie!=null&&rev.extra){ showTrioResultMP(rev); return; }
   $('waitOverlay').hidden=true;
   if(!resultMap) resultMap=makeMap('resultmap');
   if(resultLayer) resultLayer.remove();
@@ -1567,12 +1738,13 @@ function showResultMP(rev){
   const fit=()=>{ resultMap.invalidateSize(); if(pts.length>1) resultMap.fitBounds(L.latLngBounds(pts),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(rev.truth,5,{animate:false}); };
   fit(); setTimeout(fit,150);
   const mine=rev.results.find(r=>r.id===mp.me.id)||{pts:0,km:null,guess:null};
-  const me={round:rev.round,guess:mine.guess,truth:rev.truth,km:mine.km,pts:mine.pts,timedOut:!mine.guess,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng},guessPlace:null};
-  state.results.push(me); state.score+=mine.pts;
+  const me={round:rev.round,guess:mine.guess,truth:rev.truth,km:mine.km,pts:mine.pts,bet:mine.bet||null,timedOut:!mine.guess,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng},guessPlace:null};
+  state.results.push(me); if(mine.bet){ state.bank+=mine.pts; state.score=state.bank; } else state.score+=mine.pts;
   $('distTxt').innerHTML = mine.guess ? `Your guess was <b>${fmtDist(mine.km)}</b> away.` : `You didn't place a pin.`;
   $('nextBtn').textContent = rev.round>=state.totalRounds ? 'See results' : 'Next round';
-  $('ptsBar').style.width='0%'; countUp($('ptsNum'),0,mine.pts,1000);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.pts/50)+'%'; }));
+  $('ptsBar').style.width='0%';
+  if(mine.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${mine.bet.stake.toLocaleString()} × ${mine.bet.mult} = ${mine.bet.payout.toLocaleString()} · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,mine.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.bet.mult/5*100)+'%'; })); }
+  else { $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; countUp($('ptsNum'),0,mine.pts,1000); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.pts/50)+'%'; })); }
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(mine.pts>=4000) pe.classList.add('great');
   setTimeout(()=>{ pe.classList.add('pop'); if(mine.pts>=4500) confetti(); },1000);
   renderVerdict(me);
@@ -1583,7 +1755,7 @@ function showResultMP(rev){
   $('leaderLine').hidden=false;
   $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="background:${COLORS[lead.color??0][0]}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}</span><span class="rp">+${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} total</span></div>`).join('');
+  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult}`:''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
 }
 function showFinalMP(fin){
   show('final'); $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true;
