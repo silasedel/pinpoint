@@ -8,6 +8,17 @@ A single-file Street View geography game, solo or with friends. You get dropped 
 
 Offline copy: double-click `run.command`. It serves the game locally, opens a temporary public link through a Cloudflare tunnel, and opens the game in your browser.
 
+## Game modes
+
+Under the main card there are six modes besides Classic. Each has its own Play button, and a host can pick one for a lobby.
+
+- **Blink**: the panorama is revealed through an eyelid that opens for about a second and shuts. 15 seconds to guess from the glimpse.
+- **Snapshot**: one still photo in one direction, no looking around. 30 seconds.
+- **Sprint**: ten rounds, ten seconds each.
+- **Island Hopper**: islands only.
+- **'Murica**: the United States only.
+- **Flip**: the panorama is upside down.
+
 ## Play with friends (anywhere)
 
 Multiplayer has no server of its own. The host's browser runs the game; messages between players travel through public MQTT brokers over WebSockets (three of them, with automatic failover), which works on any network. Voice uses direct WebRTC links between browsers.
