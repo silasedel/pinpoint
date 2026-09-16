@@ -51,6 +51,13 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,75,75,.7)}70%{box-shadow:0 0 0 8px rgba(255,75,75,0)}100%{box-shadow:0 0 0 0 rgba(255,75,75,0)}}
   .menu-wrap{max-width:960px;margin:-64px auto 0;padding:0 20px 60px;position:relative;z-index:5}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+  .card.wide{margin-top:20px}
+  .solo-card{display:flex;flex-direction:column;justify-content:center}
+  .solo-card .btn{padding:22px;font-size:20px}
+  .mp-card .btn{padding:16px;font-size:16px}
+  .mp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .mp-row input{padding:14px;border:1px solid var(--line);border-radius:10px;font-size:16px;text-transform:uppercase;letter-spacing:.2em;font-weight:700;text-align:center;outline:none;width:100%}
+  .mp-row input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
   .grid .card{display:flex;flex-direction:column}
   .grid .card .fill{flex:1}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:26px}
@@ -94,6 +101,9 @@
   .postcards{display:none}
   .modes{margin-top:20px}
   .modes h3{margin:0 0 14px;font-size:18px;font-weight:800;letter-spacing:-.3px;text-align:center}
+  .tile.on{box-shadow:0 0 0 4px var(--green),0 10px 24px rgba(20,34,25,.22);transform:translateY(-2px)}
+  .tile.on::after{content:'';position:absolute;inset:0;box-shadow:inset 0 0 0 3px rgba(255,255,255,.85);border-radius:14px;pointer-events:none}
+  .tile.on .ribbon{background:linear-gradient(180deg,rgba(31,157,85,.95),rgba(31,157,85,.6) 60%,rgba(31,157,85,0))}
   .classic-bar{display:block;width:100%;padding:14px;border-radius:12px;border:2px solid var(--line);background:#f6f8f7;font-weight:800;font-size:16px;margin-bottom:12px;text-align:center;transition:.15s}
   .classic-bar:hover{border-color:var(--green)}
   .classic-bar.on{border-color:var(--green);background:var(--green-soft);color:var(--green-dark)}
@@ -269,10 +279,12 @@
   #lobby{overflow:auto;padding:30px 20px 100px}
   .lobby-wrap{max-width:960px;margin:0 auto}
   .brand-row{display:flex;align-items:center;gap:12px}
-  .lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
-  .code-box{text-align:center;padding:18px;border-radius:14px;background:var(--green-soft);margin-bottom:18px}
+  .lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+  .code-box{display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;padding:18px 22px;border-radius:16px;background:var(--green-soft);margin-bottom:20px}
+  .code-box .cb-actions{display:flex;gap:8px}
   .code-box small{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green-dark)}
   .code-box b{display:block;font-size:44px;font-weight:800;letter-spacing:.3em;margin-left:.3em;color:var(--green-dark);line-height:1.1}
+  .code-box .cb-code{text-align:center}
   .code-box .url{font-size:12px;color:var(--muted);word-break:break-all;margin-top:6px}
   .plist{display:flex;flex-direction:column;gap:6px}
   .prow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:#f6f8f7;border:1px solid var(--line);font-size:14px}
@@ -280,7 +292,7 @@
   .prow .pn{font-weight:700;flex:1}
   .prow .tag{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
   .prow .ok{color:var(--green-dark);font-weight:800}
-  .swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
+  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
   .swatch{position:relative;height:46px;border-radius:10px;border:3px solid transparent;cursor:pointer;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
   .swatch.mine{border-color:var(--text);box-shadow:0 0 0 2px #fff inset}
   .swatch.taken{cursor:not-allowed;filter:grayscale(1) opacity(.45)}
@@ -292,7 +304,11 @@
   .countdown b{font-size:28px;display:block;color:#a06d00}
   .lobby-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
   .start-big{width:100%;margin-top:18px;padding:18px;font-size:17px}
-  #lobbyModes{margin-top:20px}
+  #lobbyModes,#lobbySettings{margin-top:20px}
+  #setup{overflow:auto;padding:30px 20px 60px}
+  .setup-wrap{max-width:960px;margin:0 auto}
+  .brand-row .lockup{color:var(--text)}
+  #game.gray .pano,#game.gray #pix{filter:grayscale(1)}
   .waiting{color:var(--muted);font-size:14px;font-weight:600;padding:12px 0}
   .conn{margin-top:10px;padding:10px 12px;border-radius:10px;background:#f6f8f7;border:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.5}
   .conn.ok{background:var(--green-soft);color:var(--green-dark);border-color:#bfe3cd}
@@ -385,82 +401,64 @@
 
   <div class="menu-wrap">
     <div class="grid">
-      <div class="card">
-        <h2>Solo game</h2>
-        <p class="lead">Pick a pace. Five rounds is the standard.</p>
-
-        <div class="label">Time per round</div>
-        <div class="seg" id="timeSeg">
-          <button data-t="10">10s</button>
-          <button data-t="30">30s</button>
-          <button data-t="60" class="on">60s</button>
-          <button data-t="0">No limit</button>
-          <button data-t="custom">Custom</button>
-        </div>
-        <div class="custom-row" id="timeCustom" hidden><input type="range" min="1" max="180" value="45"><input type="number" min="1" max="180" value="45"><span>sec</span></div>
-
-        <div class="label">Rounds</div>
-        <div class="seg" id="roundSeg">
-          <button data-r="5" class="on">5</button>
-          <button data-r="10">10</button>
-          <button data-r="custom">Custom</button>
-        </div>
-        <div class="custom-row" id="roundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
-
-        <div class="fill"></div>
-        <button class="btn btn-primary btn-block start" id="startBtn">Play</button>
+      <div class="card solo-card">
+        <h2 style="text-align:center">Solo</h2>
+        <button class="btn btn-primary btn-block" id="soloBtn">Play</button>
       </div>
-
-      <div class="card">
-        <h2>Leaderboard</h2>
-        <p class="lead">Top scores on this device, per mode.</p>
-        <div class="filters">
-          <div class="fgroup"><span class="fl">Rounds</span><button class="chip on" data-fr="all">All</button><button class="chip" data-fr="5">5</button><button class="chip" data-fr="10">10</button></div>
-          <div class="fgroup"><span class="fl">Time</span><button class="chip on" data-ft="all">All</button><button class="chip" data-ft="10">10s</button><button class="chip" data-ft="30">30s</button><button class="chip" data-ft="60">60s</button><button class="chip" data-ft="0">No limit</button></div>
-        </div>
-        <div id="boardWrap"></div>
-        <div class="board-foot"><span id="boardCount"></span><button class="link" id="clearBoard" hidden>Clear leaderboard</button></div>
+      <div class="card mp-card">
+        <h2 style="text-align:center">Multiplayer</h2>
+        <button class="btn btn-primary btn-block" id="hostBtn">Create game</button>
+        <div class="mp-row"><input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn">Join game</button></div>
       </div>
     </div>
-    <div class="card friends">
-      <h3>Multiplayer</h3>
-      <div class="friends-row">
-        <button class="btn btn-primary" id="hostBtn">Create game</button>
-        <input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off">
-        <button class="btn btn-secondary" id="joinBtn">Join game</button>
+    <div class="card wide">
+      <h2>Leaderboard</h2>
+      <div class="filters" style="margin-top:12px">
+        <div class="fgroup"><span class="fl">Rounds</span><button class="chip on" data-fr="all">All</button><button class="chip" data-fr="5">5</button><button class="chip" data-fr="10">10</button></div>
+        <div class="fgroup"><span class="fl">Time</span><button class="chip on" data-ft="all">All</button><button class="chip" data-ft="10">10s</button><button class="chip" data-ft="30">30s</button><button class="chip" data-ft="60">60s</button><button class="chip" data-ft="0">No limit</button></div>
       </div>
+      <div id="boardWrap"></div>
+      <div class="board-foot"><span id="boardCount"></span><button class="link" id="clearBoard" hidden>Clear leaderboard</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SOLO SETUP ================= -->
+<div id="setup" class="screen" hidden>
+  <div class="setup-wrap">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" style="width:34px;height:34px"><path d="M32 3C19 3 8.5 13.5 8.5 26.5 8.5 44 32 61 32 61s23.5-17 23.5-34.5C55.5 13.5 45 3 32 3z" fill="#1f9d55"/><circle cx="32" cy="26" r="13.5" fill="#fff"/><g fill="none" stroke="#1f9d55" stroke-width="2.2" stroke-linecap="round"><circle cx="32" cy="26" r="13.5"/><ellipse cx="32" cy="26" rx="5.5" ry="13.5"/><path d="M18.5 26h27M20.8 19h22.4M20.8 33h22.4"/></g></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="setupBack" style="margin-left:auto">Back</button></div>
+    <div class="card">
+      <div class="label" style="margin-top:0">Time per round</div>
+      <div class="seg" id="timeSeg">
+        <button data-t="10">10s</button>
+        <button data-t="30">30s</button>
+        <button data-t="60" class="on">60s</button>
+        <button data-t="0">No limit</button>
+        <button data-t="custom">Custom</button>
+      </div>
+      <div class="custom-row" id="timeCustom" hidden><input type="range" min="1" max="180" value="45"><input type="number" min="1" max="180" value="45"><span>sec</span></div>
+      <div class="label">Rounds</div>
+      <div class="seg" id="roundSeg">
+        <button data-r="5" class="on">5</button>
+        <button data-r="10">10</button>
+        <button data-r="custom">Custom</button>
+      </div>
+      <div class="custom-row" id="roundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
+      <button class="btn btn-primary start-big" id="startBtn">Play Classic</button>
     </div>
     <div class="card modes">
-      <h3>Game modes</h3>
+      <h3>Game mode</h3>
       <div class="mode-grid" id="modeGrid"></div>
     </div>
   </div>
-
-
 </div>
 
 <!-- ================= LOBBY ================= -->
 <div id="lobby" class="screen" hidden>
   <div class="lobby-wrap">
-    <div class="brand-row" style="margin-bottom:18px"><div class="lockup" style="color:var(--text)"><svg viewBox="0 0 64 64" style="width:34px;height:34px"><path d="M32 3C19 3 8.5 13.5 8.5 26.5 8.5 44 32 61 32 61s23.5-17 23.5-34.5C55.5 13.5 45 3 32 3z" fill="#1f9d55"/><circle cx="32" cy="26" r="13.5" fill="#fff"/><g fill="none" stroke="#1f9d55" stroke-width="2.2" stroke-linecap="round"><circle cx="32" cy="26" r="13.5"/><ellipse cx="32" cy="26" rx="5.5" ry="13.5"/><path d="M18.5 26h27M20.8 19h22.4M20.8 33h22.4"/></g></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="leaveBtn" style="margin-left:auto">Leave</button></div>
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" style="width:34px;height:34px"><path d="M32 3C19 3 8.5 13.5 8.5 26.5 8.5 44 32 61 32 61s23.5-17 23.5-34.5C55.5 13.5 45 3 32 3z" fill="#1f9d55"/><circle cx="32" cy="26" r="13.5" fill="#fff"/><g fill="none" stroke="#1f9d55" stroke-width="2.2" stroke-linecap="round"><circle cx="32" cy="26" r="13.5"/><ellipse cx="32" cy="26" rx="5.5" ry="13.5"/><path d="M18.5 26h27M20.8 19h22.4M20.8 33h22.4"/></g></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="leaveBtn" style="margin-left:auto">Leave</button></div>
+    <div class="code-box"><div class="cb-code"><small>Code</small><b id="roomCode">····</b></div><div class="cb-actions"><button class="btn btn-secondary" id="copyLink">Copy invite link</button><button class="btn btn-secondary" id="copyCode">Copy code</button></div><div class="conn" id="connBox" hidden style="flex-basis:100%;margin:0"></div><div id="roomUrl" hidden></div></div>
     <div class="lobby-grid">
-      <div class="card">
-        <div class="code-box"><small>Room code</small><b id="roomCode">····</b><div class="url" id="roomUrl"></div><div class="lobby-actions" style="justify-content:center;margin-top:10px"><button class="btn btn-secondary" id="copyLink" style="padding:10px 16px;font-size:13px">Copy invite link</button><button class="btn btn-secondary" id="copyCode" style="padding:10px 16px;font-size:13px">Copy code</button></div></div>
-        <h2>Players <span id="pcount" style="color:var(--muted);font-weight:600;font-size:14px"></span></h2>
-        <div class="plist" id="plist" style="margin-top:10px"></div>
-        <div id="hostPanel" hidden>
-          <div class="label">Time per round</div>
-          <div class="seg" id="mpTimeSeg"><button data-t="10">10s</button><button data-t="30">30s</button><button data-t="60" class="on">60s</button><button data-t="0">No limit</button><button data-t="custom">Custom</button></div>
-          <div class="custom-row" id="mpTimeCustom" hidden><input type="range" min="1" max="180" value="45"><input type="number" min="1" max="180" value="45"><span>sec</span></div>
-          <div class="label">Rounds</div>
-          <div class="seg" id="mpRoundSeg"><button data-r="5" class="on">5</button><button data-r="10">10</button><button data-r="custom">Custom</button></div>
-          <div class="custom-row" id="mpRoundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
-          <button class="btn btn-primary start-big" id="mpStartBtn">Start Classic game</button>
-        </div>
-        <div class="conn" id="connBox" hidden></div>
-        <div id="guestPanel" class="waiting" hidden>Waiting for the host to start…</div>
-        <div class="countdown" id="countdown" hidden></div>
-      </div>
       <div class="card">
         <h2>You</h2>
         <div class="label">Name</div>
@@ -469,10 +467,26 @@
         <div class="swatches" id="swatches"></div>
         <div class="mic-lobby"><div><b>Voice chat</b> is built in. Use the mic button in the corner to talk.<br><label style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer"><input type="checkbox" id="spkMode"> I'm on speakers, not headphones (turns on echo cancelling)</label></div></div>
       </div>
+      <div class="card">
+        <h2>Players <span id="pcount" style="color:var(--muted);font-weight:600;font-size:14px"></span></h2>
+        <div class="plist" id="plist" style="margin-top:10px"></div>
+        <div id="guestPanel" class="waiting" hidden>Waiting for the host to start…</div>
+        <div class="countdown" id="countdown" hidden></div>
+      </div>
+    </div>
+    <div class="card" id="lobbySettings" hidden>
+      <div id="hostPanel">
+        <div class="label" style="margin-top:0">Time per round</div>
+        <div class="seg" id="mpTimeSeg"><button data-t="10">10s</button><button data-t="30">30s</button><button data-t="60" class="on">60s</button><button data-t="0">No limit</button><button data-t="custom">Custom</button></div>
+        <div class="custom-row" id="mpTimeCustom" hidden><input type="range" min="1" max="180" value="45"><input type="number" min="1" max="180" value="45"><span>sec</span></div>
+        <div class="label">Rounds</div>
+        <div class="seg" id="mpRoundSeg"><button data-r="5" class="on">5</button><button data-r="10">10</button><button data-r="custom">Custom</button></div>
+        <div class="custom-row" id="mpRoundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
+        <button class="btn btn-primary start-big" id="mpStartBtn">Start Classic game</button>
+      </div>
     </div>
     <div class="card modes" id="lobbyModes" hidden>
       <h3>Game mode</h3>
-      <button class="classic-bar on" id="lobbyClassic">Classic</button>
       <div class="mode-grid" id="lobbyModeGrid"></div>
     </div>
   </div>
@@ -639,6 +653,7 @@ const SNOW_SOUTH=['Argentina South','Chile South','New Zealand South','Tasmania'
 const DENSE=[['Manhattan',40.755,-73.985],['Downtown Chicago',41.882,-87.63],['Downtown Toronto',43.65,-79.382],['Downtown San Francisco',37.789,-122.401],['Central Tokyo',35.69,139.7],['Shinjuku',35.694,139.7],['Shibuya',35.659,139.7],['Osaka Umeda',34.702,135.497],['Seoul Gangnam',37.498,127.028],['Seoul Jongno',37.57,126.985],['Hong Kong Central',22.282,114.158],['Mong Kok',22.319,114.17],['Taipei Xinyi',25.034,121.565],['Singapore CBD',1.284,103.851],['Bangkok Silom',13.728,100.53],['Kuala Lumpur KLCC',3.157,101.712],['Jakarta Thamrin',-6.195,106.823],['Manila Makati',14.556,121.023],['Ho Chi Minh District 1',10.775,106.7],['Mumbai Fort',18.935,72.835],['Delhi Connaught Place',28.632,77.219],['Dubai Marina',25.08,55.14],['Istanbul Beyoğlu',41.036,28.978],['Paris Opéra',48.871,2.332],['London City',51.514,-0.09],['Madrid Sol',40.417,-3.703],['Barcelona Eixample',41.392,2.165],['Milan Duomo',45.464,9.19],['Berlin Mitte',52.52,13.405],['Vienna Innere Stadt',48.208,16.372],['Prague Old Town',50.087,14.42],['Warsaw Śródmieście',52.232,21.012],['Moscow Tverskaya',55.762,37.606],['Mexico City Centro',19.433,-99.14],['São Paulo Centro',-23.548,-46.638],['Buenos Aires Microcentro',-34.604,-58.38],['Santiago Centro',-33.44,-70.65],['Bogotá Centro',4.6,-74.075],['Lima Centro',-12.047,-77.031],['Johannesburg CBD',-26.205,28.04],['Nairobi CBD',-1.284,36.82],['Cairo Downtown',30.045,31.238],['Sydney CBD',-33.868,151.208],['Melbourne CBD',-37.814,144.963]];
 const MODES={
   classic:  {name:'Classic', desc:'The standard game.'},
+  gray:     {name:'Grayscale', desc:'No color. Just light and shadow.', gray:true},
   blink:    {name:'Blink', desc:'One quick blink, then guess.', time:15},
   pixel:    {name:'Pixelated', desc:'Blocky, blurry, barely there.'},
   stranded: {name:'Stranded', desc:'Only places in the middle of nowhere.', filter:n=>REMOTE.includes(n), radius:25000, remote:true},
@@ -791,7 +806,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-001044';
+const BUILD='20260916-002611';
 const state={ mode:'classic', timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -859,10 +874,10 @@ function picker(segId,customId,attr,min,max,onChange){
 picker('timeSeg','timeCustom','t',1,180,v=>{ state.userTime=v; });
 picker('roundSeg','roundCustom','r',1,100,v=>{ state.userRounds=v; });
 state.userTime=60; state.userRounds=5;
-$('startBtn').addEventListener('click',()=>{ state.mode='classic'; startGame(); });
+$('startBtn').addEventListener('click',()=>startGame());
 $('againBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); } else if(!mp.role) startGame(); });
 $('menuBtn').addEventListener('click',()=>{ if(mp.role) mpLeave(); renderBoard(); show('menu'); });
-function show(id){ for(const s of ['menu','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
+function show(id){ for(const s of ['menu','setup','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
 
 /* ---------- Game flow ---------- */
 function ensureGuessMap(){
@@ -881,7 +896,7 @@ function ensureGuessMap(){
 }
 function resetGameState(){
   const m=modeOf(state.mode); $('modePill').hidden=state.mode==='classic'; $('modeLbl').textContent=m.name;
-  $('blink').hidden=true; stopPixel();
+  $('blink').hidden=true; stopPixel(); $('game').classList.toggle('gray',!!m.gray);
   state.round=0; state.score=0; state.results=[]; state.locs=[]; state.guess=null; state.saved=false; preload.idx=-1; preload.promise=null;
   panos.forEach(f=>{ f.onload=null; f.src='about:blank'; });
   ensureGuessMap();
@@ -891,12 +906,12 @@ async function startGame(){
   const m=modeOf(state.mode);
   state.timeLimit=m.time!=null?m.time:state.userTime; state.totalRounds=m.rounds!=null?m.rounds:state.userRounds;
   resetGameState();
-  $('startBtn').disabled=true; $('startBtn').textContent='Loading…';
+  $('startBtn').disabled=true; const __lbl=$('startBtn').textContent; $('startBtn').textContent='Loading…';
   show('game'); $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
   const plan=continentPlan(state.totalRounds);
   (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{ state.locs[i]=await findLocation(plan[i],m); }catch(e){ state.locs[i]=e; } } })();
   await nextRound();
-  $('startBtn').disabled=false; $('startBtn').textContent='Play solo';
+  $('startBtn').disabled=false; $('startBtn').textContent=__lbl;
 }
 
 async function waitForLoc(i){
@@ -1258,7 +1273,7 @@ document.addEventListener('keydown',e=>{
     if(!$('game').hidden && state.guess && !state.locked){ e.preventDefault(); submitGuess(false); }
     else if(!$('result').hidden){ e.preventDefault(); $('nextBtn').click(); }
     else if(!$('final').hidden && !mp.role){ e.preventDefault(); startGame(); }
-    else if(!$('menu').hidden && document.activeElement===document.body){ e.preventDefault(); state.mode='classic'; startGame(); }
+    else if(!$('setup').hidden && document.activeElement===document.body){ e.preventDefault(); startGame(); }
   }
 });
 window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resultMap&&resultMap.invalidateSize(); finalMap&&finalMap.invalidateSize(); });
@@ -1266,7 +1281,7 @@ window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resu
    MULTIPLAYER — host-authoritative. Game messages travel through public MQTT brokers
    (plain WebSockets, so they work on any network); WebRTC is used only for voice.
    ========================================================= */
-const COLORS=[['#e63946','Red'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#2bb673','Green'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#8e44ad','Purple'],['#e84393','Pink'],['#8d6e63','Brown'],['#111827','Black']];
+const COLORS=[['#e63946','Red'],['#ff6b6b','Coral'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#9acd32','Lime'],['#2bb673','Green'],['#12a5a0','Teal'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#6f42c1','Indigo'],['#b23fd0','Purple'],['#e84393','Pink']];
 const BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081'];
 const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpeer:null}, code:'', settings:{time:60,rounds:5,mode:'classic'}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby',
            links:[], link:null, seen:{}, hb:null, hostSeen:0, joinTimer:null, brokerIdx:0 };
@@ -1358,9 +1373,7 @@ function mpSetup(role,code){
   diag.t0=Date.now(); diag.log=[];
   $('mpName').value=mp.me.name;
   $('roomCode').textContent=code;
-  $('roomUrl').textContent='Join at '+location.host+location.pathname.replace(/index\.html$/,'');
-  $('copyLink').hidden=false;
-  $('hostPanel').hidden=role!=='host'; $('guestPanel').hidden=role!=='guest'; $('countdown').hidden=true; $('connBox').hidden=true; $('lobbyModes').hidden=role!=='host';
+  $('lobbySettings').hidden=role!=='host'; $('guestPanel').hidden=role!=='guest'; $('countdown').hidden=true; $('connBox').hidden=true; $('lobbyModes').hidden=role!=='host';
   $('mpStartBtn').disabled=false;
   show('lobby'); renderLobby();
 }
@@ -1527,7 +1540,7 @@ function renderLobby(){
   $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}"><span class="sw" style="background:${p.color===null?'#cfd8d2':COLORS[p.color][0]}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
   $('swatches').innerHTML=COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
     return `<div class="swatch ${mine?'mine':''} ${taken?'taken':''}" data-i="${i}" style="background:${c}" ${taken?`data-owner="${esc(owner.name||'taken')}"`:''} title="${n}">${mine?'✓':''}</div>`; }).join('');
-  if(mp.role==='host'){ mpTimePick.mark(mp.settings.time); mpRoundPick.mark(mp.settings.rounds); const cur=mp.settings.mode||'classic'; $('lobbyClassic').classList.toggle('on',cur==='classic'); [...$('lobbyModeGrid').children].forEach(t=>t.classList.toggle('on',t.dataset.mode===cur)); $('mpStartBtn').textContent=`Start ${modeOf(cur).name} game`; }
+  if(mp.role==='host'){ mpTimePick.mark(mp.settings.time); mpRoundPick.mark(mp.settings.rounds); const cur=mp.settings.mode||'classic'; markTiles($('lobbyModeGrid'),cur); $('mpStartBtn').textContent=`Start ${modeOf(cur).name} game`; }
   else { const m=modeOf(mp.settings.mode); $('guestPanel').textContent=`Waiting for the host to start… (${m.name} · ${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`; }
 }
 function mpToLobby(){
@@ -1735,13 +1748,16 @@ $('leaveBtn').addEventListener('click',()=>{ mpLeave(); show('menu'); });
 window.addEventListener('pagehide',()=>{ if(mp.role) mpLeave(); });
 $('mpName').addEventListener('input',()=>{ mp.me.name=$('mpName').value.trim().slice(0,16); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
 $('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return; const i=+sw.dataset.i; mpSend({t:'color',color:mp.me.color===i?null:i}); if(mp.role==='guest'){ mp.me.color=mp.me.color===i?null:i; } });
-function modeTiles(){ return Object.entries(MODES).filter(([id])=>id!=='classic').map(([id,m])=>`<button class="tile" data-mode="${id}" style="background-image:url(images/mode-${id}.jpg)" title="${m.name}"><span class="ribbon">${m.name}</span><span class="cap">${m.desc}</span></button>`).join(''); }
+function modeTiles(){ return Object.entries(MODES).map(([id,m])=>`<button class="tile" data-mode="${id}" style="background-image:url(images/mode-${id}.jpg)" title="${m.name}"><span class="ribbon">${m.name}</span><span class="cap">${m.desc}</span></button>`).join(''); }
+function markTiles(grid,id){ [...grid.children].forEach(t=>t.classList.toggle('on',t.dataset.mode===id)); }
 $('modeGrid').innerHTML=modeTiles();
-$('modeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); if(b){ state.mode=b.dataset.mode; startGame(); } });
+function setSoloMode(id){ state.mode=id; markTiles($('modeGrid'),id); $('startBtn').textContent='Play '+modeOf(id).name; }
+$('modeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); if(b) setSoloMode(b.dataset.mode); });
+$('soloBtn').addEventListener('click',()=>{ setSoloMode('classic'); show('setup'); $('setup').scrollTo(0,0); });
+$('setupBack').addEventListener('click',()=>show('menu'));
 $('lobbyModeGrid').innerHTML=modeTiles();
 function setLobbyMode(id){ mp.settings.mode=id; const m=modeOf(id); if(m.time!=null) mp.settings.time=m.time; if(m.rounds!=null) mp.settings.rounds=m.rounds; mp.locPromise=null; hostSync(); }
 $('lobbyModeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); if(b) setLobbyMode(b.dataset.mode); });
-$('lobbyClassic').addEventListener('click',()=>setLobbyMode('classic'));
 const mpTimePick=picker('mpTimeSeg','mpTimeCustom','t',1,180,v=>{ mp.settings.time=v; hostSync(); });
 const mpRoundPick=picker('mpRoundSeg','mpRoundCustom','r',1,100,v=>{ mp.settings.rounds=v; hostSync(); });
 $('mpStartBtn').addEventListener('click',()=>{ if(playerList().length<2){ toast('You need at least one more player'); return; } hostStartGame(); });

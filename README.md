@@ -10,8 +10,9 @@ Offline copy: double-click `run.command`. It serves the game locally, opens a te
 
 ## Game modes
 
-Picture tiles at the bottom of the menu. Click one to play it solo, or a host picks one in the lobby.
+Picture tiles on the solo setup screen and in the lobby. Classic is selected by default; click a tile to select it, then press Play or Start.
 
+- **Grayscale**: no color.
 - **Blink**: a fixed 120° still is revealed through an eyelid for about a second. 15 seconds to guess.
 - **Pixelated**: the panorama rendered to a 128-pixel-wide canvas you drag around.
 - **Stranded**: remote regions only, never within 60 km of a big city.
