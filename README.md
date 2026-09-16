@@ -13,7 +13,7 @@ Offline copy: double-click `run.command`. It serves the game locally, opens a te
 Under the main card there are six modes besides Classic. Each has its own Play button, and a host can pick one for a lobby.
 
 - **Blink**: the panorama is revealed through an eyelid that opens for about a second and shuts. 15 seconds to guess from the glimpse.
-- **Pixelated**: the panorama is rendered to a 160-pixel-wide canvas you drag around. Shapes and colors only.
+- **Pixelated**: the panorama is rendered to a 128-pixel-wide canvas you drag around. Shapes and colors only.
 - **Stranded**: remote regions only, and any spot inside a town or city is rejected.
 - **Island Hopper**: islands only.
 - **'Murica**: the United States only.
