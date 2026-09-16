@@ -30,6 +30,7 @@ Picture tiles on the solo setup screen and in the lobby (multiplayer-only modes 
 - **Odd One Out**: three wide panoramic strips (150° cylindrical crops) stacked on the left, a map with two pins on the right. Pick the view that has no pin.
 - **Two Truths and a Lie**: two wide strips and a map with three pins. Pick the pin that is the lie. The map and the Lock in button stay put; nothing pops up on hover.
 - **Country**: no pin. The map shows country borders (Natural Earth 50m via world-atlas); hover highlights, click selects. Right country is 5,000, anything else 0. The true country is found by point-in-polygon against the same data.
+- **Capitals**: Country mode, but every drop is inside a capital city (~100 capitals with official coverage, within about 2 km of the centre). Click the country.
 - **Passport**: every round is in one country. Until you use your stamp, round results show only your pin, your points and the distance: no flag, no line, no region. After stamping, results reveal normally (on unlabeled imagery, country name still hidden until the end). Once per game you can stamp a country name; a correct stamp is worth 1,000 × rounds remaining (max 5,000), a wrong one scores nothing and uses up the try.
 - **Peek** (multiplayer only): everyone's pins are visible to everyone while guessing, live.
 
