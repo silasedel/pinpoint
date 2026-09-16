@@ -326,8 +326,6 @@
   #game.gray .pano,#game.gray #pix{filter:grayscale(1)}
   #bettray{position:absolute;left:16px;bottom:72px;z-index:7;width:480px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 18px 16px;opacity:.6;transition:opacity .18s}
   #bettray:hover,#bettray:focus-within{opacity:1}
-  #bettray .legend{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5}
-  #bettray .legend b{color:var(--text)}
   #bettray .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
   #bettray .bank{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
   #bettray .bank b{display:block;font-size:26px;letter-spacing:0;color:var(--text);text-transform:none;font-variant-numeric:tabular-nums}
@@ -590,10 +588,9 @@
     <div class="row"><div class="bank">Bankroll<b id="bankLbl">1,000</b></div><div class="bank pot">Your bet<b id="betLbl">0</b></div></div>
     <div class="chips">
       <button class="chip-btn c1" data-v="1">1</button><button class="chip-btn c5" data-v="5">5</button><button class="chip-btn c25" data-v="25">25</button><button class="chip-btn c100" data-v="100">100</button><button class="chip-btn c500" data-v="500">500</button>
-      <span class="sm"><button id="betClear">Min</button><button id="betHalf">Half</button><button class="allin" id="betAll">All in</button></span>
+      <span class="sm"><button id="betClear">Clear</button><button id="betHalf">Half</button><button class="allin" id="betAll">All in</button></span>
     </div>
     <div class="potchips" id="potChips"></div>
-    <div class="legend" id="betLegend"></div>
   </div>
   <div id="passport" hidden>
     <div class="ptitle">Passport <span>Every round is in the same country. Results won't show where you were until you stamp it. Name it early for a bigger bonus. One try.</span></div>
@@ -982,7 +979,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-095534';
+const BUILD='20260916-103904';
 const state={ mode:'classic', passport:null, bank:1000, bet:0, pick:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1103,7 +1100,7 @@ async function waitForLoc(i){
 }
 
 async function nextRound(){
-  state.round++; state.guess=null; state.locked=false; state.fitDone=false; state.pick=null; state.bet=0; if(modeOf(state.mode).bet){ state.bet=defaultBet(); renderBet(); }
+  state.round++; state.guess=null; state.locked=false; state.fitDone=false; state.pick=null; state.bet=0; if(modeOf(state.mode).bet) renderBet();
   show('game');
   $('roundLbl').textContent=`${state.round} / ${state.totalRounds}`;
   const last=state.results[state.results.length-1];
@@ -1175,13 +1172,13 @@ function stopTimer(){ if(state.timer){ clearInterval(state.timer); state.timer=n
 
 /* Payout multiplier from the base score: 5× for a bullseye, sliding down with distance. Break-even is about 1,200 km; beyond that you lose part or all of the stake. */
 function betMult(base){ return Math.round(5*Math.pow(Math.max(0,Math.min(5000,base))/5000,2)*100)/100; }
-function defaultBet(){ return Math.max(1,Math.min(state.bank,Math.round(state.bank*0.1))); }
 function submitGuess(auto=false){
   if(state.locked) return;
   const m=modeOf(state.mode);
   if(m.trio){ if(state.pick==null && !auto) return; }
   else if(!state.guess && !auto) return;
-  if(m.bet){ if(state.bet<1) state.bet=Math.min(1,state.bank); }   // a bet is required every round
+  if(m.bet&&!auto&&state.bet<1) return;   // a bet is required every round
+  if(m.bet&&state.bet<1) state.bet=Math.min(1,state.bank);   // time ran out with no bet: the minimum stake goes in
   state.locked=true;
   if(mp.role){ mpSubmitGuess(); return; }   // clock keeps running so you can see how long the others have
   stopTimer();
@@ -1464,11 +1461,10 @@ function renderBet(){
   $('potChips').innerHTML=parts.map(c=>`<i class="chip-btn ${c}" style="width:12px;height:12px;border-width:2px;box-shadow:0 1px 2px rgba(0,0,0,.4)"></i>`).join('');
   const gb=$('guessBtn');
   if(!state.locked){ if(state.guess&&state.bet>=1){ gb.disabled=false; gb.textContent=`Bet ${state.bet.toLocaleString()} · lock in`; } else { gb.disabled=true; gb.textContent=state.guess?'Add chips to bet':'Place your pin'; } }
-  const be=Math.round(1492.7*Math.log(Math.sqrt(5)));   // distance where the multiplier is exactly 1×
-  $('betLegend').innerHTML=`Pays your bet × a multiplier that slides with distance: bullseye <b>5×</b> · ${fmtDist(100)} <b>${betMult(scoreFor(100)).toFixed(1)}×</b> · ${fmtDist(500)} <b>${betMult(scoreFor(500)).toFixed(1)}×</b> · ${fmtDist(1000)} <b>${betMult(scoreFor(1000)).toFixed(1)}×</b> · ${fmtDist(2000)} <b>${betMult(scoreFor(2000)).toFixed(1)}×</b>. You come out ahead inside ${fmtDist(be)}.`;
+
 }
 document.querySelector('#bettray .chips').addEventListener('click',e=>{ const b=e.target.closest('.chip-btn'); if(!b||state.locked) return; const v=+b.dataset.v; if(state.bet+v<=state.bank){ state.bet+=v; renderBet(); } });
-$('betClear').addEventListener('click',()=>{ if(state.locked) return; state.bet=Math.min(1,state.bank); renderBet(); });
+$('betClear').addEventListener('click',()=>{ if(state.locked) return; state.bet=0; renderBet(); });
 $('betHalf').addEventListener('click',()=>{ if(state.locked) return; state.bet=Math.max(1,Math.round(state.bank/2)); renderBet(); });
 $('betAll').addEventListener('click',()=>{ if(state.locked) return; state.bet=state.bank; renderBet(); });
 
