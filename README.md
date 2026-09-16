@@ -12,13 +12,20 @@ Offline copy: double-click `run.command`. It serves the game locally, opens a te
 
 Picture tiles at the bottom of the menu. Click one to play it solo, or a host picks one in the lobby.
 
-- **Blink**: a fixed 120° still is revealed through an eyelid for about a second. 15 seconds to guess from the glimpse.
+- **Blink**: a fixed 120° still is revealed through an eyelid for about a second. 15 seconds to guess.
 - **Pixelated**: the panorama rendered to a 128-pixel-wide canvas you drag around.
 - **Stranded**: remote regions only, never within 60 km of a big city.
-- **Island Hopper**: a curated list of ~85 small islands, so the coast is always near.
+- **Island Hopper**: a curated list of ~85 small islands.
+- **Coastline**: ~80 spots on or beside the sea.
 - **'Murica**: the United States only.
-- **Concrete Jungle**: within about three quarters of a mile of ~45 of the densest city cores on Earth.
-- **Million Plus**: within about three miles of the center of one of ~120 cities with over a million people.
+- **Concrete Jungle**: within about three quarters of a mile of ~45 of the densest city cores.
+- **M+**: within about three miles of the center of ~120 cities over a million people.
+- **Landmarks**: dropped within a couple hundred meters of one of ~55 famous places, facing it.
+- **Time Machine**: only captures from before 2010, pulled from each spot's imagery history.
+- **Snow Globe**: only captures from winter months in snowy regions.
+- **Countdown**: 30 seconds, and points are worth less the longer you wait (full value at the start, a quarter at zero).
+
+All location picking asks Google for its own imagery only (`StreetViewSource.GOOGLE`), which is what makes country selection even; before that, user-uploaded photospheres were crowding out official coverage in Europe and the US.
 
 ## Play with friends (anywhere)
 
