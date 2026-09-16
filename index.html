@@ -229,15 +229,6 @@
   .leaflet-interactive:focus{outline:none}
   .peek-tip{background:rgba(255,255,255,.92);border:0;box-shadow:0 1px 4px rgba(0,0,0,.25);font-weight:700;font-size:11px;padding:2px 6px;border-radius:6px}
   .peek-tip::before{display:none}
-  #passport{position:absolute;left:16px;bottom:72px;z-index:7;width:380px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px}
-  #passport .ptitle{font-weight:800;font-size:15px;display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
-  #passport .ptitle span{font-weight:500;font-size:12px;color:var(--muted)}
-  #passport .prow2{display:flex;gap:6px}
-  #passport input{flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:14px;outline:none}
-  #passport input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
-  #passport input:disabled{background:#f3f6f4;color:var(--muted)}
-  #passport .ppstat{margin-top:8px;font-size:13px;color:var(--muted)}
-  #passport .ppstat .ok{color:var(--green)} #passport .ppstat .bad{color:var(--red)}
   .coordbar{display:flex;gap:6px;padding:8px 8px 0;border-top:1px solid var(--line)}
   .coordbar input{flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:13px;outline:none;font-variant-numeric:tabular-nums}
   .coordbar input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
@@ -367,13 +358,15 @@
   #tempSlider::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#fff;border:3px solid var(--green-dark);box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:pointer}
   #tempSlider::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:#fff;border:3px solid var(--green-dark);box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:pointer}
   #guessbar .gb-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin:4px 2px 12px}
-  #guessbar .gb-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 12px}
-  #guessbar .gb-opts button{padding:13px 10px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:14px;cursor:pointer;color:var(--text)}
+  #guessbar .gb-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:8px 0 4px}
+  #guessbar .gb-opts.g3{grid-template-columns:repeat(3,1fr)}
+  #guessbar .gb-opts.g2{grid-template-columns:repeat(2,1fr);margin-bottom:12px}
+  #guessbar .gb-opts button{padding:11px 8px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:13px;line-height:1.25;cursor:pointer;color:var(--text);min-height:46px}
   #guessbar .gb-opts button:hover{border-color:var(--green);background:var(--green-soft)}
   #guessbar .gb-opts button.on{background:var(--green);border-color:var(--green);color:#fff}
   #guessbar .btn{width:100%;padding:13px;font-size:15px}
   #game.nomap .mappanel{display:none}
-  @media (max-width:520px){ #guessbar .gb-opts{grid-template-columns:1fr} }
+  @media (max-width:560px){ #guessbar .gb-opts,#guessbar .gb-opts.g3{grid-template-columns:repeat(2,1fr)} }
   #trio{position:absolute;inset:72px 34% 0 0;z-index:4;background:#000;display:flex;flex-direction:column;gap:4px}
   #trio .col{position:relative;flex:1;min-height:0;overflow:hidden;cursor:pointer;background:#111}
   #trio .col canvas{width:100%;height:100%;object-fit:cover;display:block;transition:filter .2s,opacity .2s}
@@ -415,6 +408,11 @@
   .place .trail b.now{color:var(--text);background:var(--green-soft);border-radius:8px;padding:2px 8px}
   .place .trail b i{font-style:normal;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--red);margin-right:4px}
   .place .trail .arrow{color:var(--muted);opacity:.6}
+  .polrow{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;justify-content:center;margin:4px 0}
+  .polrow .k{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:64px;text-align:right}
+  .polrow b.ok{color:var(--green-dark)} .polrow b.no{color:var(--red)}
+  .polrow .bl{color:var(--muted);font-size:13px}
+  .polrow .yours{font-size:12px;color:var(--red);background:var(--red-soft);border-radius:99px;padding:2px 8px}
   #waitOverlay{position:absolute;inset:72px 0 0 0;z-index:8;display:flex;align-items:center;justify-content:center;background:rgba(21,34,25,.55);backdrop-filter:blur(3px)}
   #waitOverlay .wbox{background:#fff;border-radius:16px;padding:24px 30px;text-align:center;box-shadow:var(--shadow);min-width:260px}
   #waitOverlay .wbox b{font-size:20px;display:block;margin-bottom:6px}
@@ -667,15 +665,12 @@
       <div class="gb-scale"><span>-20°F</span><span>20°F</span><span>60°F</span><span>100°F</span></div>
     </div>
     <div id="govWrap" hidden>
-      <div class="gb-head">How is this country governed?</div>
-      <div class="gb-opts" id="govOpts"></div>
+      <div class="gb-head">Who holds power?</div>
+      <div class="gb-opts g3" id="polOpts"></div>
+      <div class="gb-head" style="margin-top:12px">How is the economy run?</div>
+      <div class="gb-opts g2" id="ecoOpts"></div>
     </div>
     <button class="btn btn-primary" id="gbLock" disabled>Lock in</button>
-  </div>
-  <div id="passport" hidden>
-    <div class="ptitle">Passport <span>Every round is in the same country. Results won't show where you were until you stamp it. Name it early for a bigger bonus. One try.</span></div>
-    <div class="prow2"><input id="ppIn" list="ppList" placeholder="Which country is this?" autocomplete="off"><datalist id="ppList"></datalist><button class="btn btn-primary" id="ppStamp">Stamp</button></div>
-    <div class="ppstat" id="ppStat"></div>
   </div>
   <div id="waitOverlay" hidden><div class="wbox"><b>Guess locked in</b><div id="waitTxt" style="color:var(--muted);font-size:14px"></div><div class="wlist" id="waitList"></div></div></div>
 
@@ -850,27 +845,51 @@ const CAPITALS=[['London',51.5074,-0.1278],['Paris',48.8566,2.3522],['Berlin',52
  ['Tokyo',35.6762,139.6503],['Seoul',37.5665,126.978],['Taipei',25.033,121.5654],['Manila',14.5995,120.9842],['Jakarta',-6.2088,106.8456],['Kuala Lumpur',3.139,101.6869],['Singapore',1.2903,103.852],['Bangkok',13.7563,100.5018],['Phnom Penh',11.5564,104.9282],['Vientiane',17.9757,102.6331],['Hanoi',21.0285,105.8542],['Ulaanbaatar',47.8864,106.9057],['Astana',51.1694,71.4491],['Bishkek',42.8746,74.5698],['Tashkent',41.2995,69.2401],['New Delhi',28.6139,77.209],['Dhaka',23.8103,90.4125],['Kathmandu',27.7172,85.324],['Thimphu',27.4728,89.639],['Colombo',6.9271,79.8612],['Amman',31.9454,35.9284],['Beirut',33.8938,35.5018],['Doha',25.2854,51.531],['Abu Dhabi',24.4821,54.3552],['Muscat',23.588,58.3829],
  ['Pretoria',-25.7479,28.2293],['Gaborone',-24.6282,25.9231],['Windhoek',-22.5609,17.0658],['Maseru',-29.3151,27.4869],['Mbabane',-26.3054,31.1367],['Nairobi',-1.2921,36.8219],['Kampala',0.3476,32.5825],['Kigali',-1.9441,30.0619],['Accra',5.6037,-0.187],['Abuja',9.0765,7.3986],['Dakar',14.7167,-17.4677],['Tunis',36.8065,10.1815],['Antananarivo',-18.921,47.5311],['Cairo',30.0291,31.2593],
  ['Washington, D.C.',38.9072,-77.0369],['Ottawa',45.4215,-75.6972],['Mexico City',19.4326,-99.1332],['Guatemala City',14.6349,-90.5069],['San José',9.9281,-84.0907],['Panama City',8.9824,-79.5199],['Santo Domingo',18.4861,-69.9312],['Bogotá',4.711,-74.0721],['Quito',-0.1807,-78.4678],['Lima',-12.0464,-77.0428],['La Paz',-16.4897,-68.1193],['Santiago',-33.4489,-70.6693],['Buenos Aires',-34.6037,-58.3816],['Montevideo',-34.9011,-56.1645],['Brasília',-15.8267,-47.9218],['Canberra',-35.2809,149.13],['Wellington',-41.2865,174.7762]];
-/* Government: the form of government of each country the game can drop you in. */
-const GOV_LABELS=['Republic','Constitutional monarchy','Absolute monarchy','Communist state'];
-const GOV_ONE={0:'a republic',1:'a constitutional monarchy',2:'an absolute monarchy',3:'a communist state'};
-const GOV={};
-(function(){
-  const R='United States,Mexico,Guatemala,Costa Rica,Panama,Dominican Republic,Colombia,Ecuador,Peru,Bolivia,Brazil,Chile,Argentina,Uruguay,Iceland,Ireland,France,Portugal,Germany,Italy,Austria,Switzerland,Czech Republic,Slovakia,Poland,Hungary,Slovenia,Croatia,Serbia,Bosnia and Herzegovina,North Macedonia,Albania,Greece,Bulgaria,Romania,Ukraine,Russia,Estonia,Latvia,Lithuania,Finland,Georgia,Turkey,Israel,Lebanon,India,Bangladesh,Nepal,Sri Lanka,Pakistan,Kazakhstan,Kyrgyzstan,Uzbekistan,Mongolia,Philippines,Indonesia,Taiwan,South Korea,South Africa,Namibia,Botswana,Zimbabwe,Kenya,Uganda,Rwanda,Tanzania,Ghana,Nigeria,Senegal,Tunisia,Egypt,Ethiopia,Cameroon,Algeria,Democratic Republic of the Congo,Madagascar';
-  const C='United Kingdom,Spain,Netherlands,Belgium,Denmark,Norway,Sweden,Canada,Australia,New Zealand,Japan,Thailand,Malaysia,Cambodia,Bhutan,Jordan';
-  const A='Oman,United Arab Emirates';
-  const K='Vietnam,Laos';
-  [R,C,A,K].forEach((list,i)=>list.split(',').forEach(c=>{ GOV[c]=i; }));
-})();
-const GOV_BY_TYPE=[0,1,2,3].map(i=>Object.keys(GOV).filter(c=>GOV[c]===i));
-/* Republics outnumber everything else, so weight the draw or the answer would always be the same. */
-const GOV_WEIGHTS=[0.4,0.34,0.11,0.15];
-let govLastType=-1;
-function govMode(m){
-  let t, guard=0;
-  do{ const r=Math.random(); let acc=0; t=0; for(let i=0;i<GOV_WEIGHTS.length;i++){ acc+=GOV_WEIGHTS[i]; if(r<acc){ t=i; break; } } }
-  while(t===govLastType&&++guard<4);
-  govLastType=t;
-  const want=GOV_BY_TYPE[t]; const set=new Set(want);
+/* Politics: two separate questions per round.
+   POWER is the structure of government (who actually runs the state).
+   ECON is how the economy is organised — the capitalism/socialism axis, which is a different thing entirely. */
+const POWER=[
+ {name:'Presidential republic', short:'Presidential', blurb:'An elected president runs the government directly.'},
+ {name:'Parliamentary republic', short:'Parliamentary', blurb:'Parliament picks the government; the president is mostly ceremonial.'},
+ {name:'Semi-presidential republic', short:'Semi-presidential', blurb:'An elected president shares power with a prime minister.'},
+ {name:'Constitutional monarchy', short:'Const. monarchy', blurb:'A monarch reigns, elected politicians actually govern.'},
+ {name:'Absolute monarchy', short:'Absolute monarchy', blurb:'The monarch holds real power; no elected government above them.'},
+ {name:'One-party state', short:'One-party', blurb:'A single party is the only one legally allowed to rule.'},
+];
+const ECON=[
+ {name:'Free-market capitalism', short:'Free market', blurb:'Private business runs almost everything; light taxes and a small safety net.'},
+ {name:'Social-market capitalism', short:'Social market', blurb:'Private business plus a big welfare state, high taxes and strong unions.'},
+ {name:'State-led capitalism', short:'State-led', blurb:'Private business exists, but the state owns the biggest strategic companies.'},
+ {name:'Socialist economy', short:'Socialist', blurb:'Officially socialist: the ruling party or state steers the whole economy.'},
+];
+/* [power, economy] for every country the game can drop you in. */
+const POL={
+ 'United Kingdom':[3,0],'Ireland':[1,0],'Iceland':[1,1],'France':[2,1],'Portugal':[2,1],'Spain':[3,1],'Germany':[1,1],'Italy':[1,1],
+ 'Austria':[1,1],'Switzerland':[1,0],'Netherlands':[3,1],'Belgium':[3,1],'Denmark':[3,1],'Norway':[3,1],'Sweden':[3,1],'Finland':[1,1],
+ 'Estonia':[1,0],'Latvia':[1,0],'Lithuania':[1,0],'Poland':[2,1],'Czech Republic':[1,1],'Slovakia':[1,1],'Hungary':[1,1],'Slovenia':[1,1],
+ 'Croatia':[1,1],'Serbia':[1,1],'Bosnia and Herzegovina':[1,1],'North Macedonia':[1,1],'Albania':[1,1],'Greece':[1,1],'Bulgaria':[1,1],
+ 'Romania':[2,1],'Ukraine':[2,2],'Russia':[2,2],'Georgia':[1,0],'Turkey':[0,2],
+ 'United States':[0,0],'Canada':[3,1],'Mexico':[0,0],'Guatemala':[0,0],'Costa Rica':[0,1],'Panama':[0,0],'Dominican Republic':[0,0],
+ 'Colombia':[0,0],'Ecuador':[0,2],'Peru':[2,0],'Bolivia':[0,2],'Brazil':[0,1],'Chile':[0,0],'Argentina':[0,1],'Uruguay':[0,1],
+ 'South Africa':[1,1],'Namibia':[0,0],'Botswana':[1,0],'Zimbabwe':[0,2],'Kenya':[0,0],'Uganda':[0,0],'Rwanda':[0,2],'Tanzania':[0,2],
+ 'Ethiopia':[1,2],'Ghana':[0,0],'Nigeria':[0,2],'Senegal':[0,0],'Cameroon':[0,2],'Democratic Republic of the Congo':[2,2],
+ 'Algeria':[2,2],'Tunisia':[0,1],'Egypt':[2,2],'Madagascar':[2,0],'Israel':[1,1],'Lebanon':[1,0],'Jordan':[3,0],
+ 'Oman':[4,2],'United Arab Emirates':[4,2],
+ 'Japan':[3,1],'South Korea':[0,1],'Taiwan':[2,0],'Mongolia':[2,0],'Kazakhstan':[0,2],'Kyrgyzstan':[0,0],'Uzbekistan':[0,2],
+ 'India':[1,2],'Pakistan':[1,2],'Bangladesh':[1,0],'Nepal':[1,0],'Bhutan':[3,0],'Sri Lanka':[2,2],'Thailand':[3,0],'Cambodia':[3,0],
+ 'Vietnam':[5,3],'Laos':[5,3],'Malaysia':[3,2],'Indonesia':[0,2],'Philippines':[0,0],'Australia':[3,0],'New Zealand':[3,0],
+};
+const POL_BY_POWER=POWER.map((_,i)=>Object.keys(POL).filter(c=>POL[c][0]===i));
+const POL_BY_ECON=ECON.map((_,i)=>Object.keys(POL).filter(c=>POL[c][1]===i));
+/* Most countries are republics with market economies, so aim each round at a category instead of picking flat. */
+const POWER_W=[.22,.22,.16,.22,.08,.10], ECON_W=[.3,.3,.28,.12];
+let polLast='';
+function weighted(w){ const r=Math.random(); let acc=0; for(let i=0;i<w.length;i++){ acc+=w[i]; if(r<acc) return i; } return w.length-1; }
+function polMode(m){
+  let axis,i,key,guard=0;
+  do{ axis=Math.random()<0.5?'p':'e'; i=weighted(axis==='p'?POWER_W:ECON_W); key=axis+i; }while(key===polLast&&++guard<5);
+  polLast=key;
+  const want=(axis==='p'?POL_BY_POWER:POL_BY_ECON)[i], set=new Set(want);
   return {...m, filter:n=>set.has(countryOfRegion(n)), expect:want};
 }
 const MODES={
@@ -896,13 +915,12 @@ const MODES={
   capitals: {name:'Capitals', desc:'Click the country, but you\'re always dropped in its capital.', cities:CAPITALS, cityRadius:0.02, snap:1500, country:true},
   deported: {name:'Deported', desc:'Every round drops you in a country bordering the last one.', deported:true},
   temp:     {name:'Temperature', desc:'No map. Slide to the year-round average temperature.', slider:true},
-  gov:      {name:'Government', desc:'No map. Name the system that runs the country.', choice:true},
+  gov:      {name:'Politics', desc:'No map. Two questions: who holds power, and how the economy is run.', choice:true},
   battle:   {name:'Battle Royale', desc:'The farthest guess is knocked out every round. Last one standing wins.', elim:true, mp:true},
   lives:    {name:'Lives', desc:'Three lives each. The farthest guess loses one.', elim:true, lives:3, mp:true},
-  passport: {name:'Passport', desc:'Every round in one country. Stamp it early for a bonus.', passport:true},
   peek:     {name:'Peek', desc:'Everyone can see where the others are placing their pins.', peek:true, mp:true},
 };
-/* Passport: which country a region belongs to (matches the reverse geocoder's names). Tiny territories are left out. */
+/* Which country a region belongs to (matches the reverse geocoder's names). Tiny territories are left out. */
 const NOT_A_COUNTRY=new Set(['Puerto Rico','Bermuda','Curaçao','Greenland','Galápagos','Réunion','Hong Kong','Macau','Guam','American Samoa','Gibraltar','Faroe Islands','Isle of Man','Svalbard','Borneo','Crete','Malta','Andorra','Luxembourg','Singapore','Qatar','Vanuatu','Eswatini','Lesotho','Montenegro']);
 function countryOfRegion(n){
   if(NOT_A_COUNTRY.has(n)) return null;
@@ -915,9 +933,6 @@ function countryOfRegion(n){
 const CTRY_STOP=new Set(['of','the','and','republic','federation','islamic','plurinational','bolivarian','democratic','socialist','province','united','kingdom','states','state']);
 function ctryWords(a){ return String(a||'').toLowerCase().replace(/\(.*?\)/g,' ').replace(/[^a-z\u00c0-\u024f ]/g,' ').split(/\s+/).filter(w=>w&&!CTRY_STOP.has(w)); }
 function sameCountry(a,b){ if(!a||!b) return false; if(String(a).toLowerCase()===String(b).toLowerCase()) return true; const wa=ctryWords(a), wb=ctryWords(b); if(!wa.length||!wb.length) return false; return wa.every(w=>wb.includes(w))||wb.every(w=>wa.includes(w)); }
-function passportCountries(continent){ const out=new Map(); for(const c of (continent?[continent]:CONTINENTS)) for(const p of PLACES[c]){ const k=countryOfRegion(p[0]); if(k){ if(!out.has(k)) out.set(k,[]); out.get(k).push(p[0]); } } return out; }
-function pickPassportCountry(continent){ const m=passportCountries(continent); let names=[...m.keys()]; try{ const last=localStorage.getItem('pp_passport'); names=names.filter(n=>n!==last); }catch(e){} const c=names[Math.random()*names.length|0]; try{ localStorage.setItem('pp_passport',c); }catch(e){} return c; }
-const ALL_COUNTRIES=[...passportCountries(null).keys()].sort();
 /* Deported: land borders between countries the game can actually drop you in. Islands with no reachable neighbour are left out. */
 const NEIGHBORS={
  'Albania':['Greece','North Macedonia'],'Algeria':['Tunisia'],'Argentina':['Chile','Bolivia','Brazil','Uruguay'],
@@ -1048,13 +1063,13 @@ async function findLocation(continent,mode){
         let matched=null;
         if(mode.expect){ place=await placeOf(lat,lng); const want=Array.isArray(mode.expect)?mode.expect:[mode.expect];
           matched=place?want.find(c=>sameCountry(place.country,c)):null; if(!matched) continue; }
-        let govType=null, tempF=null;
-        if(mode.choice){ govType=GOV[matched]; if(govType==null) continue; }
+        let pol=null, tempF=null;
+        if(mode.choice){ pol=POL[matched]; if(!pol) continue; }
         if(mode.slider){ tempF=await tempOf(lat,lng); if(tempF==null) continue; }
         if(mode.face&&mode.cities){ const c=mode.cities.find(x=>x[0]===name); if(c){ const dLon=(c[2]-lng)*Math.PI/180, la1=lat*Math.PI/180, la2=c[1]*Math.PI/180; heading=Math.round((Math.atan2(Math.sin(dLon)*Math.cos(la2),Math.cos(la1)*Math.sin(la2)-Math.sin(la1)*Math.cos(la2)*Math.cos(dLon))*180/Math.PI+360)%360); } }
         notePlace(name);
         const out={ pano, lat, lng, heading, place, continent:cont, region:name, key:matched };
-        if(govType!=null) out.gov=govType;
+        if(pol) out.pol=pol;
         if(tempF!=null) out.tempF=tempF;
         if(!place) placeOf(lat,lng).then(p=>{ out.place=p; });
         return out;
@@ -1190,8 +1205,8 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-141203';
-const state={ mode:'classic', passport:null, chain:[], bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
+const BUILD='20260916-141718';
+const state={ mode:'classic', chain:[], bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
 
@@ -1408,7 +1423,7 @@ function resetGameState(){
   $('blink').hidden=true; stopPixel(); $('game').classList.toggle('gray',!!m.gray); $('game').classList.toggle('trio',!!m.trio);
   $('game').classList.toggle('nomap',!!(m.slider||m.choice)); resetGuessBar();
   $('bettray').hidden=!m.bet; state.bank=1000; state.bet=0; state.pick=null; $('trio').hidden=true; $('tmap').hidden=true; if(m.bet) renderBet();
-  state.passport=null; state.chain=[]; $('passport').hidden=true; peekClear();
+  state.chain=[]; peekClear();
   state.round=0; state.score=0; state.results=[]; state.locs=[]; state.guess=null; state.saved=false; preload.idx=-1; preload.promise=null;
   panos.forEach(f=>{ f.onload=null; f.src='about:blank'; });
   ensureGuessMap();
@@ -1421,12 +1436,11 @@ async function startGame(){
   $('startBtn').disabled=true; const __lbl=$('startBtn').textContent; $('startBtn').textContent='Loading…';
   show('game'); $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
   const plan=continentPlan(state.totalRounds);
-  let pm=m;
-  if(m.passport){ const c=pickPassportCountry(plan[0]); state.passport={country:c,stamp:null}; pm={...m,filter:n=>countryOfRegion(n)===c,expect:c}; renderPassport(); }
+  const pm=m;
   if(m.country){ $('loadingText').textContent='Loading borders…'; try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); show('setup'); $('startBtn').disabled=false; $('startBtn').textContent=__lbl; return; } }
   (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{
       if(m.deported){ const l=await deportStep(state.chain,m); state.locs[i]=l; state.chain.push(l.key); }
-      else state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],m.choice?govMode(m):pm);
+      else state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],m.choice?polMode(m):pm);
     }catch(e){ state.locs[i]=e; } } })();
   await nextRound();
   $('startBtn').disabled=false; $('startBtn').textContent=__lbl;
@@ -1449,7 +1463,6 @@ async function nextRound(){
   $('guessBtn').disabled=true; $('guessBtn').textContent=modeOf(state.mode).country?'Click a country':'Place your pin';
   if(mp.role&&amOut()){ $('guessBtn').disabled=true; $('guessBtn').textContent='Knocked out · spectating'; }
   if(modeOf(state.mode).country){ if(countryLayer&&!countryLayerOn){ countryLayer.addTo(guessMap); countryLayerOn=true; } if(countryLayer) countryLayer.resetStyle(); $('mappanel').classList.add('cty'); } else { if(countryLayerOn){ countryLayer.remove(); countryLayerOn=false; } $('mappanel').classList.remove('cty'); }
-  if(state.passport) renderPassport();
   $('loading').classList.remove('fade'); $('loadingText').textContent='Finding a location…';
   if(guessMarker){ guessMarker.remove(); guessMarker=null; }
   $('coordIn').value='';
@@ -1521,7 +1534,8 @@ function submitGuess(auto=false){
   if(state.locked||amOut()) return;
   const m=modeOf(state.mode);
   if(m.trio){ if(state.pick==null && !auto) return; }
-  else if(m.slider||m.choice){ if(state.choice==null && !auto) return; }
+  else if(m.slider){ if(state.choice==null && !auto) return; }
+  else if(m.choice){ const c=state.choice; if(!auto&&(!c||c.p==null||c.e==null)) return; }
   else if(!state.guess && !auto) return;
   if(m.bet&&!auto&&state.bet<1) return;   // a bet is required every round
   if(m.bet&&state.bet<1) state.bet=Math.min(1,state.bank);   // time ran out with no bet: the minimum stake goes in
@@ -1538,8 +1552,9 @@ function submitGuess(auto=false){
     const sel=state.choice; let r;
     if(m.slider){ const ans=state.current.tempF; const err=sel==null?null:Math.abs(sel-ans); const pts=err==null?0:tempScore(err);
       r={round:state.round,slider:true,sel,ans,err,pts,guess:null,truth,km:null,timedOut:sel==null,loc:state.current,guessPlace:null}; }
-    else { const ans=state.current.gov; const ok=sel===ans; const pts=ok?5000:0;
-      r={round:state.round,gov:true,sel,ans,ok,pts,guess:null,truth,km:null,timedOut:sel==null,loc:state.current,guessPlace:null}; }
+    else { const ans=state.current.pol; const okP=!!sel&&sel.p===ans[0], okE=!!sel&&sel.e===ans[1];
+      const pts=(okP?2500:0)+(okE?2500:0);
+      r={round:state.round,gov:true,sel,ans,okP,okE,ok:okP&&okE,pts,guess:null,truth,km:null,timedOut:!sel||(sel.p==null&&sel.e==null),loc:state.current,guessPlace:null}; }
     state.score+=r.pts; state.results.push(r); showResult(r); return;
   }
   if(m.country){
@@ -1567,9 +1582,8 @@ function showResult(r){
   if(!resultMap) resultMap=makeMap('resultmap');
   if(resultLayer) resultLayer.remove();
   resultLayer=L.layerGroup().addTo(resultMap);
-  const hid=passportHidden();
-  plainStyle(resultMap,!!modeOf(state.mode).passport&&!hid);
-  let line=null, casing=null;
+  plainStyle(resultMap,false);
+  const hid=false; let line=null, casing=null;
   if(r.guess){
     if(!hid){ casing=L.polyline([r.guess,r.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
     line=L.polyline([r.guess,r.truth],{color:'#1f9d55',weight:3,opacity:1}).addTo(resultLayer); }
@@ -1601,7 +1615,7 @@ function renderVerdict(r){
   const tp=r.loc.place, gp=r.guessPlace;
   const same=!!(tp&&gp&&tp.country===gp.country);
   let text,cls;
-  const hide=!!modeOf(state.mode).passport, hid=passportHidden();
+  const hide=false, hid=false;
   if(r.timedOut){ text="Time's up — no guess placed"; cls='bad'; }
   else { [text,cls]=verdictFor(r.km,same&&!hid); if(same&&!hid&&r.km>=200) text=hide?'Right country':`Right country: ${tp.country}`; }
   const v=$('verdict'); v.textContent=text; v.className='verdict '+cls;
@@ -1647,10 +1661,9 @@ function showFinal(){
   const pct=isBet?Math.min(1,state.score/5000):Math.min(1,state.score/max);
   const fv=$('finalVerdict');
   fv.textContent = pct>=.95?'World class':pct>=.8?'Excellent':pct>=.6?'Solid':pct>=.4?'Getting there':'Keep exploring';
-  if(state.passport&&state.passport.country) fv.textContent=`It was ${state.passport.country} · `+fv.textContent;
   fv.className='verdict '+(pct>=.6?'good':pct>=.3?'mid':'bad');
   if(pct>=.8) setTimeout(confetti,900);
-  $('roundChips').innerHTML=(state.passport?`<div class="rchip ${state.passport.stamp&&state.passport.stamp.ok?'top':''}">Stamp · ${state.passport.stamp?(state.passport.stamp.ok?'right in round '+state.passport.stamp.round:'wrong ('+esc(state.passport.stamp.country)+')'):'not used'}<b>${state.passport.stamp&&state.passport.stamp.ok?'+'+state.passport.stamp.bonus.toLocaleString():'+0'}</b></div>`:'')+state.results.map(r=>`<div class="rchip ${(r.trio?r.ok:r.pts>=4500)?'top':''}">R${r.round} · ${r.trio?(r.ok?'correct':'wrong'):(r.loc.place?esc(r.loc.place.country):(r.guess?fmtDist(r.km):'no guess'))}<b>${(r.bet&&r.pts>0?'+':'')+r.pts.toLocaleString()}</b></div>`).join('');
+  $('roundChips').innerHTML=state.results.map(r=>`<div class="rchip ${(r.trio?r.ok:r.pts>=4500)?'top':''}">R${r.round} · ${r.trio?(r.ok?'correct':'wrong'):(r.loc.place?esc(r.loc.place.country):(r.guess?fmtDist(r.km):'no guess'))}<b>${(r.bet&&r.pts>0?'+':'')+r.pts.toLocaleString()}</b></div>`).join('');
 
   // Leaderboard save
   state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false;
@@ -1831,14 +1844,31 @@ function resetGuessBar(){
   const m=modeOf(state.mode), bar=$('guessbar');
   bar.hidden=!(m.slider||m.choice);
   $('tempWrap').hidden=!m.slider; $('govWrap').hidden=!m.choice;
-  if(m.slider){ $('tempSlider').value=50; paintTemp(50); }
-  if(m.choice&&!$('govOpts').children.length) $('govOpts').innerHTML=GOV_LABELS.map((l,i)=>`<button data-i="${i}">${esc(l)}</button>`).join('');
-  [...$('govOpts').children].forEach(b=>b.classList.remove('on'));
-  $('gbLock').disabled=true; $('gbLock').textContent=m.slider?'Move the slider':'Pick one first';
+  if(m.slider){ $('tempSlider').value=50; paintTemp(50); state.choice=null; }
+  if(m.choice){
+    if(!$('polOpts').children.length){
+      $('polOpts').innerHTML=POWER.map((o,i)=>`<button data-i="${i}" title="${esc(o.blurb)}">${esc(o.name)}</button>`).join('');
+      $('ecoOpts').innerHTML=ECON.map((o,i)=>`<button data-i="${i}" title="${esc(o.blurb)}">${esc(o.name)}</button>`).join('');
+    }
+    [...$('polOpts').children,...$('ecoOpts').children].forEach(b=>b.classList.remove('on'));
+    state.choice={p:null,e:null};
+  }
+  $('gbLock').disabled=true; $('gbLock').textContent=m.slider?'Move the slider':'Answer both';
+}
+function polPicked(){
+  const c=state.choice||{};
+  const done=c.p!=null&&c.e!=null;
+  $('gbLock').disabled=!done;
+  $('gbLock').textContent=done?`Lock in · ${POWER[c.p].short} · ${ECON[c.e].short}`
+    :(c.p==null&&c.e==null?'Answer both':(c.p==null?'Pick who holds power':'Pick how the economy is run'));
 }
 $('tempSlider').addEventListener('input',e=>{ if(state.locked) return; const v=+e.target.value; state.choice=v; paintTemp(v); $('gbLock').disabled=false; $('gbLock').textContent=`Lock in ${v}°F`; });
-$('govOpts').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b||state.locked) return; state.choice=+b.dataset.i;
-  [...e.currentTarget.children].forEach(c=>c.classList.toggle('on',c===b)); $('gbLock').disabled=false; $('gbLock').textContent='Lock in · '+GOV_LABELS[state.choice]; });
+function polClick(e,key){ const b=e.target.closest('button'); if(!b||state.locked) return;
+  if(!state.choice||typeof state.choice!=='object') state.choice={p:null,e:null};
+  state.choice[key]=+b.dataset.i;
+  [...e.currentTarget.children].forEach(c=>c.classList.toggle('on',c===b)); polPicked(); }
+$('polOpts').addEventListener('click',e=>polClick(e,'p'));
+$('ecoOpts').addEventListener('click',e=>polClick(e,'e'));
 $('gbLock').addEventListener('click',()=>submitGuess(false));
 
 /* ---------- Trio modes: Odd One Out / Two Truths and a Lie ---------- */
@@ -2028,16 +2058,27 @@ function truthOnlyMap(truth){
 }
 function choiceText(kind,sel,ans,pts,ok,err){
   const v=$('verdict');
+  if(kind==='gov'){
+    const okP=!!sel&&sel.p===ans[0], okE=!!sel&&sel.e===ans[1];
+    const none=!sel||(sel.p==null&&sel.e==null);
+    v.textContent = none?"Time's up — no answer" : (okP&&okE?'Both right':(okP||okE?'Half right':'Neither one'));
+    v.className='verdict '+(okP&&okE?'good':(okP||okE?'mid':'bad'));
+    const row=(label,right,picked,o)=>`<div class="polrow"><span class="k">${label}</span><b class="${right?'ok':'no'}">${esc(o.name)}</b><span class="bl">${esc(o.blurb)}</span>${picked!=null&&!right?`<span class="yours">you said ${esc(picked)}</span>`:''}</div>`;
+    $('distTxt').innerHTML =
+      row('Power',okP,sel&&sel.p!=null?POWER[sel.p].name:null,POWER[ans[0]])+
+      row('Economy',okE,sel&&sel.e!=null?ECON[sel.e].name:null,ECON[ans[1]]);
+    $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; $('ptsBar').style.width='0%'; countUp($('ptsNum'),0,pts,900);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(pts/50)+'%'; }));
+    const pe0=$('ptsNum').parentElement; pe0.classList.remove('pop','great'); if(pts>=5000) pe0.classList.add('great');
+    setTimeout(()=>{ pe0.classList.add('pop'); if(pts>=5000) confetti(); },900);
+    return;
+  }
   if(kind==='slider'){
     if(sel==null){ v.textContent="Time's up — no guess"; v.className='verdict bad'; }
     else { const t=err<=1?['Bang on','good']:err<=3?['Very close','good']:err<=6?['Close','good']:err<=12?['Not far','mid']:['Way off','bad'];
       v.textContent=t[0]; v.className='verdict '+t[1]; }
     $('distTxt').innerHTML = sel==null ? `The average is <b>${fmtTemp(ans)}</b>.`
       : `You said <b>${sel}°F</b>. The year-round average is <b>${fmtTemp(ans)}</b> — off by <b>${err.toFixed(1)}°F</b>.`;
-  } else {
-    v.textContent = sel==null ? 'Time\'s up — no pick' : (ok?`Correct: ${GOV_LABELS[ans]}`:`Nope. It's ${GOV_ONE[ans]}`);
-    v.className='verdict '+(ok?'good':'bad');
-    $('distTxt').innerHTML = sel==null ? '' : `You picked <b>${esc(GOV_LABELS[sel])}</b>.`;
   }
   $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; $('ptsBar').style.width='0%'; countUp($('ptsNum'),0,pts,900);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(pts/50)+'%'; }));
@@ -2057,14 +2098,15 @@ function showChoiceResultMP(rev){
   $('waitOverlay').hidden=true;
   const m=modeOf(state.mode); const slider=!!m.slider;
   const mine=rev.results.find(r=>r.id===mp.me.id)||{pts:0,sel:null,ok:false,err:null};
-  const ans=slider?rev.ans.tempF:rev.ans.gov;
-  state.results.push({round:rev.round,slider,gov:!slider,sel:mine.sel,ans,ok:mine.ok,err:mine.err,pts:mine.pts,guess:null,truth:rev.truth,km:null,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng},guessPlace:null});
+  const ans=slider?rev.ans.tempF:rev.ans.pol;
+  state.results.push({round:rev.round,slider,gov:!slider,sel:mine.sel,ans,ok:mine.ok,okP:mine.okP,okE:mine.okE,err:mine.err,pts:mine.pts,guess:null,truth:rev.truth,km:null,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng},guessPlace:null});
   state.score+=mine.pts;
   truthOnlyMap(rev.truth);
   choiceText(slider?'slider':'gov',mine.sel,ans,mine.pts,mine.ok,mine.err);
   $('placeTxt').innerHTML=rev.place?`<span>📍 Location: <b>${esc(rev.place.region?rev.place.region+', ':'')}${esc(rev.place.country)}</b></span>`:'';
   $('nextBtn').textContent = (rev.round>=state.totalRounds||rev.over) ? 'See results' : 'Next round';
-  mpRankRows(rev,r=> r.sel==null?'no guess':(slider?`${r.sel}°F · off by ${r.err.toFixed(1)}°`:esc(GOV_LABELS[r.sel])));
+  mpRankRows(rev,r=> r.sel==null?'no answer':(slider?`${r.sel}°F · off by ${r.err.toFixed(1)}°`
+    :`${r.sel.p!=null?esc(POWER[r.sel.p].short):'—'} · ${r.sel.e!=null?esc(ECON[r.sel.e].short):'—'}`));
 }
 /* Leader line + per-round ranking for multiplayer result screens (shared by the newer modes). */
 function mpRankRows(rev,rdFn){
@@ -2075,32 +2117,13 @@ function mpRankRows(rev,rdFn){
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
   $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${rdFn(r)}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} total</span></div>`).join('');
 }
-/* Unlabeled imagery for Passport result maps, so the map doesn't spell out the country. */
+/* Swap in unlabeled satellite imagery for a result map when a mode needs to hide place names. */
 function plainStyle(m,on){
   if(!m) return; const el=m.getContainer();
   if(on){ if(!m._plain) m._plain=L.tileLayer(ESRI+'World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri, Maxar, Earthstar Geographics'}); if(m._base) m._base.remove(); if(!m.hasLayer(m._plain)) m._plain.addTo(m); m._plain.bringToBack(); el.classList.add('plain'); }
   else if(m._plain&&m.hasLayer(m._plain)){ m._plain.remove(); applyStyle(m); el.classList.remove('plain'); }
   else el.classList.remove('plain');
 }
-
-/* ---------- Passport: one country all game; stamp it early for a bonus ---------- */
-/* Until you've used your stamp, round results hide the true location entirely: no flag, no line, no region. You get your points and the distance. */
-function passportHidden(){ return !!(modeOf(state.mode).passport&&state.passport&&!state.passport.stamp); }
-function stampBonus(round){ return Math.min(5000,1000*(state.totalRounds-round+1)); }
-function renderPassport(){
-  const p=$('passport'); if(!state.passport){ p.hidden=true; return; } p.hidden=false;
-  const st=state.passport.stamp; $('ppIn').disabled=!!st; $('ppStamp').disabled=!!st;
-  $('ppStat').innerHTML=st?(st.ok?`<b class="ok">Stamped ${esc(st.country)} · +${st.bonus.toLocaleString()}</b>`:`<b class="bad">Wrong stamp: ${esc(st.country)}. The country is revealed at the end.</b>`):`Stamp now for <b>+${stampBonus(state.round||1).toLocaleString()}</b> if you're right. Wrong stamps score nothing.`;
-}
-function applyStamp(st){ if(!state.passport) return; state.passport.stamp=st; if(st.ok){ state.score+=st.bonus; $('scoreLbl').textContent=state.score.toLocaleString(); toast(`Stamped! +${st.bonus.toLocaleString()}`); confetti(); } else toast('Wrong stamp'); renderPassport(); }
-function doStamp(){
-  const v=$('ppIn').value.trim(); if(!v||!state.passport||state.passport.stamp) return;
-  if(mp.role){ mpSend({t:'stamp',country:v}); $('ppStat').textContent='Stamping…'; $('ppStamp').disabled=true; return; }
-  const ok=sameCountry(v,state.passport.country); applyStamp({country:v,ok,bonus:ok?stampBonus(state.round):0,round:state.round});
-}
-$('ppList').innerHTML=ALL_COUNTRIES.map(c=>`<option value="${esc(c)}">`).join('');
-$('ppStamp').addEventListener('click',doStamp);
-$('ppIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); doStamp(); } if(e.key==='Escape') e.target.blur(); });
 
 /* ---------- Peek (multiplayer only): everyone's pins are visible while guessing ---------- */
 const peekMarkers={}; let peekT=0, peekPending=null;
@@ -2303,12 +2326,6 @@ function hostOnMessage(from,m,link){
     if(free) pl.color=c; hostSync();
   }
   else if(m.t==='pin'){ if(mp.phase!=='round'||!modeOf(mp.settings.mode).peek) return; mpBroadcast({t:'pin',id:from,lat:m.lat,lng:m.lng}); if(from!==mp.me.id) peekShow(from,m.lat,m.lng); }
-  else if(m.t==='stamp'){
-    if(!mp.country||pl.stamp||mp.phase==='lobby') return; const ok=sameCountry(m.country,mp.country); const bonus=ok?stampBonus(state.round):0;
-    pl.stamp={country:String(m.country||'').slice(0,40),ok,bonus,round:state.round}; if(ok) pl.score+=bonus;
-    if(from===mp.me.id) applyStamp(pl.stamp); else mpSendTo(from,{t:'stamped',stamp:pl.stamp});
-    mpBroadcast({t:'players',players:pubPlayers()});
-  }
   else if(m.t==='guess'){
     if(mp.phase!=='round' || mp.guesses[from]!==undefined) return;
     const gm=modeOf(mp.settings.mode);
@@ -2333,8 +2350,9 @@ function hostReveal(){
     if(mm.country){ const ok=!!(g&&g.country&&tn&&g.country===tn); const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:g&&g.country?{lat:g.lat,lng:g.lng}:null,country:g?g.country||null:null,ok,km:null,pts,total:p.score}; }
     if(mm.slider){ const sel=g&&g.choice!=null?g.choice:null; const err=sel==null?null:Math.abs(sel-loc.tempF); const pts=err==null?0:tempScore(err); p.score+=pts;
       return {id:p.id,name:p.name,color:p.color,guess:null,sel,err,km:null,pts,total:p.score}; }
-    if(mm.choice){ const sel=g&&g.choice!=null?g.choice:null; const ok=sel===loc.gov; const pts=ok?5000:0; p.score+=pts;
-      return {id:p.id,name:p.name,color:p.color,guess:null,sel,ok,km:null,pts,total:p.score}; }
+    if(mm.choice){ const sel=(g&&g.choice&&typeof g.choice==='object')?g.choice:null;
+      const okP=!!sel&&sel.p===loc.pol[0], okE=!!sel&&sel.e===loc.pol[1]; const pts=(okP?2500:0)+(okE?2500:0); p.score+=pts;
+      return {id:p.id,name:p.name,color:p.color,guess:null,sel,okP,okE,ok:okP&&okE,km:null,pts,total:p.score}; }
     if(mm.trio){ const ok=!!g&&g.pick===loc.lie; const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:null,pick:g?g.pick:null,ok,km:null,pts,total:p.score}; }
     const has=!!(g&&g.lat!=null); const km=has?haversine(g,truth):null; let pts=has?Math.round(scoreFor(km)*(cd?countdownMult(g.left||0,state.timeLimit):1)):0; let bet=null;
     if(mm.bet){ const stake=Math.max(1,Math.min(p.score,(g&&g.bet)||1)); const mult=betMult(pts); const payout=Math.round(stake*mult); bet={stake,mult,payout,base:pts}; pts=payout-stake; }
@@ -2354,25 +2372,23 @@ function hostReveal(){
              outIds:tied.filter(r=>r.out).map(r=>r.id)};
     }
   }
-  const rev={t:'reveal',round:state.round,truth,place:loc.place||null,results,lie:loc.lie,extra:loc.extra?loc.extra.map(e=>({lat:e.lat,lng:e.lng})):null,truthCountry:mm.country?tn:undefined,ans:(mm.slider||mm.choice)?{tempF:loc.tempF??null,gov:loc.gov??null}:undefined,
+  const rev={t:'reveal',round:state.round,truth,place:loc.place||null,results,lie:loc.lie,extra:loc.extra?loc.extra.map(e=>({lat:e.lat,lng:e.lng})):null,truthCountry:mm.country?tn:undefined,ans:(mm.slider||mm.choice)?{tempF:loc.tempF??null,pol:loc.pol||null}:undefined,
              elim,players:mm.elim?pubPlayers():null,over:mm.elim?alivePlayers().length<=1:false};
   mpBroadcast(rev); showResultMP(rev);
 }
 function mpHostNext(){
-  if(state.round>=state.totalRounds||(modeOf(mp.settings.mode).elim&&alivePlayers().length<=1)){ const fin={t:'final',players:pubPlayers(),country:mp.country||null}; mpBroadcast(fin); showFinalMP(fin); }
+  if(state.round>=state.totalRounds||(modeOf(mp.settings.mode).elim&&alivePlayers().length<=1)){ const fin={t:'final',players:pubPlayers()}; mpBroadcast(fin); showFinalMP(fin); }
   else { mpBroadcast({t:'round',i:state.round}); mpRound(); }
 }
 function findGameLocations(){
   const rounds=mp.settings.rounds;
   if(mp.locPromise&&mp.locRounds===rounds) return mp.locPromise;
   mp.locRounds=rounds;
-  const m0=modeOf(mp.settings.mode);
-  if(m0.passport&&!mp.country) mp.country=pickPassportCountry(null);
-  const m=m0.passport?{...m0,filter:n=>countryOfRegion(n)===mp.country,expect:mp.country}:m0;
+  const m=modeOf(mp.settings.mode);
   mp.locPromise=(async()=>{ const plan=continentPlan(rounds); const locs=[]; const chain=[];
     for(let i=0;i<plan.length;i++){
       if(m.deported){ const l=await deportStep(chain,m); locs[i]=l; chain.push(l.key); continue; }
-      const rm=m.choice?govMode(m):m;
+      const rm=m.choice?polMode(m):m;
       try{ locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],rm); }
       catch(e){ locs[i]=m.trio?await findTrio(null,m):await findLocation(null,rm); } }
     return locs; })();
@@ -2397,7 +2413,7 @@ async function hostStartGame(){
   if(modeOf(mp.settings.mode).country){ try{ await loadGeo(); }catch(e){ toast('Could not load country borders. Check your connection.'); mp.starting=false; $('mpStartBtn').disabled=false; $('mpStartBtn').textContent='Start game'; return; } }
   const locs=await findGameLocations();
   mp.locPromise=null;   // next game gets fresh spots
-  const payload=locs.map(l=>({pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,gov:l.gov,key:l.key,from:l.from,fresh:l.fresh}));
+  const payload=locs.map(l=>({pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,pol:l.pol,key:l.key,from:l.from,fresh:l.fresh}));
   mp.phase='round'; mp.starting=false;
   if(modeOf(mp.settings.mode).bet) for(const p of playerList()) p.score=1000;
   mpBroadcast({t:'start',settings:mp.settings,locs:payload,players:pubPlayers()});
@@ -2419,7 +2435,6 @@ function guestOnMessage(m){
   else if(m.t==='round'){ mp.phase='round'; mpRound(); }
   else if(m.t==='guessed'){ mp.guesses[m.id]=true; updateStrip(); updateWaitList(m.n,m.total); }
   else if(m.t==='pin'){ if(m.id!==mp.me.id) peekShow(m.id,m.lat,m.lng); }
-  else if(m.t==='stamped'){ applyStamp(m.stamp); }
   else if(m.t==='reveal'){ mp.phase='reveal'; showResultMP(m); }
   else if(m.t==='final'){ showFinalMP(m); }
   else if(m.t==='lobby-return'){ mpToLobby(); }
@@ -2439,7 +2454,6 @@ async function mpStartGameLocal(settings,locs){
   state.timeLimit=settings.time; state.totalRounds=settings.rounds; state.locs=locs.map(l=>({...l}));
   mp.guesses={};
   const mm=modeOf(state.mode);
-  if(mm.passport){ state.passport={country:mp.country||null,stamp:null}; renderPassport(); }
   if(mm.country){ try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); } }
   show('game'); $('hudBrand').hidden=true; $('strip').hidden=false; $('waitOverlay').hidden=true; updateStrip();
   mpRound();
@@ -2474,7 +2488,7 @@ function renderLobby(){
   else { const m=modeOf(mp.settings.mode); $('guestPanel').textContent=`Waiting for the host to start… (${m.name} · ${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`; }
 }
 function mpToLobby(){
-  mp.phase='lobby'; mp.starting=false; mp.locPromise=null; mp.country=null; mp.guesses={}; for(const p of playerList()){ p.score=0; p.stamp=null; p.out=false; p.outRound=null; p.lives=null; }
+  mp.phase='lobby'; mp.starting=false; mp.locPromise=null; mp.guesses={}; for(const p of playerList()){ p.score=0; p.out=false; p.outRound=null; p.lives=null; }
   $('countdown').hidden=true; $('mpStartBtn').disabled=false;
   $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
   show('lobby'); if(mp.role==='host') hostSync(); else renderLobby();
@@ -2491,9 +2505,8 @@ function showResultMP(rev){
   if(!resultMap) resultMap=makeMap('resultmap');
   if(resultLayer) resultLayer.remove();
   resultLayer=L.layerGroup().addTo(resultMap);
-  const hid=passportHidden();
-  plainStyle(resultMap,!!modeOf(state.mode).passport&&!hid);
-  const pts=hid?[]:[rev.truth]; const lines=[];
+  plainStyle(resultMap,false);
+  const hid=false; const pts=[rev.truth]; const lines=[];
   for(const r of rev.results){ if(!r.guess) continue; pts.push(r.guess);
     if(!hid){ L.polyline([r.guess,rev.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
     lines.push(L.polyline([r.guess,rev.truth],{color:COLORS[r.color??0][0],weight:3,opacity:1}).addTo(resultLayer)); }
@@ -2553,7 +2566,6 @@ function showFinalMP(fin){
   const lastStanding=elimMode&&ps.filter(p=>!p.out).length===1;
   fv.textContent = lastStanding ? (iWon?'🏆 Last one standing!':`${winner?winner.name:'Someone'} is the last one standing`) : (iWon ? '🏆 You win!' : `${winner?winner.name:'Someone'} wins`);
   fv.className='verdict '+(iWon?'good':'mid');
-  if(fin.country) fv.textContent=`It was ${fin.country} · `+fv.textContent;
   plainStyle(finalMap,false);
   if(iWon) setTimeout(confetti,900);
   $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd">${p.out?'out in round '+p.outRound:(p.lives!=null?p.lives+' life'+(p.lives===1?'':'s')+' left':'survived')}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
@@ -2708,7 +2720,7 @@ $('modeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); i
 $('soloBtn').addEventListener('click',()=>{ setSoloMode('classic'); show('setup'); $('setup').scrollTo(0,0); });
 $('setupBack').addEventListener('click',()=>show('menu'));
 $('lobbyModeGrid').innerHTML=modeTiles(true);
-function setLobbyMode(id){ mp.settings.mode=id; const m=modeOf(id); if(m.time!=null) mp.settings.time=m.time; if(m.rounds!=null) mp.settings.rounds=m.rounds; mp.locPromise=null; mp.country=null; if(m.country) loadGeo().catch(()=>{}); hostSync(); }
+function setLobbyMode(id){ mp.settings.mode=id; const m=modeOf(id); if(m.time!=null) mp.settings.time=m.time; if(m.rounds!=null) mp.settings.rounds=m.rounds; mp.locPromise=null; if(m.country) loadGeo().catch(()=>{}); hostSync(); }
 $('lobbyModeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); if(b) setLobbyMode(b.dataset.mode); });
 const mpTimePick=picker('mpTimeSeg','mpTimeCustom','t',1,180,v=>{ mp.settings.time=v; hostSync(); });
 const mpRoundPick=picker('mpRoundSeg','mpRoundCustom','r',1,100,v=>{ mp.settings.rounds=v; hostSync(); });
