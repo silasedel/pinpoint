@@ -10,14 +10,15 @@ Offline copy: double-click `run.command`. It serves the game locally, opens a te
 
 ## Game modes
 
-Under the main card there are six modes besides Classic. Each has its own Play button, and a host can pick one for a lobby.
+Picture tiles at the bottom of the menu. Click one to play it solo, or a host picks one in the lobby.
 
-- **Blink**: the panorama is revealed through an eyelid that opens for about a second and shuts. 15 seconds to guess from the glimpse.
-- **Pixelated**: the panorama is rendered to a 128-pixel-wide canvas you drag around. Shapes and colors only.
-- **Stranded**: remote regions only, and any spot inside a town or city is rejected.
-- **Island Hopper**: a curated list of ~85 small islands (nothing much over 2,000 km²), so the coast is always near.
+- **Blink**: a fixed 120° still is revealed through an eyelid for about a second. 15 seconds to guess from the glimpse.
+- **Pixelated**: the panorama rendered to a 128-pixel-wide canvas you drag around.
+- **Stranded**: remote regions only, never within 60 km of a big city.
+- **Island Hopper**: a curated list of ~85 small islands, so the coast is always near.
 - **'Murica**: the United States only.
-- **Concrete Jungle**: a random spot within a couple of miles of the center of one of ~100 big cities.
+- **Concrete Jungle**: within about three quarters of a mile of ~45 of the densest city cores on Earth.
+- **Million Plus**: within about three miles of the center of one of ~120 cities with over a million people.
 
 ## Play with friends (anywhere)
 
@@ -25,7 +26,7 @@ Multiplayer has no server of its own. The host's browser runs the game; messages
 
 1. The host opens https://silasedel.github.io/pinpoint/ and clicks **Create game**.
 2. The host clicks **Copy invite link** and sends it to friends. The invite link opens the game and joins the lobby automatically. Or send the 4-letter code and they click **Join game** on the same site.
-3. Everyone picks a name and a color (no two players can share a color). The host picks time and rounds and presses Start. A 30-second countdown gives people time to finish picking, or the host can start right away.
+3. Everyone picks a name and a color (no two players can share a color). The host picks time, rounds and a mode, and presses Start. The game begins immediately.
 4. **Voice chat** is built in. The mic button in the bottom-left corner (or the M key) turns your microphone on; click again to mute. It's off until you turn it on, and everyone hears everyone who's live. A green ring shows who's talking.
 5. Every round shows the same panorama to everyone. When all guesses are in, or time runs out, the map shows every pin in its player's color with distances, points, and running totals. The host advances rounds. 2 to 10 players.
 
