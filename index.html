@@ -370,6 +370,13 @@
   .strip{display:flex;gap:6px;align-items:center}
   .strip .dotp{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800;opacity:.45;transition:opacity .2s,transform .2s}
   .strip .dotp.done{opacity:1;transform:scale(1.1)}
+  .strip .dotp{position:relative}
+  .strip .dotp.out{opacity:.3;filter:grayscale(1)}
+  .strip .dotp .lv{position:absolute;right:-4px;bottom:-4px;background:#fff;color:#152219;border-radius:99px;font-size:9px;font-weight:800;padding:0 4px;line-height:13px;font-style:normal;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+  .elimrow{margin:0 0 8px;padding:9px 12px;border-radius:10px;background:var(--red-soft);color:#a3202c;font-weight:800;font-size:14px;text-align:center}
+  .elimrow.me{background:#a3202c;color:#fff}
+  .elimrow.life{background:#fff4e0;color:#9a5b00}
+  .rrow.out .pn{text-decoration:line-through;opacity:.6}
   #waitOverlay{position:absolute;inset:72px 0 0 0;z-index:8;display:flex;align-items:center;justify-content:center;background:rgba(21,34,25,.55);backdrop-filter:blur(3px)}
   #waitOverlay .wbox{background:#fff;border-radius:16px;padding:24px 30px;text-align:center;box-shadow:var(--shadow);min-width:260px}
   #waitOverlay .wbox b{font-size:20px;display:block;margin-bottom:6px}
@@ -790,6 +797,9 @@ const MODES={
   twotruths:{name:'Two Truths and a Lie', desc:'Two views, three pins. Which pin is the lie?', trio:2, pins:3},
   country:  {name:'Country', desc:'No pin. Just click the right country.', country:true},
   capitals: {name:'Capitals', desc:'Click the country, but you\'re always dropped in its capital.', cities:CAPITALS, cityRadius:0.02, snap:1500, country:true},
+  deported: {name:'Deported', desc:'Every round drops you in a country bordering the last one.', deported:true},
+  battle:   {name:'Battle Royale', desc:'The farthest guess is knocked out every round. Last one standing wins.', elim:true, mp:true},
+  lives:    {name:'Lives', desc:'Three lives each. The farthest guess loses one.', elim:true, lives:3, mp:true},
   passport: {name:'Passport', desc:'Every round in one country. Stamp it early for a bonus.', passport:true},
   peek:     {name:'Peek', desc:'Everyone can see where the others are placing their pins.', peek:true, mp:true},
 };
@@ -809,6 +819,57 @@ function sameCountry(a,b){ if(!a||!b) return false; if(String(a).toLowerCase()==
 function passportCountries(continent){ const out=new Map(); for(const c of (continent?[continent]:CONTINENTS)) for(const p of PLACES[c]){ const k=countryOfRegion(p[0]); if(k){ if(!out.has(k)) out.set(k,[]); out.get(k).push(p[0]); } } return out; }
 function pickPassportCountry(continent){ const m=passportCountries(continent); let names=[...m.keys()]; try{ const last=localStorage.getItem('pp_passport'); names=names.filter(n=>n!==last); }catch(e){} const c=names[Math.random()*names.length|0]; try{ localStorage.setItem('pp_passport',c); }catch(e){} return c; }
 const ALL_COUNTRIES=[...passportCountries(null).keys()].sort();
+/* Deported: land borders between countries the game can actually drop you in. Islands with no reachable neighbour are left out. */
+const NEIGHBORS={
+ 'Albania':['Greece','North Macedonia'],'Algeria':['Tunisia'],'Argentina':['Chile','Bolivia','Brazil','Uruguay'],
+ 'Austria':['Germany','Czech Republic','Slovakia','Hungary','Slovenia','Italy','Switzerland'],'Bangladesh':['India'],
+ 'Belgium':['Netherlands','France','Germany'],'Bhutan':['India'],'Bolivia':['Peru','Chile','Argentina','Brazil'],
+ 'Bosnia and Herzegovina':['Croatia','Serbia'],'Botswana':['South Africa','Namibia','Zimbabwe'],
+ 'Brazil':['Uruguay','Argentina','Bolivia','Peru','Colombia'],'Bulgaria':['Romania','Serbia','North Macedonia','Greece','Turkey'],
+ 'Cambodia':['Thailand','Laos','Vietnam'],'Canada':['United States'],'Chile':['Argentina','Bolivia','Peru'],
+ 'Colombia':['Ecuador','Peru','Brazil','Panama'],'Costa Rica':['Panama'],'Croatia':['Slovenia','Hungary','Serbia','Bosnia and Herzegovina'],
+ 'Czech Republic':['Germany','Poland','Slovakia','Austria'],'Denmark':['Germany'],'Ecuador':['Colombia','Peru'],
+ 'Estonia':['Latvia','Russia'],'Finland':['Sweden','Norway','Russia'],'France':['Spain','Italy','Switzerland','Germany','Belgium'],
+ 'Georgia':['Turkey','Russia'],'Germany':['France','Belgium','Netherlands','Denmark','Poland','Czech Republic','Austria','Switzerland'],
+ 'Greece':['Albania','North Macedonia','Bulgaria','Turkey'],'Guatemala':['Mexico'],
+ 'Hungary':['Austria','Slovakia','Ukraine','Romania','Serbia','Croatia','Slovenia'],'India':['Nepal','Bhutan','Bangladesh'],
+ 'Indonesia':['Malaysia'],'Ireland':['United Kingdom'],'Israel':['Jordan'],'Italy':['France','Switzerland','Austria','Slovenia'],
+ 'Jordan':['Israel'],'Kazakhstan':['Russia','Kyrgyzstan','Uzbekistan'],'Kenya':['Uganda','Tanzania'],
+ 'Kyrgyzstan':['Kazakhstan','Uzbekistan'],'Laos':['Thailand','Vietnam','Cambodia'],'Latvia':['Estonia','Lithuania','Russia'],
+ 'Lithuania':['Latvia','Poland'],'Malaysia':['Thailand','Indonesia'],'Mexico':['United States','Guatemala'],
+ 'Mongolia':['Russia'],'Namibia':['South Africa','Botswana'],'Nepal':['India'],'Netherlands':['Belgium','Germany'],
+ 'North Macedonia':['Greece','Albania','Bulgaria','Serbia'],'Norway':['Sweden','Finland','Russia'],
+ 'Panama':['Costa Rica','Colombia'],'Peru':['Ecuador','Colombia','Brazil','Bolivia','Chile'],
+ 'Poland':['Germany','Czech Republic','Slovakia','Ukraine','Lithuania','Russia'],'Portugal':['Spain'],
+ 'Romania':['Hungary','Ukraine','Bulgaria','Serbia'],
+ 'Russia':['Norway','Finland','Estonia','Latvia','Lithuania','Poland','Ukraine','Georgia','Kazakhstan','Mongolia'],
+ 'Rwanda':['Uganda','Tanzania'],'Serbia':['Hungary','Romania','Bulgaria','North Macedonia','Croatia','Bosnia and Herzegovina'],
+ 'Slovakia':['Czech Republic','Poland','Ukraine','Hungary','Austria'],'Slovenia':['Italy','Austria','Hungary','Croatia'],
+ 'South Africa':['Namibia','Botswana','Zimbabwe'],'Spain':['France','Portugal'],'Sweden':['Norway','Finland'],
+ 'Switzerland':['France','Germany','Austria','Italy'],'Tanzania':['Kenya','Uganda','Rwanda'],
+ 'Thailand':['Malaysia','Cambodia','Laos'],'Tunisia':['Algeria'],'Turkey':['Greece','Bulgaria','Georgia'],
+ 'Uganda':['Kenya','Tanzania','Rwanda'],'Ukraine':['Poland','Slovakia','Hungary','Romania','Russia'],
+ 'United Arab Emirates':['Oman'],'United Kingdom':['Ireland'],'United States':['Canada','Mexico'],
+ 'Uruguay':['Brazil','Argentina'],'Uzbekistan':['Kazakhstan','Kyrgyzstan'],'Vietnam':['Cambodia','Laos'],
+ 'Zimbabwe':['South Africa','Botswana'],'Oman':['United Arab Emirates'],
+};
+(function(){ for(const [a,list] of Object.entries(NEIGHBORS)) for(const b of list){ (NEIGHBORS[b]=NEIGHBORS[b]||[]); if(!NEIGHBORS[b].includes(a)) NEIGHBORS[b].push(a); } })();
+const DEPORT_START=Object.keys(NEIGHBORS);
+/* Which graph country a pick actually landed in: the box it came from can straddle a border, so trust the geocoder. */
+function deportKey(loc,allow){
+  const c=loc&&loc.place&&loc.place.country;
+  if(c){ const hit=(allow&&allow.length?allow:DEPORT_START).find(k=>sameCountry(c,k)); if(hit) return hit; }
+  return countryOfRegion(loc.region);
+}
+/* Deported chain: the next round is in a neighbour of the last country, never straight back where you came from. */
+function deportMode(m,chain){
+  const prev=chain[chain.length-1];
+  let allow=prev&&NEIGHBORS[prev]?NEIGHBORS[prev].slice():DEPORT_START.slice();
+  const back=chain[chain.length-2];
+  if(back&&allow.length>1&&allow.includes(back)) allow=allow.filter(c=>c!==back);
+  const set=new Set(allow);
+  return {...m, filter:n=>set.has(countryOfRegion(n)), expect:allow};
+}
 function modeOf(id){ return MODES[id]||MODES.classic; }
 
 /* ---------- Street View lookup (keyless service) ---------- */
@@ -852,7 +913,8 @@ async function findLocation(continent,mode){
             pano=fit[Math.random()*fit.length|0].pano;
           }
         }
-        if(mode.expect){ place=await placeOf(lat,lng); if(!place||!sameCountry(place.country,mode.expect)) continue; }
+        if(mode.expect){ place=await placeOf(lat,lng); const want=Array.isArray(mode.expect)?mode.expect:[mode.expect];
+          if(!place||!want.some(c=>sameCountry(place.country,c))) continue; }
         if(mode.face&&mode.cities){ const c=mode.cities.find(x=>x[0]===name); if(c){ const dLon=(c[2]-lng)*Math.PI/180, la1=lat*Math.PI/180, la2=c[1]*Math.PI/180; heading=Math.round((Math.atan2(Math.sin(dLon)*Math.cos(la2),Math.cos(la1)*Math.sin(la2)-Math.sin(la1)*Math.cos(la2)*Math.cos(dLon))*180/Math.PI+360)%360); } }
         notePlace(name);
         const out={ pano, lat, lng, heading, place, continent:cont, region:name };
@@ -979,7 +1041,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-103904';
+const BUILD='20260916-121118';
 const state={ mode:'classic', passport:null, bank:1000, bet:0, pick:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1057,7 +1119,7 @@ function ensureGuessMap(){
   if(guessMap) return;
   {
     guessMap=makeMap('guessmap');
-    guessMap.on('click',e=>{ if(state.locked||modeOf(state.mode).country) return; setGuess(e.latlng); });
+    guessMap.on('click',e=>{ if(state.locked||modeOf(state.mode).country||amOut()) return; setGuess(e.latlng); });
     const panel=$('mappanel');
     const fitWorld=()=>{ if(state.fitDone) return; state.fitDone=true; guessMap.invalidateSize(); guessMap.fitBounds([[-55,-170],[72,180]],{animate:false}); };
     const openMap=()=>{ if(panel.classList.contains('open')) return; panel.classList.add('open'); guessMap.invalidateSize(); setTimeout(()=>{ if(panel.classList.contains('open')) fitWorld(); },220); };
@@ -1088,7 +1150,12 @@ async function startGame(){
   let pm=m;
   if(m.passport){ const c=pickPassportCountry(plan[0]); state.passport={country:c,stamp:null}; pm={...m,filter:n=>countryOfRegion(n)===c,expect:c}; renderPassport(); }
   if(m.country){ $('loadingText').textContent='Loading borders…'; try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); show('setup'); $('startBtn').disabled=false; $('startBtn').textContent=__lbl; return; } }
-  (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{ state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],pm); }catch(e){ state.locs[i]=e; } } })();
+  const chain=[];
+  (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{
+      const rm=m.deported?deportMode(m,chain):pm;
+      state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(m.deported?null:plan[i],rm);
+      if(m.deported) chain.push(deportKey(state.locs[i],rm.expect));
+    }catch(e){ state.locs[i]=e; if(m.deported) chain.length=0; } } })();
   await nextRound();
   $('startBtn').disabled=false; $('startBtn').textContent=__lbl;
 }
@@ -1102,12 +1169,13 @@ async function waitForLoc(i){
 async function nextRound(){
   state.round++; state.guess=null; state.locked=false; state.fitDone=false; state.pick=null; state.bet=0; if(modeOf(state.mode).bet) renderBet();
   show('game');
-  $('roundLbl').textContent=`${state.round} / ${state.totalRounds}`;
+  $('roundLbl').textContent = (mp.role&&modeOf(state.mode).elim) ? `${state.round} · ${alivePlayers().length} left` : `${state.round} / ${state.totalRounds}`;
   const last=state.results[state.results.length-1];
   if(last){ countUp($('scoreLbl'),state.score-last.pts,state.score,900); $('scorePill').classList.remove('pop'); void $('scorePill').offsetWidth; $('scorePill').classList.add('pop');
     if(last.pts>0){ const f=document.createElement('span'); f.className='floater'; f.textContent='+'+last.pts.toLocaleString(); $('scorePill').appendChild(f); setTimeout(()=>f.remove(),1400); } }
   else $('scoreLbl').textContent='0';
   $('guessBtn').disabled=true; $('guessBtn').textContent=modeOf(state.mode).country?'Click a country':'Place your pin';
+  if(mp.role&&amOut()){ $('guessBtn').disabled=true; $('guessBtn').textContent='Knocked out · spectating'; }
   if(modeOf(state.mode).country){ if(countryLayer&&!countryLayerOn){ countryLayer.addTo(guessMap); countryLayerOn=true; } if(countryLayer) countryLayer.resetStyle(); $('mappanel').classList.add('cty'); } else { if(countryLayerOn){ countryLayer.remove(); countryLayerOn=false; } $('mappanel').classList.remove('cty'); }
   if(state.passport) renderPassport();
   $('loading').classList.remove('fade'); $('loadingText').textContent='Finding a location…';
@@ -1147,6 +1215,7 @@ async function nextRound(){
 }
 
 function setGuess(latlng){
+  if(amOut()) return;
   const ll=L.latLng(latlng.lat, ((latlng.lng+180)%360+360)%360-180);
   state.guess=ll;
   if(guessMarker) guessMarker.setLatLng(ll); else guessMarker=L.marker(ll,{icon:mp.role&&mp.me.color!=null?colorIcon(COLORS[mp.me.color][0]):guessIcon}).addTo(guessMap);
@@ -1173,7 +1242,7 @@ function stopTimer(){ if(state.timer){ clearInterval(state.timer); state.timer=n
 /* Payout multiplier from the base score: 5× for a bullseye, sliding down with distance. Break-even is about 1,200 km; beyond that you lose part or all of the stake. */
 function betMult(base){ return Math.round(5*Math.pow(Math.max(0,Math.min(5000,base))/5000,2)*100)/100; }
 function submitGuess(auto=false){
-  if(state.locked) return;
+  if(state.locked||amOut()) return;
   const m=modeOf(state.mode);
   if(m.trio){ if(state.pick==null && !auto) return; }
   else if(!state.guess && !auto) return;
@@ -1253,6 +1322,7 @@ function renderVerdict(r){
   const parts=[];
   if(hid){ $('placeTxt').innerHTML='<span>Location hidden until you stamp the country.</span>'; return; }
   if(tp) parts.push(`<span>📍 Location: <b>${esc(tp.region?tp.region+', ':'')}${hide?'???':esc(tp.country)}</b></span>`);
+  if(modeOf(state.mode).deported&&tp&&state.round<state.totalRounds) parts.push(`<span>Next round: <b>a country bordering ${esc(tp.country)}</b></span>`);
   if(gp) parts.push(hide?(gp.region?`<span>Your pin: <b>${esc(gp.region)}</b></span>`:''):`<span>Your pin: <b>${esc(gp.region?gp.region+', ':'')}${esc(gp.country)}</b></span>`);
   else if(r.guess && tp) parts.push(`<span>Your pin: <b>in the ocean</b></span>`);
   $('placeTxt').innerHTML=parts.join('');
@@ -1582,7 +1652,7 @@ function ensureCountryLayer(){
     l.bindTooltip(f.properties.name,{sticky:true,direction:'top',opacity:.95,className:'peek-tip'});
     l.on('mouseover',()=>{ if(state.locked||(state.guess&&state.guess.country===f.properties.name)) return; l.setStyle({fillOpacity:.3,weight:1.6,color:'#1f9d55',opacity:1}); });
     l.on('mouseout',()=>{ l.setStyle(ctyStyle(f)); });
-    l.on('click',e=>{ L.DomEvent.stopPropagation(e); if(state.locked||!modeOf(state.mode).country) return; setCountryGuess(f); });
+    l.on('click',e=>{ L.DomEvent.stopPropagation(e); if(state.locked||amOut()||!modeOf(state.mode).country) return; setCountryGuess(f); });
   }});
   return countryLayer;
 }
@@ -1723,6 +1793,8 @@ function mkCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.random()*CO
 function mkId(){ return Math.random().toString(36).slice(2,10); }
 function myName(){ try{ return localStorage.getItem('pp_name')||''; }catch(e){ return ''; } }
 function playerList(){ return Object.values(mp.players); }
+function alivePlayers(){ return playerList().filter(p=>!p.out); }
+function amOut(){ const me=mp.players[mp.me.id]; return !!(me&&me.out); }
 const T={ host:c=>`pinpoint/v2/${c}/h`, all:c=>`pinpoint/v2/${c}/a`, one:(c,id)=>`pinpoint/v2/${c}/p/${id}` };
 const diag={log:[],t0:0};
 function dlog(m){ const t=((Date.now()-diag.t0)/1000).toFixed(1); diag.log.push(t+'s '+m); if(diag.log.length>80) diag.log.shift(); console.log('[pinpoint]',m); }
@@ -1835,7 +1907,7 @@ function connFailed(why){
 }
 
 /* ----- host side ----- */
-function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,score:p.score,host:!!p.host,vpeer:p.vpeer||null})); }
+function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null})); }
 function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mpBroadcast({t:'lobby',players:pubPlayers(),settings:mp.settings,cd:mp.cd?mp.cdLeft:null}); renderLobby(); voiceConnect(); }
 function hostDrop(id){
   if(!mp.players[id]||id==='host') return;
@@ -1871,14 +1943,14 @@ function hostOnMessage(from,m,link){
   else if(m.t==='guess'){
     if(mp.phase!=='round' || mp.guesses[from]!==undefined) return;
     mp.guesses[from]=m.guess?{lat:m.guess.lat,lng:m.guess.lng,left:m.left,bet:m.bet,country:m.guess.country||null}:(m.pick!=null?{pick:m.pick,bet:m.bet}:(modeOf(mp.settings.mode).bet?{bet:m.bet||1}:null));
-    mpBroadcast({t:'guessed',id:from,n:Object.keys(mp.guesses).length,total:playerList().length}); updateStrip(); updateWaitList();
+    mpBroadcast({t:'guessed',id:from,n:Object.keys(mp.guesses).length,total:alivePlayers().length}); updateStrip(); updateWaitList();
     hostCheckRound();
   }
 }
 function hostCheckRound(){
   if(mp.phase!=='round') return;
-  const ids=playerList().map(p=>p.id);
-  if(ids.every(id=>mp.guesses[id]!==undefined)) hostReveal();
+  const ids=alivePlayers().map(p=>p.id);
+  if(ids.length&&ids.every(id=>mp.guesses[id]!==undefined)) hostReveal();
 }
 function hostReveal(){
   if(mp.phase!=='round') return;
@@ -1886,17 +1958,33 @@ function hostReveal(){
   const loc=state.locs[state.round-1]; const truth={lat:loc.lat,lng:loc.lng};
   const mm=modeOf(mp.settings.mode); const cd=mm.countdown;
   const tf=mm.country?countryAt(truth.lat,truth.lng):null; const tn=tf?tf.properties.name:null;
-  const results=playerList().map(p=>{ const g=mp.guesses[p.id]||null;
+  const results=alivePlayers().map(p=>{ const g=mp.guesses[p.id]||null;
     if(mm.country){ const ok=!!(g&&g.country&&tn&&g.country===tn); const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:g&&g.country?{lat:g.lat,lng:g.lng}:null,country:g?g.country||null:null,ok,km:null,pts,total:p.score}; }
     if(mm.trio){ const ok=!!g&&g.pick===loc.lie; const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:null,pick:g?g.pick:null,ok,km:null,pts,total:p.score}; }
     const has=!!(g&&g.lat!=null); const km=has?haversine(g,truth):null; let pts=has?Math.round(scoreFor(km)*(cd?countdownMult(g.left||0,state.timeLimit):1)):0; let bet=null;
     if(mm.bet){ const stake=Math.max(1,Math.min(p.score,(g&&g.bet)||1)); const mult=betMult(pts); const payout=Math.round(stake*mult); bet={stake,mult,payout,base:pts}; pts=payout-stake; }
     p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:has?{lat:g.lat,lng:g.lng}:null,km,pts,bet,total:p.score}; });
-  const rev={t:'reveal',round:state.round,truth,place:loc.place||null,results,lie:loc.lie,extra:loc.extra?loc.extra.map(e=>({lat:e.lat,lng:e.lng})):null,truthCountry:mm.country?tn:undefined};
+  let elim=null;
+  if(mm.elim){
+    const alive=alivePlayers();
+    const far=r=>r.guess?r.km:(r.ok?-1:Infinity);   // no guess is the worst possible; a correct country pick can never be last
+    const worst=Math.max(...results.map(far));
+    const tied=results.filter(r=>far(r)===worst);
+    if(alive.length>1&&tied.length<alive.length){
+      for(const r of tied){ const p=mp.players[r.id]; if(!p) continue;
+        if(mm.lives){ p.lives=(p.lives==null?mm.lives:p.lives)-1; if(p.lives<=0){ p.lives=0; p.out=true; p.outRound=state.round; } }
+        else { p.out=true; p.outRound=state.round; }
+        r.out=!!p.out; r.lives=p.lives??null; }
+      elim={ids:tied.map(r=>r.id),names:tied.map(r=>r.name),km:isFinite(worst)?worst:null,lives:!!mm.lives,
+             outIds:tied.filter(r=>r.out).map(r=>r.id)};
+    }
+  }
+  const rev={t:'reveal',round:state.round,truth,place:loc.place||null,results,lie:loc.lie,extra:loc.extra?loc.extra.map(e=>({lat:e.lat,lng:e.lng})):null,truthCountry:mm.country?tn:undefined,
+             elim,players:mm.elim?pubPlayers():null,over:mm.elim?alivePlayers().length<=1:false};
   mpBroadcast(rev); showResultMP(rev);
 }
 function mpHostNext(){
-  if(state.round>=state.totalRounds){ const fin={t:'final',players:pubPlayers(),country:mp.country||null}; mpBroadcast(fin); showFinalMP(fin); }
+  if(state.round>=state.totalRounds||(modeOf(mp.settings.mode).elim&&alivePlayers().length<=1)){ const fin={t:'final',players:pubPlayers(),country:mp.country||null}; mpBroadcast(fin); showFinalMP(fin); }
   else { mpBroadcast({t:'round',i:state.round}); mpRound(); }
 }
 function findGameLocations(){
@@ -1906,7 +1994,12 @@ function findGameLocations(){
   const m0=modeOf(mp.settings.mode);
   if(m0.passport&&!mp.country) mp.country=pickPassportCountry(null);
   const m=m0.passport?{...m0,filter:n=>countryOfRegion(n)===mp.country,expect:mp.country}:m0;
-  mp.locPromise=(async()=>{ const plan=continentPlan(rounds); const locs=[]; for(let i=0;i<plan.length;i++){ try{ locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],m); }catch(e){ locs[i]=m.trio?await findTrio(null,m):await findLocation(null,m); } } return locs; })();
+  mp.locPromise=(async()=>{ const plan=continentPlan(rounds); const locs=[]; const chain=[];
+    for(let i=0;i<plan.length;i++){ const rm=m.deported?deportMode(m,chain):m;
+      try{ locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(m.deported?null:plan[i],rm); }
+      catch(e){ chain.length=0; locs[i]=m.trio?await findTrio(null,m):await findLocation(null,m.deported?deportMode(m,chain):m); }
+      if(m.deported) chain.push(deportKey(locs[i],rm.expect)); }
+    return locs; })();
   return mp.locPromise;
 }
 async function hostStartGame(){
@@ -1917,7 +2010,13 @@ async function hostStartGame(){
   mpBroadcast({t:'countdown',secs:0,msg:'Starting…'});
   // Auto-assign colors and names
   const taken=new Set(playerList().map(p=>p.color).filter(c=>c!==null));
-  let n=1; for(const p of playerList()){ if(!p.name) p.name='Player '+(n++); if(p.color===null){ const c=COLORS.findIndex((_,i)=>!taken.has(i)); p.color=c<0?0:c; taken.add(p.color); } p.score=0; }
+  let n=1; for(const p of playerList()){ if(!p.name) p.name='Player '+(n++); if(p.color===null){ const c=COLORS.findIndex((_,i)=>!taken.has(i)); p.color=c<0?0:c; taken.add(p.color); } p.score=0; p.out=false; p.outRound=null; p.lives=null; }
+  const em=modeOf(mp.settings.mode);
+  if(em.elim){ const np=playerList().length;
+    // worst case: every player but one runs out of lives, and the survivor is down to their last one
+    const need=em.lives?(np-1)*em.lives+(em.lives-1):np-1;
+    mp.settings.rounds=Math.max(3,Math.min(em.lives?18:12,need));
+    for(const p of playerList()) p.lives=em.lives||null; }
   if(mp.me.color===null) mp.me.color=mp.players[mp.me.id].color;
   if(modeOf(mp.settings.mode).country){ try{ await loadGeo(); }catch(e){ toast('Could not load country borders. Check your connection.'); mp.starting=false; $('mpStartBtn').disabled=false; $('mpStartBtn').textContent='Start game'; return; } }
   const locs=await findGameLocations();
@@ -1972,7 +2071,7 @@ async function mpStartGameLocal(settings,locs){
 async function mpRound(){
   mp.phase='round'; mp.guesses={}; $('waitOverlay').hidden=true; updateStrip(); peekClear();
   await nextRound();
-  if(mp.role==='host' && state.timeLimit){ if(mp.deadline) clearTimeout(mp.deadline); mp.deadline=setTimeout(()=>{ for(const p of playerList()) if(mp.guesses[p.id]===undefined) mp.guesses[p.id]=null; hostReveal(); },(state.timeLimit+4)*1000); }
+  if(mp.role==='host' && state.timeLimit){ if(mp.deadline) clearTimeout(mp.deadline); mp.deadline=setTimeout(()=>{ for(const p of alivePlayers()) if(mp.guesses[p.id]===undefined) mp.guesses[p.id]=null; hostReveal(); },(state.timeLimit+4)*1000); }
 }
 function mpSubmitGuess(){
   const g=state.guess?{lat:state.guess.lat,lng:state.guess.lng,country:state.guess.country||undefined}:null;
@@ -1981,10 +2080,10 @@ function mpSubmitGuess(){
 }
 function updateStrip(){
   const el=$('strip'); if(!mp.role) return;
-  el.innerHTML=playerList().map(p=>`<div class="dotp ${mp.guesses[p.id]!==undefined?'done':''} ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}" style="background:${COLORS[p.color??0][0]}" title="${esc(p.name||'…')}">${mp.guesses[p.id]!==undefined?'✓':esc((p.name||'?')[0].toUpperCase())}</div>`).join('');
+  el.innerHTML=playerList().map(p=>`<div class="dotp ${mp.guesses[p.id]!==undefined&&!p.out?'done':''} ${p.out?'out':''} ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}" style="background:${COLORS[p.color??0][0]}" title="${esc(p.name||'…')}${p.out?' — out':(p.lives!=null?' — '+p.lives+' live'+(p.lives===1?'':'s'):'')}">${p.out?'✕':(mp.guesses[p.id]!==undefined?'✓':esc((p.name||'?')[0].toUpperCase()))}${!p.out&&p.lives!=null?`<i class="lv">${p.lives}</i>`:''}</div>`).join('');
 }
 function updateWaitList(n,total){
-  const ps=playerList(); const done=n!=null?n:ps.filter(p=>mp.guesses[p.id]!==undefined).length;
+  const ps=alivePlayers(); const done=n!=null?n:ps.filter(p=>mp.guesses[p.id]!==undefined).length;
   $('waitList').innerHTML=ps.map(p=>`<div class="prow" style="padding:6px 10px"><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name||'…')}</span><span class="${mp.guesses[p.id]!==undefined?'ok':'tag'}">${mp.guesses[p.id]!==undefined?'✓ guessed':'thinking'}</span></div>`).join('');
   const w=$('waitTxt'); if(w.textContent.indexOf('Waiting')>=0) w.textContent=`Waiting for the others… ${done}/${total||ps.length} in`;
 }
@@ -1999,7 +2098,7 @@ function renderLobby(){
   else { const m=modeOf(mp.settings.mode); $('guestPanel').textContent=`Waiting for the host to start… (${m.name} · ${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`; }
 }
 function mpToLobby(){
-  mp.phase='lobby'; mp.starting=false; mp.locPromise=null; mp.country=null; mp.guesses={}; for(const p of playerList()){ p.score=0; p.stamp=null; }
+  mp.phase='lobby'; mp.starting=false; mp.locPromise=null; mp.country=null; mp.guesses={}; for(const p of playerList()){ p.score=0; p.stamp=null; p.out=false; p.outRound=null; p.lives=null; }
   $('countdown').hidden=true; $('mpStartBtn').disabled=false;
   $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
   show('lobby'); if(mp.role==='host') hostSync(); else renderLobby();
@@ -2008,6 +2107,7 @@ function mpToLobby(){
 /* ----- multiplayer result screens ----- */
 function showResultMP(rev){
   show('result'); $('nextBtn').hidden=mp.role!=='host'; $('nextWait').hidden=mp.role==='host'; $('roundRank').hidden=false;
+  if(rev.players){ for(const p of rev.players){ if(mp.players[p.id]) Object.assign(mp.players[p.id],p); } updateStrip(); }
   if(rev.lie!=null&&rev.extra){ showTrioResultMP(rev); return; }
   if(rev.truthCountry!==undefined){ showCountryResultMP(rev); return; }
   $('waitOverlay').hidden=true;
@@ -2029,7 +2129,7 @@ function showResultMP(rev){
   const me={round:rev.round,guess:mine.guess,truth:rev.truth,km:mine.km,pts:mine.pts,bet:mine.bet||null,timedOut:!mine.guess,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng},guessPlace:null};
   state.results.push(me); if(mine.bet){ state.bank+=mine.pts; state.score=state.bank; } else state.score+=mine.pts;
   $('distTxt').innerHTML = mine.guess ? `Your guess was <b>${fmtDist(mine.km)}</b> away.` : `You didn't place a pin.`;
-  $('nextBtn').textContent = rev.round>=state.totalRounds ? 'See results' : 'Next round';
+  $('nextBtn').textContent = (rev.round>=state.totalRounds||rev.over) ? 'See results' : 'Next round';
   $('ptsBar').style.width='0%';
   if(mine.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${mine.bet.stake.toLocaleString()} × ${mine.bet.mult.toFixed(2)} = ${mine.bet.payout.toLocaleString()} back · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,mine.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.bet.mult/5*100)+'%'; })); }
   else { $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; countUp($('ptsNum'),0,mine.pts,1000); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.pts/50)+'%'; })); }
@@ -2043,7 +2143,16 @@ function showResultMP(rev){
   $('leaderLine').hidden=false;
   $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="background:${COLORS[lead.color??0][0]}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
+  $('roundRank').innerHTML=elimBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out?' · out':(r.lives!=null?` · ${r.lives} live${r.lives===1?'':'s'}`:'')}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
+}
+/* One line on the result screen naming whoever just lost a life or got knocked out. */
+function elimBanner(rev){
+  const e=rev.elim; if(!e) return '';
+  const mine=e.ids.includes(mp.me.id); const names=e.names.map(esc).join(' and ');
+  const far=e.km!=null?`farthest at ${fmtDist(e.km)}`:'no guess';
+  if(e.lives){ const knocked=e.outIds.length?` · ${e.outIds.length===e.ids.length?'out of lives':'one of them is out of lives'}`:'';
+    return `<div class="elimrow life ${mine?'me':''}">${mine?'You lose a life':names+' lose'+(e.ids.length===1?'s':'')+' a life'} · ${far}${knocked}</div>`; }
+  return `<div class="elimrow ${mine?'me':''}">${mine?"You're knocked out":names+(e.ids.length===1?' is':' are')+' knocked out'} · ${far}</div>`;
 }
 function showFinalMP(fin){
   show('final'); $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true;
@@ -2056,17 +2165,20 @@ function showFinalMP(fin){
   for(const r of state.results){ pts.push(r.truth); L.marker(r.truth,{icon:trueIcon}).addTo(finalLayer); }
   const fit=()=>{ finalMap.invalidateSize(); if(pts.length) finalMap.fitBounds(L.latLngBounds(pts),{padding:[60,60]}); };
   fit(); setTimeout(fit,150);
-  const ps=fin.players.slice().sort((a,b)=>b.score-a.score);
+  const elimMode=!!modeOf(state.mode).elim;
+  const ps=fin.players.slice().sort((a,b)=> elimMode ? ((a.out?1:0)-(b.out?1:0))||((b.outRound||0)-(a.outRound||0))||((b.lives??0)-(a.lives??0))||(b.score-a.score) : b.score-a.score);
   const winner=ps[0]; const me=ps.find(p=>p.id===mp.me.id)||{score:0};
   $('finalMax').textContent=`/ ${max.toLocaleString()}`;
   $('finalBar').style.width='0%'; countUp($('finalNum'),0,me.score,1400);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('finalBar').style.width=(me.score/max*100)+'%'; }));
   const fv=$('finalVerdict'); const iWon=winner&&winner.id===mp.me.id;
-  fv.textContent = iWon ? '🏆 You win!' : `${winner?winner.name:'Someone'} wins`; fv.className='verdict '+(iWon?'good':'mid');
+  const lastStanding=elimMode&&ps.filter(p=>!p.out).length===1;
+  fv.textContent = lastStanding ? (iWon?'🏆 Last one standing!':`${winner?winner.name:'Someone'} is the last one standing`) : (iWon ? '🏆 You win!' : `${winner?winner.name:'Someone'} wins`);
+  fv.className='verdict '+(iWon?'good':'mid');
   if(fin.country) fv.textContent=`It was ${fin.country} · `+fv.textContent;
   plainStyle(finalMap,false);
   if(iWon) setTimeout(confetti,900);
-  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span><span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
+  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd">${p.out?'out in round '+p.outRound:(p.lives!=null?p.lives+' life'+(p.lives===1?'':'s')+' left':'survived')}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
 }
 
 /* =========================================================
