@@ -410,6 +410,11 @@
   .elimrow.me{background:#a3202c;color:#fff}
   .elimrow.life{background:#fff4e0;color:#9a5b00}
   .rrow.out .pn{text-decoration:line-through;opacity:.6}
+  .place .trail{display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:center;max-width:560px}
+  .place .trail b{font-weight:700;color:var(--muted)}
+  .place .trail b.now{color:var(--text);background:var(--green-soft);border-radius:8px;padding:2px 8px}
+  .place .trail b i{font-style:normal;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--red);margin-right:4px}
+  .place .trail .arrow{color:var(--muted);opacity:.6}
   #waitOverlay{position:absolute;inset:72px 0 0 0;z-index:8;display:flex;align-items:center;justify-content:center;background:rgba(21,34,25,.55);backdrop-filter:blur(3px)}
   #waitOverlay .wbox{background:#fff;border-radius:16px;padding:24px 30px;text-align:center;box-shadow:var(--shadow);min-width:260px}
   #waitOverlay .wbox b{font-size:20px;display:block;margin-bottom:6px}
@@ -956,6 +961,38 @@ function deportKey(loc,allow){
   if(c){ const hit=(allow&&allow.length?allow:DEPORT_START).find(k=>sameCountry(c,k)); if(hit) return hit; }
   return countryOfRegion(loc.region);
 }
+/* Transient network trouble shouldn't cost you the chain: retry the same step before giving up on it. */
+async function deportStep(chain,m){
+  for(let tries=0;tries<3;tries++){
+    try{ return await findDeported(chain,m); }
+    catch(e){ dlog('deported step failed ('+(tries+1)+'/3): '+e.message); await new Promise(r=>setTimeout(r,1200)); }
+  }
+  return await findDeported(chain,m);   // one last go; if this throws the round is genuinely unavailable
+}
+/* One Deported round. Every result is either a neighbour of the last country or an explicit fresh start —
+   a failed lookup can no longer silently drop you somewhere unrelated. */
+async function findDeported(chain,m){
+  const prev=chain[chain.length-1];
+  if(prev&&NEIGHBORS[prev]){
+    for(let pass=0;pass<2;pass++){
+      const rm=deportMode(m,chain);
+      try{ const l=await findLocation(null,rm); l.from=prev; l.key=deportKey(l,rm.expect); dlog(`deported ${prev} → ${l.key}`); return l; }
+      catch(e){ dlog(`deported: nothing found next to ${prev} (pass ${pass+1}): ${e.message}`); }
+    }
+    // Last resort before giving up on the chain: each neighbour on its own, with a wider snap.
+    for(const c of shuffle(NEIGHBORS[prev].slice())){
+      try{ const l=await findLocation(null,{...m,filter:n=>countryOfRegion(n)===c,expect:[c],radius:40000});
+        l.from=prev; l.key=c; dlog(`deported ${prev} → ${c} (wide search)`); return l; }
+      catch(e){}
+    }
+    dlog(`deported: dead end at ${prev}, starting a new chain`);
+  }
+  const rm=deportMode(m,[]);
+  const l=await findLocation(null,rm);
+  l.key=deportKey(l,rm.expect); l.fresh=!!prev; l.from=prev||null;
+  dlog(`deported: ${prev?'new chain from ':'start at '}${l.key}`);
+  return l;
+}
 /* Deported chain: the next round is in a neighbour of the last country, never straight back where you came from. */
 function deportMode(m,chain){
   const prev=chain[chain.length-1];
@@ -1153,8 +1190,8 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-131459';
-const state={ mode:'classic', passport:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
+const BUILD='20260916-141203';
+const state={ mode:'classic', passport:null, chain:[], bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
 
@@ -1371,7 +1408,7 @@ function resetGameState(){
   $('blink').hidden=true; stopPixel(); $('game').classList.toggle('gray',!!m.gray); $('game').classList.toggle('trio',!!m.trio);
   $('game').classList.toggle('nomap',!!(m.slider||m.choice)); resetGuessBar();
   $('bettray').hidden=!m.bet; state.bank=1000; state.bet=0; state.pick=null; $('trio').hidden=true; $('tmap').hidden=true; if(m.bet) renderBet();
-  state.passport=null; $('passport').hidden=true; peekClear();
+  state.passport=null; state.chain=[]; $('passport').hidden=true; peekClear();
   state.round=0; state.score=0; state.results=[]; state.locs=[]; state.guess=null; state.saved=false; preload.idx=-1; preload.promise=null;
   panos.forEach(f=>{ f.onload=null; f.src='about:blank'; });
   ensureGuessMap();
@@ -1387,12 +1424,10 @@ async function startGame(){
   let pm=m;
   if(m.passport){ const c=pickPassportCountry(plan[0]); state.passport={country:c,stamp:null}; pm={...m,filter:n=>countryOfRegion(n)===c,expect:c}; renderPassport(); }
   if(m.country){ $('loadingText').textContent='Loading borders…'; try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); show('setup'); $('startBtn').disabled=false; $('startBtn').textContent=__lbl; return; } }
-  const chain=[];
   (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{
-      const rm=m.deported?deportMode(m,chain):(m.choice?govMode(m):pm);
-      state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(m.deported?null:plan[i],rm);
-      if(m.deported) chain.push(deportKey(state.locs[i],rm.expect));
-    }catch(e){ state.locs[i]=e; if(m.deported) chain.length=0; } } })();
+      if(m.deported){ const l=await deportStep(state.chain,m); state.locs[i]=l; state.chain.push(l.key); }
+      else state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],m.choice?govMode(m):pm);
+    }catch(e){ state.locs[i]=e; } } })();
   await nextRound();
   $('startBtn').disabled=false; $('startBtn').textContent=__lbl;
 }
@@ -1425,7 +1460,11 @@ async function nextRound(){
 
   let loc;
   try{ loc=await waitForLoc(state.round-1); }
-  catch(e){ toast(e.message); state.locs[state.round-1]=undefined; try{ try{ state.locs[state.round-1]=await findLocation(null,modeOf(state.mode)); }catch(e3){ state.locs[state.round-1]=await findLocation(); } loc=state.locs[state.round-1]; }catch(e2){ toast('Street View lookup failed. Check your connection.'); show('menu'); return; } }
+  catch(e){ toast(e.message); const idx=state.round-1; state.locs[idx]=undefined;
+    try{ const md=modeOf(state.mode);
+      if(md.deported){ const l=await deportStep(state.chain.slice(0,idx),md); state.locs[idx]=l; state.chain[idx]=l.key; }
+      else { try{ state.locs[idx]=await findLocation(null,md); }catch(e3){ state.locs[idx]=await findLocation(); } }
+      loc=state.locs[idx]; }catch(e2){ toast('Street View lookup failed. Check your connection.'); show('menu'); return; } }
   state.current=loc;
   $('loadingText').textContent='Loading Street View…';
   const idx=state.round-1;
@@ -1569,7 +1608,7 @@ function renderVerdict(r){
   const parts=[];
   if(hid){ $('placeTxt').innerHTML='<span>Location hidden until you stamp the country.</span>'; return; }
   if(tp) parts.push(`<span>📍 Location: <b>${esc(tp.region?tp.region+', ':'')}${hide?'???':esc(tp.country)}</b></span>`);
-  if(modeOf(state.mode).deported&&tp&&state.round<state.totalRounds) parts.push(`<span>Next round: <b>a country bordering ${esc(tp.country)}</b></span>`);
+  if(modeOf(state.mode).deported) parts.push(deportTrail(r));
   if(gp) parts.push(hide?(gp.region?`<span>Your pin: <b>${esc(gp.region)}</b></span>`:''):`<span>Your pin: <b>${esc(gp.region?gp.region+', ':'')}${esc(gp.country)}</b></span>`);
   else if(r.guess && tp) parts.push(`<span>Your pin: <b>in the ocean</b></span>`);
   $('placeTxt').innerHTML=parts.join('');
@@ -1962,6 +2001,25 @@ function showCountryResultMP(rev){
   if(rev.place) $('placeTxt').innerHTML=`<span>📍 Location: <b>${esc(rev.place.region?rev.place.region+', ':'')}${esc(rev.place.country)}</b></span>`;
   mpRankRows(rev,r=>r.country?esc(r.country):'no pick');
 }
+/* Deported: the countries you've been walked through, and whether the next one really is a neighbour. */
+function deportTrail(r){
+  const here=(r.loc&&r.loc.key)||(r.loc&&r.loc.place&&r.loc.place.country)||'?';
+  const parts=[];
+  for(const p of state.results){
+    const k=(p.loc&&p.loc.key)||null; if(!k) continue;
+    parts.push(`${p.loc.fresh&&parts.length?'<i>new chain</i> ':''}${esc(k)}`);
+  }
+  if(!parts.length) parts.push(esc(here));
+  const trail=parts.map((t,i)=>`<b class="${i===parts.length-1?'now':''}">${t}</b>`).join('<span class="arrow">→</span>');
+  const next=state.locs[state.round];   // already prefetched in the background
+  let line='';
+  if(state.round<state.totalRounds){
+    line = (next&&!(next instanceof Error)&&next.fresh)
+      ? `Next round: <b>a fresh start</b> — nothing reachable next to ${esc(here)}`
+      : `Next round: <b>a country bordering ${esc(here)}</b>`;
+  }
+  return `<span class="trail">${trail}</span>${line?`<span>${line}</span>`:''}`;
+}
 /* Temperature / Government: the map just shows where you were, the panel does the scoring. */
 function truthOnlyMap(truth){
   if(!resultMap) resultMap=makeMap('resultmap'); if(resultLayer) resultLayer.remove(); resultLayer=L.layerGroup().addTo(resultMap); plainStyle(resultMap,false);
@@ -2312,10 +2370,11 @@ function findGameLocations(){
   if(m0.passport&&!mp.country) mp.country=pickPassportCountry(null);
   const m=m0.passport?{...m0,filter:n=>countryOfRegion(n)===mp.country,expect:mp.country}:m0;
   mp.locPromise=(async()=>{ const plan=continentPlan(rounds); const locs=[]; const chain=[];
-    for(let i=0;i<plan.length;i++){ const rm=m.deported?deportMode(m,chain):(m.choice?govMode(m):m);
-      try{ locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(m.deported?null:plan[i],rm); }
-      catch(e){ chain.length=0; locs[i]=m.trio?await findTrio(null,m):await findLocation(null,m.deported?deportMode(m,chain):(m.choice?govMode(m):m)); }
-      if(m.deported) chain.push(deportKey(locs[i],rm.expect)); }
+    for(let i=0;i<plan.length;i++){
+      if(m.deported){ const l=await deportStep(chain,m); locs[i]=l; chain.push(l.key); continue; }
+      const rm=m.choice?govMode(m):m;
+      try{ locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],rm); }
+      catch(e){ locs[i]=m.trio?await findTrio(null,m):await findLocation(null,rm); } }
     return locs; })();
   return mp.locPromise;
 }
@@ -2338,7 +2397,7 @@ async function hostStartGame(){
   if(modeOf(mp.settings.mode).country){ try{ await loadGeo(); }catch(e){ toast('Could not load country borders. Check your connection.'); mp.starting=false; $('mpStartBtn').disabled=false; $('mpStartBtn').textContent='Start game'; return; } }
   const locs=await findGameLocations();
   mp.locPromise=null;   // next game gets fresh spots
-  const payload=locs.map(l=>({pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,gov:l.gov}));
+  const payload=locs.map(l=>({pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,gov:l.gov,key:l.key,from:l.from,fresh:l.fresh}));
   mp.phase='round'; mp.starting=false;
   if(modeOf(mp.settings.mode).bet) for(const p of playerList()) p.score=1000;
   mpBroadcast({t:'start',settings:mp.settings,locs:payload,players:pubPlayers()});
@@ -2444,7 +2503,8 @@ function showResultMP(rev){
   const fit=()=>{ resultMap.invalidateSize(); if(pts.length>1) resultMap.fitBounds(L.latLngBounds(pts),{padding:[70,70],maxZoom:hid?5:12,animate:false}); else if(pts.length===1) resultMap.setView(pts[0],hid?4:5,{animate:false}); else resultMap.setView([20,0],2,{animate:false}); };
   fit(); setTimeout(fit,150);
   const mine=rev.results.find(r=>r.id===mp.me.id)||{pts:0,km:null,guess:null};
-  const me={round:rev.round,guess:mine.guess,truth:rev.truth,km:mine.km,pts:mine.pts,bet:mine.bet||null,timedOut:!mine.guess,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng},guessPlace:null};
+  const cur=state.locs[rev.round-1]||{};
+  const me={round:rev.round,guess:mine.guess,truth:rev.truth,km:mine.km,pts:mine.pts,bet:mine.bet||null,timedOut:!mine.guess,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng,key:cur.key,fresh:cur.fresh},guessPlace:null};
   state.results.push(me); if(mine.bet){ state.bank+=mine.pts; state.score=state.bank; } else state.score+=mine.pts;
   $('distTxt').innerHTML = mine.guess ? `Your guess was <b>${fmtDist(mine.km)}</b> away.` : `You didn't place a pin.`;
   $('nextBtn').textContent = (rev.round>=state.totalRounds||rev.over) ? 'See results' : 'Next round';
