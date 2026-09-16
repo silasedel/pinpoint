@@ -301,6 +301,8 @@
   .mic-lobby{display:flex;align-items:center;gap:10px;margin-top:22px;padding:12px 14px;border-radius:12px;background:#f6f8f7;border:1px solid var(--line);font-size:13px;color:var(--muted)}
   .mic-lobby b{color:var(--text)}
   @media (max-width:820px){ .lobby-grid{grid-template-columns:1fr} }
+  .update{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;display:flex;gap:12px;align-items:center;padding:10px 12px 10px 16px;border-radius:12px;background:var(--text);color:#fff;font-weight:600;font-size:14px;box-shadow:var(--shadow)}
+  .update button{padding:8px 14px;border-radius:8px;background:var(--green);color:#fff;font-weight:700}
   .toast{position:fixed;left:50%;top:80px;transform:translateX(-50%);z-index:60;padding:10px 18px;border-radius:10px;background:var(--red);color:#fff;font-weight:600;box-shadow:var(--shadow);animation:toastin .35s cubic-bezier(.2,1.2,.4,1)}
   .toast.ok{background:var(--green);padding:10px 22px;font-weight:700}
   @keyframes toastin{from{opacity:0;transform:translate(-50%,-14px)}to{opacity:1;transform:translate(-50%,0)}}
@@ -572,7 +574,7 @@ async function findLocation(continent){
         const {data}=await svService.getPanorama({ location:p, radius:attempt<10?20000:80000,
           source: google.maps.StreetViewSource.OUTDOOR, preference: google.maps.StreetViewPreference.NEAREST });
         const loc=data&&data.location; if(!loc||!loc.pano||!loc.latLng) continue;
-        if(!/google/i.test(data.copyright||'') && attempt<11) continue;     // prefer official coverage over photospheres
+        if(!/google/i.test(data.copyright||'')) continue;     // official Google coverage only: photospheres block image copying
         notePlace(pl[0]);
         const out={ pano:loc.pano, lat:loc.latLng.lat(), lng:loc.latLng.lng(), heading:Math.floor(Math.random()*360), place:null, continent:cont, region:pl[0] };
         placeOf(out.lat,out.lng).then(p=>{ out.place=p; });
@@ -674,6 +676,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
+const BUILD='20260915-203107';
 const state={ timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ return `${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -938,7 +941,11 @@ $('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDef
 /* ---------- Copy image: four 90° views (N/E/S/W) rendered from the high-zoom panorama tiles ---------- */
 const SV_TILE=(pano,z,x,y)=>`https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid=${encodeURIComponent(pano)}&x=${x}&y=${y}&zoom=${z}&nbt=1&fover=2`;
 const VIEW_W=1200, VIEW_H=675, VIEW_FOV=90;   // 16:9, exactly 90° across so the four views tile into 360°
-async function fetchBitmap(url){ const r=await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return createImageBitmap(await r.blob()); }
+async function fetchBitmap(url,retry=1){
+  try{ const r=await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return await createImageBitmap(await r.blob()); }
+  catch(e){ if(retry>0){ await new Promise(r=>setTimeout(r,400)); return fetchBitmap(url,retry-1); } throw e; }
+}
+async function runLimited(jobs,limit){ let i=0; const workers=Array.from({length:limit},async()=>{ while(i<jobs.length){ const j=jobs[i++]; await j(); } }); await Promise.all(workers); }
 async function panoMeta(pano){
   let w=13312,h=6656,center=0;
   try{ await gmapsReady; const {data}=await (svService||(svService=new google.maps.StreetViewService())).getPanorama({pano}); const t=data.tiles||{}; if(t.worldSize&&t.worldSize.width){ w=t.worldSize.width; h=t.worldSize.height; } if(typeof t.centerHeading==='number') center=t.centerHeading; }catch(e){}
@@ -951,8 +958,9 @@ async function loadBand(pano,zoom,meta){
   const vfov=2*Math.atan(Math.tan(VIEW_FOV/2*Math.PI/180)*VIEW_H/VIEW_W)*180/Math.PI;
   const latTop=vfov/2+2, y0=Math.max(0,Math.floor((0.5-latTop/180)*H/512)), y1=Math.min(rows-1,Math.floor((0.5+latTop/180)*H/512));
   const c=document.createElement('canvas'); c.width=W; c.height=(y1-y0+1)*512; const ctx=c.getContext('2d',{willReadFrequently:true});
-  const jobs=[]; for(let y=y0;y<=y1;y++) for(let x=0;x<cols;x++) jobs.push(fetchBitmap(SV_TILE(pano,zoom,x,y)).then(b=>ctx.drawImage(b,x*512,(y-y0)*512)).catch(()=>{}));
-  await Promise.all(jobs);
+  let drawn=0; const jobs=[]; for(let y=y0;y<=y1;y++) for(let x=0;x<cols;x++) jobs.push(()=>fetchBitmap(SV_TILE(pano,zoom,x,y)).then(b=>{ ctx.drawImage(b,x*512,(y-y0)*512); drawn++; }).catch(()=>{}));
+  await runLimited(jobs,6);
+  if(!drawn) throw new Error('This spot has no copyable imagery');
   return {img:ctx.getImageData(0,0,W,c.height), W, H, yOff:y0*512};
 }
 /* Rectilinear projection of one heading out of the equirect band, bilinear sampled. */
@@ -1567,6 +1575,12 @@ function confetti(){
     if(t-t0<2600) requestAnimationFrame(frame); else { ctx.clearRect(0,0,c.width,c.height); c.hidden=true; }
   })(t0);
 }
+/* Update check: GitHub Pages caches for ~10 minutes, so tell people when a newer build exists. */
+async function checkUpdate(){
+  try{ const r=await fetch(location.pathname.replace(/index\.html$/,'')+'version.txt?t='+Date.now(),{cache:'no-store'}); const v=(await r.text()).trim();
+    if(v&&v!==BUILD&&!document.getElementById('updateBar')){ const d=document.createElement('div'); d.id='updateBar'; d.className='update'; d.innerHTML='A newer version of Pinpoint is available <button>Update</button>'; d.querySelector('button').onclick=()=>location.reload(true); document.body.appendChild(d); } }catch(e){}
+}
+if(location.protocol==='https:'){ setTimeout(checkUpdate,3000); setInterval(checkUpdate,90000); }
 function toast(msg,kind){ const t=document.createElement('div'); t.className='toast'+(kind?' '+kind:''); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),kind==='ok'?1800:3500); }
 </script>
 <script async src="https://maps.googleapis.com/maps/api/js?callback=__gmapsReady&loading=async&v=weekly"></script>
