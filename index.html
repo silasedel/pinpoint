@@ -676,7 +676,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260915-204519';
+const BUILD='20260915-204815';
 const state={ timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ return `${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1251,8 +1251,14 @@ function mpStartCountdown(secs){
   mp.cdLeft=secs; mpBroadcast({t:'countdown',secs});
   $('mpStartBtn').hidden=true; $('mpStartNow').hidden=false; $('mpCancel').hidden=false;
   runCountdown(secs,()=>hostStartGame());
-  // Find all locations while people pick colors.
-  mp.locPromise=(async()=>{ const plan=continentPlan(mp.settings.rounds); const locs=[]; for(let i=0;i<plan.length;i++){ try{ locs[i]=await findLocation(plan[i]); }catch(e){ locs[i]=await findLocation(); } } return locs; })();
+  findGameLocations();   // find all locations while people pick colors
+}
+function findGameLocations(){
+  const rounds=mp.settings.rounds;
+  if(mp.locPromise&&mp.locRounds===rounds) return mp.locPromise;
+  mp.locRounds=rounds;
+  mp.locPromise=(async()=>{ const plan=continentPlan(rounds); const locs=[]; for(let i=0;i<plan.length;i++){ try{ locs[i]=await findLocation(plan[i]); }catch(e){ locs[i]=await findLocation(); } } return locs; })();
+  return mp.locPromise;
 }
 async function hostStartGame(){
   if(mp.role!=='host'||mp.phase!=='lobby'||mp.starting) return;
@@ -1264,7 +1270,8 @@ async function hostStartGame(){
   const taken=new Set(playerList().map(p=>p.color).filter(c=>c!==null));
   let n=1; for(const p of playerList()){ if(!p.name) p.name='Player '+(n++); if(p.color===null){ const c=COLORS.findIndex((_,i)=>!taken.has(i)); p.color=c<0?0:c; taken.add(p.color); } p.score=0; }
   if(mp.me.color===null) mp.me.color=mp.players[mp.me.id].color;
-  const locs=await mp.locPromise;
+  const locs=await findGameLocations();
+  mp.locPromise=null;   // next game gets fresh spots
   const payload=locs.map(l=>({pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null}));
   mp.phase='round'; mp.starting=false;
   mpBroadcast({t:'start',settings:mp.settings,locs:payload,players:pubPlayers()});
@@ -1335,7 +1342,7 @@ function renderLobby(){
   else $('guestPanel').textContent=`Waiting for the host to start… (${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`;
 }
 function mpToLobby(){
-  mp.phase='lobby'; mp.starting=false; mp.guesses={}; for(const p of playerList()) p.score=0;
+  mp.phase='lobby'; mp.starting=false; mp.locPromise=null; mp.guesses={}; for(const p of playerList()) p.score=0;
   $('countdown').hidden=true; $('mpStartBtn').hidden=false; $('mpStartNow').hidden=true; $('mpCancel').hidden=true;
   $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
   show('lobby'); if(mp.role==='host') hostSync(); else renderLobby();
@@ -1538,7 +1545,7 @@ $('mpTimeSeg').addEventListener('click',e=>{ const b=e.target.closest('button');
 $('mpRoundSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; mp.settings.rounds=+b.dataset.r; hostSync(); });
 $('mpStartBtn').addEventListener('click',()=>{ if(playerList().length<2){ toast('You need at least one more player'); return; } mpStartCountdown(30); });
 $('mpStartNow').addEventListener('click',()=>hostStartGame());
-$('mpCancel').addEventListener('click',()=>{ if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=true; $('mpStartBtn').hidden=false; $('mpStartNow').hidden=true; $('mpCancel').hidden=true; mpBroadcast({t:'cancel'}); });
+$('mpCancel').addEventListener('click',()=>{ mp.locPromise=null; if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=true; $('mpStartBtn').hidden=false; $('mpStartNow').hidden=true; $('mpCancel').hidden=true; mpBroadcast({t:'cancel'}); });
 
 /* ---------- Menu extras: live hero panorama (double-buffered) + page loader ---------- */
 const heroFrames=[document.getElementById('hero0'),document.getElementById('hero1')];
