@@ -95,10 +95,11 @@
   .modes{margin-top:20px}
   .modes h3{margin:0 0 4px;font-size:18px;font-weight:800;letter-spacing:-.3px}
   .modes .sub{margin:0 0 14px;font-size:13px;color:var(--muted)}
+  .classic-btn{flex-direction:column;gap:2px;padding:18px;font-size:20px;margin-bottom:14px}
+  .classic-btn span{font-size:13px;font-weight:500;opacity:.85}
   .mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .mode{position:relative;padding:14px 14px 12px;border-radius:12px;border:1px solid var(--line);background:#f8faf9;display:flex;flex-direction:column;gap:6px;transition:.15s}
   .mode:hover{border-color:var(--green);background:#fff}
-  .mode .mi{font-size:26px;line-height:1}
   .mode b{font-size:15px}
   .mode p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.4;flex:1}
   .mode .meta{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green-dark)}
@@ -423,7 +424,8 @@
     </div>
     <div class="card modes">
       <h3>Game modes</h3>
-      <p class="sub">Same scoring, different rules. Rounds come from the picker above unless the mode says otherwise.</p>
+      <p class="sub">Same scoring, different rules. Time and rounds come from the picker above unless the mode says otherwise.</p>
+      <button class="btn btn-primary btn-block classic-btn" id="classicBtn">Classic<span>Look around, walk, zoom. The standard game.</span></button>
       <div class="mode-grid" id="modeGrid"></div>
     </div>
     <div class="card friends">
@@ -617,13 +619,13 @@ const ISLANDS=['Iceland','Sicily','Sardinia','Crete','Malta','Madagascar','Réun
 const REMOTE=['Mongolia','Kazakhstan','Kyrgyzstan','Northern Territory','Western Australia','South Australia','Queensland','Botswana','Namibia','Lesotho','Iceland','Faroe Islands','Greenland','Alaska','Canada West','Canada East','Siberia West','Siberia East','Russian Far East','Argentina South','Chile South','Chile North','Bolivia','Peru','Madagascar','Nepal','Bhutan','Norway','Sweden','Finland','Tanzania','Zambia','Mozambique','Oman','Jordan','Tunisia','Mali','Chad','Sudan','Uzbekistan','Papua New Guinea','New Zealand South','Tasmania','USA West','Mexico North','Ethiopia'];
 const CITIES=[['Tokyo',35.68,139.76],['Osaka',34.69,135.5],['Seoul',37.56,126.98],['Taipei',25.04,121.56],['Hong Kong',22.32,114.17],['Singapore',1.3,103.85],['Bangkok',13.75,100.5],['Kuala Lumpur',3.15,101.7],['Jakarta',-6.2,106.85],['Manila',14.6,120.98],['Ho Chi Minh City',10.78,106.7],['Hanoi',21.03,105.85],['Mumbai',19.08,72.88],['Delhi',28.63,77.22],['Bengaluru',12.97,77.59],['Colombo',6.93,79.85],['Dhaka',23.73,90.41],['Dubai',25.2,55.27],['Doha',25.29,51.53],['Tel Aviv',32.08,34.78],['Istanbul',41.01,28.97],['Athens',37.98,23.73],['Rome',41.9,12.5],['Milan',45.46,9.19],['Naples',40.85,14.27],['Madrid',40.42,-3.7],['Barcelona',41.39,2.17],['Lisbon',38.72,-9.14],['Paris',48.86,2.35],['Lyon',45.76,4.84],['London',51.51,-0.13],['Manchester',53.48,-2.24],['Glasgow',55.86,-4.25],['Dublin',53.35,-6.26],['Amsterdam',52.37,4.9],['Brussels',50.85,4.35],['Berlin',52.52,13.4],['Hamburg',53.55,10.0],['Munich',48.14,11.58],['Vienna',48.21,16.37],['Zurich',47.38,8.54],['Prague',50.08,14.43],['Warsaw',52.23,21.01],['Kraków',50.06,19.94],['Budapest',47.5,19.04],['Bucharest',44.43,26.1],['Belgrade',44.8,20.47],['Stockholm',59.33,18.07],['Oslo',59.91,10.75],['Copenhagen',55.68,12.57],['Helsinki',60.17,24.94],['Moscow',55.75,37.62],['Saint Petersburg',59.93,30.32],['Kyiv',50.45,30.52],['New York',40.75,-73.98],['Chicago',41.88,-87.63],['Los Angeles',34.05,-118.25],['San Francisco',37.78,-122.42],['Seattle',47.61,-122.33],['Boston',42.36,-71.06],['Philadelphia',39.95,-75.16],['Washington',38.9,-77.03],['Miami',25.77,-80.19],['Houston',29.76,-95.37],['Dallas',32.78,-96.8],['Atlanta',33.75,-84.39],['Denver',39.74,-104.99],['Toronto',43.65,-79.38],['Montreal',45.5,-73.57],['Vancouver',49.28,-123.12],['Mexico City',19.43,-99.13],['Guadalajara',20.67,-103.35],['Bogotá',4.65,-74.08],['Lima',-12.05,-77.04],['Santiago',-33.45,-70.66],['Buenos Aires',-34.6,-58.38],['São Paulo',-23.55,-46.63],['Rio de Janeiro',-22.91,-43.2],['Montevideo',-34.9,-56.19],['Johannesburg',-26.2,28.04],['Cape Town',-33.92,18.42],['Nairobi',-1.29,36.82],['Lagos',6.52,3.38],['Accra',5.56,-0.2],['Tunis',36.8,10.18],['Sydney',-33.87,151.21],['Melbourne',-37.81,144.96],['Brisbane',-27.47,153.03],['Perth',-31.95,115.86],['Auckland',-36.85,174.76],['Almaty',43.24,76.89],['Tashkent',41.31,69.28],['Amman',31.95,35.93],['Cairo',30.05,31.24]];
 const MODES={
-  classic: {name:'Classic', icon:'🌍', desc:'Look around, walk, zoom. The standard game.', meta:'Your time · your rounds'},
-  blink:   {name:'Blink', icon:'👁️', desc:'The world opens for a blink and shuts. Guess from what you glimpsed.', meta:'15s · one glimpse', time:15},
-  pixel:   {name:'Pixelated', icon:'🟩', desc:'The whole world at 160 pixels wide. Drag to look around. Colors and shapes are all you get.', meta:'Heavily pixelated'},
-  stranded:{name:'Stranded', icon:'🏜️', desc:'Middle of nowhere. Dirt tracks, no towns, no signs, nobody coming.', meta:'Remote only', filter:n=>REMOTE.includes(n), radius:25000, remote:true},
-  islands: {name:'Island Hopper', icon:'🏝️', desc:'Only islands. Volcanoes, reefs, fjords, and the odd sheep.', meta:'Islands only', filter:n=>ISLANDS.includes(n)},
-  murica:  {name:"'Murica", icon:'🦅', desc:'All 50 states, nothing else. Read the road signs and the license plates.', meta:'USA only', filter:n=>/^USA|^Alaska$|^Hawaii$/.test(n)},
-  jungle:  {name:'Concrete Jungle', icon:'🏙️', desc:'Big cities only. Skylines, storefronts, traffic and a hundred languages of signage.', meta:'Dense cities', city:true},
+  classic: {name:'Classic', desc:'Look around, walk, zoom. The standard game.', meta:'Your time · your rounds'},
+  blink:   {name:'Blink', desc:'The world opens for a blink and shuts. Guess from what you glimpsed.', meta:'15s · one glimpse', time:15},
+  pixel:   {name:'Pixelated', desc:'The whole world at 160 pixels wide. Drag to look around. Colors and shapes are all you get.', meta:'Heavily pixelated'},
+  stranded:{name:'Stranded', desc:'Middle of nowhere. Dirt tracks, no towns, no signs, nobody coming.', meta:'Remote only', filter:n=>REMOTE.includes(n), radius:25000, remote:true},
+  islands: {name:'Island Hopper', desc:'Only islands. Volcanoes, reefs, fjords, and the odd sheep.', meta:'Islands only', filter:n=>ISLANDS.includes(n)},
+  murica:  {name:"'Murica", desc:'All 50 states, nothing else. Read the road signs and the license plates.', meta:'USA only', filter:n=>/^USA|^Alaska$|^Hawaii$/.test(n)},
+  jungle:  {name:'Concrete Jungle', desc:'Big cities only. Skylines, storefronts, traffic and a hundred languages of signage.', meta:'Dense cities', city:true},
 };
 function modeOf(id){ return MODES[id]||MODES.classic; }
 
@@ -752,7 +754,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260915-231821';
+const BUILD='20260915-232106';
 const state={ mode:'classic', timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -821,6 +823,7 @@ picker('timeSeg','timeCustom','t',1,180,v=>{ state.userTime=v; });
 picker('roundSeg','roundCustom','r',1,100,v=>{ state.userRounds=v; });
 state.userTime=60; state.userRounds=5;
 $('startBtn').addEventListener('click',()=>{ state.mode='classic'; startGame(); });
+$('classicBtn').addEventListener('click',()=>{ state.mode='classic'; startGame(); });
 $('againBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); } else if(!mp.role) startGame(); });
 $('menuBtn').addEventListener('click',()=>{ if(mp.role) mpLeave(); renderBoard(); show('menu'); });
 function show(id){ for(const s of ['menu','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
@@ -841,7 +844,7 @@ function ensureGuessMap(){
   }
 }
 function resetGameState(){
-  const m=modeOf(state.mode); $('modePill').hidden=state.mode==='classic'; $('modeLbl').textContent=m.icon+' '+m.name;
+  const m=modeOf(state.mode); $('modePill').hidden=state.mode==='classic'; $('modeLbl').textContent=m.name;
   $('blink').hidden=true; stopPixel();
   state.round=0; state.score=0; state.results=[]; state.locs=[]; state.guess=null; state.saved=false; preload.idx=-1; preload.promise=null;
   panos.forEach(f=>{ f.onload=null; f.src='about:blank'; });
@@ -1483,7 +1486,7 @@ function renderLobby(){
   $('swatches').innerHTML=COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
     return `<div class="swatch ${mine?'mine':''} ${taken?'taken':''}" data-i="${i}" style="background:${c}" ${taken?`data-owner="${esc(owner.name||'taken')}"`:''} title="${n}">${mine?'✓':''}</div>`; }).join('');
   if(mp.role==='host'){ mpTimePick.mark(mp.settings.time); mpRoundPick.mark(mp.settings.rounds); [...$('mpModeSeg').children].forEach(b=>b.classList.toggle('on',b.dataset.m===(mp.settings.mode||'classic'))); }
-  else { const m=modeOf(mp.settings.mode); $('guestPanel').textContent=`Waiting for the host to start… (${m.icon} ${m.name} · ${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`; }
+  else { const m=modeOf(mp.settings.mode); $('guestPanel').textContent=`Waiting for the host to start… (${m.name} · ${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`; }
 }
 function mpToLobby(){
   mp.phase='lobby'; mp.starting=false; mp.locPromise=null; mp.guesses={}; for(const p of playerList()) p.score=0;
@@ -1690,9 +1693,9 @@ $('leaveBtn').addEventListener('click',()=>{ mpLeave(); show('menu'); });
 window.addEventListener('pagehide',()=>{ if(mp.role) mpLeave(); });
 $('mpName').addEventListener('input',()=>{ mp.me.name=$('mpName').value.trim().slice(0,16); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
 $('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return; const i=+sw.dataset.i; mpSend({t:'color',color:mp.me.color===i?null:i}); if(mp.role==='guest'){ mp.me.color=mp.me.color===i?null:i; } });
-$('modeGrid').innerHTML=Object.entries(MODES).filter(([id])=>id!=='classic').map(([id,m])=>`<div class="mode"><div class="mi">${m.icon}</div><b>${m.name}</b><p>${m.desc}</p><div class="meta">${m.meta}</div><button class="btn btn-primary" data-mode="${id}">Play ${m.name}</button></div>`).join('');
+$('modeGrid').innerHTML=Object.entries(MODES).filter(([id])=>id!=='classic').map(([id,m])=>`<div class="mode"><b>${m.name}</b><p>${m.desc}</p><div class="meta">${m.meta}</div><button class="btn btn-secondary" data-mode="${id}">Play ${m.name}</button></div>`).join('');
 $('modeGrid').addEventListener('click',e=>{ const b=e.target.closest('button[data-mode]'); if(b){ state.mode=b.dataset.mode; startGame(); } });
-$('mpModeSeg').innerHTML=Object.entries(MODES).map(([id,m])=>`<button data-m="${id}" ${id==='classic'?'class="on"':''}>${m.icon} ${m.name}</button>`).join('');
+$('mpModeSeg').innerHTML=Object.entries(MODES).map(([id,m])=>`<button data-m="${id}" ${id==='classic'?'class="on"':''}>${m.name}</button>`).join('');
 $('mpModeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; mp.settings.mode=b.dataset.m; const m=modeOf(b.dataset.m); if(m.time!=null) mp.settings.time=m.time; if(m.rounds!=null) mp.settings.rounds=m.rounds; mp.locPromise=null; hostSync(); });
 const mpTimePick=picker('mpTimeSeg','mpTimeCustom','t',1,180,v=>{ mp.settings.time=v; hostSync(); });
 const mpRoundPick=picker('mpRoundSeg','mpRoundCustom','r',1,100,v=>{ mp.settings.rounds=v; hostSync(); });
