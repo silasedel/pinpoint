@@ -109,11 +109,13 @@
   .mode-seg{display:grid;grid-template-columns:repeat(4,1fr)}
   .mode-seg button{padding:8px 4px;font-size:13px}
   /* Blink: SVG shutter above the panorama */
-  #blink{position:absolute;inset:0;z-index:4;pointer-events:none}
+  #blink{position:absolute;inset:0;z-index:5;pointer-events:none}
   #blink svg{width:100%;height:100%;display:block}
   #pix{position:absolute;inset:0;z-index:4;background:#000;cursor:grab;touch-action:none;overflow:hidden}
   #pix:active{cursor:grabbing}
   #pix canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+  #pix.smooth canvas{image-rendering:auto}
+  #pix.fixed{cursor:default;pointer-events:none}
   #pix .dev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;opacity:.8}
   .modepill{background:#efe7ff}.modepill small{color:#5b3fb8}
   .postcards h3{text-align:center;font-family:'Caveat',cursive;font-size:30px;font-weight:600;color:var(--green-dark);margin:0 0 6px}
@@ -620,7 +622,7 @@ const REMOTE=['Mongolia','Kazakhstan','Kyrgyzstan','Northern Territory','Western
 const CITIES=[['Tokyo',35.68,139.76],['Osaka',34.69,135.5],['Seoul',37.56,126.98],['Taipei',25.04,121.56],['Hong Kong',22.32,114.17],['Singapore',1.3,103.85],['Bangkok',13.75,100.5],['Kuala Lumpur',3.15,101.7],['Jakarta',-6.2,106.85],['Manila',14.6,120.98],['Ho Chi Minh City',10.78,106.7],['Hanoi',21.03,105.85],['Mumbai',19.08,72.88],['Delhi',28.63,77.22],['Bengaluru',12.97,77.59],['Colombo',6.93,79.85],['Dhaka',23.73,90.41],['Dubai',25.2,55.27],['Doha',25.29,51.53],['Tel Aviv',32.08,34.78],['Istanbul',41.01,28.97],['Athens',37.98,23.73],['Rome',41.9,12.5],['Milan',45.46,9.19],['Naples',40.85,14.27],['Madrid',40.42,-3.7],['Barcelona',41.39,2.17],['Lisbon',38.72,-9.14],['Paris',48.86,2.35],['Lyon',45.76,4.84],['London',51.51,-0.13],['Manchester',53.48,-2.24],['Glasgow',55.86,-4.25],['Dublin',53.35,-6.26],['Amsterdam',52.37,4.9],['Brussels',50.85,4.35],['Berlin',52.52,13.4],['Hamburg',53.55,10.0],['Munich',48.14,11.58],['Vienna',48.21,16.37],['Zurich',47.38,8.54],['Prague',50.08,14.43],['Warsaw',52.23,21.01],['Kraków',50.06,19.94],['Budapest',47.5,19.04],['Bucharest',44.43,26.1],['Belgrade',44.8,20.47],['Stockholm',59.33,18.07],['Oslo',59.91,10.75],['Copenhagen',55.68,12.57],['Helsinki',60.17,24.94],['Moscow',55.75,37.62],['Saint Petersburg',59.93,30.32],['Kyiv',50.45,30.52],['New York',40.75,-73.98],['Chicago',41.88,-87.63],['Los Angeles',34.05,-118.25],['San Francisco',37.78,-122.42],['Seattle',47.61,-122.33],['Boston',42.36,-71.06],['Philadelphia',39.95,-75.16],['Washington',38.9,-77.03],['Miami',25.77,-80.19],['Houston',29.76,-95.37],['Dallas',32.78,-96.8],['Atlanta',33.75,-84.39],['Denver',39.74,-104.99],['Toronto',43.65,-79.38],['Montreal',45.5,-73.57],['Vancouver',49.28,-123.12],['Mexico City',19.43,-99.13],['Guadalajara',20.67,-103.35],['Bogotá',4.65,-74.08],['Lima',-12.05,-77.04],['Santiago',-33.45,-70.66],['Buenos Aires',-34.6,-58.38],['São Paulo',-23.55,-46.63],['Rio de Janeiro',-22.91,-43.2],['Montevideo',-34.9,-56.19],['Johannesburg',-26.2,28.04],['Cape Town',-33.92,18.42],['Nairobi',-1.29,36.82],['Lagos',6.52,3.38],['Accra',5.56,-0.2],['Tunis',36.8,10.18],['Sydney',-33.87,151.21],['Melbourne',-37.81,144.96],['Brisbane',-27.47,153.03],['Perth',-31.95,115.86],['Auckland',-36.85,174.76],['Almaty',43.24,76.89],['Tashkent',41.31,69.28],['Amman',31.95,35.93],['Cairo',30.05,31.24]];
 const MODES={
   classic: {name:'Classic', desc:'Look around, walk, zoom. The standard game.', meta:'Your time · your rounds'},
-  blink:   {name:'Blink', desc:'The world opens for a blink and shuts. Guess from what you glimpsed.', meta:'15s · one glimpse', time:15},
+  blink:   {name:'Blink', desc:'A fixed, super-wide view opens for a blink and shuts. No looking around. Guess from what you glimpsed.', meta:'15s · one glimpse', time:15},
   pixel:   {name:'Pixelated', desc:'The whole world at 160 pixels wide. Drag to look around. Colors and shapes are all you get.', meta:'Heavily pixelated'},
   stranded:{name:'Stranded', desc:'Middle of nowhere. Dirt tracks, no towns, no signs, nobody coming.', meta:'Remote only', filter:n=>REMOTE.includes(n), radius:25000, remote:true},
   islands: {name:'Island Hopper', desc:'Only islands. Volcanoes, reefs, fjords, and the odd sheep.', meta:'Islands only', filter:n=>ISLANDS.includes(n)},
@@ -754,7 +756,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260915-232106';
+const BUILD='20260915-232303';
 const state={ mode:'classic', timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -895,11 +897,18 @@ async function nextRound(){
   if(preload.idx===idx && preload.promise){ await preload.promise; }
   else { await loadInto(panos[1-front],loc); }
   swapFrames();
-  if(state.mode==='pixel') startPixel(loc); else stopPixel();
+  if(state.mode==='pixel') startPixel(loc);
+  else if(state.mode==='blink'){
+    $('blink').hidden=false; $('lid').setAttribute('d','M0 0H100V100H0Z');   // eye shut while the still renders
+    $('loadingText').textContent='Get ready…';
+    await startPixel(loc,{w:1280,h:720,fov:120,fixed:true,smooth:true,zoom:4});
+    if(state.round!==idx+1) return;
+  }
+  else stopPixel();
   $('loading').classList.add('fade');
-  if(state.mode==='blink') runBlink();
   const ri=$('roundIntro'); ri.innerHTML=`<div>Round ${state.round} <span>/ ${state.totalRounds}</span></div>`; ri.hidden=false; setTimeout(()=>{ ri.hidden=true; },1100);
-  startTimer();
+  if(state.mode==='blink'){ const r0=state.round; setTimeout(()=>{ if(state.round===r0&&!$('game').hidden){ runBlink(); startTimer(); } },1250); }   // intro first, then the glimpse and the clock together
+  else startTimer();
   preloadRound(idx+1);
 }
 
@@ -1134,7 +1143,7 @@ $('copyBtn').addEventListener('click',()=>copyImagery());
 /* ---------- Mode effects ---------- */
 function runBlink(){
   const el=$('blink'), lid=$('lid'); el.hidden=false;
-  const t0=performance.now(); const OPEN=550, HOLD=1300, CLOSE=220;
+  const t0=performance.now(); const OPEN=260, HOLD=650, CLOSE=130;
   const ease=k=>1-Math.pow(1-k,3);
   (function frame(t){
     const dt=t-t0; let ry;
@@ -1144,16 +1153,19 @@ function runBlink(){
   })(t0);
 }
 /* Pixelated: a tiny canvas panorama viewer rendered from the imagery tiles, upscaled with hard pixel edges. */
-const pix={band:null,meta:null,heading:0,pitch:0,fov:85,drag:null,active:false,round:0};
+const pix={band:null,meta:null,heading:0,pitch:0,fov:85,drag:null,active:false,round:0,fixed:false};
 function stopPixel(){ pix.active=false; $('pix').hidden=true; }
-async function startPixel(loc){
-  const round=state.round; pix.active=true; pix.round=round; pix.heading=loc.heading; pix.pitch=0; pix.fov=85;
-  $('pix').hidden=false; $('pixDev').hidden=false; const c=$('pixCanvas'); c.getContext('2d').clearRect(0,0,c.width,c.height);
+/* opts: {w,h,fov,fixed,zoom}. Pixelated uses a 160×90 canvas; Blink uses a full-res 120° still with no interaction. */
+async function startPixel(loc,opts={}){
+  const round=state.round; pix.active=true; pix.round=round; pix.heading=loc.heading; pix.pitch=0; pix.fov=opts.fov||85; pix.fixed=!!opts.fixed;
+  const el=$('pix'); el.hidden=false; el.classList.toggle('smooth',!!opts.smooth); el.classList.toggle('fixed',!!opts.fixed);
+  $('pixDev').hidden=false; $('pixDev').textContent='Loading…';
+  const c=$('pixCanvas'); c.width=opts.w||160; c.height=opts.h||90; c.getContext('2d').clearRect(0,0,c.width,c.height);
   try{
-    const meta=await panoMeta(loc.pano); const band=await loadBand(loc.pano,3,meta,70);
-    if(state.round!==round||!pix.active) return;
-    pix.band=band; pix.meta=meta; $('pixDev').hidden=true; drawPixel();
-  }catch(e){ $('pixDev').textContent='Imagery unavailable'; }
+    const meta=await panoMeta(loc.pano); const band=await loadBand(loc.pano,opts.zoom||3,meta,70);
+    if(state.round!==round||!pix.active) return false;
+    pix.band=band; pix.meta=meta; $('pixDev').hidden=true; drawPixel(); return true;
+  }catch(e){ $('pixDev').textContent='Imagery unavailable'; return false; }
 }
 function drawPixel(){
   if(!pix.band||!pix.active) return;
@@ -1168,10 +1180,10 @@ function drawPixel(){
 }
 (function(){
   const el=$('pix');
-  el.addEventListener('pointerdown',e=>{ pix.drag={x:e.clientX,y:e.clientY,h:pix.heading,p:pix.pitch}; el.setPointerCapture(e.pointerId); });
+  el.addEventListener('pointerdown',e=>{ if(pix.fixed) return; pix.drag={x:e.clientX,y:e.clientY,h:pix.heading,p:pix.pitch}; el.setPointerCapture(e.pointerId); });
   el.addEventListener('pointermove',e=>{ if(!pix.drag) return; const k=pix.fov/el.clientWidth; pix.heading=pix.drag.h-(e.clientX-pix.drag.x)*k; pix.pitch=Math.max(-0.9,Math.min(0.9,pix.drag.p+(e.clientY-pix.drag.y)*k*Math.PI/180)); drawPixel(); });
   el.addEventListener('pointerup',()=>{ pix.drag=null; }); el.addEventListener('pointercancel',()=>{ pix.drag=null; });
-  el.addEventListener('wheel',e=>{ e.preventDefault(); pix.fov=Math.max(35,Math.min(110,pix.fov+e.deltaY*0.05)); drawPixel(); },{passive:false});
+  el.addEventListener('wheel',e=>{ e.preventDefault(); if(pix.fixed) return; pix.fov=Math.max(35,Math.min(110,pix.fov+e.deltaY*0.05)); drawPixel(); },{passive:false});
 })();
 
 /* ---------- Coordinate paste box ---------- */
@@ -1203,7 +1215,7 @@ $('coordIn').addEventListener('input',()=>$('coordIn').classList.remove('bad'));
 /* ---------- Controls ---------- */
 $('guessBtn').addEventListener('click',()=>submitGuess(false));
 $('pinBtn').addEventListener('click',()=>{ const p=$('mappanel'); $('pinBtn').classList.toggle('on'); p.classList.toggle('pinned'); p.classList.add('open'); guessMap.invalidateSize(); });
-$('resetBtn').addEventListener('click',()=>{ if(!state.current) return; if(state.mode==='pixel'){ pix.heading=state.current.heading; pix.pitch=0; pix.fov=85; drawPixel(); return; } panos[front].src=embedUrl(state.current); });
+$('resetBtn').addEventListener('click',()=>{ if(!state.current) return; if(state.mode==='blink') return; if(state.mode==='pixel'){ pix.heading=state.current.heading; pix.pitch=0; pix.fov=85; drawPixel(); return; } panos[front].src=embedUrl(state.current); });
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT') return;
   if(e.code==='Space'||e.code==='Enter'){
