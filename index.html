@@ -198,6 +198,12 @@
   .copymenu button:hover{background:var(--green-soft);color:var(--green-dark)}
   .copymenu button small{display:block;font-weight:500;color:var(--muted);font-size:11px}
   .copymenu .hd{padding:6px 12px 4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  #boardModal{position:fixed;inset:0;z-index:70;background:rgba(10,20,14,.55);display:flex;align-items:center;justify-content:center;padding:20px}
+  #boardModal .box{background:var(--card);border-radius:16px;padding:20px 22px;width:min(96vw,560px);max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  #boardModal h3{margin:0;font-size:20px;letter-spacing:-.3px}
+  #boardModal .sub{color:var(--muted);font-size:13px;margin:2px 0 14px}
+  #boardModal .btn{width:100%;margin-top:16px}
+  .board-tag{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--green-dark);background:var(--green-soft);padding:4px 9px;border-radius:99px;vertical-align:middle;margin-left:8px}
   #imgModal{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px}
   #imgModal .box{background:#fff;border-radius:12px;padding:14px;max-width:min(96vw,1000px);max-height:94vh;overflow:auto;text-align:center}
   #imgModal img{max-width:100%;height:auto;display:block;margin:0 auto 10px}
@@ -518,7 +524,7 @@
       </div>
     </div>
     <div class="card wide">
-      <h2>Leaderboard</h2>
+      <h2>Leaderboard<span class="board-tag">Classic</span></h2>
       <div class="filters" style="margin-top:12px">
         <div class="fgroup"><span class="fl">Rounds</span><button class="chip on" data-fr="all">All</button><button class="chip" data-fr="5">5</button><button class="chip" data-fr="10">10</button></div>
         <div class="fgroup"><span class="fl">Time</span><button class="chip on" data-ft="all">All</button><button class="chip" data-ft="10">10s</button><button class="chip" data-ft="30">30s</button><button class="chip" data-ft="60">60s</button><button class="chip" data-ft="0">No limit</button></div>
@@ -696,12 +702,19 @@
     </div>
     <div class="final-actions">
       <button class="btn btn-secondary" id="menuBtn">Menu</button>
+      <button class="btn btn-secondary" id="viewBoardBtn" hidden>View leaderboard</button>
       <button class="btn btn-primary" id="againBtn">Play again</button>
       <div class="waiting" id="finalWait" hidden>Waiting for the host…</div>
     </div>
   </div>
 </div>
 
+<div id="boardModal" hidden><div class="box">
+  <h3 id="bmTitle">Leaderboard</h3>
+  <div class="sub" id="bmSub"></div>
+  <div id="bmWrap"></div>
+  <button class="btn btn-primary" id="bmClose">Close</button>
+</div></div>
 <button class="mic" id="micBtn" hidden title="Toggle microphone (M)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/><line class="slash" x1="4" y1="3.5" x2="20" y2="20.5"/></svg></span><span id="micTxt">Mic off</span></button>
 <canvas id="confetti" hidden></canvas>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -1115,10 +1128,10 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-121727';
+const BUILD='20260916-122152';
 const state={ mode:'classic', passport:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
-function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
+function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
 
 /* ---------- Leaderboard (localStorage) ---------- */
 function loadBoard(){ try{ return JSON.parse(localStorage.getItem('pp_board')||'[]'); }catch(e){ return []; } }
@@ -1130,8 +1143,17 @@ function entryMode(e){
   const m=/(\d+) rounds · (\d+)s|(\d+) rounds · no limit/.exec(e.mode||'');
   return m ? {rounds:+(m[1]||m[3]), time:m[2]!=null?+m[2]:0} : {rounds:0,time:-1};
 }
-function boardFor(r,t){
-  return loadBoard().filter(e=>{ const m=entryMode(e); return (r==='all'||m.rounds===+r)&&(t==='all'||m.time===+t); }).sort((a,c)=>c.score-a.score||a.ts-c.ts);
+/* Which mode an entry belongs to. Entries saved before modes existed only carry a label like "Blink · 5 rounds · 30s". */
+function entryModeId(e){
+  if(e.modeId) return e.modeId;
+  const head=String(e.mode||'').split(' · ')[0];
+  const hit=Object.keys(MODES).find(id=>MODES[id].name===head);
+  return hit||'classic';
+}
+function boardFor(r,t,modeId){
+  return loadBoard().filter(e=>{ const m=entryMode(e);
+    return (!modeId||entryModeId(e)===modeId)&&(r==='all'||m.rounds===+r)&&(t==='all'||m.time===+t);
+  }).sort((a,c)=>c.score-a.score||a.ts-c.ts);
 }
 function setFilter(key,val){
   filter[key]=String(val);
@@ -1144,18 +1166,33 @@ document.querySelector('.filters').addEventListener('click',e=>{
   renderBoard();
 });
 function renderBoard(highlightId){
-  const b=boardFor(filter.rounds,filter.time);
+  const b=boardFor(filter.rounds,filter.time,'classic');
   const wrap=$('boardWrap');
-  const total=loadBoard().length;
+  const total=loadBoard().length, classic=boardFor('all','all','classic').length;
   $('clearBoard').hidden=!total;
-  if(!b.length){ wrap.innerHTML=`<div class="empty">${total?'No scores in this mode yet.':'No scores yet. Play a game!'}</div>`; $('boardCount').textContent=total?`${total} game${total===1?'':'s'} recorded in total`:''; return; }
+  if(!b.length){ wrap.innerHTML=`<div class="empty">${classic?'No Classic scores with these settings yet.':'No Classic scores yet. Play a game!'}</div>`; $('boardCount').textContent=total?`${total} game${total===1?'':'s'} saved across every mode`:''; return; }
   const showMode=filter.rounds==='all'||filter.time==='all';
   wrap.innerHTML=`<table class="board"><tr><th>#</th><th>Name</th>${showMode?'<th>Mode</th>':'<th>Date</th>'}<th style="text-align:right">Score</th></tr>`+
     b.slice(0,10).map((e,i)=>`<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="mode">${showMode?esc(e.mode):new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`).join('')+`</table>`;
-  $('boardCount').textContent=`${b.length} game${b.length===1?'':'s'} in this mode`;
+  $('boardCount').textContent=`${b.length} Classic game${b.length===1?'':'s'} here · ${total} saved across every mode`;
 }
+/* One mode's board, opened from the end of a game. */
+function openBoardModal(modeId,highlightId){
+  const b=boardFor('all','all',modeId), m=modeOf(modeId);
+  $('bmTitle').textContent=`${m.name} leaderboard`;
+  $('bmSub').textContent=b.length?`${b.length} game${b.length===1?'':'s'} saved on this device`:'Nothing saved for this mode yet';
+  $('bmWrap').innerHTML=b.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th style="text-align:right">Score</th></tr>`+
+    b.slice(0,10).map((e,i)=>{ const em=entryMode(e);
+      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`
+    :`<div class="empty">Finish a game in this mode and save your score.</div>`;
+  $('boardModal').hidden=false;
+}
+$('bmClose').addEventListener('click',()=>{ $('boardModal').hidden=true; });
+$('boardModal').addEventListener('click',e=>{ if(e.target===$('boardModal')) $('boardModal').hidden=true; });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('boardModal').hidden) $('boardModal').hidden=true; });
+$('viewBoardBtn').addEventListener('click',()=>openBoardModal(state.mode,state.savedId));
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-$('clearBoard').addEventListener('click',()=>{ if(confirm('Clear the leaderboard on this device?')){ saveBoard([]); renderBoard(); } });
+$('clearBoard').addEventListener('click',()=>{ if(confirm('Clear every saved score on this device, in every mode?')){ saveBoard([]); renderBoard(); } });
 renderBoard();
 
 /* ---------- Menu ---------- */
@@ -1186,7 +1223,7 @@ state.userTime=60; state.userRounds=5;
 $('startBtn').addEventListener('click',()=>startGame());
 $('againBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); } else if(!mp.role) startGame(); });
 $('menuBtn').addEventListener('click',()=>{ if(mp.role) mpLeave(); renderBoard(); show('menu'); });
-function show(id){ for(const s of ['menu','setup','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
+function show(id){ $('boardModal').hidden=true; for(const s of ['menu','setup','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
 
 /* ---------- Game flow ---------- */
 function ensureGuessMap(){
@@ -1421,7 +1458,7 @@ function countUp(el,from,to,ms,signed){
 
 /* ---------- Final ---------- */
 function showFinal(){
-  show('final'); $('standings').hidden=true; $('saveRow').hidden=false; $('roundChips').hidden=false; $('finalWait').hidden=true; $('againBtn').hidden=false;
+  show('final'); $('standings').hidden=true; $('saveRow').hidden=false; $('roundChips').hidden=false; $('finalWait').hidden=true; $('againBtn').hidden=false; $('viewBoardBtn').hidden=false;
   const max=state.totalRounds*5000;
   if(!finalMap) finalMap=makeMap('finalmap');
   if(finalLayer) finalLayer.remove();
@@ -1452,23 +1489,24 @@ function showFinal(){
   $('roundChips').innerHTML=(state.passport?`<div class="rchip ${state.passport.stamp&&state.passport.stamp.ok?'top':''}">Stamp · ${state.passport.stamp?(state.passport.stamp.ok?'right in round '+state.passport.stamp.round:'wrong ('+esc(state.passport.stamp.country)+')'):'not used'}<b>${state.passport.stamp&&state.passport.stamp.ok?'+'+state.passport.stamp.bonus.toLocaleString():'+0'}</b></div>`:'')+state.results.map(r=>`<div class="rchip ${(r.trio?r.ok:r.pts>=4500)?'top':''}">R${r.round} · ${r.trio?(r.ok?'correct':'wrong'):(r.loc.place?esc(r.loc.place.country):(r.guess?fmtDist(r.km):'no guess'))}<b>${(r.bet&&r.pts>0?'+':'')+r.pts.toLocaleString()}</b></div>`).join('');
 
   // Leaderboard save
-  state.saved=false; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false;
+  state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false;
   try{ $('nameInput').value=localStorage.getItem('pp_name')||''; }catch(e){}
-  const rank=boardFor(state.totalRounds,state.timeLimit).filter(e=>e.score>state.score).length+1;
+  const rank=boardFor(state.totalRounds,state.timeLimit,state.mode).filter(e=>e.score>state.score).length+1;
   $('saveBtn').textContent = rank<=10 ? `Save to leaderboard · #${rank} in ${modeLabel()}` : 'Save to leaderboard';
 }
 $('saveBtn').addEventListener('click',()=>{
   if(state.saved) return;
   const name=($('nameInput').value.trim()||'Anonymous').slice(0,20);
-  const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,score:state.score,mode:modeLabel(),rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()};
+  const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()};
   const b=loadBoard(); b.push(entry); saveBoard(b);
   try{ localStorage.setItem('pp_name',name); }catch(e){}
-  state.saved=true;
-  const same=boardFor(state.totalRounds,state.timeLimit);
+  state.saved=true; state.savedId=entry.id;
+  const same=boardFor(state.totalRounds,state.timeLimit,state.mode);
   const rank=same.filter(e=>e.score>entry.score).length+1;
   $('saveBtn').hidden=true; $('nameInput').hidden=true;
   $('savedMsg').hidden=false; $('savedMsg').textContent=`Saved · #${rank} of ${same.length} in ${modeLabel()}`;
-  renderBoard(entry.id);
+  renderBoard(state.mode==='classic'?entry.id:undefined);
+  openBoardModal(state.mode,entry.id);
 });
 $('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('saveBtn').click(); } });
 
@@ -2310,7 +2348,7 @@ function elimBanner(rev){
   return `<div class="elimrow ${mine?'me':''}">${mine?"You're knocked out":names+(e.ids.length===1?' is':' are')+' knocked out'} · ${far}</div>`;
 }
 function showFinalMP(fin){
-  show('final'); $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true;
+  show('final'); $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true; $('viewBoardBtn').hidden=true;
   $('againBtn').hidden=mp.role!=='host'; $('finalWait').hidden=mp.role==='host'; $('againBtn').textContent='Back to lobby';
   const max=state.totalRounds*5000;
   if(!finalMap) finalMap=makeMap('finalmap');
