@@ -537,6 +537,7 @@
       <div class="filters" style="margin-top:12px">
         <div class="fgroup"><span class="fl">Rounds</span><button class="chip on" data-fr="all">All</button><button class="chip" data-fr="5">5</button><button class="chip" data-fr="10">10</button></div>
         <div class="fgroup"><span class="fl">Time</span><button class="chip on" data-ft="all">All</button><button class="chip" data-ft="10">10s</button><button class="chip" data-ft="30">30s</button><button class="chip" data-ft="60">60s</button><button class="chip" data-ft="0">No limit</button></div>
+        <div class="fgroup"><span class="fl">Board</span><button class="chip on" data-bs="global">Everyone</button><button class="chip" data-bs="device">This device</button></div>
       </div>
       <div id="boardWrap"></div>
       <div class="board-foot"><span id="boardCount"></span><span><button class="link" id="allBoards">Every mode's leaderboard</button><button class="link" id="clearBoard" hidden style="margin-left:14px">Clear Classic scores</button></span></div>
@@ -553,6 +554,7 @@
       <div class="filters" id="bpFilters">
         <div class="fgroup"><span class="fl">Rounds</span><button class="chip on" data-br="all">All</button><button class="chip" data-br="5">5</button><button class="chip" data-br="10">10</button></div>
         <div class="fgroup"><span class="fl">Time</span><button class="chip on" data-bt="all">All</button><button class="chip" data-bt="10">10s</button><button class="chip" data-bt="30">30s</button><button class="chip" data-bt="60">60s</button><button class="chip" data-bt="0">No limit</button></div>
+        <div class="fgroup"><span class="fl">Board</span><button class="chip on" data-bps="global">Everyone</button><button class="chip" data-bps="device">This device</button></div>
       </div>
       <div id="bpWrap"></div>
       <div class="board-foot"><span id="bpCount"></span><button class="link" id="bpClear" hidden>Clear these scores</button></div>
@@ -726,7 +728,7 @@
     <div class="rank" id="standings" hidden></div>
     <div class="save-row" id="saveRow">
       <input id="nameInput" maxlength="20" placeholder="Your name">
-      <button class="btn btn-secondary" id="saveBtn">Save to leaderboard</button>
+      <button class="btn btn-secondary" id="saveBtn">Save to global leaderboard</button>
       <span class="saved" id="savedMsg" hidden></span>
     </div>
     <div class="final-actions">
@@ -1151,15 +1153,76 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-123022';
+const BUILD='20260916-131459';
 const state={ mode:'classic', passport:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
 
-/* ---------- Leaderboard (localStorage) ---------- */
+/* ---------- Global leaderboard ----------
+   No server: each mode's board is one retained MQTT message on the same public brokers multiplayer uses.
+   Every client merges what it receives from all three and republishes the merged list, so the brokers converge.
+   ------------------------------------------------------------------------------------------------------- */
+const LB_ROOT='worlddrop/v1/lb';
+const LB_MAX=50;
+const lb={links:[], boards:{}, seen:{}, queue:[], upAt:0};
+function lbLive(){ return lb.links.some(l=>l.ready); }
+function lbClean(e){
+  if(!e||typeof e!=='object') return null;
+  const name=String(e.name==null?'':e.name).replace(/[<>]/g,'').trim().slice(0,20);
+  const score=Math.round(+e.score), ts=+e.ts, rounds=Math.round(+e.rounds), time=Math.round(+e.time);
+  if(!name||!isFinite(score)||score<0||score>2e6||!isFinite(ts)) return null;
+  return {id:String(e.id||'').slice(0,24)||('x'+ts), name, score,
+          rounds:isFinite(rounds)&&rounds>0?rounds:0, time:isFinite(time)&&time>=0?time:0, ts};
+}
+function lbMerge(modeId,list){
+  if(!MODES[modeId]) return [];
+  const byId=new Map((lb.boards[modeId]||[]).map(e=>[e.id,e]));
+  if(Array.isArray(list)) for(const raw of list.slice(0,200)){ const e=lbClean(raw); if(e&&!byId.has(e.id)) byId.set(e.id,e); }
+  lb.boards[modeId]=[...byId.values()].sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,LB_MAX);
+  return lb.boards[modeId];
+}
+/* Don't publish until this mode's retained board has arrived, or nothing would be left of it. */
+function lbReadyFor(modeId){ return !!lb.seen[modeId] || (lb.upAt&&Date.now()-lb.upAt>3000); }
+function lbPublish(modeId){
+  if(!lbReadyFor(modeId)) return false;
+  const payload=JSON.stringify(lb.boards[modeId]||[]); let sent=false;
+  for(const l of lb.links) if(l.ready){ try{ l.client.publish(LB_ROOT+'/'+modeId,payload,{qos:0,retain:true}); sent=true; }catch(e){} }
+  return sent;
+}
+function lbFlush(){
+  if(!lb.queue.length) return;
+  const rest=[];
+  for(const e of lb.queue){ lbMerge(e.modeId,[e]); if(!lbPublish(e.modeId)) rest.push(e); }
+  lb.queue=rest;
+  if(lb.queue.length) setTimeout(lbFlush,4000);
+}
+function lbSubmit(entry){
+  const e=lbClean(entry); if(!e) return;
+  const modeId=entry.modeId||'classic';
+  lbMerge(modeId,[e]);
+  if(!lbPublish(modeId)){ lb.queue.push({...e,modeId}); setTimeout(lbFlush,3500); }
+  lbPaint();
+}
+function lbPaint(){
+  if(!$('menu').hidden) renderBoard();
+  if(!$('board').hidden) renderBoardPage();
+}
+function lbConnect(){
+  for(const url of BROKERS){
+    let c; try{ c=mqtt.connect(url,{connectTimeout:8000,reconnectPeriod:20000,keepalive:30,clean:true,clientId:'wdlb_'+Math.random().toString(36).slice(2,10)}); }catch(e){ continue; }
+    const link={url,client:c,ready:false}; lb.links.push(link);
+    c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); c.subscribe(LB_ROOT+'/+',{qos:0}); setTimeout(lbFlush,1200); lbPaint(); });
+    c.on('message',(t,payload)=>{ const id=t.split('/').pop(); let list=null; try{ list=JSON.parse(payload.toString()); }catch(e){ return; }
+      lb.seen[id]=true; lbMerge(id,list); lbPaint(); });
+    c.on('error',()=>{}); c.on('close',()=>{ link.ready=false; }); c.on('offline',()=>{ link.ready=false; lbPaint(); });
+  }
+}
+setTimeout(lbConnect,300);
+
+/* ---------- Leaderboard (localStorage mirror) ---------- */
 function loadBoard(){ try{ return JSON.parse(localStorage.getItem('pp_board')||'[]'); }catch(e){ return []; } }
 function saveBoard(b){ try{ localStorage.setItem('pp_board',JSON.stringify(b)); }catch(e){} }
-const filter={rounds:'all',time:'all'};
+const filter={rounds:'all',time:'all',scope:'global'};
 /* Older entries only stored a label like "5 rounds · 60s"; derive the numbers. */
 function entryMode(e){
   if(e.rounds!=null) return {rounds:e.rounds,time:e.time};
@@ -1173,9 +1236,14 @@ function entryModeId(e){
   const hit=Object.keys(MODES).find(id=>MODES[id].name===head);
   return hit||'classic';
 }
-function boardFor(r,t,modeId){
-  return loadBoard().filter(e=>{ const m=entryMode(e);
-    return (!modeId||entryModeId(e)===modeId)&&(r==='all'||m.rounds===+r)&&(t==='all'||m.time===+t);
+/* scope: 'global' reads the shared board, 'device' reads what this browser saved. */
+function entriesFor(modeId,scope){
+  if((scope||'global')==='global') return (lb.boards[modeId]||[]).slice();
+  return loadBoard().filter(e=>!modeId||entryModeId(e)===modeId);
+}
+function boardFor(r,t,modeId,scope){
+  return entriesFor(modeId,scope).filter(e=>{ const m=entryMode(e);
+    return (r==='all'||m.rounds===+r)&&(t==='all'||m.time===+t);
   }).sort((a,c)=>c.score-a.score||a.ts-c.ts);
 }
 function setFilter(key,val){
@@ -1185,47 +1253,61 @@ function setFilter(key,val){
 }
 document.querySelector('.filters').addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b) return;
-  if(b.dataset.fr!=null) setFilter('rounds',b.dataset.fr); else setFilter('time',b.dataset.ft);
+  if(b.dataset.fr!=null) setFilter('rounds',b.dataset.fr);
+  else if(b.dataset.ft!=null) setFilter('time',b.dataset.ft);
+  else { filter.scope=b.dataset.bs; document.querySelectorAll('[data-bs]').forEach(x=>x.classList.toggle('on',x.dataset.bs===filter.scope)); }
   renderBoard();
 });
 function renderBoard(highlightId){
-  const b=boardFor(filter.rounds,filter.time,'classic');
+  const b=boardFor(filter.rounds,filter.time,'classic',filter.scope);
   const wrap=$('boardWrap');
-  const total=loadBoard().length, classic=boardFor('all','all','classic').length;
-  $('clearBoard').hidden=!classic;
-  if(!b.length){ wrap.innerHTML=`<div class="empty">${classic?'No Classic scores with these settings yet.':'No Classic scores yet. Play a game!'}</div>`; $('boardCount').textContent=total?`${total} game${total===1?'':'s'} saved across every mode`:''; return; }
+  const classic=boardFor('all','all','classic',filter.scope).length;
+  const glob=filter.scope==='global';
+  const foot=glob ? `${classic} Classic score${classic===1?'':'s'} worldwide${lbLive()?'':' · offline, showing what\'s cached'}`
+                  : `${classic} Classic game${classic===1?'':'s'} on this device`;
+  $('clearBoard').hidden=glob||!classic;
+  if(!b.length){ wrap.innerHTML=`<div class="empty">${classic?'No Classic scores with these settings.':(glob?'No Classic scores yet. Be the first.':'Nothing saved on this device yet.')}</div>`; $('boardCount').textContent=foot; return; }
   const showMode=filter.rounds==='all'||filter.time==='all';
-  wrap.innerHTML=`<table class="board"><tr><th>#</th><th>Name</th>${showMode?'<th>Mode</th>':'<th>Date</th>'}<th style="text-align:right">Score</th></tr>`+
-    b.slice(0,10).map((e,i)=>`<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="mode">${showMode?esc(e.mode):new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`).join('')+`</table>`;
-  $('boardCount').textContent=`${b.length} Classic game${b.length===1?'':'s'} here · ${total} saved across every mode`;
+  wrap.innerHTML=`<table class="board"><tr><th>#</th><th>Name</th>${showMode?'<th>Setup</th>':'<th>Date</th>'}<th style="text-align:right">Score</th></tr>`+
+    b.slice(0,10).map((e,i)=>{ const em=entryMode(e);
+      const setup=`${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}`;
+      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`;
+  $('boardCount').textContent=foot;
 }
 /* ---------- Leaderboard page: one board per mode ---------- */
-const bp={mode:'classic', rounds:'all', time:'all', highlight:null, from:'menu'};
+const bp={mode:'classic', rounds:'all', time:'all', scope:'global', highlight:null, from:'menu'};
 function openBoardPage(modeId,highlightId,from){
   bp.mode=modeId||'classic'; bp.highlight=highlightId||null; bp.from=from||'menu';
-  bp.rounds='all'; bp.time='all';
+  bp.rounds='all'; bp.time='all'; bp.scope=filter.scope;
   renderBoardPage(); show('board'); $('board').scrollTo(0,0);
 }
 function renderBoardPage(){
-  const m=modeOf(bp.mode), all=boardFor('all','all',bp.mode), rows=boardFor(bp.rounds,bp.time,bp.mode);
+  const m=modeOf(bp.mode), all=boardFor('all','all',bp.mode,bp.scope), rows=boardFor(bp.rounds,bp.time,bp.mode,bp.scope);
+  const glob=bp.scope==='global';
   $('bpHero').style.backgroundImage=`url(images/mode-${bp.mode}.jpg)`;
   $('bpTitle').textContent=`${m.name} leaderboard`;
-  $('bpSub').textContent=all.length?`${all.length} game${all.length===1?'':'s'} saved on this device`:'Nothing saved for this mode yet';
+  $('bpSub').textContent=glob
+    ? (all.length?`${all.length} score${all.length===1?'':'s'} worldwide${lbLive()?'':' · offline, showing what\'s cached'}`:(lbLive()?'No scores yet. Be the first.':'Connecting to the global board…'))
+    : (all.length?`${all.length} game${all.length===1?'':'s'} saved on this device`:'Nothing saved on this device yet');
   document.querySelectorAll('#bpFilters [data-br]').forEach(b=>b.classList.toggle('on',b.dataset.br===bp.rounds));
   document.querySelectorAll('#bpFilters [data-bt]').forEach(b=>b.classList.toggle('on',b.dataset.bt===bp.time));
-  $('bpClear').hidden=!all.length;
+  document.querySelectorAll('#bpFilters [data-bps]').forEach(b=>b.classList.toggle('on',b.dataset.bps===bp.scope));
+  $('bpClear').hidden=glob||!all.length;
   $('bpWrap').innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th>Date</th><th style="text-align:right">Score</th></tr>`+
     rows.slice(0,25).map((e,i)=>{ const em=entryMode(e);
       return `<tr class="${e.id===bp.highlight?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="mode">${new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`
     :`<div class="empty">${all.length?'No scores with these settings.':'Finish a game in this mode and save your score.'}</div>`;
   $('bpCount').textContent=rows.length?`${rows.length} game${rows.length===1?'':'s'} shown`:'';
   $('bpModes').innerHTML=Object.entries(MODES).filter(([id,mm])=>!mm.mp).map(([id,mm])=>{
-    const n=boardFor('all','all',id).length;
+    const n=boardFor('all','all',id,bp.scope).length;
     return `<button class="bpmode ${id===bp.mode?'on':''} ${n?'':'empty'}" data-mode="${id}"><img src="images/mode-${id}.jpg" alt=""><span style="min-width:0"><b>${esc(mm.name)}</b><span>${n?n+' saved':'no scores yet'}</span></span></button>`;
   }).join('');
 }
 $('bpFilters').addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return;
-  if(b.dataset.br!=null) bp.rounds=b.dataset.br; else bp.time=b.dataset.bt; renderBoardPage(); });
+  if(b.dataset.br!=null) bp.rounds=b.dataset.br;
+  else if(b.dataset.bt!=null) bp.time=b.dataset.bt;
+  else bp.scope=b.dataset.bps;
+  renderBoardPage(); });
 $('bpModes').addEventListener('click',e=>{ const b=e.target.closest('.bpmode'); if(!b) return;
   bp.mode=b.dataset.mode; bp.rounds='all'; bp.time='all'; bp.highlight=null; renderBoardPage(); $('board').scrollTo(0,0); });
 $('bpClear').addEventListener('click',()=>{ const m=modeOf(bp.mode);
@@ -1534,7 +1616,7 @@ function showFinal(){
   // Leaderboard save
   state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false;
   try{ $('nameInput').value=localStorage.getItem('pp_name')||''; }catch(e){}
-  const rank=boardFor(state.totalRounds,state.timeLimit,state.mode).filter(e=>e.score>state.score).length+1;
+  const rank=boardFor(state.totalRounds,state.timeLimit,state.mode,filter.scope).filter(e=>e.score>state.score).length+1;
   $('saveBtn').textContent = rank<=10 ? `Save to leaderboard · #${rank} in ${modeLabel()}` : 'Save to leaderboard';
 }
 $('saveBtn').addEventListener('click',()=>{
@@ -1542,12 +1624,13 @@ $('saveBtn').addEventListener('click',()=>{
   const name=($('nameInput').value.trim()||'Anonymous').slice(0,20);
   const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()};
   const b=loadBoard(); b.push(entry); saveBoard(b);
+  lbSubmit(entry);
   try{ localStorage.setItem('pp_name',name); }catch(e){}
   state.saved=true; state.savedId=entry.id;
-  const same=boardFor(state.totalRounds,state.timeLimit,state.mode);
+  const same=boardFor(state.totalRounds,state.timeLimit,state.mode,filter.scope);
   const rank=same.filter(e=>e.score>entry.score).length+1;
   $('saveBtn').hidden=true; $('nameInput').hidden=true;
-  $('savedMsg').hidden=false; $('savedMsg').textContent=`Saved · #${rank} of ${same.length} in ${modeLabel()}`;
+  $('savedMsg').hidden=false; $('savedMsg').textContent=`Saved · #${rank} of ${same.length} in ${modeLabel()}${filter.scope==='global'?(lbLive()?' worldwide':' (offline — it will post when you reconnect)'):''}`;
   renderBoard(state.mode==='classic'?entry.id:undefined);
 });
 $('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('saveBtn').click(); } });
