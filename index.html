@@ -696,7 +696,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260915-223614';
+const BUILD='20260915-224655';
 const state={ timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ return `${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -744,14 +744,22 @@ renderBoard();
 function picker(segId,customId,attr,min,max,onChange){
   const seg=$(segId), row=$(customId), range=row.querySelector('input[type=range]'), num=row.querySelector('input[type=number]');
   const clamp=v=>Math.min(max,Math.max(min,Math.round(+v)||min));
-  const mark=val=>{ const preset=[...seg.children].find(b=>b.dataset[attr]!=='custom'&&+b.dataset[attr]===val); [...seg.children].forEach(b=>b.classList.toggle('on',preset?b===preset:b.dataset[attr]==='custom')); row.hidden=!!preset; if(!preset){ range.value=val; num.value=val; } };
+  let custom=false;   // once the player picks Custom it stays Custom until they click a preset
+  const editing=()=>document.activeElement===num||document.activeElement===range;
+  const mark=val=>{
+    const preset=custom?null:[...seg.children].find(b=>b.dataset[attr]!=='custom'&&+b.dataset[attr]===val);
+    [...seg.children].forEach(b=>b.classList.toggle('on',preset?b===preset:b.dataset[attr]==='custom'));
+    row.hidden=!!preset;
+    if(!preset&&!editing()){ range.value=val; num.value=val; }
+  };
   seg.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
-    if(b.dataset[attr]==='custom'){ [...seg.children].forEach(x=>x.classList.toggle('on',x===b)); row.hidden=false; onChange(clamp(num.value)); }
-    else { mark(+b.dataset[attr]); onChange(+b.dataset[attr]); } });
+    if(b.dataset[attr]==='custom'){ custom=true; mark(clamp(num.value)); onChange(clamp(num.value)); }
+    else { custom=false; mark(+b.dataset[attr]); onChange(+b.dataset[attr]); } });
   range.addEventListener('input',()=>{ num.value=range.value; onChange(clamp(range.value)); });
-  num.addEventListener('input',()=>{ const v=clamp(num.value); range.value=v; onChange(v); });
-  num.addEventListener('blur',()=>{ num.value=clamp(num.value); });
-  return {mark};
+  num.addEventListener('input',()=>{ if(num.value==='') return; const v=clamp(num.value); range.value=v; onChange(v); });   // keeps what you typed; clamps on blur
+  num.addEventListener('blur',()=>{ num.value=clamp(num.value); range.value=num.value; onChange(+num.value); });
+  num.addEventListener('keydown',e=>{ if(e.key==='Enter') num.blur(); });
+  return {mark, isCustom:()=>custom};
 }
 picker('timeSeg','timeCustom','t',1,180,v=>{ state.timeLimit=v; });
 picker('roundSeg','roundCustom','r',1,100,v=>{ state.totalRounds=v; });
