@@ -1,4 +1,4 @@
-# Pinpoint
+# WorldDrop
 
 A single-file Street View geography game, solo or with friends. You get dropped somewhere on Earth, drop a pin where you think you are, and score up to 5,000 points per round on GeoGuessr's distance curve.
 
@@ -10,7 +10,7 @@ Offline copy: double-click `run.command`. It serves the game locally, opens a te
 
 ## Game modes
 
-Picture tiles on the solo setup screen and in the lobby. Classic is selected by default; click a tile to select it, then press Play or Start.
+Picture tiles on the solo setup screen and in the lobby (multiplayer-only modes appear only in the lobby). Classic is selected by default; click a tile to select it, then press Play or Start.
 
 - **Grayscale**: no color.
 - **Blink**: a fixed 120° still is revealed through an eyelid for about a second. 15 seconds to guess.
@@ -21,14 +21,17 @@ Picture tiles on the solo setup screen and in the lobby. Classic is selected by 
 - **'Murica**: the United States only.
 - **Concrete Jungle**: within about three quarters of a mile of ~45 of the densest city cores.
 - **M+**: within about three miles of the center of ~120 cities over a million people.
-- **Landmarks**: dropped within a couple hundred meters of one of ~55 famous places, facing it.
+- **Landmarks**: ~95 world-famous places. Each has a viewpoint with confirmed coverage; the pick stands within about 100 m of it and faces the landmark.
 - **Time Machine**: only captures from before 2010, pulled from each spot's imagery history.
-- **Snow Globe**: only captures from winter months in snowy regions.
+- **Snow Globe**: winter captures (Dec–Feb north, Jun–Aug south) in cold regions, and each candidate panorama is checked for actual snow: a low-res tile is sampled on the off-road sides for bright, neutral-to-cool pixels, and only white scenes pass.
 - **Countdown**: 30 seconds, and points are worth less the longer you wait (full value at the start, a quarter at zero).
 - **Altitude**: high regions only, each pick verified above 2,000 m via open-elevation.
 - **All In**: you start with 1,000 chips and must bet every round (1 to everything). Payout is stake × multiplier from the base score: 4,900+ pays 5×, 4,500+ 3×, 3,750+ 2×, 2,500+ returns the stake, 1,250+ returns half, below that loses it. Bankroll is the score; hit zero and the game ends.
 - **Odd One Out**: three still views and a map with two pins. Pick the view that has no pin.
 - **Two Truths and a Lie**: two still views and a map with three pins. Pick the pin that is the lie.
+- **Country**: no pin. The map shows country borders (Natural Earth 50m via world-atlas); hover highlights, click selects. Right country is 5,000, anything else 0. The true country is found by point-in-polygon against the same data.
+- **Passport**: every round is in one country, which is only revealed at the end (round result maps use unlabeled imagery and the country name is hidden). Once per game you can stamp a country name; a correct stamp is worth 1,000 × rounds remaining (max 5,000), a wrong one scores nothing and uses up the try.
+- **Peek** (multiplayer only): everyone's pins are visible to everyone while guessing, live.
 
 All location picking asks Google for its own imagery only (`StreetViewSource.GOOGLE`), which is what makes country selection even; before that, user-uploaded photospheres were crowding out official coverage in Europe and the US.
 
