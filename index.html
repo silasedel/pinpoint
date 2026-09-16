@@ -324,14 +324,17 @@
   .setup-wrap{max-width:960px;margin:0 auto}
   .brand-row .lockup{color:var(--text)}
   #game.gray .pano,#game.gray #pix{filter:grayscale(1)}
-  #bettray{position:absolute;left:16px;bottom:72px;z-index:7;width:400px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px}
+  #bettray{position:absolute;left:16px;bottom:72px;z-index:7;width:480px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 18px 16px;opacity:.6;transition:opacity .18s}
+  #bettray:hover,#bettray:focus-within{opacity:1}
+  #bettray .legend{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5}
+  #bettray .legend b{color:var(--text)}
   #bettray .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
   #bettray .bank{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-  #bettray .bank b{display:block;font-size:20px;letter-spacing:0;color:var(--text);text-transform:none;font-variant-numeric:tabular-nums}
+  #bettray .bank b{display:block;font-size:26px;letter-spacing:0;color:var(--text);text-transform:none;font-variant-numeric:tabular-nums}
   #bettray .pot{text-align:right}
   #bettray .pot b{color:var(--green-dark)}
   .chips{display:flex;gap:8px;margin-top:10px;align-items:center}
-  .chip-btn{width:46px;height:46px;border-radius:50%;border:4px dashed rgba(255,255,255,.85);box-shadow:0 2px 4px rgba(0,0,0,.35),inset 0 0 0 3px rgba(0,0,0,.15);color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center;text-shadow:0 1px 2px rgba(0,0,0,.5);transition:transform .1s}
+  .chip-btn{width:50px;height:50px;border-radius:50%;border:4px dashed rgba(255,255,255,.85);box-shadow:0 2px 4px rgba(0,0,0,.35),inset 0 0 0 3px rgba(0,0,0,.15);color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center;text-shadow:0 1px 2px rgba(0,0,0,.5);transition:transform .1s}
   .chip-btn:hover{transform:translateY(-3px)} .chip-btn:active{transform:scale(.94)}
   .chip-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
   .chip-btn.c1{background:#f1f3f5;color:#333;text-shadow:none;border-color:#c8ccd0} .chip-btn.c5{background:#d7263d} .chip-btn.c25{background:#1f9d55} .chip-btn.c100{background:#222} .chip-btn.c500{background:#6f42c1}
@@ -340,20 +343,20 @@
   .chips .sm button.allin{background:#fff4d6;color:#7a5200}
   .potchips{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;min-height:14px}
   .potchips i{width:12px;height:12px;border-radius:50%;border:2px dashed rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.4)}
-  #trio{position:absolute;inset:72px 0 0 0;z-index:4;background:#000;display:flex;gap:4px}
-  #trio .col{position:relative;flex:1;overflow:hidden;cursor:pointer;background:#111}
+  #trio{position:absolute;inset:72px 34% 0 0;z-index:4;background:#000;display:flex;flex-direction:column;gap:4px}
+  #trio .col{position:relative;flex:1;min-height:0;overflow:hidden;cursor:pointer;background:#111}
   #trio .col canvas{width:100%;height:100%;object-fit:cover;display:block;transition:filter .2s,opacity .2s}
-  #trio .col .lbl{position:absolute;left:50%;top:14px;transform:translateX(-50%);width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-weight:800;font-size:20px;display:grid;place-items:center;border:2px solid rgba(255,255,255,.8)}
+  #trio .col .lbl{position:absolute;left:14px;top:14px;width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-weight:800;font-size:20px;display:grid;place-items:center;border:2px solid rgba(255,255,255,.8)}
   #trio .col .dev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;opacity:.8}
   #trio.pickable .col:hover canvas{filter:brightness(1.08)}
   #trio .col.on{outline:5px solid var(--green);outline-offset:-5px}
   #trio .col.on .lbl{background:var(--green);border-color:#fff}
-  #trio .col.on::after{content:'Your pick';position:absolute;left:50%;bottom:16px;transform:translateX(-50%);padding:6px 12px;border-radius:99px;background:var(--green);color:#fff;font-weight:800;font-size:13px}
-  #tmap{position:absolute;left:0;right:0;bottom:0;z-index:8;height:64px;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(0,0,0,.35);transition:height .25s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
-  #tmap.open{height:72vh}
-  #tmap .handle{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-weight:800;gap:12px;flex:none}
+  #trio .col.on::after{content:'Your pick';position:absolute;right:14px;bottom:14px;padding:6px 12px;border-radius:99px;background:var(--green);color:#fff;font-weight:800;font-size:13px}
+  #tmap{position:absolute;top:72px;right:0;bottom:0;width:34%;min-width:300px;z-index:8;background:var(--card);border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.35);display:flex;flex-direction:column}
+  #tmap .handle{order:2;display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:12px 16px 14px;font-weight:800;flex:none;border-top:1px solid var(--line)}
   #tmap .handle .hint{color:var(--muted);font-weight:600;font-size:13px}
-  #tmap .handle .btn{padding:10px 18px;font-size:14px}
+  #tmap .handle .btn{padding:14px 18px;font-size:15px;width:100%}
+  @media (max-width:820px){ #trio{inset:72px 0 44% 0} #tmap{top:auto;height:44%;width:100%;min-width:0;border-left:0;border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(0,0,0,.35)} }
   #triomap{flex:1;min-height:0;background:#bfd9e8}
   .marker-num{width:34px;height:34px;border-radius:50%;background:#152219;color:#fff;font-weight:800;font-size:15px;display:grid;place-items:center;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.4);cursor:pointer;transition:transform .1s}
   .marker-num:hover{transform:scale(1.1)}
@@ -587,9 +590,10 @@
     <div class="row"><div class="bank">Bankroll<b id="bankLbl">1,000</b></div><div class="bank pot">Your bet<b id="betLbl">0</b></div></div>
     <div class="chips">
       <button class="chip-btn c1" data-v="1">1</button><button class="chip-btn c5" data-v="5">5</button><button class="chip-btn c25" data-v="25">25</button><button class="chip-btn c100" data-v="100">100</button><button class="chip-btn c500" data-v="500">500</button>
-      <span class="sm"><button id="betClear">Clear</button><button class="allin" id="betAll">All in</button></span>
+      <span class="sm"><button id="betClear">Min</button><button id="betHalf">Half</button><button class="allin" id="betAll">All in</button></span>
     </div>
     <div class="potchips" id="potChips"></div>
+    <div class="legend" id="betLegend"></div>
   </div>
   <div id="passport" hidden>
     <div class="ptitle">Passport <span>Every round is in the same country. Name it early for a bigger bonus. One try.</span></div>
@@ -751,7 +755,7 @@ const LANDMARKS=[
  ['Petronas Towers',3.1579,101.7116,3.1555,101.7130],['Marina Bay Sands',1.2834,103.8607,1.2868,103.8545],['Merlion',1.2868,103.8545,1.2860,103.8540],['Tokyo Tower',35.6586,139.7454,35.6600,139.7440],['Tokyo Skytree',35.7101,139.8107,35.7080,139.8100],['Shibuya Crossing',35.6595,139.7005,35.6595,139.7010],['Fushimi Inari',34.9671,135.7727,34.9675,135.7730],['Osaka Castle',34.6873,135.5262,34.6860,135.5250],['Mount Fuji',35.3606,138.7274,35.5019,138.8010],
  ['Gyeongbokgung Palace',37.5796,126.9770,37.5758,126.9769],['Angkor Wat',13.4125,103.8670,13.4120,103.8625],['Wat Arun',13.7437,100.4888,13.7435,100.4900],['Grand Palace, Bangkok',13.7500,100.4913,13.7520,100.4910],['Borobudur',-7.6079,110.2038,-7.6085,110.2050],
  ['Sydney Opera House',-33.8568,151.2153,-33.8590,151.2135],['Sydney Harbour Bridge',-33.8523,151.2108,-33.8560,151.2090],['Uluru',-25.3444,131.0369,-25.35145,131.0396],['Twelve Apostles',-38.6662,143.1043,-38.6650,143.1050],['Auckland Sky Tower',-36.8484,174.7622,-36.8470,174.7630],
- ['Golden Gate Bridge',37.8199,-122.4783,37.8075,-122.4750],['Alcatraz',37.8267,-122.4230,37.8085,-122.4100],['Hollywood Sign',34.1341,-118.3215,34.1250,-118.3290],['TCL Chinese Theatre',34.1022,-118.3410,34.1020,-118.3400],['Las Vegas Strip',36.1126,-115.1767,36.1130,-115.1720],['Space Needle',47.6205,-122.3493,47.6195,-122.3480],['Hoover Dam',36.0161,-114.7377,36.0155,-114.7395],['Grand Canyon',36.1000,-112.1000,36.0619,-112.1077],['Mount Rushmore',43.8791,-103.4591,43.8778,-103.4550],
+ ['Golden Gate Bridge',37.8199,-122.4783,37.8075,-122.4750],['Alcatraz',37.8267,-122.4230,37.8085,-122.4100],['Hollywood Sign',34.1341,-118.3215,34.1250,-118.3290],['TCL Chinese Theatre',34.1022,-118.3410,34.1020,-118.3400],['Las Vegas Strip',36.1126,-115.1767,36.11723,-115.17307],['Space Needle',47.6205,-122.3493,47.6195,-122.3480],['Hoover Dam',36.0161,-114.7377,36.0155,-114.7395],['Grand Canyon',36.1000,-112.1000,36.0619,-112.1077],['Mount Rushmore',43.8791,-103.4591,43.8778,-103.4550],
  ['White House',38.8977,-77.0365,38.8990,-77.0365],['US Capitol',38.8899,-77.0091,38.8899,-77.0150],['Lincoln Memorial',38.8893,-77.0502,38.8893,-77.0480],['Washington Monument',38.8895,-77.0353,38.8890,-77.0310],['Statue of Liberty',40.6892,-74.0445,40.6905,-74.0450],['Times Square',40.7580,-73.9855,40.7570,-73.9860],['Brooklyn Bridge',40.7061,-73.9969,40.7075,-73.9990],['Empire State Building',40.7484,-73.9857,40.7470,-73.9850],['Cloud Gate (The Bean)',41.8827,-87.6233,41.8825,-87.6240],['Gateway Arch',38.6247,-90.1848,38.6250,-90.1885],
  ['Niagara Falls',43.0780,-79.0750,43.0800,-79.0770],['CN Tower',43.6426,-79.3871,43.6410,-79.3890],['Chichén Itzá',20.6843,-88.5678,20.6830,-88.5695],['Christ the Redeemer',-22.9519,-43.2105,-22.9522,-43.2110],['Machu Picchu',-13.1631,-72.5450,-13.1640,-72.5440],['Iguazu Falls',-25.6953,-54.4367,-25.6920,-54.4375],['Obelisco de Buenos Aires',-34.6037,-58.3816,-34.6045,-58.3816],
  ['Table Mountain',-33.9625,18.4098,-33.9200,18.4050],
@@ -779,7 +783,7 @@ const MODES={
   snow:     {name:'Snow Globe', desc:'Only winter imagery.', filter:n=>SNOW_NORTH.includes(n)||SNOW_SOUTH.includes(n), snow:true},
   countdown:{name:'Countdown', desc:'30 seconds. Every second costs you points.', time:30, countdown:true},
   altitude: {name:'Altitude', desc:'Only places above 2,000 meters.', places:HIGH, radius:15000, alt:2000},
-  allin:    {name:'All In', desc:'Bet chips on every guess. Close pays 5×, far loses the stake.', bet:true},
+  allin:    {name:'All In', desc:'Bet chips every round. The closer you are, the bigger the multiplier.', bet:true},
   oddone:   {name:'Odd One Out', desc:'Three views, two pins. Which view has no pin?', trio:3, pins:2},
   twotruths:{name:'Two Truths and a Lie', desc:'Two views, three pins. Which pin is the lie?', trio:2, pins:3},
   country:  {name:'Country', desc:'No pin. Just click the right country.', country:true},
@@ -972,7 +976,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-012904';
+const BUILD='20260916-013558';
 const state={ mode:'classic', passport:null, bank:1000, bet:0, pick:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} rounds · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1093,14 +1097,14 @@ async function waitForLoc(i){
 }
 
 async function nextRound(){
-  state.round++; state.guess=null; state.locked=false; state.fitDone=false; state.pick=null; state.bet=0; if(modeOf(state.mode).bet) renderBet();
+  state.round++; state.guess=null; state.locked=false; state.fitDone=false; state.pick=null; state.bet=0; if(modeOf(state.mode).bet){ state.bet=defaultBet(); renderBet(); }
   show('game');
   $('roundLbl').textContent=`${state.round} / ${state.totalRounds}`;
   const last=state.results[state.results.length-1];
   if(last){ countUp($('scoreLbl'),state.score-last.pts,state.score,900); $('scorePill').classList.remove('pop'); void $('scorePill').offsetWidth; $('scorePill').classList.add('pop');
     if(last.pts>0){ const f=document.createElement('span'); f.className='floater'; f.textContent='+'+last.pts.toLocaleString(); $('scorePill').appendChild(f); setTimeout(()=>f.remove(),1400); } }
   else $('scoreLbl').textContent='0';
-  $('guessBtn').disabled=true; $('guessBtn').textContent=modeOf(state.mode).bet?'Place your pin, then bet':modeOf(state.mode).country?'Click a country':'Place your pin';
+  $('guessBtn').disabled=true; $('guessBtn').textContent=modeOf(state.mode).country?'Click a country':'Place your pin';
   if(modeOf(state.mode).country){ if(countryLayer&&!countryLayerOn){ countryLayer.addTo(guessMap); countryLayerOn=true; } if(countryLayer) countryLayer.resetStyle(); $('mappanel').classList.add('cty'); } else { if(countryLayerOn){ countryLayer.remove(); countryLayerOn=false; } $('mappanel').classList.remove('cty'); }
   if(state.passport) renderPassport();
   $('loading').classList.remove('fade'); $('loadingText').textContent='Finding a location…';
@@ -1163,7 +1167,9 @@ function startTimer(){
 }
 function stopTimer(){ if(state.timer){ clearInterval(state.timer); state.timer=null; } if(!state.timeLimit){ $('timeFill').style.width='100%'; $('timeFill').className=''; } }
 
-function betMult(base){ return base>=4900?5:base>=4500?3:base>=3750?2:base>=2500?1:base>=1250?0.5:0; }
+/* Payout multiplier from the base score: 5× for a bullseye, sliding down with distance. Break-even is about 1,200 km; beyond that you lose part or all of the stake. */
+function betMult(base){ return Math.round(5*Math.pow(Math.max(0,Math.min(5000,base))/5000,2)*100)/100; }
+function defaultBet(){ return Math.max(1,Math.min(state.bank,Math.round(state.bank*0.1))); }
 function submitGuess(auto=false){
   if(state.locked) return;
   const m=modeOf(state.mode);
@@ -1221,7 +1227,7 @@ function showResult(r){
   const busted=r.bet&&state.bank<=0;
   $('nextBtn').textContent = (state.round>=state.totalRounds||busted) ? 'See results' : 'Next round';
   $('ptsBar').style.width='0%';
-  if(r.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult} = ${r.bet.payout.toLocaleString()} · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,r.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.bet.mult/5*100)+'%'; })); }
+  if(r.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)} = ${r.bet.payout.toLocaleString()} back · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,r.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.bet.mult/5*100)+'%'; })); }
   else { $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; countUp($('ptsNum'),0,r.pts,1000); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.pts/50)+'%'; })); }
   renderVerdict(r);
   // Country info may still be loading; fill in when it arrives.
@@ -1449,10 +1455,13 @@ function renderBet(){
   const cls={1:'c1',5:'c5',25:'c25',100:'c100',500:'c500'}; let rest=state.bet; const parts=[]; for(const v of [500,100,25,5,1]){ while(rest>=v&&parts.length<60){ parts.push(cls[v]); rest-=v; } }
   $('potChips').innerHTML=parts.map(c=>`<i class="chip-btn ${c}" style="width:12px;height:12px;border-width:2px;box-shadow:0 1px 2px rgba(0,0,0,.4)"></i>`).join('');
   const gb=$('guessBtn');
-  if(!state.locked){ if(state.guess&&state.bet>=1){ gb.disabled=false; gb.textContent=`Bet ${state.bet.toLocaleString()} · lock in`; } else { gb.disabled=true; gb.textContent=state.guess?'Add chips to bet':(state.bet?'Place your pin':'Place your pin, then bet'); } }
+  if(!state.locked){ if(state.guess&&state.bet>=1){ gb.disabled=false; gb.textContent=`Bet ${state.bet.toLocaleString()} · lock in`; } else { gb.disabled=true; gb.textContent=state.guess?'Add chips to bet':'Place your pin'; } }
+  const be=Math.round(1492.7*Math.log(Math.sqrt(5)));   // distance where the multiplier is exactly 1×
+  $('betLegend').innerHTML=`Pays your bet × a multiplier that slides with distance: bullseye <b>5×</b> · ${fmtDist(100)} <b>${betMult(scoreFor(100)).toFixed(1)}×</b> · ${fmtDist(500)} <b>${betMult(scoreFor(500)).toFixed(1)}×</b> · ${fmtDist(1000)} <b>${betMult(scoreFor(1000)).toFixed(1)}×</b> · ${fmtDist(2000)} <b>${betMult(scoreFor(2000)).toFixed(1)}×</b>. You come out ahead inside ${fmtDist(be)}.`;
 }
 document.querySelector('#bettray .chips').addEventListener('click',e=>{ const b=e.target.closest('.chip-btn'); if(!b||state.locked) return; const v=+b.dataset.v; if(state.bet+v<=state.bank){ state.bet+=v; renderBet(); } });
-$('betClear').addEventListener('click',()=>{ if(state.locked) return; state.bet=0; renderBet(); });
+$('betClear').addEventListener('click',()=>{ if(state.locked) return; state.bet=Math.min(1,state.bank); renderBet(); });
+$('betHalf').addEventListener('click',()=>{ if(state.locked) return; state.bet=Math.max(1,Math.round(state.bank/2)); renderBet(); });
 $('betAll').addEventListener('click',()=>{ if(state.locked) return; state.bet=state.bank; renderBet(); });
 
 /* ---------- Trio modes: Odd One Out / Two Truths and a Lie ---------- */
@@ -1471,16 +1480,18 @@ async function startTrio(loc){
   const views=m.trio===3?[0,1,2]:[0,1,2].filter(i=>i!==loc.lie);          // Odd One Out shows all three; Two Truths hides the lie's view
   const pins =m.pins===3?[0,1,2]:[0,1,2].filter(i=>i!==loc.lie);          // Two Truths pins all three; Odd One Out pins only the truths
   const trio=$('trio'); trio.hidden=false; trio.classList.toggle('pickable',m.trio===3);
-  trio.innerHTML=views.map((i,k)=>`<div class="col" data-i="${i}"><canvas width="960" height="720"></canvas><div class="lbl">${String.fromCharCode(65+k)}</div><div class="dev">Loading…</div></div>`).join('');
+  trio.innerHTML=views.map((i,k)=>`<div class="col" data-i="${i}"><canvas></canvas><div class="lbl">${String.fromCharCode(65+k)}</div><div class="dev">Loading…</div></div>`).join('');
   $('tmap').hidden=false; $('tmap').classList.remove('open');
-  $('tmapTitle').textContent=m.trio===3?'Map · 2 pins':'Map · 3 pins'; $('tmapHint').textContent=m.trio===3?'Pick the view that has no pin':'Pick the pin that is the lie';
+  $('tmapTitle').textContent=m.trio===3?'Which view has no pin?':'Which pin is the lie?'; $('tmapHint').textContent=m.trio===3?'Pick the view that has no pin':'Pick the pin that is the lie';
   $('trioLock').disabled=true; $('trioLock').textContent='Pick one first';
   if(!trioMap){ trioMap=makeMap('triomap'); }
   if(trioLayer) trioLayer.remove(); trioLayer=L.layerGroup().addTo(trioMap);
   const pts=[];
   pins.forEach((i,k)=>{ const p=set[i]; pts.push([p.lat,p.lng]); const mk=L.marker([p.lat,p.lng],{icon:numIcon(k+1),zIndexOffset:1000}).addTo(trioLayer); mk._trioIdx=i; if(m.pins===3) mk.on('click',()=>trioPick(i)); });
   setTimeout(()=>{ trioMap.invalidateSize(); trioMap.fitBounds(L.latLngBounds(pts),{padding:[60,60],maxZoom:6,animate:false}); },100);
-  await Promise.all(views.map(async i=>{ const col=trio.querySelector(`.col[data-i="${i}"]`); try{ await renderStillTo(col.querySelector('canvas'),set[i].pano,set[i].heading,90,3); }catch(e){} if(state.round===round){ const dv=col.querySelector('.dev'); if(dv) dv.remove(); } }));
+  // Wide panoramic strips: a cylindrical crop of the panorama, 150° across, as tall as the strip's shape allows.
+  await Promise.all(views.map(async i=>{ const col=trio.querySelector(`.col[data-i="${i}"]`); const c=col.querySelector('canvas'); const cw=Math.max(320,col.clientWidth), ch=Math.max(120,col.clientHeight); c.width=Math.round(Math.min(1600,cw*1.4)); c.height=Math.round(c.width*ch/cw); const hfov=150, vfov=Math.min(95,hfov*ch/cw);
+    try{ await renderBandTo(c,set[i].pano,set[i].heading,hfov,vfov,3,4); }catch(e){} if(state.round===round){ const dv=col.querySelector('.dev'); if(dv) dv.remove(); } }));
 }
 function trioPick(i){
   if(state.locked||!modeOf(state.mode).trio) return; state.pick=i;
@@ -1490,7 +1501,15 @@ function trioPick(i){
 }
 $('trio').addEventListener('click',e=>{ const col=e.target.closest('.col'); if(col&&modeOf(state.mode).trio===3) trioPick(+col.dataset.i); });
 $('trioLock').addEventListener('click',()=>submitGuess(false));
-(function(){ const el=$('tmap'); const open=()=>{ el.classList.add('open'); setTimeout(()=>trioMap&&trioMap.invalidateSize(),260); }; el.addEventListener('mouseenter',open); el.addEventListener('mouseleave',()=>{ el.classList.remove('open'); setTimeout(()=>trioMap&&trioMap.invalidateSize(),260); }); el.addEventListener('touchstart',open,{passive:true}); })();
+window.addEventListener('resize',()=>{ trioMap&&trioMap.invalidateSize(); });
+/* Cylindrical crop of the panorama: hfov° across and vfov° tall around pitchC, no rectilinear stretching, so very wide views stay natural. */
+async function renderBandTo(c,pano,heading,hfov,vfov,zoom,pitchC){
+  const meta=await panoMeta(pano); const band=await loadBand(pano,zoom||3,meta,Math.min(88,vfov/2+Math.abs(pitchC||0)+2));
+  const w=c.width,h=c.height; const ctx=c.getContext('2d'); const o=ctx.createImageData(w,h); const d=o.data; const {img,W:bw0,H:bh0,yOff}=band; const src=img.data, bw=img.width, bh=img.height;
+  for(let py=0;py<h;py++){ const lat=((pitchC||0)+(0.5-(py+0.5)/h)*vfov)*Math.PI/180; const sy=Math.min(bh-1,Math.max(0,Math.floor((0.5-lat/Math.PI)*bh0-yOff)));
+    for(let px=0;px<w;px++){ const lon=(heading-meta.center+((px+0.5)/w-0.5)*hfov)*Math.PI/180; let u=lon/(2*Math.PI)+0.5; u-=Math.floor(u); const sx=Math.min(bw-1,Math.floor(u*bw0)); const i=(sy*bw+sx)*4, k=(py*w+px)*4; d[k]=src[i]; d[k+1]=src[i+1]; d[k+2]=src[i+2]; d[k+3]=255; } }
+  ctx.putImageData(o,0,0);
+}
 function trioResultMap(loc,lie){
   if(!resultMap) resultMap=makeMap('resultmap');
   if(resultLayer) resultLayer.remove(); resultLayer=L.layerGroup().addTo(resultMap);
@@ -2005,7 +2024,7 @@ function showResultMP(rev){
   $('distTxt').innerHTML = mine.guess ? `Your guess was <b>${fmtDist(mine.km)}</b> away.` : `You didn't place a pin.`;
   $('nextBtn').textContent = rev.round>=state.totalRounds ? 'See results' : 'Next round';
   $('ptsBar').style.width='0%';
-  if(mine.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${mine.bet.stake.toLocaleString()} × ${mine.bet.mult} = ${mine.bet.payout.toLocaleString()} · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,mine.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.bet.mult/5*100)+'%'; })); }
+  if(mine.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${mine.bet.stake.toLocaleString()} × ${mine.bet.mult.toFixed(2)} = ${mine.bet.payout.toLocaleString()} back · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,mine.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.bet.mult/5*100)+'%'; })); }
   else { $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; countUp($('ptsNum'),0,mine.pts,1000); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.pts/50)+'%'; })); }
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(mine.pts>=4000) pe.classList.add('great');
   setTimeout(()=>{ pe.classList.add('pop'); if(mine.pts>=4500) confetti(); },1000);
@@ -2017,7 +2036,7 @@ function showResultMP(rev){
   $('leaderLine').hidden=false;
   $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="background:${COLORS[lead.color??0][0]}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult}`:''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
+  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
 }
 function showFinalMP(fin){
   show('final'); $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true;

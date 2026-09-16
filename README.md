@@ -26,9 +26,9 @@ Picture tiles on the solo setup screen and in the lobby (multiplayer-only modes 
 - **Snow Globe**: winter captures (Dec–Feb north, Jun–Aug south) in cold regions, and each candidate panorama is checked for actual snow: a low-res tile is sampled on the off-road sides for bright, neutral-to-cool pixels, and only white scenes pass.
 - **Countdown**: 30 seconds, and points are worth less the longer you wait (full value at the start, a quarter at zero).
 - **Altitude**: high regions only, each pick verified above 2,000 m via open-elevation.
-- **All In**: you start with 1,000 chips and must bet every round (1 to everything). Payout is stake × multiplier from the base score: 4,900+ pays 5×, 4,500+ 3×, 3,750+ 2×, 2,500+ returns the stake, 1,250+ returns half, below that loses it. Bankroll is the score; hit zero and the game ends.
-- **Odd One Out**: three still views and a map with two pins. Pick the view that has no pin.
-- **Two Truths and a Lie**: two still views and a map with three pins. Pick the pin that is the lie.
+- **All In**: you start with 1,000 chips and bet every round (default stake is 10% of your bankroll; chips, Min, Half and All in adjust it). Payout is stake × a multiplier that slides with distance: 5 × (base score / 5000)², so a bullseye pays 5×, 100 km 4.4×, 500 km 2.6×, 1,000 km 1.3×, 2,000 km 0.3×. Break-even is about 1,200 km. Bankroll is the score; hit zero and the game ends.
+- **Odd One Out**: three wide panoramic strips (150° cylindrical crops) stacked on the left, a map with two pins on the right. Pick the view that has no pin.
+- **Two Truths and a Lie**: two wide strips and a map with three pins. Pick the pin that is the lie. The map and the Lock in button stay put; nothing pops up on hover.
 - **Country**: no pin. The map shows country borders (Natural Earth 50m via world-atlas); hover highlights, click selects. Right country is 5,000, anything else 0. The true country is found by point-in-polygon against the same data.
 - **Passport**: every round is in one country, which is only revealed at the end (round result maps use unlabeled imagery and the country name is hidden). Once per game you can stamp a country name; a correct stamp is worth 1,000 × rounds remaining (max 5,000), a wrong one scores nothing and uses up the try.
 - **Peek** (multiplayer only): everyone's pins are visible to everyone while guessing, live.
