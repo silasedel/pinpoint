@@ -54,6 +54,8 @@ Running from the launcher instead? It prints a temporary public link (via `cloud
 
 Game traffic never depends on a direct connection, so joining works from any network. Voice does use direct links, so on unusually strict networks two specific people may not hear each other.
 
+Leaving the name box empty is fine: A browser that never types a name gets its own handle, `Player 100` to `Player 1000`, generated once and kept, and the name box shows it as the placeholder so you know what you'll be called.
+
 ## Version
 
 The footer on the home page shows the version as `v<major>.<minor>`. Major goes up for a new capability, a batch of modes, or a layout, branding or architecture rework; minor goes up for a fix or a polish pass. It's bumped with every change, the build stamp is in the tooltip, and the same footer holds the credits and the small print.

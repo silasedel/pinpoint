@@ -1435,7 +1435,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-140541';
+const BUILD='20260917-162516';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1551,7 +1551,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
 /* ---------- Version ----------
    Counted from the project's own history: MAJOR is a release that added a capability, a batch of modes,
    or reworked the layout, the branding or the architecture. MINOR is everything else — fixes and polish. */
-const VERSION={major:24,minor:3};
+const VERSION={major:24,minor:4};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -1878,12 +1878,7 @@ function nagToSave(action){
   const n=$('nameInput'); if(!n.value.trim()) n.focus();
   nag.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
-$('nagSave').addEventListener('click',()=>{
-  const n=$('nameInput');
-  if(!n.value.trim()){ $('nagTitle').textContent='Type a name first'; $('nagSub').textContent='It goes on the board next to your score.';
-    n.classList.remove('bad'); void n.offsetWidth; n.classList.add('bad'); n.focus(); return; }
-  const go=nagAction; hideNag(); $('saveBtn').click(); if(go) go();
-});
+$('nagSave').addEventListener('click',()=>{ const go=nagAction; hideNag(); $('saveBtn').click(); if(go) go(); });
 $('nagSkip').addEventListener('click',()=>{ const go=nagAction; hideNag(); if(go) go(); });
 function finalAgain(){
   if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); return; }
@@ -2168,7 +2163,7 @@ function showFinal(){
   $('againBtn').textContent=state.daily?'Back to menu':'Play again';
   if(state.daily){   // a daily saves itself under the name you already use
     $('saveRow').hidden=true;
-    if(!state.saved){ const e=recordScore(myName()||mp.me.name||'Anonymous'); state.saved=true; state.savedId=e&&e.id; }
+    if(!state.saved){ const e=recordScore(myName()||mp.me.name||anonName()); state.saved=true; state.savedId=e&&e.id; }
   }
   const max=state.totalRounds*5000;
   if(!finalMap) finalMap=makeMap('finalmap');
@@ -2202,6 +2197,7 @@ function showFinal(){
   // Leaderboard save
   state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false; hideNag();
   try{ $('nameInput').value=localStorage.getItem('pp_name')||''; }catch(e){}
+  $('nameInput').placeholder=anonName();
   const rank=boardFor(state.totalRounds,state.timeLimit,state.mode).filter(e=>e.score>state.score).length+1;
   $('saveBtn').textContent = rank<=10 ? `Save to leaderboard · #${rank} in ${modeLabel()}` : 'Save to leaderboard';
 }
@@ -2210,12 +2206,12 @@ function recordScore(name){
   if(state.daily){   // the daily has its own board and doesn't touch the all-time ones
     const done=dailyDone();
     if(done&&done.date===state.daily.date) return {id:done.id||''};
-    const e=dlSubmit({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||'Anonymous').slice(0,20),
+    const e=dlSubmit({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
       score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now()});
     if(e) try{ localStorage.setItem('pp_daily',JSON.stringify({date:state.daily.date,score:state.score,id:e.id})); }catch(err){}
     return e||{id:''};
   }
-  const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||'Anonymous').slice(0,20),
+  const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
     score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()};
   const b=loadBoard(); b.push(entry); saveBoard(b);
   lbSubmit(entry);
@@ -2225,7 +2221,7 @@ function recordScore(name){
 }
 $('saveBtn').addEventListener('click',()=>{
   if(state.saved) return;
-  const name=($('nameInput').value.trim()||'Anonymous').slice(0,20);
+  const name=($('nameInput').value.trim()||anonName()).slice(0,20);
   const entry=recordScore(name);
   try{ localStorage.setItem('pp_name',name); }catch(e){}
   state.saved=true; state.savedId=entry.id;
@@ -2758,6 +2754,13 @@ const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ';
 function mkCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.random()*CODE_CHARS.length|0]; return c; }
 function mkId(){ return Math.random().toString(36).slice(2,10); }
 function myName(){ try{ return localStorage.getItem('pp_name')||''; }catch(e){ return ''; } }
+/* Nobody lands on the board as "Anonymous": a browser that never types a name gets its own player number and keeps it. */
+function anonName(){
+  let n=null; try{ n=localStorage.getItem('pp_anon'); }catch(e){}
+  if(!n||!/^Player \d{3,4}$/.test(n)){ n='Player '+(100+Math.floor(Math.random()*901)); try{ localStorage.setItem('pp_anon',n); }catch(e){} }
+  return n;
+}
+function scoreName(){ return myName()||anonName(); }
 function playerList(){ return Object.values(mp.players); }
 function alivePlayers(){ return playerList().filter(p=>!p.out); }
 function amOut(){ const me=mp.players[mp.me.id]; return !!(me&&me.out); }
@@ -3148,7 +3151,7 @@ function showFinalMP(fin){
   fv.className='verdict '+(iWon?'good':'mid');
   plainStyle(finalMap,false);
   if(iWon) setTimeout(confetti,900);
-  if(!state.saved){ const me0=mp.players[mp.me.id]||{}; const e=recordScore(me0.name||mp.me.name||myName()||'Anonymous'); state.saved=true; state.savedId=e.id; }
+  if(!state.saved){ const me0=mp.players[mp.me.id]||{}; const e=recordScore(me0.name||mp.me.name||scoreName()); state.saved=true; state.savedId=e.id; }
   $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd">${p.out?'out in round '+p.outRound:(p.lives!=null?p.lives+' life'+(p.lives===1?'':'s')+' left':'survived')}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
 }
 
