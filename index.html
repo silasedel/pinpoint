@@ -69,6 +69,10 @@
   .seg button{flex:1;padding:10px 6px;border-radius:8px;background:transparent;color:var(--muted);font-weight:600;font-size:14px;transition:.15s}
   .seg button:hover{color:var(--text)}
   .seg button.on{color:var(--green-dark);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:700}
+  .rules{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .rules .chip{padding:9px 14px;font-size:14px}
+  .rules .chip.on{background:var(--green);border-color:var(--green);color:#fff}
+  .rules .hint{font-size:12px;color:var(--muted);align-self:center}
   .custom-row{display:flex;align-items:center;gap:12px;margin-top:10px;padding:10px 12px;border-radius:10px;background:#f6f8f7;border:1px solid var(--line)}
   .custom-row input[type=range]{flex:1;accent-color:var(--green)}
   .custom-row input[type=number]{width:74px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-weight:700;text-align:center;outline:none}
@@ -121,6 +125,7 @@
   #blink{position:absolute;inset:0;z-index:5;pointer-events:none}
   #blink svg{width:100%;height:100%;display:block}
   #pix{position:absolute;inset:0;z-index:4;background:#000;cursor:grab;touch-action:none;overflow:hidden}
+  #pix.fixed{cursor:default}
   #pix:active{cursor:grabbing}
   #pix canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
   #pix.smooth canvas{image-rendering:auto}
@@ -219,6 +224,14 @@
   #imgModal img{max-width:100%;height:auto;display:block;margin:0 auto 10px}
   .icon-btn{width:44px;height:44px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-size:18px;box-shadow:var(--shadow)}
   .icon-btn:hover{background:#f6f8f7}
+  #sfxBtn svg{width:20px;height:20px}
+  #sfxBtn .slash{display:none}
+  #sfxBtn.off{color:var(--muted)}
+  #sfxBtn.off .w1,#sfxBtn.off .w2{display:none}
+  #sfxBtn.off .slash{display:block}
+  #flash{position:absolute;inset:0;z-index:9;pointer-events:none;background:#fff;opacity:0}
+  #flash.go{animation:flashIn .5s ease-out}
+  @keyframes flashIn{0%{opacity:.55}100%{opacity:0}}
 
   .mappanel{position:absolute;right:0;bottom:0;z-index:7;width:340px;height:270px;border-radius:var(--radius) 0 0 0;overflow:hidden;opacity:.62;
     background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:opacity .18s,width .18s ease-out,height .18s ease-out}
@@ -230,6 +243,7 @@
   .leaflet-interactive:focus{outline:none}
   .peek-tip{background:rgba(255,255,255,.92);border:0;box-shadow:0 1px 4px rgba(0,0,0,.25);font-weight:700;font-size:11px;padding:2px 6px;border-radius:6px}
   .peek-tip::before{display:none}
+  .mappanel .grab{display:none}
   .coordbar{display:flex;gap:6px;padding:8px 8px 0;border-top:1px solid var(--line)}
   .coordbar input{flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:13px;outline:none;font-variant-numeric:tabular-nums}
   .coordbar input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
@@ -416,6 +430,10 @@
   .place .trail b.now{color:var(--text);background:var(--green-soft);border-radius:8px;padding:2px 8px}
   .place .trail b i{font-style:normal;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--red);margin-right:4px}
   .place .trail .arrow{color:var(--muted);opacity:.6}
+  .pct{color:var(--green-dark);font-weight:600}
+  .pct b{font-weight:800}
+  #finalPct{margin-top:6px;font-size:14px;color:var(--muted);min-height:20px}
+  #finalPct b{color:var(--green-dark)}
   .polrow{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;justify-content:center;margin:4px 0}
   .polrow .k{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:64px;text-align:right}
   .polrow b.ok{color:var(--green-dark)} .polrow b.no{color:var(--red)}
@@ -468,8 +486,12 @@
     .hero{height:auto;min-height:0}
     .hero-content{padding:28px 20px 90px}
     .menu-wrap{margin-top:-70px}
-    .mappanel{width:100vw;height:240px;border-radius:0}
-    .mappanel.open{height:min(560px,calc(100vh - 100px))}
+    .mappanel{width:100vw;height:34vh;border-radius:14px 14px 0 0;opacity:1;transition:height .2s ease-out}
+    .mappanel.open{height:62vh}
+    .mappanel.dragging{transition:none}
+    .mappanel .grab{display:flex;align-items:center;justify-content:center;height:26px;flex:none;touch-action:none;cursor:grab;background:var(--card);border-radius:14px 14px 0 0}
+    .mappanel .grab i{width:44px;height:5px;border-radius:99px;background:#cfd8d2;display:block}
+    .mappanel .grab:active i{background:var(--green)}
     .pill{min-width:0;padding:6px 10px}.pill b{font-size:15px}
     .hud-brand span{display:none}
     .pts{font-size:38px}
@@ -603,6 +625,11 @@
         <button data-r="custom">Custom</button>
       </div>
       <div class="custom-row" id="roundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
+      <div class="label">Camera</div>
+      <div class="rules" id="soloRules">
+        <button class="chip" data-rule="nomove">No move</button>
+        <button class="chip" data-rule="lock">Camera lock</button>
+      </div>
       <button class="btn btn-primary start-big" id="startBtn">Play Classic</button>
     </div>
     <div class="card modes">
@@ -641,6 +668,12 @@
         <div class="label">Rounds</div>
         <div class="seg" id="mpRoundSeg"><button data-r="5" class="on">5</button><button data-r="10">10</button><button data-r="custom">Custom</button></div>
         <div class="custom-row" id="mpRoundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
+      <div class="label">Camera</div>
+      <div class="rules" id="mpRules">
+        <button class="chip" data-rule="nomove">No move</button>
+        <button class="chip" data-rule="lock">Camera lock</button>
+      </div>
+
         <button class="btn btn-primary start-big" id="mpStartBtn">Start Classic game</button>
       </div>
     </div>
@@ -685,6 +718,7 @@
     </div>
     <button class="btn btn-primary" id="gbLock" disabled>Lock in</button>
   </div>
+  <div id="flash"></div>
   <div id="waitOverlay" hidden><div class="wbox"><b>Guess locked in</b><div id="waitTxt" style="color:var(--muted);font-size:14px"></div><div class="wlist" id="waitList"></div></div></div>
 
   <div class="hud">
@@ -700,11 +734,13 @@
   </div>
 
   <div class="ctl">
+    <button class="icon-btn" id="sfxBtn" title="Sound on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w1" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="w2" d="M19 6a8.5 8.5 0 0 1 0 12"/><line class="slash" x1="3" y1="3" x2="21" y2="21"/></svg></button>
     <button class="icon-btn" id="resetBtn" title="Return to start">↺</button>
     <button class="icon-btn wide" id="copyBtn" title="Copy a PNG of this spot: north, east, south and west views in a 2×2 grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span id="copyTxt">Copy image</span></button>
   </div>
 
   <div class="mappanel" id="mappanel">
+    <div class="grab" id="mapGrab"><i></i></div>
     <div id="guessmap"></div>
     <div class="coordbar"><input id="coordIn" placeholder="Paste coordinates: 48.8584, 2.2945 (or a Google Maps link)" autocomplete="off" spellcheck="false"><button id="coordGo" title="Drop the pin at these coordinates">Go</button></div>
     <div class="mapbar">
@@ -737,6 +773,7 @@
     <div class="verdict" id="finalVerdict">Game over</div>
     <div class="pts"><span id="finalNum">0</span> <small id="finalMax">/ 25,000</small></div>
     <div class="bar"><i id="finalBar"></i></div>
+    <div id="finalPct"></div>
     <div class="rounds" id="roundChips"></div>
     <div class="rank" id="standings" hidden></div>
     <div class="save-row" id="saveRow">
@@ -1223,8 +1260,8 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-092548';
-const state={ mode:'classic', chain:[], bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
+const BUILD='20260917-093824';
+const state={ mode:'classic', chain:[], nomove:false, lock:false, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
 
@@ -1281,13 +1318,92 @@ function lbConnect(){
   for(const url of BROKERS){
     let c; try{ c=mqtt.connect(url,{connectTimeout:8000,reconnectPeriod:20000,keepalive:30,clean:true,clientId:'wdlb_'+Math.random().toString(36).slice(2,10)}); }catch(e){ continue; }
     const link={url,client:c,ready:false}; lb.links.push(link);
-    c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); c.subscribe(LB_ROOT+'/+',{qos:0}); setTimeout(lbFlush,1200); lbPaint(); });
-    c.on('message',(t,payload)=>{ const id=t.split('/').pop(); let list=null; try{ list=JSON.parse(payload.toString()); }catch(e){ return; }
-      lb.seen[id]=true; lbMerge(id,list); lbPaint(); });
+    c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+'],{qos:0}); setTimeout(()=>{ lbFlush(); stPublish(); },1200); lbPaint(); });
+    c.on('message',(t,payload)=>{ const parts=t.split('/'); const id=parts.pop(); let data=null; try{ data=JSON.parse(payload.toString()); }catch(e){ return; }
+      if(parts[parts.length-1]==='st'){ if(data&&MODES[id]) stats.got[id]={r:stClean(data.r),g:stClean(data.g)}; return; }
+      lb.seen[id]=true; lbMerge(id,data); lbPaint(); });
     c.on('error',()=>{}); c.on('close',()=>{ link.ready=false; }); c.on('offline',()=>{ link.ready=false; lbPaint(); });
   }
 }
 setTimeout(lbConnect,300);
+
+/* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
+const sfxOn={v:true}; try{ sfxOn.v=localStorage.getItem('pp_sfx')!=='0'; }catch(e){}
+let AC=null;
+function ac(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } } if(AC.state==='suspended') AC.resume(); return AC; }
+function tone({f=440,to=null,t=0.12,type='sine',v=0.2,delay=0,slide='exponential'}){
+  const a=ac(); if(!a||!sfxOn.v) return;
+  const o=a.createOscillator(), g=a.createGain(); o.type=type; const t0=a.currentTime+delay;
+  o.frequency.setValueAtTime(f,t0);
+  if(to){ if(slide==='linear') o.frequency.linearRampToValueAtTime(to,t0+t); else o.frequency.exponentialRampToValueAtTime(Math.max(1,to),t0+t); }
+  g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(v,t0+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+t);
+  o.connect(g).connect(a.destination); o.start(t0); o.stop(t0+t+0.05);
+}
+function noise({t=0.25,v=0.12,from=1800,to=300,delay=0}){
+  const a=ac(); if(!a||!sfxOn.v) return;
+  const n=Math.floor(a.sampleRate*t), buf=a.createBuffer(1,n,a.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+  const src=a.createBufferSource(); src.buffer=buf;
+  const f=a.createBiquadFilter(); f.type='bandpass'; f.Q.value=1.1;
+  const t0=a.currentTime+delay;
+  f.frequency.setValueAtTime(from,t0); f.frequency.exponentialRampToValueAtTime(Math.max(40,to),t0+t);
+  const g=a.createGain(); g.gain.setValueAtTime(v,t0); g.gain.exponentialRampToValueAtTime(0.0001,t0+t);
+  src.connect(f).connect(g).connect(a.destination); src.start(t0); src.stop(t0+t+0.02);
+}
+const SFX={
+  pin:   ()=>{ tone({f:760,to:420,t:0.09,type:'triangle',v:0.16}); },
+  click: ()=>{ tone({f:520,to:520,t:0.05,type:'square',v:0.05}); },
+  lock:  ()=>{ tone({f:330,to:660,t:0.16,type:'triangle',v:0.18}); noise({t:0.18,v:0.05,from:1200,to:400}); },
+  reveal:()=>{ noise({t:0.45,v:0.13,from:2600,to:220}); tone({f:180,to:90,t:0.4,type:'sine',v:0.1}); },
+  tick:  ()=>{ tone({f:1180,t:0.03,type:'square',v:0.035}); },
+  great: ()=>{ [0,0.09,0.18].forEach((d,i)=>tone({f:[523,659,784][i],t:0.3,type:'triangle',v:0.16,delay:d})); },
+  perfect:()=>{ [0,0.08,0.16,0.26].forEach((d,i)=>tone({f:[659,784,988,1319][i],t:0.42,type:'triangle',v:0.17,delay:d})); },
+  low:   ()=>{ tone({f:880,t:0.07,type:'square',v:0.07}); },
+  out:   ()=>{ tone({f:300,to:110,t:0.5,type:'sawtooth',v:0.14}); noise({t:0.35,v:0.08,from:700,to:120}); },
+  start: ()=>{ tone({f:392,t:0.14,type:'triangle',v:0.14}); tone({f:587,t:0.22,type:'triangle',v:0.14,delay:0.11}); },
+};
+function sfx(n){ try{ if(sfxOn.v&&SFX[n]) SFX[n](); }catch(e){} }
+function sfxToggle(){ sfxOn.v=!sfxOn.v; try{ localStorage.setItem('pp_sfx',sfxOn.v?'1':'0'); }catch(e){} paintSfx(); if(sfxOn.v) sfx('click'); }
+function paintSfx(){ const b=$('sfxBtn'); if(!b) return; b.classList.toggle('off',!sfxOn.v); b.title=sfxOn.v?'Sound on':'Sound off'; }
+
+/* ---------- Score distributions, for percentiles ----------
+   One retained message per mode holds two histograms: r = single-round scores in 100-point buckets,
+   g = finished games as a percentage of the maximum. A client adds only its own samples to whatever
+   it last received, so a lost update costs a few samples and nothing else. */
+const ST_ROOT='worlddrop/v1/st';
+const ST_MIN=20;   // below this many samples a percentile is noise, so it stays hidden
+const stats={got:{}, mine:{}, dirty:{}};
+function newHist(){ return new Array(51).fill(0); }
+function stGet(modeId){ const g=stats.got[modeId]||{r:newHist(),g:newHist()}; const m=stats.mine[modeId]; if(!m) return g;
+  return {r:g.r.map((v,i)=>v+m.r[i]), g:g.g.map((v,i)=>v+m.g[i])}; }
+function stAdd(modeId,kind,bucket){
+  if(!MODES[modeId]) return;
+  const m=stats.mine[modeId]||(stats.mine[modeId]={r:newHist(),g:newHist()});
+  m[kind][Math.max(0,Math.min(50,Math.round(bucket)))]++; stats.dirty[modeId]=true;
+}
+function stRound(modeId,pts){ stAdd(modeId,'r',pts/100); }
+function stGame(modeId,pts,max){ if(max>0) stAdd(modeId,'g',pts/max*50); }
+function stPct(modeId,kind,bucket){
+  const h=stGet(modeId)[kind]; const total=h.reduce((a,b)=>a+b,0);
+  if(total<ST_MIN) return null;
+  const b=Math.max(0,Math.min(50,Math.round(bucket)));
+  let below=0; for(let i=0;i<b;i++) below+=h[i];
+  return Math.max(0,Math.min(99,Math.round((below+h[b]*0.5)/total*100)));
+}
+function stClean(h){ return Array.isArray(h)&&h.length===51 ? h.map(v=>{ const n=Math.round(+v); return isFinite(n)&&n>0?Math.min(n,1e7):0; }) : newHist(); }
+function stPublish(){
+  for(const id of Object.keys(stats.dirty)){
+    if(!stats.dirty[id]) continue;
+    const merged=stGet(id); let sent=false;
+    for(const l of lb.links) if(l.ready){ try{ l.client.publish(ST_ROOT+'/'+id,JSON.stringify(merged),{qos:0,retain:true}); sent=true; }catch(e){} }
+    if(sent){ stats.got[id]=merged; delete stats.mine[id]; delete stats.dirty[id]; }
+  }
+}
+function pctLine(modeId,kind,bucket,what){
+  const p=stPct(modeId,kind,bucket);
+  return p==null?'':`<span class="pct">Better than <b>${p}%</b> of ${what}</span>`;
+}
 
 /* ---------- Leaderboard (localStorage mirror) ---------- */
 function loadBoard(){ try{ return JSON.parse(localStorage.getItem('pp_board')||'[]'); }catch(e){ return []; } }
@@ -1413,6 +1529,16 @@ function picker(segId,customId,attr,min,max,onChange){
   num.addEventListener('keydown',e=>{ if(e.key==='Enter') num.blur(); });
   return {mark, isCustom:()=>custom};
 }
+/* No move / camera lock apply to any mode that uses the live panorama. */
+function paintRules(el,rules){ [...el.querySelectorAll('.chip')].forEach(b=>b.classList.toggle('on',!!rules[b.dataset.rule])); }
+$('soloRules').addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return;
+  const k=b.dataset.rule; state[k]=!state[k];
+  if(k==='lock'&&state.lock) state.nomove=true; if(k==='nomove'&&!state.nomove) state.lock=false;
+  paintRules($('soloRules'),state); sfx('click'); });
+$('mpRules').addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b||mp.role!=='host') return;
+  const k=b.dataset.rule; mp.settings[k]=!mp.settings[k];
+  if(k==='lock'&&mp.settings.lock) mp.settings.nomove=true; if(k==='nomove'&&!mp.settings.nomove) mp.settings.lock=false;
+  paintRules($('mpRules'),mp.settings); hostSync(); });
 picker('timeSeg','timeCustom','t',1,180,v=>{ state.userTime=v; });
 picker('roundSeg','roundCustom','r',1,100,v=>{ state.userRounds=v; });
 state.userTime=60; state.userRounds=5;
@@ -1452,11 +1578,27 @@ function ensureGuessMap(){
     const panel=$('mappanel');
     const fitWorld=()=>{ if(state.fitDone) return; state.fitDone=true; guessMap.invalidateSize(); guessMap.fitBounds([[-55,-170],[72,180]],{animate:false}); };
     const openMap=()=>{ if(panel.classList.contains('open')) return; panel.classList.add('open'); guessMap.invalidateSize(); setTimeout(()=>{ if(panel.classList.contains('open')) fitWorld(); },220); };
+    const clearInlineH=()=>{ if(innerWidth>820) panel.style.height=''; };
+    window.addEventListener('resize',clearInlineH); clearInlineH();
     const closeMap=()=>{ if(panel.classList.contains('pinned')||document.activeElement===$('coordIn')) return; panel.classList.remove('open'); guessMap.invalidateSize(); };
     panel.addEventListener('transitionend',e=>{ if(e.target===panel){ guessMap.invalidateSize(); if(panel.classList.contains('open')) fitWorld(); } });   // the panel animates its size; re-measure once it settles
     panel.addEventListener('mouseenter',openMap);
     panel.addEventListener('mouseleave',closeMap);
     panel.addEventListener('touchstart',openMap,{passive:true});
+    /* Phones: drag the bar at the top of the map to size it, or tap it to snap between stops. */
+    const grab=$('mapGrab'); let dragY=null, dragH=0, moved=0;
+    const stops=()=>[Math.round(innerHeight*0.34),Math.round(innerHeight*0.62),Math.round(innerHeight*0.88)];
+    const setH=h=>{ panel.style.height=Math.max(140,Math.min(innerHeight-70,h))+'px'; guessMap.invalidateSize(); };
+    grab.addEventListener('pointerdown',e=>{ dragY=e.clientY; dragH=panel.getBoundingClientRect().height; moved=0;
+      panel.classList.add('dragging','open'); grab.setPointerCapture(e.pointerId); e.preventDefault(); });
+    grab.addEventListener('pointermove',e=>{ if(dragY==null) return; const dy=dragY-e.clientY; moved=Math.max(moved,Math.abs(dy)); setH(dragH+dy); });
+    const endDrag=()=>{ if(dragY==null) return; dragY=null; panel.classList.remove('dragging');
+      const h=panel.getBoundingClientRect().height; const st=stops();
+      let target=st.reduce((a,b)=>Math.abs(b-h)<Math.abs(a-h)?b:a);
+      if(moved<8){ const i=st.findIndex(v=>Math.abs(v-h)<24); target=st[(i+1)%st.length] || st[1]; }   // a tap cycles through the stops
+      panel.style.height=target+'px'; panel.classList.toggle('open',target>st[0]);
+      setTimeout(()=>guessMap.invalidateSize(),220); };
+    grab.addEventListener('pointerup',endDrag); grab.addEventListener('pointercancel',endDrag);
   }
 }
 function resetGameState(){
@@ -1475,7 +1617,7 @@ async function startGame(){
   state.timeLimit=m.time!=null?m.time:state.userTime; state.totalRounds=m.rounds!=null?m.rounds:state.userRounds;
   resetGameState();
   $('startBtn').disabled=true; const __lbl=$('startBtn').textContent; $('startBtn').textContent='Loading…';
-  show('game'); $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
+  show('game'); $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true; sfx('start');
   const plan=continentPlan(state.totalRounds);
   const pm=m;
   if(m.country){ $('loadingText').textContent='Loading borders…'; try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); show('setup'); $('startBtn').disabled=false; $('startBtn').textContent=__lbl; return; } }
@@ -1507,7 +1649,7 @@ async function nextRound(){
   $('loading').classList.remove('fade'); $('loadingText').textContent='Finding a location…';
   if(guessMarker){ guessMarker.remove(); guessMarker=null; }
   $('coordIn').value='';
-  $('mappanel').classList.remove('open'); guessMap.invalidateSize();
+  $('mappanel').classList.remove('open'); if(innerWidth>820) $('mappanel').style.height=''; guessMap.invalidateSize();
   guessMap.setView([25,10],1,{animate:false});
   stopTimer(); $('timerPill').classList.remove('low'); $('timerPill').querySelector('small').textContent='TIME';
   $('timerLbl').textContent = state.timeLimit ? fmtTime(state.timeLimit) : '∞';
@@ -1522,13 +1664,16 @@ async function nextRound(){
   state.current=loc;
   $('loadingText').textContent='Loading Street View…';
   const idx=state.round-1;
-  if(modeOf(state.mode).trio){ panos.forEach(f=>{ f.onload=null; f.src='about:blank'; }); }   // no panorama frame needed
+  const canvasRound=!modeOf(state.mode).trio && state.mode!=='pixel' && state.mode!=='blink' && (state.nomove||state.lock);
+  if(modeOf(state.mode).trio||canvasRound){ panos.forEach(f=>{ f.onload=null; f.src='about:blank'; }); }   // no panorama frame needed
   else {
     if(preload.idx===idx && preload.promise){ await preload.promise; }
     else { await loadInto(panos[1-front],loc); }
     swapFrames();
   }
-  if(state.mode==='pixel') startPixel(loc);
+  if(canvasRound){ const w=Math.min(1280,Math.round(innerWidth*0.85)), h=Math.round(w*Math.min(0.62,innerHeight/innerWidth));
+    await startPixel(loc,{w,h,fov:85,zoom:4,smooth:true,fixed:state.lock,full:true}); }
+  else if(state.mode==='pixel') startPixel(loc);
   else if(modeOf(state.mode).trio){ startTrio(loc); }
   else if(state.mode==='blink'){
     $('blink').hidden=false; $('lid').setAttribute('d','M0 0H100V100H0Z');   // eye shut while the still renders
@@ -1539,9 +1684,11 @@ async function nextRound(){
   else stopPixel();
   $('loading').classList.add('fade');
   const ri=$('roundIntro'); ri.innerHTML=`<div>Round ${state.round} <span>/ ${state.totalRounds}</span></div>`; ri.hidden=false; setTimeout(()=>{ ri.hidden=true; },1100);
+  if(state.round===1) setTimeout(()=>{ if(!$('game').hidden) toast(state.lock?'Camera locked: one fixed view, no looking around'
+    :(state.nomove?'No move: drag to look around, scroll to zoom':'Drag to look around · click the arrows on the road to move')); },1400);
   if(state.mode==='blink'){ const r0=state.round; setTimeout(()=>{ if(state.round===r0&&!$('game').hidden){ runBlink(); startTimer(); } },1250); }   // intro first, then the glimpse and the clock together
   else startTimer();
-  if(!modeOf(state.mode).trio) preloadRound(idx+1);
+  if(!modeOf(state.mode).trio&&!canvasRound) preloadRound(idx+1);
 }
 
 function setGuess(latlng){
@@ -1549,6 +1696,7 @@ function setGuess(latlng){
   const ll=L.latLng(latlng.lat, ((latlng.lng+180)%360+360)%360-180);
   state.guess=ll;
   if(guessMarker) guessMarker.setLatLng(ll); else guessMarker=L.marker(ll,{icon:mp.role&&mp.me.color!=null?colorIcon(COLORS[mp.me.color][0]):guessIcon}).addTo(guessMap);
+  sfx('pin');
   const gb=$('guessBtn'); if(gb.disabled&&!modeOf(state.mode).bet){ gb.disabled=false; gb.textContent='Guess'; gb.classList.remove('ready'); void gb.offsetWidth; gb.classList.add('ready'); }
   if(modeOf(state.mode).bet) renderBet();
   if(mp.role&&modeOf(state.mode).peek) peekSend();
@@ -1562,7 +1710,7 @@ function startTimer(){
   state.timer=setInterval(()=>{
     const ms=Math.max(0,end-Date.now()); const left=Math.ceil(ms/1000); const frac=ms/(state.timeLimit*1000);
     fill.style.width=(frac*100)+'%'; fill.className= left<=10?'low': frac<.5?'mid':'';
-    if(left!==state.timeLeft){ state.timeLeft=left; $('timerLbl').textContent=fmtTime(left); if(modeOf(state.mode).countdown) $('timerPill').querySelector('small').textContent='WORTH ×'+countdownMult(left,state.timeLimit).toFixed(2); }
+    if(left!==state.timeLeft){ state.timeLeft=left; $('timerLbl').textContent=fmtTime(left); if(left<=5&&left>0&&!state.locked) sfx('low'); if(modeOf(state.mode).countdown) $('timerPill').querySelector('small').textContent='WORTH ×'+countdownMult(left,state.timeLimit).toFixed(2); }
     $('timerPill').classList.toggle('low',left<=10);
     if(left<=0){ stopTimer(); submitGuess(true); }
   },100);
@@ -1580,7 +1728,7 @@ function submitGuess(auto=false){
   else if(!state.guess && !auto) return;
   if(m.bet&&!auto&&state.bet<1) return;   // a bet is required every round
   if(m.bet&&state.bet<1) state.bet=Math.min(1,state.bank);   // time ran out with no bet: the minimum stake goes in
-  state.locked=true;
+  state.locked=true; sfx('lock');
   if(mp.role){ mpSubmitGuess(); return; }   // clock keeps running so you can see how long the others have
   stopTimer();
   if(m.trio){
@@ -1632,10 +1780,11 @@ function showResult(r){
   }
   if(!hid) L.marker(r.truth,{icon:trueIcon}).addTo(resultLayer);
   const fit=()=>{ resultMap.invalidateSize(); if(hid){ resultMap.setView(r.guess||[20,0],r.guess?4:2,{animate:false}); return; } if(r.guess) resultMap.fitBounds(L.latLngBounds([r.guess,r.truth]),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(r.truth,5,{animate:false}); };
-  fit(); setTimeout(fit,150);
+  fit(); setTimeout(fit,150); sfx('reveal');
   if(line) setTimeout(()=>{ for(const pl of [casing,line]){ const el=pl.getElement(); if(!el) continue; const len=el.getTotalLength(); el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.classList.add('draw-line'); void el.getBoundingClientRect(); el.style.strokeDashoffset=0; } },350);
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(r.pts>=4000) pe.classList.add('great');
-  setTimeout(()=>{ pe.classList.add('pop'); if(r.pts>=4500) confetti(); },1000);
+  setTimeout(()=>{ pe.classList.add('pop'); if(r.pts>=4500){ confetti(); flash(); sfx(r.pts>=4900?'perfect':'great'); } },1000);
+  stRound(state.mode,r.pts);
 
   $('distTxt').innerHTML = r.guess ? `Your guess was <b>${fmtDist(r.km)}</b> from the correct location.` : (hid?`You didn't place a pin.`:`You didn't place a pin. The location is marked with a flag.`);
   const busted=r.bet&&state.bank<=0;
@@ -1663,6 +1812,7 @@ function renderVerdict(r){
   const parts=[];
   if(hid){ $('placeTxt').innerHTML='<span>Location hidden until you stamp the country.</span>'; return; }
   if(tp) parts.push(`<span>📍 Location: <b>${esc(tp.region?tp.region+', ':'')}${hide?'???':esc(tp.country)}</b></span>`);
+  { const line=pctLine(state.mode,'r',r.pts/100,'guesses in '+modeOf(state.mode).name); if(line) parts.push(line); }
   if(modeOf(state.mode).deported) parts.push(deportTrail(r));
   if(gp) parts.push(hide?(gp.region?`<span>Your pin: <b>${esc(gp.region)}</b></span>`:''):`<span>Your pin: <b>${esc(gp.region?gp.region+', ':'')}${esc(gp.country)}</b></span>`);
   else if(r.guess && tp) parts.push(`<span>Your pin: <b>in the ocean</b></span>`);
@@ -1671,9 +1821,14 @@ function renderVerdict(r){
 $('nextBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpHostNext(); return; } if(mp.role) return; if(state.round>=state.totalRounds||(modeOf(state.mode).bet&&state.bank<=0)) showFinal(); else nextRound(); });
 
 function countUp(el,from,to,ms,signed){
-  const t0=performance.now();
-  (function step(t){ const k=Math.min(1,(t-t0)/ms); const e=1-Math.pow(1-k,3); const v=Math.round(from+(to-from)*e); el.textContent=(signed&&v>0?'+':'')+v.toLocaleString(); if(k<1) requestAnimationFrame(step); })(t0);
+  const t0=performance.now(); let lastTick=0;
+  (function step(t){ const k=Math.min(1,(t-t0)/ms); const e=1-Math.pow(1-k,3); const v=Math.round(from+(to-from)*e);
+    el.textContent=(signed&&v>0?'+':'')+v.toLocaleString();
+    if(to>from&&t-lastTick>55&&k<1){ lastTick=t; sfx('tick'); }
+    if(k<1) requestAnimationFrame(step); })(t0);
 }
+/* A white bloom over the panorama when a guess lands close. */
+function flash(){ const f=$('flash'); if(!f) return; f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); }
 
 /* ---------- Final ---------- */
 function showFinal(){
@@ -1696,6 +1851,7 @@ function showFinal(){
   fit(); setTimeout(fit,150);
 
   const isBet=modeOf(state.mode).bet;
+  $('finalPct').innerHTML=isBet?'':pctLine(state.mode,'g',state.score/max*50,'finished '+modeOf(state.mode).name+' games');
   $('finalMax').textContent=isBet?'chips (started with 1,000)':`/ ${max.toLocaleString()}`;
   $('finalBar').style.width='0%'; countUp($('finalNum'),0,state.score,1400);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('finalBar').style.width=Math.min(100,(isBet?state.score/5000*100:state.score/max*100))+'%'; }));
@@ -1712,12 +1868,20 @@ function showFinal(){
   const rank=boardFor(state.totalRounds,state.timeLimit,state.mode,filter.scope).filter(e=>e.score>state.score).length+1;
   $('saveBtn').textContent = rank<=10 ? `Save to leaderboard · #${rank} in ${modeLabel()}` : 'Save to leaderboard';
 }
+/* Every finished game lands on the board the same way, solo or with friends. */
+function recordScore(name){
+  const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||'Anonymous').slice(0,20),
+    score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()};
+  const b=loadBoard(); b.push(entry); saveBoard(b);
+  lbSubmit(entry);
+  stGame(state.mode,state.score,state.totalRounds*5000);
+  stPublish();
+  return entry;
+}
 $('saveBtn').addEventListener('click',()=>{
   if(state.saved) return;
   const name=($('nameInput').value.trim()||'Anonymous').slice(0,20);
-  const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()};
-  const b=loadBoard(); b.push(entry); saveBoard(b);
-  lbSubmit(entry);
+  const entry=recordScore(name);
   try{ localStorage.setItem('pp_name',name); }catch(e){}
   state.saved=true; state.savedId=entry.id;
   const same=boardFor(state.totalRounds,state.timeLimit,state.mode,filter.scope);
@@ -1831,13 +1995,14 @@ function runBlink(){
   })(t0);
 }
 /* Pixelated: a tiny canvas panorama viewer rendered from the imagery tiles, upscaled with hard pixel edges. */
-const pix={band:null,meta:null,heading:0,pitch:0,fov:85,drag:null,active:false,round:0,fixed:false};
+const pix={band:null,meta:null,heading:0,pitch:0,fov:85,drag:null,active:false,round:0,fixed:false,full:null};
 function stopPixel(){ pix.active=false; $('pix').hidden=true; }
 /* opts: {w,h,fov,fixed,zoom}. Pixelated uses a 160×90 canvas; Blink uses a full-res 120° still with no interaction. */
 async function startPixel(loc,opts={}){
   const round=state.round; pix.active=true; pix.round=round; pix.heading=loc.heading; pix.pitch=0; pix.fov=opts.fov||85; pix.fixed=!!opts.fixed;
   const el=$('pix'); el.hidden=false; el.classList.toggle('smooth',!!opts.smooth); el.classList.toggle('fixed',!!opts.fixed);
   $('pixDev').hidden=false; $('pixDev').textContent='Loading…';
+  pix.full=opts.full?{w:opts.w,h:opts.h}:null;
   const c=$('pixCanvas'); c.width=opts.w||128; c.height=opts.h||72; c.getContext('2d').clearRect(0,0,c.width,c.height);
   try{
     const meta=await panoMeta(loc.pano); const band=await loadBand(loc.pano,opts.zoom||3,meta,70);
@@ -1847,7 +2012,12 @@ async function startPixel(loc,opts={}){
 }
 function drawPixel(){
   if(!pix.band||!pix.active) return;
-  const c=$('pixCanvas'); const W=c.width, H=c.height; const ctx=c.getContext('2d'); const o=ctx.createImageData(W,H); const d=o.data;
+  const c=$('pixCanvas');
+  if(pix.full){   // full-size viewer: drop to a smaller render while the pointer is down, then sharpen
+    const want=pix.drag?0.5:1, w=Math.round(pix.full.w*want), h=Math.round(pix.full.h*want);
+    if(c.width!==w||c.height!==h){ c.width=w; c.height=h; }
+  }
+  const W=c.width, H=c.height; const ctx=c.getContext('2d'); const o=ctx.createImageData(W,H); const d=o.data;
   const {img,W:bw0,H:bh0,yOff}=pix.band; const src=img.data, bw=img.width, bh=img.height;
   const f=(W/2)/Math.tan(pix.fov/2*Math.PI/180); const cp=Math.cos(pix.pitch), sp=Math.sin(pix.pitch); const lon0=(pix.heading-pix.meta.center)*Math.PI/180;
   for(let py=0;py<H;py++){ const dy=-(py+0.5-H/2); for(let px=0;px<W;px++){ const dx=px+0.5-W/2;
@@ -1860,7 +2030,8 @@ function drawPixel(){
   const el=$('pix');
   el.addEventListener('pointerdown',e=>{ if(pix.fixed) return; pix.drag={x:e.clientX,y:e.clientY,h:pix.heading,p:pix.pitch}; el.setPointerCapture(e.pointerId); });
   el.addEventListener('pointermove',e=>{ if(!pix.drag) return; const k=pix.fov/el.clientWidth; pix.heading=pix.drag.h-(e.clientX-pix.drag.x)*k; pix.pitch=Math.max(-0.9,Math.min(0.9,pix.drag.p+(e.clientY-pix.drag.y)*k*Math.PI/180)); drawPixel(); });
-  el.addEventListener('pointerup',()=>{ pix.drag=null; }); el.addEventListener('pointercancel',()=>{ pix.drag=null; });
+  const release=()=>{ if(!pix.drag) return; pix.drag=null; if(pix.full) drawPixel(); };
+  el.addEventListener('pointerup',release); el.addEventListener('pointercancel',release);
   el.addEventListener('wheel',e=>{ e.preventDefault(); if(pix.fixed) return; pix.fov=Math.max(35,Math.min(110,pix.fov+e.deltaY*0.05)); drawPixel(); },{passive:false});
 })();
 
@@ -2201,7 +2372,8 @@ $('coordIn').addEventListener('input',()=>$('coordIn').classList.remove('bad'));
 /* ---------- Controls ---------- */
 $('guessBtn').addEventListener('click',()=>submitGuess(false));
 $('pinBtn').addEventListener('click',()=>{ const p=$('mappanel'); $('pinBtn').classList.toggle('on'); p.classList.toggle('pinned'); p.classList.add('open'); guessMap.invalidateSize(); });
-$('resetBtn').addEventListener('click',()=>{ if(!state.current) return; if(state.mode==='blink') return; if(state.mode==='pixel'){ pix.heading=state.current.heading; pix.pitch=0; pix.fov=85; drawPixel(); return; } panos[front].src=embedUrl(state.current); });
+$('sfxBtn').addEventListener('click',sfxToggle); paintSfx();
+$('resetBtn').addEventListener('click',()=>{ if(!state.current) return; if(state.mode==='blink'||state.lock) return; if(pix.active){ pix.heading=state.current.heading; pix.pitch=0; pix.fov=85; drawPixel(); return; } panos[front].src=embedUrl(state.current); });
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT') return;
   if(e.code==='Space'||e.code==='Enter'){
@@ -2219,7 +2391,7 @@ window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resu
    ========================================================= */
 const COLORS=[['#e63946','Red'],['#ff6b6b','Coral'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#9acd32','Lime'],['#2bb673','Green'],['#12a5a0','Teal'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#6f42c1','Indigo'],['#b23fd0','Purple'],['#e84393','Pink']];
 const BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081'];
-const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpeer:null}, code:'', settings:{time:60,rounds:5,mode:'classic'}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby',
+const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpeer:null}, code:'', settings:{time:60,rounds:5,mode:'classic',nomove:false,lock:false}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby',
            links:[], link:null, seen:{}, hb:null, hostSeen:0, joinTimer:null, brokerIdx:0 };
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ';
 function mkCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.random()*CODE_CHARS.length|0]; return c; }
@@ -2493,6 +2665,7 @@ async function mpStartGameLocal(settings,locs){
   state.mode=settings.mode||'classic';
   resetGameState();
   state.timeLimit=settings.time; state.totalRounds=settings.rounds; state.locs=locs.map(l=>({...l}));
+  state.nomove=!!settings.nomove; state.lock=!!settings.lock;
   mp.guesses={};
   const mm=modeOf(state.mode);
   if(mm.country){ try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); } }
@@ -2525,6 +2698,7 @@ function renderLobby(){
   $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}"><span class="sw" style="background:${p.color===null?'#cfd8d2':COLORS[p.color][0]}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
   $('swatches').innerHTML=COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
     return `<div class="swatch ${mine?'mine':''} ${taken?'taken':''}" data-i="${i}" style="background:${c}" ${taken?`data-owner="${esc(owner.name||'taken')}"`:''} title="${n}">${mine?'✓':''}</div>`; }).join('');
+  paintRules($('mpRules'),mp.settings);
   if(mp.role==='host'){ mpTimePick.mark(mp.settings.time); mpRoundPick.mark(mp.settings.rounds); const cur=mp.settings.mode||'classic'; markTiles($('lobbyModeGrid'),cur); $('mpStartBtn').textContent=`Start ${modeOf(cur).name} game`; }
   else { const m=modeOf(mp.settings.mode); $('guestPanel').textContent=`Waiting for the host to start… (${m.name} · ${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`; }
 }
@@ -2566,7 +2740,8 @@ function showResultMP(rev){
   if(mine.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${mine.bet.stake.toLocaleString()} × ${mine.bet.mult.toFixed(2)} = ${mine.bet.payout.toLocaleString()} back · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,mine.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.bet.mult/5*100)+'%'; })); }
   else { $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; countUp($('ptsNum'),0,mine.pts,1000); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.pts/50)+'%'; })); }
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(mine.pts>=4000) pe.classList.add('great');
-  setTimeout(()=>{ pe.classList.add('pop'); if(mine.pts>=4500) confetti(); },1000);
+  setTimeout(()=>{ pe.classList.add('pop'); if(mine.pts>=4500){ confetti(); flash(); sfx(mine.pts>=4900?'perfect':'great'); } },1000);
+  stRound(state.mode,mine.pts);
   renderVerdict(me);
   (async()=>{ const [tp,gp]=await Promise.all([ me.loc.place||placeOf(rev.truth.lat,rev.truth.lng), mine.guess?placeOf(mine.guess.lat,mine.guess.lng):null ]); me.loc.place=tp; me.guessPlace=gp; if(!$('result').hidden) renderVerdict(me); })();
   const overall=rev.results.slice().sort((a,b)=>b.total-a.total);
@@ -2580,6 +2755,7 @@ function showResultMP(rev){
 /* One line on the result screen naming whoever just lost a life or got knocked out. */
 function elimBanner(rev){
   const e=rev.elim; if(!e) return '';
+  if(e.ids.includes(mp.me.id)) sfx('out');
   const mine=e.ids.includes(mp.me.id); const names=e.names.map(esc).join(' and ');
   const far=e.km!=null?`farthest at ${fmtDist(e.km)}`:'no guess';
   if(e.lives){ const knocked=e.outIds.length?` · ${e.outIds.length===e.ids.length?'out of lives':'one of them is out of lives'}`:'';
@@ -2587,7 +2763,7 @@ function elimBanner(rev){
   return `<div class="elimrow ${mine?'me':''}">${mine?"You're knocked out":names+(e.ids.length===1?' is':' are')+' knocked out'} · ${far}</div>`;
 }
 function showFinalMP(fin){
-  show('final'); $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true; $('viewBoardBtn').hidden=true;
+  show('final'); $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true; $('viewBoardBtn').hidden=false;
   $('againBtn').hidden=mp.role!=='host'; $('finalWait').hidden=mp.role==='host'; $('againBtn').textContent='Back to lobby';
   const max=state.totalRounds*5000;
   if(!finalMap) finalMap=makeMap('finalmap');
@@ -2597,6 +2773,7 @@ function showFinalMP(fin){
   for(const r of state.results){ pts.push(r.truth); L.marker(r.truth,{icon:trueIcon}).addTo(finalLayer); }
   const fit=()=>{ finalMap.invalidateSize(); if(pts.length) finalMap.fitBounds(L.latLngBounds(pts),{padding:[60,60]}); };
   fit(); setTimeout(fit,150);
+  $('finalPct').innerHTML=pctLine(state.mode,'g',state.score/max*50,'finished '+modeOf(state.mode).name+' games');
   const elimMode=!!modeOf(state.mode).elim;
   const ps=fin.players.slice().sort((a,b)=> elimMode ? ((a.out?1:0)-(b.out?1:0))||((b.outRound||0)-(a.outRound||0))||((b.lives??0)-(a.lives??0))||(b.score-a.score) : b.score-a.score);
   const winner=ps[0]; const me=ps.find(p=>p.id===mp.me.id)||{score:0};
@@ -2609,6 +2786,7 @@ function showFinalMP(fin){
   fv.className='verdict '+(iWon?'good':'mid');
   plainStyle(finalMap,false);
   if(iWon) setTimeout(confetti,900);
+  if(!state.saved){ const me0=mp.players[mp.me.id]||{}; const e=recordScore(me0.name||mp.me.name||myName()||'Anonymous'); state.saved=true; state.savedId=e.id; }
   $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd">${p.out?'out in round '+p.outRound:(p.lives!=null?p.lives+' life'+(p.lives===1?'':'s')+' left':'survived')}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
 }
 
