@@ -58,6 +58,14 @@ Game traffic never depends on a direct connection, so joining works from any net
 
 The footer on the home page shows the version as `v<major>.<minor>`. Major goes up for a new capability, a batch of modes, or a layout, branding or architecture rework; minor goes up for a fix or a polish pass. It's bumped with every change, the build stamp is in the tooltip, and the same footer holds the credits and the small print.
 
+## Daily drop
+
+One game a day, the same five locations for everyone. The date seeds a small deterministic generator (mulberry32 over a hash of the UTC date) that picks the mode, the time per round, and sometimes a continent or country, then drives the location search itself — every random choice in place picking takes an optional generator, so two browsers with the same date produce byte-identical panorama ids. Rounds are always five. Today's board is its own retained message keyed by the date (`worlddrop/v1/dl/<date>`), so it resets itself at midnight UTC, and a daily result never touches the all-time mode boards. Replays are allowed but only the first attempt posts.
+
+## Where in the world
+
+A picker reached from the solo setup screen and the multiplayer lobby: six continents, then the countries inside one, or anywhere. The choice narrows whatever mode you picked — region names for box-based modes, a bounding-box test for the city and island lists. Modes that already decide the world for you (Deported's border chain, Politics' system targeting, the trio modes) ignore it.
+
 ## Feel and rules
 
 - **Sound** is synthesised in the browser with WebAudio, so there are no audio files: a pin drop, a lock-in chime, a reveal sweep, a ticking score counter, a last-five-seconds beep, a three-note fanfare for a great guess and a four-note one for a near-perfect. The speaker button in the bottom-left corner mutes it and the choice is remembered.

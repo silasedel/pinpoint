@@ -53,6 +53,26 @@
   .menu-wrap{max-width:960px;margin:-64px auto 0;padding:0 20px 60px;position:relative;z-index:5}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
   .card.wide{margin-top:20px}
+  .card.big{padding:0 26px 26px;overflow:hidden}
+  .card.big h2{margin:16px 0 4px;font-size:26px;letter-spacing:-.5px}
+  .card.big p{margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.5}
+  .cardart{height:120px;margin:0 -26px;background:center/cover no-repeat;position:relative}
+  .cardart::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--card),rgba(255,255,255,0) 70%)}
+  .cardart.solo{background-image:url(images/mode-classic.jpg)}
+  .cardart.mp{background-image:url(images/mode-peek.jpg)}
+  .dailybtn{display:flex;align-items:center;gap:16px;width:100%;text-align:left;cursor:pointer;font-family:inherit;
+    border:0;border-radius:20px;padding:20px 24px;margin-bottom:20px;color:#fff;
+    background:linear-gradient(120deg,#14532d,#1f9d55 55%,#2bb673);box-shadow:0 12px 30px rgba(20,60,38,.35);
+    position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+  .dailybtn::after{content:'';position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.09)}
+  .dailybtn:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(20,60,38,.42)}
+  .dailybtn .dl{flex:1;min-width:0;position:relative;z-index:1}
+  .dailybtn .k{display:block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+  .dailybtn b{display:block;font-size:24px;letter-spacing:-.4px;margin:2px 0 3px}
+  .dailybtn .s{display:block;font-size:13.5px;opacity:.9}
+  .dailybtn .dr{position:relative;z-index:1;flex:none;background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.4);
+    border-radius:99px;padding:10px 20px;font-weight:800;font-size:15px}
+  @media (max-width:560px){ .dailybtn{flex-direction:column;align-items:flex-start;gap:12px} .dailybtn .dr{align-self:stretch;text-align:center} }
   .solo-card{display:flex;flex-direction:column;justify-content:center}
   .solo-card .btn{padding:22px;font-size:20px}
   .mp-card .btn{padding:16px;font-size:16px}
@@ -96,6 +116,31 @@
   .board td.mode{color:var(--muted);font-size:12px}
   .board tr.me td{background:var(--green-soft)}
   .empty{color:var(--muted);font-size:14px;padding:18px 0;text-align:center}
+  #region,#daily{overflow:auto;padding:30px 20px 60px}
+  .rsub{color:var(--muted);font-size:13px;margin:0 0 14px}
+  .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .rgrid.small{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .rgrid button{padding:14px 12px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:14.5px;cursor:pointer;color:var(--text);font-family:inherit;text-align:left}
+  .rgrid.small button{padding:10px 11px;font-size:13.5px;font-weight:600}
+  .rgrid button:hover{border-color:var(--green);background:var(--green-soft)}
+  .rgrid button.on{background:var(--green);border-color:var(--green);color:#fff}
+  .rgrid button small{display:block;font-weight:600;font-size:11px;color:var(--muted);margin-top:3px}
+  .rgrid button.on small{color:rgba(255,255,255,.85)}
+  @media (max-width:640px){ .rgrid{grid-template-columns:repeat(2,1fr)} }
+  .dailycard{padding:0;overflow:hidden}
+  .dhero{position:relative;min-height:170px;display:flex;align-items:flex-end;padding:20px 22px;background:#1a2a20 center/cover no-repeat}
+  .dhero::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,.25) 70%,rgba(0,0,0,.1))}
+  .dhero .t{position:relative;z-index:1;color:#fff}
+  .dhero h2{margin:2px 0 0;font-size:30px;letter-spacing:-.5px;text-shadow:0 2px 12px rgba(0,0,0,.55)}
+  .dkicker{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.9}
+  .dfacts{display:flex;flex-wrap:wrap;gap:10px;padding:18px 22px 4px}
+  .dfact{flex:1 1 130px;background:var(--green-soft);border-radius:12px;padding:10px 12px}
+  .dfact small{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--green-dark)}
+  .dfact b{font-size:16px;letter-spacing:-.2px}
+  .dailycard .btn{margin:18px 22px 22px;width:calc(100% - 44px)}
+  .btn.big{padding:18px;font-size:18px}
+  .ddone{margin:-8px 22px 20px;text-align:center;font-size:13px;color:var(--muted)}
+  .ddone b{color:var(--green-dark)}
   .legal{margin:22px auto 0;max-width:760px;text-align:center;font-size:12px;line-height:1.55;color:var(--muted);
     border-top:1px solid var(--line);padding:14px 8px 4px}
   .legal .ver{font-weight:800;color:var(--text);font-size:13px;letter-spacing:.01em}
@@ -564,27 +609,73 @@
   </section>
 
   <div class="menu-wrap">
+    <button class="dailybtn" id="dailyBtn">
+      <span class="dl">
+        <span class="k">Daily drop</span>
+        <b id="dailyHeadline">Today's game</b>
+        <span class="s" id="dailySub">Five rounds. Same for everyone, everywhere.</span>
+      </span>
+      <span class="dr" id="dailyRight">Play</span>
+    </button>
     <div class="grid">
-      <div class="card solo-card">
-        <h2 style="text-align:center">Solo</h2>
+      <div class="card solo-card big">
+        <div class="cardart solo"></div>
+        <h2>Solo</h2>
+        <p>Twenty-six modes, any corner of the world, your own pace.</p>
         <button class="btn btn-primary btn-block" id="soloBtn">Play</button>
       </div>
-      <div class="card mp-card">
-        <h2 style="text-align:center">Multiplayer</h2>
+      <div class="card mp-card big">
+        <div class="cardart mp"></div>
+        <h2>Multiplayer</h2>
+        <p>Up to ten friends, one room code, voice chat built in.</p>
         <button class="btn btn-primary btn-block" id="hostBtn">Create game</button>
         <div class="mp-row"><input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn">Join game</button></div>
       </div>
     </div>
     <div class="card wide">
-      <h2>Leaderboard<span class="board-tag">Classic</span></h2>
-      <div class="filters" style="margin-top:12px">
-        <div class="fgroup"><span class="fl">Rounds</span><button class="chip on" data-fr="all">All</button><button class="chip" data-fr="5">5</button><button class="chip" data-fr="10">10</button></div>
-        <div class="fgroup"><span class="fl">Time</span><button class="chip on" data-ft="all">All</button><button class="chip" data-ft="10">10s</button><button class="chip" data-ft="30">30s</button><button class="chip" data-ft="60">60s</button><button class="chip" data-ft="0">No limit</button></div>
-      </div>
-      <div id="boardWrap"></div>
-      <div class="board-foot"><span id="boardCount"></span><button class="link" id="allBoards">Every mode's leaderboard</button></div>
+      <h2>Today's leaderboard<span class="board-tag" id="menuDailyTag">Daily</span></h2>
+      <div class="rsub" id="menuDailySub">Everyone who has played today's drop</div>
+      <div id="menuDailyWrap"></div>
+      <div class="board-foot"><span id="menuDailyCount"></span><button class="link" id="allBoards">Every mode's leaderboard</button></div>
     </div>
     <footer class="legal" id="legal"></footer>
+  </div>
+</div>
+
+<!-- ================= WHERE IN THE WORLD ================= -->
+<div id="region" class="screen" hidden>
+  <div class="setup-wrap">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="regionBack" style="margin-left:auto">Done</button></div>
+    <div class="card">
+      <h2 style="margin:0 0 4px">Where in the world?</h2>
+      <div class="rsub" id="regionNow">Anywhere on Earth</div>
+      <button class="btn btn-secondary btn-block" id="regionAll" style="margin-bottom:16px">Anywhere on Earth</button>
+      <div class="rgrid" id="contGrid"></div>
+      <div id="countryBox" hidden>
+        <div class="label" id="countryLbl">Countries</div>
+        <div class="rgrid small" id="countryGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DAILY ================= -->
+<div id="daily" class="screen" hidden>
+  <div class="setup-wrap">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="dailyBack" style="margin-left:auto">Back</button></div>
+    <div class="card dailycard">
+      <div class="dhero" id="dHero">
+        <div class="t"><div class="dkicker" id="dDate">Daily</div><h2 id="dTitle">Today's drop</h2></div>
+      </div>
+      <div class="dfacts" id="dFacts"></div>
+      <button class="btn btn-primary btn-block big" id="dStart">Start today's game</button>
+      <div class="ddone" id="dDone" hidden></div>
+    </div>
+    <div class="card wide">
+      <h2 style="margin-bottom:4px">Today's leaderboard</h2>
+      <div class="rsub" id="dBoardSub">Everyone who has played today</div>
+      <div id="dBoardWrap"></div>
+    </div>
   </div>
 </div>
 
@@ -629,6 +720,8 @@
         <button data-r="custom">Custom</button>
       </div>
       <div class="custom-row" id="roundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
+      <div class="label">Where in the world</div>
+      <button class="btn btn-secondary btn-block" id="regionBtn" style="margin-bottom:14px">Anywhere on Earth</button>
       <div class="label">Camera</div>
       <div class="rules" id="soloRules">
         <button class="chip" data-rule="nomove">No move</button>
@@ -672,6 +765,8 @@
         <div class="label">Rounds</div>
         <div class="seg" id="mpRoundSeg"><button data-r="5" class="on">5</button><button data-r="10">10</button><button data-r="custom">Custom</button></div>
         <div class="custom-row" id="mpRoundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
+      <div class="label">Where in the world</div>
+      <button class="btn btn-secondary btn-block" id="mpRegionBtn" style="margin-bottom:14px">Anywhere on Earth</button>
       <div class="label">Camera</div>
       <div class="rules" id="mpRules">
         <button class="chip" data-rule="nomove">No move</button>
@@ -842,17 +937,75 @@ const CONTINENTS=['NA','SA','EU','AF','AS','OC'];
 const RECENT_MAX=24;
 function recentPlaces(){ try{ return JSON.parse(localStorage.getItem('pp_recent')||'[]'); }catch(e){ return []; } }
 function notePlace(name){ try{ const r=recentPlaces().filter(x=>x!==name); r.push(name); localStorage.setItem('pp_recent',JSON.stringify(r.slice(-RECENT_MAX))); }catch(e){} }
-function pickPlace(continent,exclude,filter){
+/* Every pick can run off a supplied generator instead of Math.random, which is what makes the daily
+   identical on every device: same seed, same sequence, same five locations. */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function seedFrom(str){ let h=2166136261>>>0; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function pickPlace(continent,exclude,filter,rng){
+  const R=rng||Math.random;
   let pool=(continent&&!filter?PLACES[continent]:CONTINENTS.flatMap(c=>PLACES[c]));
   if(filter) pool=pool.filter(p=>filter(p[0]));
-  const recent=new Set(recentPlaces().concat(exclude||[]));
+  if(!pool.length) return null;
+  const recent=new Set(rng?[]:recentPlaces().concat(exclude||[]));   // a seeded run must not depend on local history
   let cands=pool.filter(p=>!recent.has(p[0])); if(cands.length<3) cands=pool.filter(p=>!(exclude||[]).includes(p[0])); if(!cands.length) cands=pool;
-  return cands[Math.random()*cands.length|0];
+  return cands[R()*cands.length|0];
 }
-function pointIn(pl){ return {lat:pl[1]+Math.random()*(pl[2]-pl[1]), lng:pl[3]+Math.random()*(pl[4]-pl[3])}; }
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.random()*(i+1)|0; [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function pointIn(pl,rng){ const R=rng||Math.random; return {lat:pl[1]+R()*(pl[2]-pl[1]), lng:pl[3]+R()*(pl[4]-pl[3])}; }
+function shuffle(a,rng){ const R=rng||Math.random; for(let i=a.length-1;i>0;i--){ const j=R()*(i+1)|0; [a[i],a[j]]=[a[j],a[i]]; } return a; }
 /* One continent per round, in shuffled order, so a game spans the globe. */
-function continentPlan(n){ const plan=[]; while(plan.length<n) plan.push(...shuffle(CONTINENTS.slice())); return plan.slice(0,n); }
+function continentPlan(n,rng){ const plan=[]; while(plan.length<n) plan.push(...shuffle(CONTINENTS.slice(),rng)); return plan.slice(0,n); }
+
+/* ---------- Where in the world: a continent, a country, or anywhere ---------- */
+const CONT_NAMES={NA:'North America',SA:'South America',EU:'Europe',AF:'Africa',AS:'Asia',OC:'Oceania'};
+/* Built on first use: countryOfRegion leans on tables defined further down the file. */
+let _ci=null;
+function countryIndex(){
+  if(_ci) return _ci;
+  _ci={};   // continent -> country -> [region names]
+  for(const c of CONTINENTS){ _ci[c]={}; for(const p of PLACES[c]){ const k=countryOfRegion(p[0])||p[0]; (_ci[c][k]=_ci[c][k]||[]).push(p[0]); } }
+  return _ci;
+}
+function regionLabel(r){
+  if(!r||r.type==='all') return 'Anywhere';
+  if(r.type==='continent') return CONT_NAMES[r.value]||r.value;
+  return r.value;
+}
+/* Which PLACES entries a region allows. */
+function regionNames(r){
+  if(!r||r.type==='all') return null;
+  if(r.type==='continent') return new Set(PLACES[r.value].map(p=>p[0]));
+  const out=new Set();
+  for(const c of CONTINENTS) for(const p of PLACES[c]) if((countryOfRegion(p[0])||p[0])===r.value) out.add(p[0]);
+  return out;
+}
+/* City and island lists carry no country, so fall back to the boxes they sit inside. */
+function boxesFor(r){
+  if(!r||r.type==='all') return null;
+  const names=regionNames(r); const out=[];
+  for(const c of CONTINENTS) for(const p of PLACES[c]) if(names.has(p[0])) out.push(p);
+  return out;
+}
+function inBoxes(boxes,lat,lng){ return !boxes||boxes.some(b=>lat>=b[1]&&lat<=b[2]&&lng>=b[3]&&lng<=b[4]); }
+/* A mode plus a region: the mode's own pool narrowed to the chosen part of the world. */
+function applyRegion(m,r){
+  if(!r||r.type==='all') return m;
+  const names=regionNames(r), boxes=boxesFor(r);
+  const out={...m};
+  if(m.cities) out.cities=m.cities.filter(c=>inBoxes(boxes,c.length>4?c[3]:c[1],c.length>4?c[4]:c[2]));
+  else if(m.places) out.places=m.places.filter(p=>inBoxes(boxes,(p[1]+p[2])/2,(p[3]+p[4])/2));
+  else { const f=m.filter; out.filter=n=>names.has(n)&&(!f||f(n)); }
+  return out;
+}
+function regionEmpty(m,r){
+  if(!r||r.type==='all') return false;
+  const a=applyRegion(m,r);
+  if(a.cities) return !a.cities.length;
+  if(a.places) return !a.places.length;
+  return !CONTINENTS.flatMap(c=>PLACES[c]).some(p=>a.filter(p[0]));
+}
+/* Regions only constrain where you land, so a mode that already pins the world (Deported chains, Politics
+   targets a system) keeps its own logic and ignores the picker. */
+function regionOK(modeId){ const m=MODES[modeId]||{}; return !(m.deported||m.trio||m.choice); }
 
 /* ---------- Game modes ---------- */
 /* Small islands only (nothing bigger than roughly 2,000 km²), so the coast is never far away. [name, latMin, latMax, lngMin, lngMax] */
@@ -1081,16 +1234,19 @@ function modeOf(id){ return MODES[id]||MODES.classic; }
 /* ---------- Street View lookup (keyless service) ---------- */
 const gmapsReady = new Promise(res=>{ window.__gmapsReady = res; });
 let svService=null;
-async function findLocation(continent,mode){
+async function findLocation(continent,mode,rng){
   await gmapsReady;
   svService = svService || new google.maps.StreetViewService();
   mode=mode||{};
+  const R=rng||Math.random;
   const tried=[];
   for(let round=0; round<12; round++){
     let pl, name, point;
-    if(mode.cities){ const recent=new Set(recentPlaces().concat(tried)); let pool=mode.cities.filter(x=>!recent.has(x[0])); if(pool.length<3) pool=mode.cities; const c=pool[Math.random()*pool.length|0]; name=c[0]; const cy=c.length>4?c[3]:c[1], cx=c.length>4?c[4]:c[2]; point=()=>{ const r=Math.sqrt(Math.random())*mode.cityRadius, a=Math.random()*Math.PI*2; return {lat:cy+r*Math.sin(a), lng:cx+r*Math.cos(a)/Math.cos(cy*Math.PI/180)}; }; }
-    else if(mode.places){ const recent=new Set(recentPlaces().concat(tried)); let pool=mode.places.filter(x=>!recent.has(x[0])); if(pool.length<3) pool=mode.places.filter(x=>!tried.includes(x[0])); pl=pool[Math.random()*pool.length|0]; name=pl[0]; point=()=>pointIn(pl); }
-    else { pl=pickPlace(round<8?continent:null, tried, mode.filter); name=pl[0]; point=()=>pointIn(pl); }
+    if(mode.cities){ const recent=new Set(rng?tried:recentPlaces().concat(tried)); let pool=mode.cities.filter(x=>!recent.has(x[0])); if(pool.length<3) pool=mode.cities; if(!pool.length) break;
+      const c=pool[R()*pool.length|0]; name=c[0]; const cy=c.length>4?c[3]:c[1], cx=c.length>4?c[4]:c[2]; point=()=>{ const r=Math.sqrt(R())*mode.cityRadius, a=R()*Math.PI*2; return {lat:cy+r*Math.sin(a), lng:cx+r*Math.cos(a)/Math.cos(cy*Math.PI/180)}; }; }
+    else if(mode.places){ const recent=new Set(rng?tried:recentPlaces().concat(tried)); let pool=mode.places.filter(x=>!recent.has(x[0])); if(pool.length<3) pool=mode.places.filter(x=>!tried.includes(x[0])); if(!pool.length) break;
+      pl=pool[R()*pool.length|0]; name=pl[0]; point=()=>pointIn(pl,rng); }
+    else { pl=pickPlace(round<8?continent:null, tried, mode.filter, rng); if(!pl) break; name=pl[0]; point=()=>pointIn(pl,rng); }
     tried.push(name);
     const cont=pl?(CONTINENTS.find(c=>PLACES[c].includes(pl))||continent):null;
     if(mode.places&&pl&&(pl[2]-pl[1])*(pl[4]-pl[3])>1.5) continue;
@@ -1105,7 +1261,7 @@ async function findLocation(continent,mode){
         let place=null;
         if(mode.remote && MILLION.some(c=>haversine({lat,lng},{lat:c[1],lng:c[2]})<60)) continue;   // nowhere near a big city
         if(mode.alt){ const el=await elevationOf(lat,lng); if(el!=null && el<mode.alt) continue; }
-        let pano=loc.pano, heading=Math.floor(Math.random()*360);
+        let pano=loc.pano, heading=Math.floor(R()*360);
         if(mode.old||mode.snow){   // pick a historic capture of this spot that fits the mode
           const opts=(data.time||[]).map(e=>{ let d=null; for(const k of Object.keys(e)) if(e[k] instanceof Date) d=e[k]; return {pano:e.pano,d}; }).filter(e=>e.d);
           const south=lat<0;
@@ -1116,7 +1272,7 @@ async function findLocation(continent,mode){
             if(!best||bs<0.28) continue; pano=best.pano;
           } else {
             const fit=opts.filter(e=>e.d.getFullYear()<2010); if(!fit.length) continue;
-            pano=fit[Math.random()*fit.length|0].pano;
+            pano=fit[R()*fit.length|0].pano;
           }
         }
         let matched=null;
@@ -1126,7 +1282,7 @@ async function findLocation(continent,mode){
         if(mode.choice){ pol=POL[matched]; if(!pol) continue; }
         if(mode.slider){ tempF=await tempOf(lat,lng); if(tempF==null) continue; }
         if(mode.face&&mode.cities){ const c=mode.cities.find(x=>x[0]===name); if(c){ const dLon=(c[2]-lng)*Math.PI/180, la1=lat*Math.PI/180, la2=c[1]*Math.PI/180; heading=Math.round((Math.atan2(Math.sin(dLon)*Math.cos(la2),Math.cos(la1)*Math.sin(la2)-Math.sin(la1)*Math.cos(la2)*Math.cos(dLon))*180/Math.PI+360)%360); } }
-        notePlace(name);
+        if(!rng) notePlace(name);
         const out={ pano, lat, lng, heading, place, continent:cont, region:name, key:matched };
         if(pol) out.pol=pol;
         if(tempF!=null) out.tempF=tempF;
@@ -1264,8 +1420,8 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-112947';
-const state={ mode:'classic', chain:[], nomove:false, lock:false, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
+const BUILD='20260917-132646';
+const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
 
@@ -1275,7 +1431,7 @@ function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classi
    ------------------------------------------------------------------------------------------------------- */
 const LB_ROOT='worlddrop/v1/lb';
 const LB_MAX=50;
-const lb={links:[], boards:{}, seen:{}, queue:[], upAt:0};
+const lb={links:[], boards:{}, seen:{}, queue:[], upAt:0, daily:[], dailyDate:'', dailySeen:false};
 function lbLive(){ return lb.links.some(l=>l.ready); }
 function lbClean(e){
   if(!e||typeof e!=='object') return null;
@@ -1337,16 +1493,38 @@ function lbSubmit(entry){
   lbPaint();
 }
 function lbPaint(){
-  if(!$('menu').hidden) renderBoard();
+  if(!$('menu').hidden){ renderBoard(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintDailyButton(); }
   if(!$('board').hidden) renderBoardPage();
+  if(!$('daily').hidden) renderDailyBoard('dBoardWrap','dBoardSub');
+}
+/* Today's board is its own retained message, keyed by date, so it resets itself every day. */
+function dlMerge(list){
+  const byId=new Map(lb.daily.map(e=>[e.id,e]));
+  if(Array.isArray(list)) for(const raw of list.slice(0,300)){ const e=lbClean(raw); if(e&&!byId.has(e.id)) byId.set(e.id,e); }
+  lb.daily=[...byId.values()].sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,100);
+}
+function dlPublish(){
+  const payload=JSON.stringify(lb.daily); let sent=false;
+  for(const l of lb.links) if(l.ready){ try{ l.client.publish(DL_ROOT+'/'+lb.dailyDate,payload,{qos:0,retain:true}); sent=true; }catch(e){} }
+  return sent;
+}
+function dlSubmit(entry){
+  const e=lbClean(entry); if(!e) return null;
+  if(lb.dailyDate!==dailyDate()){ lb.dailyDate=dailyDate(); lb.daily=[]; lb.dailySeen=false; }
+  dlMerge([e]);
+  if(!lb.dailySeen&&!(lb.upAt&&Date.now()-lb.upAt>3000)) setTimeout(()=>{ dlPublish(); lbPaint(); },3500);
+  else dlPublish();
+  lbPaint(); return e;
 }
 function lbConnect(){
   for(const url of BROKERS){
     let c; try{ c=mqtt.connect(url,{connectTimeout:8000,reconnectPeriod:20000,keepalive:30,clean:true,clientId:'wdlb_'+Math.random().toString(36).slice(2,10)}); }catch(e){ continue; }
     const link={url,client:c,ready:false}; lb.links.push(link);
-    c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+'],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint(); });
+    c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); lb.dailyDate=dailyDate();
+      c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+',DL_ROOT+'/'+lb.dailyDate],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint(); });
     c.on('message',(t,payload)=>{ const parts=t.split('/'); const id=parts.pop(); let data=null; try{ data=JSON.parse(payload.toString()); }catch(e){ return; }
       if(parts[parts.length-1]==='st'){ if(data&&MODES[id]) stats.got[id]={r:stClean(data.r),g:stClean(data.g)}; return; }
+      if(parts[parts.length-1]==='dl'){ if(id===dailyDate()){ lb.dailySeen=true; lb.dailyDate=id; dlMerge(data); lbPaint(); } return; }
       lb.seen[id]=true; lbMerge(id,data); lbPaint(); });
     c.on('error',()=>{}); c.on('close',()=>{ link.ready=false; }); c.on('offline',()=>{ link.ready=false; lbPaint(); });
   }
@@ -1358,7 +1536,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
 /* ---------- Version ----------
    Counted from the project's own history: MAJOR is a release that added a capability, a batch of modes,
    or reworked the layout, the branding or the architecture. MINOR is everything else — fixes and polish. */
-const VERSION={major:23,minor:36};
+const VERSION={major:24,minor:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -1406,6 +1584,7 @@ function paintSfx(){ const b=$('sfxBtn'); if(!b) return; b.classList.toggle('off
    g = finished games as a percentage of the maximum. A client adds only its own samples to whatever
    it last received, so a lost update costs a few samples and nothing else. */
 const ST_ROOT='worlddrop/v1/st';
+const DL_ROOT='worlddrop/v1/dl';
 const ST_MIN=20;   // below this many samples a percentile is noise, so it stays hidden
 const stats={got:{}, mine:{}, dirty:{}};
 function newHist(){ return new Array(51).fill(0); }
@@ -1466,14 +1645,10 @@ function setFilter(key,val){
   const attr=key==='rounds'?'fr':'ft';
   document.querySelectorAll(`[data-${attr}]`).forEach(b=>b.classList.toggle('on',b.dataset[attr]===filter[key]));
 }
-document.querySelector('.filters').addEventListener('click',e=>{
-  const b=e.target.closest('.chip'); if(!b) return;
-  if(b.dataset.fr!=null) setFilter('rounds',b.dataset.fr); else setFilter('time',b.dataset.ft);
-  renderBoard();
-});
+
 function renderBoard(highlightId){
+  const wrap=$('boardWrap'); if(!wrap) return;   // the home page shows the daily board now; this survives for the mode pages
   const b=boardFor(filter.rounds,filter.time,'classic');
-  const wrap=$('boardWrap');
   const classic=boardFor('all','all','classic').length;
   const foot=`${classic} Classic score${classic===1?'':'s'} worldwide${lbLive()?'':' · offline, showing what\'s cached'}`;
   if(!b.length){ wrap.innerHTML=`<div class="empty">${classic?'No Classic scores with these settings.':'No Classic scores yet. Be the first.'}</div>`; $('boardCount').textContent=foot; return; }
@@ -1484,6 +1659,114 @@ function renderBoard(highlightId){
       return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`;
   $('boardCount').textContent=foot;
 }
+/* ---------- Where in the world: pick a continent, then narrow to a country ---------- */
+let regionCont=null;
+let regionFrom='setup';
+function curRegion(){ return regionFrom==='lobby'?(mp.settings.region||{type:'all',value:null}):state.region; }
+function paintRegion(){
+  if($('regionBtn')) $('regionBtn').textContent=regionLabel(state.region);
+  if($('mpRegionBtn')) $('mpRegionBtn').textContent=regionLabel(mp.settings.region);
+  const lbl=regionLabel(curRegion());
+  if($('regionNow')) $('regionNow').textContent=curRegion().type==='all'?'Anywhere on Earth':`Currently: ${lbl}`;
+}
+function renderRegionScreen(){
+  paintRegion();
+  const cur=curRegion();
+  $('regionAll').classList.toggle('on',cur.type==='all');
+  $('contGrid').innerHTML=CONTINENTS.map(c=>{
+    const n=Object.keys(countryIndex()[c]).length;
+    const on=(cur.type==='continent'&&cur.value===c)||regionCont===c;
+    return `<button data-cont="${c}" class="${on?'on':''}">${esc(CONT_NAMES[c])}<small>${n} countries</small></button>`;
+  }).join('');
+  const box=$('countryBox');
+  if(!regionCont){ box.hidden=true; return; }
+  box.hidden=false;
+  $('countryLbl').textContent=`Countries in ${CONT_NAMES[regionCont]}`;
+  const names=Object.keys(countryIndex()[regionCont]).sort();
+  $('countryGrid').innerHTML=
+    `<button data-whole="${regionCont}" class="${cur.type==='continent'&&cur.value===regionCont?'on':''}">All of ${esc(CONT_NAMES[regionCont])}</button>`+
+    names.map(n=>`<button data-country="${esc(n)}" class="${cur.type==='country'&&cur.value===n?'on':''}">${esc(n)}</button>`).join('');
+}
+function setRegion(r){ if(regionFrom==='lobby'){ mp.settings.region=r; hostSync(); } else state.region=r; paintRegion(); renderRegionScreen(); sfx('click'); }
+function openRegion(from){
+  regionFrom=from; const cur=curRegion();
+  regionCont=cur.type==='country' ? CONTINENTS.find(c=>Object.keys(countryIndex()[c]).includes(cur.value))
+    : (cur.type==='continent'?cur.value:null);
+  renderRegionScreen(); show('region'); $('region').scrollTo(0,0);
+}
+$('regionBtn').addEventListener('click',()=>openRegion('setup'));
+$('mpRegionBtn').addEventListener('click',()=>{ if(mp.role!=='host'){ toast('Only the host can change this'); return; } openRegion('lobby'); });
+$('regionBack').addEventListener('click',()=>{ show(regionFrom==='lobby'?'lobby':'setup'); });
+$('regionAll').addEventListener('click',()=>{ regionCont=null; setRegion({type:'all',value:null}); });
+$('contGrid').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
+  regionCont=b.dataset.cont; renderRegionScreen(); sfx('click');
+  $('countryBox').scrollIntoView({block:'nearest',behavior:'smooth'}); });
+$('countryGrid').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.whole) setRegion({type:'continent',value:b.dataset.whole});
+  else setRegion({type:'country',value:b.dataset.country}); });
+
+/* ---------- The daily drop: one game a day, identical everywhere ---------- */
+const DAILY_MODES=['classic','classic','classic','gray','pixel','blink','murica','jungle','million','landmarks','coast','islands','stranded','snow','timemachine','countdown','country','capitals','altitude','temp','allin'];
+const DAILY_TIMES=[5,10,15,20,30,30,45,60,60,90,120,180];
+function dailyDate(){ return new Date().toISOString().slice(0,10); }
+function dailyNice(d){ const [y,m,dd]=d.split('-').map(Number); return new Date(Date.UTC(y,m-1,dd)).toLocaleDateString(undefined,{month:'long',day:'numeric',timeZone:'UTC'}); }
+function dailyConfig(date){
+  date=date||dailyDate();
+  const r=mulberry32(seedFrom('pinpoint-daily-'+date));
+  const mode=DAILY_MODES[r()*DAILY_MODES.length|0];
+  const m=MODES[mode];
+  let time=DAILY_TIMES[r()*DAILY_TIMES.length|0];
+  if(m.time!=null) time=m.time;                       // Blink and Countdown carry their own clock
+  else if(m.slider||m.choice||m.country) time=Math.max(30,time);   // these need reading time
+  let region={type:'all',value:null};
+  const roll=r();
+  if(regionOK(mode)){
+    if(roll<0.30){ const c=CONTINENTS[r()*CONTINENTS.length|0]; region={type:'continent',value:c}; }
+    else if(roll<0.42){ const c=CONTINENTS[r()*CONTINENTS.length|0]; const names=Object.keys(countryIndex()[c]).sort();
+      const pick=names[r()*names.length|0]; const cand={type:'country',value:pick};
+      if(!regionEmpty(MODES[mode],cand)) region=cand; }
+  }
+  if(regionEmpty(MODES[mode],region)) region={type:'all',value:null};
+  return {date, mode, time, rounds:5, region};
+}
+function dailyDone(){ try{ return JSON.parse(localStorage.getItem('pp_daily')||'null'); }catch(e){ return null; } }
+function dailyMark(score){ try{ localStorage.setItem('pp_daily',JSON.stringify({date:dailyDate(),score})); }catch(e){} }
+function dailyFacts(cfg){
+  const bits=[['Mode',modeOf(cfg.mode).name],['Rounds',cfg.rounds],['Time per round',cfg.time?cfg.time+'s':'no limit']];
+  if(cfg.region.type!=='all') bits.push(['Where',regionLabel(cfg.region)]);
+  return bits.map(([k,v])=>`<div class="dfact"><small>${k}</small><b>${esc(String(v))}</b></div>`).join('');
+}
+function renderDaily(){
+  const cfg=dailyConfig(); const done=dailyDone(); const mine=done&&done.date===cfg.date?done:null;
+  $('dHero').style.backgroundImage=`url(images/mode-${cfg.mode}.jpg)`;
+  $('dDate').textContent='Daily drop · '+dailyNice(cfg.date);
+  $('dTitle').textContent=modeOf(cfg.mode).name+(cfg.region.type!=='all'?' in '+regionLabel(cfg.region):'');
+  $('dFacts').innerHTML=dailyFacts(cfg);
+  $('dStart').textContent=mine?'Play it again':'Start today\'s game';
+  $('dDone').hidden=!mine;
+  if(mine) $('dDone').innerHTML=`You've already played today — <b>${mine.score.toLocaleString()}</b>. Replays won't change the board.`;
+  renderDailyBoard('dBoardWrap','dBoardSub');
+}
+function renderDailyBoard(wrapId,subId){
+  const rows=(lb.daily||[]).slice().sort((a,b)=>b.score-a.score||a.ts-b.ts);
+  const me=dailyDone(); const mineId=me&&me.date===dailyDate()?me.id:null;
+  const wrap=$(wrapId); if(!wrap) return;
+  wrap.innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th style="text-align:right">Score</th></tr>`+
+    rows.slice(0,10).map((e,i)=>`<tr class="${e.id===mineId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="score">${e.score.toLocaleString()}</td></tr>`).join('')+`</table>`
+    :`<div class="empty">${lbLive()?'Nobody has played today yet. Go first.':'Connecting…'}</div>`;
+  if($(subId)) $(subId).textContent=rows.length?`${rows.length} player${rows.length===1?'':'s'} today`:'Everyone plays the same five locations';
+  if($('menuDailyCount')) $('menuDailyCount').textContent=rows.length?`${rows.length} played today`:'';
+}
+function paintDailyButton(){
+  const cfg=dailyConfig(); const done=dailyDone(); const mine=done&&done.date===cfg.date?done:null;
+  $('dailyHeadline').textContent=modeOf(cfg.mode).name+(cfg.region.type!=='all'?' in '+regionLabel(cfg.region):'');
+  $('dailySub').textContent=`${cfg.rounds} rounds · ${cfg.time?cfg.time+'s':'no limit'} · same for everyone today`;
+  $('dailyRight').textContent=mine?'Played':'Play';
+}
+$('dailyBtn').addEventListener('click',()=>{ renderDaily(); show('daily'); $('daily').scrollTo(0,0); });
+$('dailyBack').addEventListener('click',()=>{ paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); show('menu'); });
+$('dStart').addEventListener('click',()=>startGame({daily:dailyConfig()}));
+
 /* ---------- Leaderboard page: one board per mode ---------- */
 const bp={mode:'classic', rounds:'all', time:'all', highlight:null, from:'menu'};
 function openBoardPage(modeId,highlightId,from){
@@ -1584,10 +1867,11 @@ $('nagSave').addEventListener('click',()=>{
 });
 $('nagSkip').addEventListener('click',()=>{ const go=nagAction; hideNag(); if(go) go(); });
 function finalAgain(){ if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); } else if(!mp.role) startGame(); }
-function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); show('menu'); }
+function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintDailyButton(); show('menu'); }
 $('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
 $('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
-function show(id){ for(const s of ['menu','setup','board','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
+$('againBtn').addEventListener('click',()=>{ if(state.daily&&!mp.role) setTimeout(()=>startGame({daily:dailyConfig()}),0); },true);
+function show(id){ for(const s of ['menu','setup','region','daily','board','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
 
 /* ---------- Game flow ---------- */
 function ensureGuessMap(){
@@ -1626,24 +1910,29 @@ function resetGameState(){
   $('blink').hidden=true; stopPixel(); $('game').classList.toggle('gray',!!m.gray); $('game').classList.toggle('trio',!!m.trio);
   $('game').classList.toggle('nomap',!!(m.slider||m.choice)); resetGuessBar();
   $('bettray').hidden=!m.bet; state.bank=1000; state.bet=0; state.pick=null; $('trio').hidden=true; $('tmap').hidden=true; if(m.bet) renderBet();
-  state.chain=[]; peekClear();
+  state.chain=[]; state.daily=null; peekClear();
   state.round=0; state.score=0; state.results=[]; state.locs=[]; state.guess=null; state.saved=false; preload.idx=-1; preload.promise=null;
   panos.forEach(f=>{ f.onload=null; f.src='about:blank'; });
   ensureGuessMap();
 }
-async function startGame(){
+async function startGame(opts){
   if(mp.role) mpLeave();
+  const daily=opts&&opts.daily||null;
+  const rng=daily?mulberry32(seedFrom('pinpoint-'+daily.date)):null;
+  if(daily){ state.mode=daily.mode; state.region=daily.region; state.nomove=false; state.lock=false; }
   const m=modeOf(state.mode);
-  state.timeLimit=m.time!=null?m.time:state.userTime; state.totalRounds=m.rounds!=null?m.rounds:state.userRounds;
+  state.timeLimit=daily?daily.time:(m.time!=null?m.time:state.userTime);
+  state.totalRounds=daily?daily.rounds:(m.rounds!=null?m.rounds:state.userRounds);
   resetGameState();
+  state.daily=daily;
   $('startBtn').disabled=true; const __lbl=$('startBtn').textContent; $('startBtn').textContent='Loading…';
   show('game'); $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true; sfx('start');
-  const plan=continentPlan(state.totalRounds);
-  const pm=m;
+  const plan=continentPlan(state.totalRounds,rng);
+  const pm=regionOK(state.mode)?applyRegion(m,state.region):m;
   if(m.country){ $('loadingText').textContent='Loading borders…'; try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); show('setup'); $('startBtn').disabled=false; $('startBtn').textContent=__lbl; return; } }
   (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{
       if(m.deported){ const l=await deportStep(state.chain,m); state.locs[i]=l; state.chain.push(l.key); }
-      else state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],m.choice?polMode(m):pm);
+      else state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],m.choice?polMode(m):pm,rng);
     }catch(e){ state.locs[i]=e; } } })();
   await nextRound();
   $('startBtn').disabled=false; $('startBtn').textContent=__lbl;
@@ -1850,7 +2139,12 @@ function flash(){ const f=$('flash'); if(!f) return; f.classList.remove('go'); v
 
 /* ---------- Final ---------- */
 function showFinal(){
-  show('final'); $('standings').hidden=true; $('saveRow').hidden=false; $('roundChips').hidden=false; $('finalWait').hidden=true; $('againBtn').hidden=false; $('viewBoardBtn').hidden=false;
+  show('final'); $('standings').hidden=true; $('roundChips').hidden=false; $('finalWait').hidden=true; $('againBtn').hidden=false;
+  $('viewBoardBtn').hidden=!!state.daily; $('saveRow').hidden=false;
+  if(state.daily){   // a daily saves itself under the name you already use
+    $('saveRow').hidden=true;
+    if(!state.saved){ const e=recordScore(myName()||mp.me.name||'Anonymous'); state.saved=true; state.savedId=e&&e.id; }
+  }
   const max=state.totalRounds*5000;
   if(!finalMap) finalMap=makeMap('finalmap');
   if(finalLayer) finalLayer.remove();
@@ -1888,6 +2182,14 @@ function showFinal(){
 }
 /* Every finished game lands on the board the same way, solo or with friends. */
 function recordScore(name){
+  if(state.daily){   // the daily has its own board and doesn't touch the all-time ones
+    const done=dailyDone();
+    if(done&&done.date===state.daily.date) return {id:done.id||''};
+    const e=dlSubmit({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||'Anonymous').slice(0,20),
+      score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now()});
+    if(e) try{ localStorage.setItem('pp_daily',JSON.stringify({date:state.daily.date,score:state.score,id:e.id})); }catch(err){}
+    return e||{id:''};
+  }
   const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||'Anonymous').slice(0,20),
     score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()};
   const b=loadBoard(); b.push(entry); saveBoard(b);
@@ -2409,7 +2711,7 @@ window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resu
    ========================================================= */
 const COLORS=[['#e63946','Red'],['#ff6b6b','Coral'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#9acd32','Lime'],['#2bb673','Green'],['#12a5a0','Teal'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#6f42c1','Indigo'],['#b23fd0','Purple'],['#e84393','Pink']];
 const BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081'];
-const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpeer:null}, code:'', settings:{time:60,rounds:5,mode:'classic',nomove:false,lock:false}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby',
+const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpeer:null}, code:'', settings:{time:60,rounds:5,mode:'classic',nomove:false,lock:false,region:{type:'all',value:null}}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby',
            links:[], link:null, seen:{}, hb:null, hostSeen:0, joinTimer:null, brokerIdx:0 };
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ';
 function mkCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.random()*CODE_CHARS.length|0]; return c; }
@@ -2615,7 +2917,8 @@ function findGameLocations(){
   const rounds=mp.settings.rounds;
   if(mp.locPromise&&mp.locRounds===rounds) return mp.locPromise;
   mp.locRounds=rounds;
-  const m=modeOf(mp.settings.mode);
+  const m0=modeOf(mp.settings.mode);
+  const m=regionOK(mp.settings.mode)?applyRegion(m0,mp.settings.region):m0;
   mp.locPromise=(async()=>{ const plan=continentPlan(rounds); const locs=[]; const chain=[];
     for(let i=0;i<plan.length;i++){
       if(m.deported){ const l=await deportStep(chain,m); locs[i]=l; chain.push(l.key); continue; }
@@ -2716,7 +3019,7 @@ function renderLobby(){
   $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}"><span class="sw" style="background:${p.color===null?'#cfd8d2':COLORS[p.color][0]}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
   $('swatches').innerHTML=COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
     return `<div class="swatch ${mine?'mine':''} ${taken?'taken':''}" data-i="${i}" style="background:${c}" ${taken?`data-owner="${esc(owner.name||'taken')}"`:''} title="${n}">${mine?'✓':''}</div>`; }).join('');
-  paintRules($('mpRules'),mp.settings);
+  paintRules($('mpRules'),mp.settings); paintRegion();
   if(mp.role==='host'){ mpTimePick.mark(mp.settings.time); mpRoundPick.mark(mp.settings.rounds); const cur=mp.settings.mode||'classic'; markTiles($('lobbyModeGrid'),cur); $('mpStartBtn').textContent=`Start ${modeOf(cur).name} game`; }
   else { const m=modeOf(mp.settings.mode); $('guestPanel').textContent=`Waiting for the host to start… (${m.name} · ${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`; }
 }
@@ -2954,10 +3257,10 @@ function markTiles(grid,id){ [...grid.children].forEach(t=>t.classList.toggle('o
 $('modeGrid').innerHTML=modeTiles(false);
 function setSoloMode(id){ state.mode=id; markTiles($('modeGrid'),id); $('startBtn').textContent='Play '+modeOf(id).name; if(modeOf(id).country) loadGeo().catch(()=>{}); }
 $('modeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); if(b) setSoloMode(b.dataset.mode); });
-$('soloBtn').addEventListener('click',()=>{ setSoloMode('classic'); show('setup'); $('setup').scrollTo(0,0); });
+$('soloBtn').addEventListener('click',()=>{ setSoloMode('classic'); paintRegion(); show('setup'); $('setup').scrollTo(0,0); });
 $('setupBack').addEventListener('click',()=>show('menu'));
 $('lobbyModeGrid').innerHTML=modeTiles(true);
-function setLobbyMode(id){ mp.settings.mode=id; const m=modeOf(id); if(m.time!=null) mp.settings.time=m.time; if(m.rounds!=null) mp.settings.rounds=m.rounds; mp.locPromise=null; if(m.country) loadGeo().catch(()=>{}); hostSync(); }
+function setLobbyMode(id){ mp.settings.mode=id; if(!regionOK(id)) mp.settings.region={type:'all',value:null}; const m=modeOf(id); if(m.time!=null) mp.settings.time=m.time; if(m.rounds!=null) mp.settings.rounds=m.rounds; mp.locPromise=null; if(m.country) loadGeo().catch(()=>{}); hostSync(); }
 $('lobbyModeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); if(b) setLobbyMode(b.dataset.mode); });
 const mpTimePick=picker('mpTimeSeg','mpTimeCustom','t',1,180,v=>{ mp.settings.time=v; hostSync(); });
 const mpRoundPick=picker('mpRoundSeg','mpRoundCustom','r',1,100,v=>{ mp.settings.rounds=v; hostSync(); });
@@ -3008,6 +3311,9 @@ async function checkUpdate(){
 if(location.protocol==='https:'){ setTimeout(checkUpdate,3000); setInterval(checkUpdate,90000); }
 function toast(msg,kind){ const t=document.createElement('div'); t.className='toast'+(kind?' '+kind:''); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),kind==='ok'?1800:3500); }
 </script>
-<script async src="https://maps.googleapis.com/maps/api/js?callback=__gmapsReady&loading=async&v=weekly"></script>
+<script async src="https://maps.googleapis.com/maps/api/js?callback=__gmapsReady&loading=async&v=weekly">
+/* First paint of the pieces defined further down the file. */
+paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion();
+</script>
 </body>
 </html>
