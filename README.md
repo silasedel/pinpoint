@@ -1,4 +1,4 @@
-# WorldDrop
+# Pinpoint
 
 A single-file Street View geography game, solo or with friends. You get dropped somewhere on Earth, drop a pin where you think you are, and score up to 5,000 points per round on GeoGuessr's distance curve.
 
