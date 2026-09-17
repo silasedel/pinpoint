@@ -56,7 +56,7 @@ Game traffic never depends on a direct connection, so joining works from any net
 
 ## Version
 
-The footer on the home page carries the version, counted from this repo's own history: `v<major>.<minor>`, where a **major** release added a capability, a batch of modes, or reworked the layout, the branding or the architecture, and a **minor** one is a fix or a polish pass. It sits next to the build stamp, and the same footer holds the credits and the small print.
+The footer on the home page shows the version as `v<major>.<minor>`. Major goes up for a new capability, a batch of modes, or a layout, branding or architecture rework; minor goes up for a fix or a polish pass. It's bumped with every change, the build stamp is in the tooltip, and the same footer holds the credits and the small print.
 
 ## Feel and rules
 
