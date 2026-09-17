@@ -1258,7 +1258,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-094605';
+const BUILD='20260917-094951';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1301,18 +1301,27 @@ function lbFlush(){
   lb.queue=rest;
   if(lb.queue.length) setTimeout(lbFlush,4000);
 }
-/* Everything this browser saved before the board went public gets uploaded once, then the local copy is just a backup. */
-function lbMigrate(){
-  let done=false; try{ done=localStorage.getItem('pp_migrated')==='1'; }catch(e){}
-  if(done) return;
+/* Reconcile, not a one-shot migration: on every load, any score this browser has that is missing from the
+   public board — and still good enough to belong on it — gets uploaded. Self-healing, so a score saved while
+   offline, or on a load that was cut short, turns up the next time the page opens. */
+let lbSynced=0;
+function lbReconcile(announce){
   const byMode={};
-  for(const e of loadBoard()){ const id=entryModeId(e); if(!MODES[id]) continue; (byMode[id]=byMode[id]||[]).push(e); }
-  const ids=Object.keys(byMode);
-  if(!ids.length){ try{ localStorage.setItem('pp_migrated','1'); }catch(e){} return; }
-  let all=true;
-  for(const id of ids){ lbMerge(id,byMode[id]); if(!lbPublish(id)) all=false; }
-  if(all){ try{ localStorage.setItem('pp_migrated','1'); }catch(e){} lbPaint(); }
-  else setTimeout(lbMigrate,4000);
+  for(const e of loadBoard()){ const id=entryModeId(e); if(!MODES[id]||!lbClean(e)) continue; (byMode[id]=byMode[id]||[]).push(e); }
+  let uploaded=0, pending=0;
+  for(const id of Object.keys(byMode)){
+    const board=lb.boards[id]||[];
+    if(!lb.seen[id]&&!lbReadyFor(id)){ pending++; continue; }          // wait for this mode's board to arrive
+    const have=new Set(board.map(e=>e.id));
+    const cut=board.length>=LB_MAX ? board[LB_MAX-1].score : -1;        // no point re-posting one the cap would drop
+    const missing=byMode[id].filter(e=>!have.has(e.id)&&e.score>cut);
+    if(!missing.length) continue;
+    lbMerge(id,missing);
+    if(lbPublish(id)) uploaded+=missing.length; else pending++;
+  }
+  if(uploaded){ lbSynced+=uploaded; lbPaint();
+    if(announce) toast(`Added ${uploaded} saved score${uploaded===1?'':'s'} to the public leaderboard`); }
+  if(pending) setTimeout(()=>lbReconcile(announce),4000);
 }
 function lbSubmit(entry){
   const e=lbClean(entry); if(!e) return;
@@ -1329,7 +1338,7 @@ function lbConnect(){
   for(const url of BROKERS){
     let c; try{ c=mqtt.connect(url,{connectTimeout:8000,reconnectPeriod:20000,keepalive:30,clean:true,clientId:'wdlb_'+Math.random().toString(36).slice(2,10)}); }catch(e){ continue; }
     const link={url,client:c,ready:false}; lb.links.push(link);
-    c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+'],{qos:0}); setTimeout(()=>{ lbFlush(); lbMigrate(); stPublish(); },1800); lbPaint(); });
+    c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+'],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint(); });
     c.on('message',(t,payload)=>{ const parts=t.split('/'); const id=parts.pop(); let data=null; try{ data=JSON.parse(payload.toString()); }catch(e){ return; }
       if(parts[parts.length-1]==='st'){ if(data&&MODES[id]) stats.got[id]={r:stClean(data.r),g:stClean(data.g)}; return; }
       lb.seen[id]=true; lbMerge(id,data); lbPaint(); });
@@ -1337,6 +1346,8 @@ function lbConnect(){
   }
 }
 setTimeout(lbConnect,300);
+setTimeout(()=>lbReconcile(false),12000);
+window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }catch(e){} });
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
 const sfxOn={v:true}; try{ sfxOn.v=localStorage.getItem('pp_sfx')!=='0'; }catch(e){}
