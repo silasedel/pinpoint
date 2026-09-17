@@ -1258,7 +1258,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-094951';
+const BUILD='20260917-101916';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1687,8 +1687,6 @@ async function nextRound(){
   else stopPixel();
   $('loading').classList.add('fade');
   const ri=$('roundIntro'); ri.innerHTML=`<div>Round ${state.round} <span>/ ${state.totalRounds}</span></div>`; ri.hidden=false; setTimeout(()=>{ ri.hidden=true; },1100);
-  if(state.round===1) setTimeout(()=>{ if(!$('game').hidden) toast(state.lock?'Camera locked: one fixed view, no looking around'
-    :(state.nomove?'No move: drag to look around, scroll to zoom':'Drag to look around · click the arrows on the road to move')); },1400);
   if(state.mode==='blink'){ const r0=state.round; setTimeout(()=>{ if(state.round===r0&&!$('game').hidden){ runBlink(); startTimer(); } },1250); }   // intro first, then the glimpse and the clock together
   else startTimer();
   if(!modeOf(state.mode).trio&&!canvasRound) preloadRound(idx+1);
