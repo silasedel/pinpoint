@@ -110,8 +110,9 @@
   table.board{width:100%;border-collapse:collapse;font-size:14px}
   .board th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
   .board td{padding:9px 8px;border-bottom:1px solid #eef2ef;white-space:nowrap}
-  .board td.rank{color:var(--muted);width:32px}
-  .board td.name{font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+  .board th:first-child{width:36px}
+  .board td.rank{color:var(--muted);width:36px}
+  .board td.name{font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:260px;width:99%}
   .board td.score{font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
   .board td.mode{color:var(--muted);font-size:12px}
   .board tr.me td{background:var(--green-soft)}
@@ -1420,7 +1421,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-132646';
+const BUILD='20260917-133842';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1536,7 +1537,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
 /* ---------- Version ----------
    Counted from the project's own history: MAJOR is a release that added a capability, a batch of modes,
    or reworked the layout, the branding or the architecture. MINOR is everything else — fixes and polish. */
-const VERSION={major:24,minor:0};
+const VERSION={major:24,minor:1};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -1742,9 +1743,10 @@ function renderDaily(){
   $('dDate').textContent='Daily drop · '+dailyNice(cfg.date);
   $('dTitle').textContent=modeOf(cfg.mode).name+(cfg.region.type!=='all'?' in '+regionLabel(cfg.region):'');
   $('dFacts').innerHTML=dailyFacts(cfg);
-  $('dStart').textContent=mine?'Play it again':'Start today\'s game';
+  $('dStart').textContent=mine?'Already played today':'Start today\'s game';
+  $('dStart').disabled=!!mine;
   $('dDone').hidden=!mine;
-  if(mine) $('dDone').innerHTML=`You've already played today — <b>${mine.score.toLocaleString()}</b>. Replays won't change the board.`;
+  if(mine) $('dDone').innerHTML=`You scored <b>${mine.score.toLocaleString()}</b> today. A new drop lands at midnight UTC.`;
   renderDailyBoard('dBoardWrap','dBoardSub');
 }
 function renderDailyBoard(wrapId,subId){
@@ -1765,7 +1767,9 @@ function paintDailyButton(){
 }
 $('dailyBtn').addEventListener('click',()=>{ renderDaily(); show('daily'); $('daily').scrollTo(0,0); });
 $('dailyBack').addEventListener('click',()=>{ paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); show('menu'); });
-$('dStart').addEventListener('click',()=>startGame({daily:dailyConfig()}));
+$('dStart').addEventListener('click',()=>{ const cfg=dailyConfig(); const done=dailyDone();
+  if(done&&done.date===cfg.date){ toast('You have already played today\'s drop'); return; }
+  startGame({daily:cfg}); });
 
 /* ---------- Leaderboard page: one board per mode ---------- */
 const bp={mode:'classic', rounds:'all', time:'all', highlight:null, from:'menu'};
@@ -1866,11 +1870,16 @@ $('nagSave').addEventListener('click',()=>{
   const go=nagAction; hideNag(); $('saveBtn').click(); if(go) go();
 });
 $('nagSkip').addEventListener('click',()=>{ const go=nagAction; hideNag(); if(go) go(); });
-function finalAgain(){ if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); } else if(!mp.role) startGame(); }
+function finalAgain(){
+  if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); return; }
+  if(mp.role) return;
+  if(state.daily){ finalMenu(); return; }   // one drop a day; there's nothing to replay
+  startGame();
+}
 function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintDailyButton(); show('menu'); }
 $('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
 $('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
-$('againBtn').addEventListener('click',()=>{ if(state.daily&&!mp.role) setTimeout(()=>startGame({daily:dailyConfig()}),0); },true);
+
 function show(id){ for(const s of ['menu','setup','region','daily','board','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
 
 /* ---------- Game flow ---------- */
@@ -2141,6 +2150,7 @@ function flash(){ const f=$('flash'); if(!f) return; f.classList.remove('go'); v
 function showFinal(){
   show('final'); $('standings').hidden=true; $('roundChips').hidden=false; $('finalWait').hidden=true; $('againBtn').hidden=false;
   $('viewBoardBtn').hidden=!!state.daily; $('saveRow').hidden=false;
+  $('againBtn').textContent=state.daily?'Back to menu':'Play again';
   if(state.daily){   // a daily saves itself under the name you already use
     $('saveRow').hidden=true;
     if(!state.saved){ const e=recordScore(myName()||mp.me.name||'Anonymous'); state.saved=true; state.savedId=e&&e.id; }
@@ -2270,15 +2280,31 @@ async function buildCopyImage(pano){
   const c=document.createElement('canvas'); c.width=VIEW_W*2+GAP*3; c.height=VIEW_H*2+GAP*3; const ctx=c.getContext('2d');
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height);
   const views=[[0,'North'],[90,'East'],[180,'South'],[270,'West']];
+  const look=modeOf(state.mode);
   for(let i=0;i<4;i++){
     const [hd,name]=views[i]; const x=GAP+(i%2)*(VIEW_W+GAP), y=GAP+Math.floor(i/2)*(VIEW_H+GAP);
     ctx.putImageData(renderView(band,hd,meta,c),x,y);
+    modeLook(ctx,c,x,y,look);
     await new Promise(r=>setTimeout(r,0));
     ctx.strokeStyle='#d5dcd8'; ctx.lineWidth=2; ctx.strokeRect(x-1,y-1,VIEW_W+2,VIEW_H+2);
     ctx.font='600 18px Inter, sans-serif'; const t=name+' · '+hd+'°'; const tw=Math.round(ctx.measureText(t).width)+22; const lx=x+Math.round(VIEW_W/2-tw/2);
     ctx.fillStyle='rgba(0,0,0,.6)'; ctx.beginPath(); ctx.roundRect(lx,y+10,tw,28,14); ctx.fill(); ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.fillText(t,x+VIEW_W/2,y+30); ctx.textAlign='left';
   }
   return c;
+}
+/* The copy should look like the round you're playing: grey stays grey, pixelated stays blocky. */
+function modeLook(ctx,canvas,x,y,m){
+  if(state.mode==='pixel'){
+    const bw=Math.round(VIEW_W/9), bh=Math.round(VIEW_H/9);   // same blockiness as the in-game canvas
+    const tmp=document.createElement('canvas'); tmp.width=bw; tmp.height=bh;
+    tmp.getContext('2d').drawImage(canvas,x,y,VIEW_W,VIEW_H,0,0,bw,bh);
+    ctx.imageSmoothingEnabled=false; ctx.drawImage(tmp,0,0,bw,bh,x,y,VIEW_W,VIEW_H); ctx.imageSmoothingEnabled=true;
+  }
+  if(m&&m.gray){
+    const d=ctx.getImageData(x,y,VIEW_W,VIEW_H), p=d.data;
+    for(let i=0;i<p.length;i+=4){ const v=0.299*p[i]+0.587*p[i+1]+0.114*p[i+2]; p[i]=p[i+1]=p[i+2]=v; }
+    ctx.putImageData(d,x,y);
+  }
 }
 function canvasBlob(c){ return new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('toBlob failed')),'image/png')); }
 let copyBusy=false;
