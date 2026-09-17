@@ -1435,7 +1435,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-135028';
+const BUILD='20260917-140541';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1551,44 +1551,46 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
 /* ---------- Version ----------
    Counted from the project's own history: MAJOR is a release that added a capability, a batch of modes,
    or reworked the layout, the branding or the architecture. MINOR is everything else — fixes and polish. */
-const VERSION={major:24,minor:2};
+const VERSION={major:24,minor:3};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
 const sfxOn={v:true}; try{ sfxOn.v=localStorage.getItem('pp_sfx')!=='0'; }catch(e){}
-let AC=null;
+let AC=null, BUS=null;
 function ac(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } } if(AC.state==='suspended') AC.resume(); return AC; }
-function tone({f=440,to=null,t=0.12,type='sine',v=0.2,delay=0,slide='exponential'}){
-  const a=ac(); if(!a||!sfxOn.v) return;
-  const o=a.createOscillator(), g=a.createGain(); o.type=type; const t0=a.currentTime+delay;
-  o.frequency.setValueAtTime(f,t0);
-  if(to){ if(slide==='linear') o.frequency.linearRampToValueAtTime(to,t0+t); else o.frequency.exponentialRampToValueAtTime(Math.max(1,to),t0+t); }
-  g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(v,t0+0.012);
+/* Everything runs through one soft-edged bus: a gentle low-pass and a little headroom, so nothing sounds brittle. */
+function bus(){
+  const a=ac(); if(!a) return null;
+  if(!BUS){ const g=a.createGain(); g.gain.value=0.9; const lp=a.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=4200; lp.Q.value=0.6;
+    g.connect(lp).connect(a.destination); BUS=g; }
+  return BUS;
+}
+/* One warm note: a sine body with a quiet octave above it, slow enough attack that nothing clicks. */
+function note({f=440,to=null,t=0.5,v=0.16,delay=0,attack=0.02,shine=0.28,type='sine'}){
+  const a=ac(), b=bus(); if(!a||!b||!sfxOn.v) return;
+  const t0=a.currentTime+delay, g=a.createGain();
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.linearRampToValueAtTime(v,t0+attack);
   g.gain.exponentialRampToValueAtTime(0.0001,t0+t);
-  o.connect(g).connect(a.destination); o.start(t0); o.stop(t0+t+0.05);
+  g.connect(b);
+  const mk=(freq,mul,ty)=>{ const o=a.createOscillator(); o.type=ty; o.frequency.setValueAtTime(freq,t0);
+    if(to) o.frequency.exponentialRampToValueAtTime(Math.max(20,to*mul),t0+t*0.9);
+    const gg=a.createGain(); gg.gain.value=mul===1?1:shine; o.connect(gg).connect(g); o.start(t0); o.stop(t0+t+0.06); };
+  mk(f,1,type); if(shine>0) mk(f*2,2,'triangle');
 }
-function noise({t=0.25,v=0.12,from=1800,to=300,delay=0}){
-  const a=ac(); if(!a||!sfxOn.v) return;
-  const n=Math.floor(a.sampleRate*t), buf=a.createBuffer(1,n,a.sampleRate), d=buf.getChannelData(0);
-  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
-  const src=a.createBufferSource(); src.buffer=buf;
-  const f=a.createBiquadFilter(); f.type='bandpass'; f.Q.value=1.1;
-  const t0=a.currentTime+delay;
-  f.frequency.setValueAtTime(from,t0); f.frequency.exponentialRampToValueAtTime(Math.max(40,to),t0+t);
-  const g=a.createGain(); g.gain.setValueAtTime(v,t0); g.gain.exponentialRampToValueAtTime(0.0001,t0+t);
-  src.connect(f).connect(g).connect(a.destination); src.start(t0); src.stop(t0+t+0.02);
-}
+/* A chord that swells instead of an arpeggio that rattles. */
+function chord(freqs,{t=0.9,v=0.13,delay=0,attack=0.05}={}){ freqs.forEach((f,i)=>note({f,t:t-i*0.04,v:v*(1-i*0.12),delay:delay+i*0.015,attack,shine:0.2})); }
 const SFX={
-  pin:   ()=>{ tone({f:760,to:420,t:0.09,type:'triangle',v:0.16}); },
-  click: ()=>{ tone({f:520,to:520,t:0.05,type:'square',v:0.05}); },
-  lock:  ()=>{ tone({f:330,to:660,t:0.16,type:'triangle',v:0.18}); noise({t:0.18,v:0.05,from:1200,to:400}); },
-  reveal:()=>{ noise({t:0.45,v:0.13,from:2600,to:220}); tone({f:180,to:90,t:0.4,type:'sine',v:0.1}); },
-  tick:  ()=>{ tone({f:1180,t:0.03,type:'square',v:0.035}); },
-  great: ()=>{ [0,0.09,0.18].forEach((d,i)=>tone({f:[523,659,784][i],t:0.3,type:'triangle',v:0.16,delay:d})); },
-  perfect:()=>{ [0,0.08,0.16,0.26].forEach((d,i)=>tone({f:[659,784,988,1319][i],t:0.42,type:'triangle',v:0.17,delay:d})); },
-  low:   ()=>{ tone({f:880,t:0.07,type:'square',v:0.07}); },
-  out:   ()=>{ tone({f:300,to:110,t:0.5,type:'sawtooth',v:0.14}); noise({t:0.35,v:0.08,from:700,to:120}); },
-  start: ()=>{ tone({f:392,t:0.14,type:'triangle',v:0.14}); tone({f:587,t:0.22,type:'triangle',v:0.14,delay:0.11}); },
+  pin:    ()=>note({f:587,to:392,t:0.22,v:0.15,attack:0.006,shine:0.15}),
+  click:  ()=>note({f:494,t:0.12,v:0.07,attack:0.008,shine:0.1}),
+  lock:   ()=>{ note({f:440,t:0.3,v:0.13,attack:0.012,shine:0.2}); note({f:659,t:0.42,v:0.11,delay:0.07,attack:0.02,shine:0.2}); },
+  reveal: ()=>{ note({f:330,to:247,t:0.85,v:0.1,attack:0.09,shine:0.12}); note({f:494,to:370,t:0.7,v:0.07,delay:0.05,attack:0.12,shine:0.1}); },
+  count:  (ms)=>note({f:330,to:660,t:Math.max(0.4,Math.min(1.4,(ms||900)/1000)),v:0.05,attack:0.06,shine:0.08}),
+  great:  ()=>chord([523,659,784],{t:1.0,v:0.13}),
+  perfect:()=>{ chord([523,659,784,1047],{t:1.3,v:0.13}); note({f:1568,t:0.9,v:0.06,delay:0.22,attack:0.08,shine:0.15}); },
+  low:    ()=>note({f:392,t:0.16,v:0.08,attack:0.006,shine:0.05}),
+  out:    ()=>{ note({f:294,to:147,t:0.9,v:0.12,attack:0.03,shine:0.1}); note({f:196,to:98,t:1.1,v:0.09,delay:0.05,attack:0.05,shine:0}); },
+  start:  ()=>{ note({f:392,t:0.35,v:0.11,attack:0.02,shine:0.18}); note({f:587,t:0.5,v:0.1,delay:0.12,attack:0.03,shine:0.18}); },
 };
 function sfx(n){ try{ if(sfxOn.v&&SFX[n]) SFX[n](); }catch(e){} }
 function sfxToggle(){ sfxOn.v=!sfxOn.v; try{ localStorage.setItem('pp_sfx',sfxOn.v?'1':'0'); }catch(e){} paintSfx(); if(sfxOn.v) sfx('click'); }
@@ -2150,10 +2152,10 @@ function renderVerdict(r){
 $('nextBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpHostNext(); return; } if(mp.role) return; if(state.round>=state.totalRounds||(modeOf(state.mode).bet&&state.bank<=0)) showFinal(); else nextRound(); });
 
 function countUp(el,from,to,ms,signed){
-  const t0=performance.now(); let lastTick=0;
+  const t0=performance.now();
+  if(to-from>200) try{ if(sfxOn.v&&SFX.count) SFX.count(ms); }catch(e){}
   (function step(t){ const k=Math.min(1,(t-t0)/ms); const e=1-Math.pow(1-k,3); const v=Math.round(from+(to-from)*e);
     el.textContent=(signed&&v>0?'+':'')+v.toLocaleString();
-    if(to>from&&t-lastTick>55&&k<1){ lastTick=t; sfx('tick'); }
     if(k<1) requestAnimationFrame(step); })(t0);
 }
 /* A white bloom over the panorama when a guess lands close. */
