@@ -66,6 +66,9 @@
     position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
   .dailybtn::after{content:'';position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.09)}
   .dailybtn:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(20,60,38,.42)}
+  .dailybtn .dmark{position:relative;z-index:1;flex:none;width:58px;height:58px;display:grid;place-items:center;
+    border-radius:18px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.34);color:#fff}
+  .dailybtn .dmark svg{width:34px;height:34px}
   .dailybtn .dl{flex:1;min-width:0;position:relative;z-index:1}
   .dailybtn .k{display:block;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
   .dailybtn b{display:block;font-size:24px;letter-spacing:-.4px;margin:2px 0 3px}
@@ -133,7 +136,8 @@
   .dhero::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,.25) 70%,rgba(0,0,0,.1))}
   .dhero .t{position:relative;z-index:1;color:#fff}
   .dhero h2{margin:2px 0 0;font-size:30px;letter-spacing:-.5px;text-shadow:0 2px 12px rgba(0,0,0,.55)}
-  .dkicker{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.9}
+  .dkicker{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.95}
+  .dkicker svg{width:22px;height:22px;flex:none}
   .dfacts{display:flex;flex-wrap:wrap;gap:10px;padding:18px 22px 4px}
   .dfact{flex:1 1 130px;background:var(--green-soft);border-radius:12px;padding:10px 12px}
   .dfact small{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--green-dark)}
@@ -582,6 +586,15 @@
   </g>
   <circle cx="32" cy="24.5" r="12.3" fill="none" stroke="#0f5c31" stroke-opacity=".55" stroke-width="1"/>
   <path d="M24.2 16.8a11.4 11.4 0 0 1 5.6-3.6" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.8" stroke-linecap="round"/>
+</symbol>
+<symbol id="dailymark" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-opacity=".38" stroke-width="2"/>
+  <circle cx="32" cy="32" r="22.5" fill="none" stroke="currentColor" stroke-opacity=".9" stroke-width="2.4"/>
+  <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-opacity=".55">
+    <path d="M32 2.5v6M32 55.5v6M2.5 32h6M55.5 32h6"/>
+  </g>
+  <path d="M32 11.5 36.6 27.4 52.5 32 36.6 36.6 32 52.5 27.4 36.6 11.5 32 27.4 27.4z" fill="currentColor"/>
+  <circle cx="32" cy="32" r="4.2" fill="currentColor" stroke="#1f9d55" stroke-width="2.6"/>
 </symbol></defs></svg>
 
 
@@ -611,12 +624,13 @@
 
   <div class="menu-wrap">
     <button class="dailybtn" id="dailyBtn">
+      <span class="dmark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#dailymark"/></svg></span>
       <span class="dl">
-        <span class="k">Daily drop</span>
-        <b id="dailyHeadline">Today's game</b>
-        <span class="s" id="dailySub">Five rounds. Same for everyone, everywhere.</span>
+        <span class="k" id="dailyDateLbl">Daily mission</span>
+        <b>Today's mission</b>
+        <span class="s">Five rounds, one shot. Nobody knows what it is until they open it.</span>
       </span>
-      <span class="dr" id="dailyRight">Play</span>
+      <span class="dr" id="dailyRight">Open</span>
     </button>
     <div class="grid">
       <div class="card solo-card big">
@@ -666,7 +680,7 @@
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="dailyBack" style="margin-left:auto">Back</button></div>
     <div class="card dailycard">
       <div class="dhero" id="dHero">
-        <div class="t"><div class="dkicker" id="dDate">Daily</div><h2 id="dTitle">Today's drop</h2></div>
+        <div class="t"><div class="dkicker"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#dailymark"/></svg><span id="dDate">Daily</span></div><h2 id="dTitle">Today's mission</h2></div>
       </div>
       <div class="dfacts" id="dFacts"></div>
       <button class="btn btn-primary btn-block big" id="dStart">Start today's game</button>
@@ -1421,7 +1435,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-133842';
+const BUILD='20260917-135028';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1537,7 +1551,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
 /* ---------- Version ----------
    Counted from the project's own history: MAJOR is a release that added a capability, a batch of modes,
    or reworked the layout, the branding or the architecture. MINOR is everything else — fixes and polish. */
-const VERSION={major:24,minor:1};
+const VERSION={major:24,minor:2};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -1740,7 +1754,7 @@ function dailyFacts(cfg){
 function renderDaily(){
   const cfg=dailyConfig(); const done=dailyDone(); const mine=done&&done.date===cfg.date?done:null;
   $('dHero').style.backgroundImage=`url(images/mode-${cfg.mode}.jpg)`;
-  $('dDate').textContent='Daily drop · '+dailyNice(cfg.date);
+  $('dDate').textContent='Daily mission · '+dailyNice(cfg.date);
   $('dTitle').textContent=modeOf(cfg.mode).name+(cfg.region.type!=='all'?' in '+regionLabel(cfg.region):'');
   $('dFacts').innerHTML=dailyFacts(cfg);
   $('dStart').textContent=mine?'Already played today':'Start today\'s game';
@@ -1760,10 +1774,9 @@ function renderDailyBoard(wrapId,subId){
   if($('menuDailyCount')) $('menuDailyCount').textContent=rows.length?`${rows.length} played today`:'';
 }
 function paintDailyButton(){
-  const cfg=dailyConfig(); const done=dailyDone(); const mine=done&&done.date===cfg.date?done:null;
-  $('dailyHeadline').textContent=modeOf(cfg.mode).name+(cfg.region.type!=='all'?' in '+regionLabel(cfg.region):'');
-  $('dailySub').textContent=`${cfg.rounds} rounds · ${cfg.time?cfg.time+'s':'no limit'} · same for everyone today`;
-  $('dailyRight').textContent=mine?'Played':'Play';
+  const today=dailyDate(); const done=dailyDone(); const mine=done&&done.date===today?done:null;
+  $('dailyDateLbl').textContent='Daily mission · '+dailyNice(today);
+  $('dailyRight').textContent=mine?'Played':'Open';
 }
 $('dailyBtn').addEventListener('click',()=>{ renderDaily(); show('daily'); $('daily').scrollTo(0,0); });
 $('dailyBack').addEventListener('click',()=>{ paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); show('menu'); });
