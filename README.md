@@ -58,7 +58,13 @@ Leaving the name box empty is fine: A browser that never types a name gets its o
 
 ## Version
 
-The footer on the home page shows the version as `v<major>.<minor>`. Major goes up for a new capability, a batch of modes, or a layout, branding or architecture rework; minor goes up for a fix or a polish pass. It's bumped with every change, the build stamp is in the tooltip, and the same footer holds the credits and the small print.
+The footer on the home page shows the version as `v<major>.<minor>.<patch>`.
+
+- **major** — a ground-up rework. 1 was the original build; 2 covers everything since the layout, system and branding were rebuilt.
+- **minor** — a release that adds a capability: a batch of modes, the global leaderboards, the daily drop.
+- **patch** — fixes and polish since the last minor.
+
+It's bumped with every change, the build stamp lives in the tooltip, and the same footer holds the credits and the small print.
 
 ## Daily drop
 

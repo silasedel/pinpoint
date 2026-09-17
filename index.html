@@ -1435,7 +1435,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-162516';
+const BUILD='20260917-163006';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1549,10 +1549,13 @@ setTimeout(()=>lbReconcile(false),12000);
 window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }catch(e){} });
 
 /* ---------- Version ----------
-   Counted from the project's own history: MAJOR is a release that added a capability, a batch of modes,
-   or reworked the layout, the branding or the architecture. MINOR is everything else — fixes and polish. */
-const VERSION={major:24,minor:4};
-const verString=()=>`v${VERSION.major}.${VERSION.minor}`;
+   major.minor.patch, counted from the project's own history.
+   MAJOR  a ground-up rework of the game: 1 was the original, 2 is everything since the layout, system and
+          branding were rebuilt from scratch.
+   MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
+   PATCH  fixes and polish since the last one. */
+const VERSION={major:2,minor:14,patch:5};
+const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
 const sfxOn={v:true}; try{ sfxOn.v=localStorage.getItem('pp_sfx')!=='0'; }catch(e){}
