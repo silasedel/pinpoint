@@ -54,6 +54,10 @@ Running from the launcher instead? It prints a temporary public link (via `cloud
 
 Game traffic never depends on a direct connection, so joining works from any network. Voice does use direct links, so on unusually strict networks two specific people may not hear each other.
 
+## Version
+
+The footer on the home page carries the version, counted from this repo's own history: `v<major>.<minor>`, where a **major** release added a capability, a batch of modes, or reworked the layout, the branding or the architecture, and a **minor** one is a fix or a polish pass. It sits next to the build stamp, and the same footer holds the credits and the small print.
+
 ## Feel and rules
 
 - **Sound** is synthesised in the browser with WebAudio, so there are no audio files: a pin drop, a lock-in chime, a reveal sweep, a ticking score counter, a last-five-seconds beep, a three-note fanfare for a great guess and a four-note one for a near-perfect. The speaker button in the bottom-left corner mutes it and the choice is remembered.
