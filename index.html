@@ -1435,7 +1435,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-163006';
+const BUILD='20260917-172217';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1554,7 +1554,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding were rebuilt from scratch.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:2,minor:14,patch:5};
+const VERSION={major:2,minor:14,patch:6};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2785,9 +2785,16 @@ function openLink(url,will,onReady,onMsg){
 function closeLinks(){ for(const l of mp.links){ try{ l.client.end(true); }catch(e){} } mp.links=[]; mp.link=null; }
 
 /* ---- voice peer (best effort; the game never depends on it) ---- */
+const VOICE_ICE=[
+  {urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302',
+         'stun:stun.cloudflare.com:3478','stun:global.stun.twilio.com:3478']},
+  {urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'},
+  {urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turns:openrelay.metered.ca:443?transport=tcp'],
+   username:'openrelayproject',credential:'openrelayproject'},
+];
 function openVoicePeer(){
   try{
-    const peer=new Peer({debug:0}); mp.peer=peer;
+    const peer=new Peer({debug:0,config:{iceServers:VOICE_ICE,sdpSemantics:'unified-plan'}}); mp.peer=peer;
     peer.on('open',id=>{ mp.me.vpeer=id; if(mp.role==='host'&&mp.players[mp.me.id]) mp.players[mp.me.id].vpeer=id; if(mp.role==='guest') mpSend({t:'vpeer',vpeer:id}); if(mp.role==='host') hostSync(); voiceShow(); voiceConnect(); });
     peer.on('call',voiceIncoming);
     peer.on('error',e=>dlog('voice peer error '+e.type));
@@ -3199,6 +3206,23 @@ function buildRxChain(st){
   return {analyser:an, nodes:[src,...chain,comp,gain,an]};
 }
 function audioCtx(){ if(!voice.ctx){ voice.ctx=new (window.AudioContext||window.webkitAudioContext)(); } if(voice.ctx.state==='suspended') voice.ctx.resume().catch(()=>{}); return voice.ctx; }
+/* A context built while a call arrives has had no user gesture, so the browser leaves it suspended and
+   nothing is audible. Any tap or key press wakes both of ours, and re-checks the voices we're playing. */
+function wakeAudio(){
+  try{ if(voice.ctx&&voice.ctx.state==='suspended') voice.ctx.resume().then(()=>checkVoiceAudible()).catch(()=>{}); }catch(e){}
+  try{ if(AC&&AC.state==='suspended') AC.resume().catch(()=>{}); }catch(e){}
+}
+for(const ev of ['pointerdown','keydown','touchstart']) document.addEventListener(ev,wakeAudio,{capture:true,passive:true});
+/* If the EQ chain isn't actually producing sound, play the raw element instead of staying silent. */
+function checkVoiceAudible(){
+  for(const id of Object.keys(voice.audios)){
+    const a=voice.audios[id], m=voice.meters[id];
+    if(!a) continue;
+    const live=voice.ctx&&voice.ctx.state==='running'&&m;
+    if(!live&&a.muted){ a.muted=false; a.play().catch(()=>{}); dlog('voice: EQ chain not running, playing '+id.slice(0,6)+' direct'); }
+    else if(live&&!a.muted){ a.muted=true; dlog('voice: EQ chain awake, back on the filtered path for '+id.slice(0,6)); }   // never both at once
+  }
+}
 function silentTrack(){
   if(voice.silent&&voice.silent.readyState==='live') return voice.silent;
   const ctx=audioCtx(); const dst=ctx.createMediaStreamDestination(); const osc=ctx.createOscillator(); const g=ctx.createGain(); g.gain.value=0; osc.connect(g); g.connect(dst); osc.start();
@@ -3218,6 +3242,11 @@ function voiceIncoming(call){ if(!mp.role) return; if(voice.calls[call.peer]){ t
 function attachCall(call){
   voice.calls[call.peer]=call;
   call.on('stream',st=>{ playRemote(call.peer,st); const pc=call.peerConnection; if(pc){ boostSender(pc); pc.getReceivers().forEach(r=>{ try{ r.jitterBufferTarget=180; }catch(e){} try{ r.playoutDelayHint=0.18; }catch(e){} }); } });
+  const pc0=call.peerConnection;
+  if(pc0) pc0.addEventListener('iceconnectionstatechange',()=>{
+    const st=pc0.iceConnectionState; dlog('voice '+call.peer.slice(0,6)+' ice '+st);
+    if(st==='failed'){ toast('Voice could not connect to a player. Your networks may be blocking it.'); try{ call.close(); }catch(e){} }
+  });;
   call.on('close',()=>voiceDrop(call.peer));
   call.on('error',()=>voiceDrop(call.peer));
 }
@@ -3236,7 +3265,15 @@ function playRemote(id,st){
   try{
     const rx=buildRxChain(st); a.muted=true;   // EQ'd playback via Web Audio
     startMeter(id,rx.analyser,rx.nodes);
-  }catch(e){ a.muted=false; }
+    // Safety net: if the graph never wakes up, fall back to plain playback rather than silence.
+    let waited=0; const watch=setInterval(()=>{
+      waited+=1000;
+      const ok=voice.ctx&&voice.ctx.state==='running';
+      if(!voice.audios[id]||waited>6000){ clearInterval(watch); return; }
+      if(!ok&&a.muted){ a.muted=false; a.play().catch(()=>{}); dlog('voice: audio context asleep, playing '+id.slice(0,6)+' direct'); }
+      else if(ok&&waited>=3000){ clearInterval(watch); }
+    },1000);
+  }catch(e){ a.muted=false; a.play().catch(()=>{}); }
 }
 function startMeter(id,an,nodes){
   const buf=new Uint8Array(an.fftSize);
