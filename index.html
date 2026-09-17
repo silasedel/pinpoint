@@ -284,9 +284,16 @@
   .rchip{padding:7px 12px;border-radius:8px;background:#f6f8f7;border:1px solid var(--line);font-size:13px;color:var(--muted)}
   .rchip b{color:var(--text);margin-left:6px}
   .rchip.top{border-color:var(--green);background:var(--green-soft);color:var(--green-dark)}
+  .savenag{margin:12px auto 0;max-width:430px;background:var(--green-soft);border:1.5px solid var(--green);border-radius:12px;padding:12px 14px;text-align:center;animation:nagIn .2s ease-out}
+  @keyframes nagIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .savenag b{display:block;font-size:15px;color:var(--text)}
+  .savenag span{display:block;font-size:13px;color:var(--muted);margin:3px 0 10px}
+  .savenag .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .savenag .btn{padding:9px 16px;font-size:14px}
   .save-row{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap;justify-content:center}
   .save-row input{padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;width:220px;outline:none}
   .save-row input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  .save-row input.bad{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft);animation:shake .3s}
   .saved{color:var(--green-dark);font-weight:700;font-size:14px}
   .final-actions{display:flex;gap:10px;margin-top:6px}
 
@@ -730,6 +737,11 @@
       <input id="nameInput" maxlength="20" placeholder="Your name">
       <button class="btn btn-secondary" id="saveBtn">Save to global leaderboard</button>
       <span class="saved" id="savedMsg" hidden></span>
+    </div>
+    <div class="savenag" id="saveNag" hidden>
+      <b id="nagTitle">Save your score first?</b>
+      <span id="nagSub">Leave now and this game won't be on the leaderboard.</span>
+      <div class="row"><button class="btn btn-primary" id="nagSave">Save it</button><button class="btn btn-secondary" id="nagSkip">Leave anyway</button></div>
     </div>
     <div class="final-actions">
       <button class="btn btn-secondary" id="menuBtn">Menu</button>
@@ -1205,7 +1217,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260916-141718';
+const BUILD='20260917-092112';
 const state={ mode:'classic', chain:[], bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1398,8 +1410,29 @@ picker('timeSeg','timeCustom','t',1,180,v=>{ state.userTime=v; });
 picker('roundSeg','roundCustom','r',1,100,v=>{ state.userRounds=v; });
 state.userTime=60; state.userRounds=5;
 $('startBtn').addEventListener('click',()=>startGame());
-$('againBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); } else if(!mp.role) startGame(); });
-$('menuBtn').addEventListener('click',()=>{ if(mp.role) mpLeave(); renderBoard(); show('menu'); });
+/* Leaving the final screen with an unsaved score asks first — it's easy to walk away from a run by accident. */
+let nagAction=null;
+function needsSave(){ return !$('final').hidden && !$('saveRow').hidden && !state.saved; }
+function hideNag(){ $('saveNag').hidden=true; nagAction=null; }
+function nagToSave(action){
+  nagAction=action; const nag=$('saveNag'); nag.hidden=false;
+  $('nagTitle').textContent='Save your score first?';
+  $('nagSub').textContent="Leave now and this game won't be on the leaderboard.";
+  $('saveBtn').classList.remove('ready'); void $('saveBtn').offsetWidth; $('saveBtn').classList.add('ready');
+  const n=$('nameInput'); if(!n.value.trim()) n.focus();
+  nag.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+$('nagSave').addEventListener('click',()=>{
+  const n=$('nameInput');
+  if(!n.value.trim()){ $('nagTitle').textContent='Type a name first'; $('nagSub').textContent='It goes on the board next to your score.';
+    n.classList.remove('bad'); void n.offsetWidth; n.classList.add('bad'); n.focus(); return; }
+  const go=nagAction; hideNag(); $('saveBtn').click(); if(go) go();
+});
+$('nagSkip').addEventListener('click',()=>{ const go=nagAction; hideNag(); if(go) go(); });
+function finalAgain(){ if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); } else if(!mp.role) startGame(); }
+function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); show('menu'); }
+$('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
+$('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
 function show(id){ for(const s of ['menu','setup','board','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
 
 /* ---------- Game flow ---------- */
@@ -1666,7 +1699,7 @@ function showFinal(){
   $('roundChips').innerHTML=state.results.map(r=>`<div class="rchip ${(r.trio?r.ok:r.pts>=4500)?'top':''}">R${r.round} · ${r.trio?(r.ok?'correct':'wrong'):(r.loc.place?esc(r.loc.place.country):(r.guess?fmtDist(r.km):'no guess'))}<b>${(r.bet&&r.pts>0?'+':'')+r.pts.toLocaleString()}</b></div>`).join('');
 
   // Leaderboard save
-  state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false;
+  state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false; hideNag();
   try{ $('nameInput').value=localStorage.getItem('pp_name')||''; }catch(e){}
   const rank=boardFor(state.totalRounds,state.timeLimit,state.mode,filter.scope).filter(e=>e.score>state.score).length+1;
   $('saveBtn').textContent = rank<=10 ? `Save to leaderboard · #${rank} in ${modeLabel()}` : 'Save to leaderboard';
@@ -1681,7 +1714,7 @@ $('saveBtn').addEventListener('click',()=>{
   state.saved=true; state.savedId=entry.id;
   const same=boardFor(state.totalRounds,state.timeLimit,state.mode,filter.scope);
   const rank=same.filter(e=>e.score>entry.score).length+1;
-  $('saveBtn').hidden=true; $('nameInput').hidden=true;
+  $('saveBtn').hidden=true; $('nameInput').hidden=true; hideNag();
   $('savedMsg').hidden=false; $('savedMsg').textContent=`Saved · #${rank} of ${same.length} in ${modeLabel()}${filter.scope==='global'?(lbLive()?' worldwide':' (offline — it will post when you reconnect)'):''}`;
   renderBoard(state.mode==='classic'?entry.id:undefined);
 });
@@ -2167,7 +2200,7 @@ document.addEventListener('keydown',e=>{
     if(!$('game').hidden && !$('guessbar').hidden && !$('gbLock').disabled && !state.locked){ e.preventDefault(); submitGuess(false); }
     else if(!$('game').hidden && state.guess && !state.locked){ e.preventDefault(); submitGuess(false); }
     else if(!$('result').hidden){ e.preventDefault(); $('nextBtn').click(); }
-    else if(!$('final').hidden && !mp.role){ e.preventDefault(); startGame(); }
+    else if(!$('final').hidden && !mp.role){ e.preventDefault(); if(needsSave()) nagToSave(finalAgain); else startGame(); }
     else if(!$('setup').hidden && document.activeElement===document.body){ e.preventDefault(); startGame(); }
   }
 });
