@@ -802,13 +802,15 @@
   .rrow .rt{color:var(--muted);font-size:12px;min-width:70px;text-align:right}
   .rrow .pos{color:var(--muted);width:20px;font-weight:700}
   .rrow.first .pos{color:#a06d00}
-  .microw{position:fixed;right:16px;bottom:16px;z-index:20;display:flex;align-items:center;gap:8px}
+  .microw{position:fixed;right:16px;bottom:16px;z-index:20;display:flex;align-items:flex-end;gap:8px}
+  .microw>.mic{height:50px;box-sizing:border-box;flex:none;align-self:flex-end;white-space:nowrap;line-height:1;margin:0;transform:none}
+  .microw>.mic .ico{flex:none}
   body.in-game .microw{left:16px;right:auto;flex-direction:row-reverse}
   .mic{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:99px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);font-weight:700;font-size:14px;color:var(--text)}
   .chatbtn{position:relative}
-  .chatbtn .ico{background:var(--green-soft);color:var(--green-dark)}
+  .mic.chatbtn .ico{background:var(--green-soft);color:var(--green-dark)}
   .chatbtn .ico svg{width:19px;height:19px}
-  .chatbtn.open .ico{background:var(--green);color:#fff}
+  .mic.chatbtn.open .ico{background:var(--green);color:#fff}
   .chatbtn .badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;border-radius:99px;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;padding:0 6px;border:2px solid var(--card);box-shadow:0 2px 6px rgba(0,0,0,.35);animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
   .chatpeek{position:absolute;bottom:60px;right:0;max-width:min(320px,70vw);padding:8px 12px;border-radius:12px;background:var(--text);color:#fff;font-size:13px;line-height:1.35;box-shadow:var(--shadow);animation:nagIn .2s ease-out;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   body.in-game .chatpeek{right:auto;left:0}
@@ -890,7 +892,7 @@
   .guess:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge-primary)}
   .guess:disabled{box-shadow:none;transform:none}
   .mic,.chatbtn,.icon-btn{box-shadow:0 3px 0 var(--edge),0 8px 20px rgba(15,64,36,.12);transition:transform .12s,box-shadow .12s,background .15s}
-  .mic:active,.chatbtn:active,.icon-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge)}
+  .mic:active,.chatbtn:active,.icon-btn:active,.microw>.mic:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge)}
   .hud{box-shadow:0 2px 0 var(--edge),0 6px 18px rgba(15,64,36,.08)}
   .rrow,.prow,.frrow,.chplay,.mkrow{box-shadow:0 2px 0 var(--edge)}
   .code-box{border:1.5px solid #bfe3cd;box-shadow:0 3px 0 #bfe3cd}
@@ -2205,7 +2207,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-220036';
+const BUILD='20260917-221806';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2335,7 +2337,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:3,patch:3};
+const VERSION={major:3,minor:3,patch:4};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
