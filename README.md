@@ -66,15 +66,19 @@ The footer on the home page shows the version as `v<major>.<minor>.<patch>`.
 
 It's bumped with every change, the build stamp lives in the tooltip, and the same footer holds the credits and the small print.
 
+## Settings
+
+A gear in the top right of the home page opens Settings: your account, a light/dark theme, the map style, text size and sound. The theme is light by default, and every choice is remembered on the device.
+
 ## Accounts
 
-There's no sign-up service and no server. An account is one retained MQTT message on the same brokers everything else uses (`worlddrop/v1/acct/<name>`), holding a display name, a random salt and a SHA-256 hash of a four-digit code. Claiming a free name publishes that record; typing a name that already exists checks the code against the hash. Signing in stores the name locally, and every score you save — solo, multiplayer or daily — goes up under it on any device you sign in on. Signing out drops you back to a numbered player.
+Saving a score needs an account, so the leaderboard is a list of people rather than a list of strangers. There's no sign-up service and no server: an account is one retained MQTT message on the same brokers everything else uses (`worlddrop/v1/acct/<name>`), holding a display name, a random salt and a SHA-256 hash of a four-digit code. Claiming a free name publishes that record; typing a name that already exists checks the code against the hash. Signing in stores the name locally, and every score you save — solo, multiplayer or daily — goes up under it on any device you sign in on. Signing out drops you back to a numbered player, who can still play everything but can't post a score. A profile photo is optional: it's cropped square, shrunk to 96 pixels and stored in the same record, so it follows you between devices and shows up next to your name in a lobby. Map pins and result lines keep using the colour you pick, since a photo can't tint a line.
 
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
 ## Daily drop
 
-One game a day, the same five locations for everyone. The home page gives nothing away: a compass mark, the date, and an Open button, identical whatever the mode is. You only find out what today's mission holds by opening it. The date seeds a small deterministic generator (mulberry32 over a hash of the UTC date) that picks the mode, the time per round, and sometimes a continent or country, then drives the location search itself — every random choice in place picking takes an optional generator, so two browsers with the same date produce byte-identical panorama ids. Rounds are always five. Today's board is its own retained message keyed by the date (`worlddrop/v1/dl/<date>`), so it resets itself at midnight UTC, and a daily result never touches the all-time mode boards. One attempt per device per day: once you've played, the button reads *Already played today* and is disabled until the next drop.
+One game a day, the same five locations for everyone, turning over at midnight in New York. The home page gives nothing away: a compass mark, the date, and an Open button, identical whatever the mode is. You only find out what today's mission holds by opening it. The date seeds a small deterministic generator (mulberry32 over a hash of the UTC date) that picks the mode, the time per round, and sometimes a continent or country, then drives the location search itself — every random choice in place picking takes an optional generator, so two browsers with the same date produce byte-identical panorama ids. Rounds are always five. Today's board is its own retained message keyed by the date (`worlddrop/v1/dl/<date>`), so it resets itself at midnight UTC, and a daily result never touches the all-time mode boards. One attempt per device per day: once you've played, the button reads *Already played today* and is disabled until the next drop.
 
 ## Where in the world
 
