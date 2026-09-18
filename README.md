@@ -1,6 +1,6 @@
 # Pinpoint
 
-A single-file Street View geography game, solo or with friends. You get dropped somewhere on Earth, drop a pin where you think you are, and score up to 5,000 points per round on GeoGuessr's distance curve.
+A single-file Street View geography game — solo, as a duo, or with up to ten friends. You get dropped somewhere on Earth, drop a pin where you think you are, and score up to 5,000 points per round on GeoGuessr's distance curve. Free, no ads, no sign-up needed to play, and an account is a name and a four-digit passcode.
 
 ## Play
 
@@ -36,9 +36,26 @@ Picture tiles on the solo setup screen and in the lobby (multiplayer-only modes 
 - **Deported**: every round drops you in a country that borders the last one, using a land-border graph of the countries the game can reach. A failed lookup can't break the chain: the step is retried, then each neighbour is tried on its own with a wider snap, and only if nothing at all is reachable does it start a new chain — which the result screen says out loud. The result screen also shows the trail so far (Italy → Slovenia → **Austria**) and whether the next round really is a neighbour.
 - **Peek** (multiplayer only): everyone's pins are visible to everyone while guessing, live.
 - **Battle Royale** (multiplayer only): the farthest guess each round is knocked out. Knocked-out players keep watching but can't guess. Last one standing wins.
+- **Duel** (duo only): head to head with 6,000 health each. Both guess the same spot; whoever is further away takes damage equal to the gap in points, times a multiplier that climbs as the duel goes on (×1 for three rounds, then half a point more every two, up to ×5), so it always ends. There's no round count — it's over at a knockout. The HUD swaps the round and score pills for two health bars. Once one player has guessed the other gets fifteen seconds. The host finds locations a few rounds ahead and hands them over as it goes.
+- **Blind** (duo only): one of you sees only the street, the other sees only the map, and you talk each other to the pin — voice chat is built in. The host picks who looks and who pins before starting, and roles swap every round by default. The pin counts for both of you; the score is shared.
+- **Learn**: its own bar on the home page. A normal game — your choice of time and length — where every round ends with the two or three things that give that country away: the side of the road, the colour of the lines and plates, the script on the signs, bollards, houses, land. Ninety countries carry hand-written tells, and only those countries come up.
 - **Lives** (multiplayer only): the same, with three lives each. The farthest guess loses one; you're out at zero. The round counter in the corner becomes your three hearts. Losing one makes that heart swell, shake and drain to grey; losing your last one cracks it down the middle with the split drawing itself in. The reveal banner shows the same hearts breaking and plays a short falling tone for a life lost, a heavier one for being knocked out. Round rankings and final standings show hearts too, with a cracked one for anybody out. The round count is sized to the table so the game can finish.
 
 All location picking asks Google for its own imagery only (`StreetViewSource.GOOGLE`), which is what makes country selection even; before that, user-uploaded photospheres were crowding out official coverage in Europe and the US.
+
+You never get the same spot twice. Regions rotate (the last sixty are skipped), and on top of that every panorama you've been dropped at is remembered — the last 800 — and a lookup that lands on one is thrown back for another point. The daily is exempt, since it has to be identical everywhere.
+
+## Custom maps
+
+Anyone signed in can build a map: give it a name, click spots on a world map (each click snaps to the nearest Street View within a couple of miles and shows a thumbnail), or paste coordinates or a Google Maps link to add one exactly. Two spots minimum, three hundred maximum. Publishing makes it one retained message (`worlddrop/v1/cmap/<id>`) with a shareable link (`?m=<id>`). The **Custom maps** bar under the mode grid — on the solo setup screen and in a lobby — lists every map on the brokers with a search box, sorted by plays. Playing one is Classic scoring over a shuffle of its spots, with your choice of time and length; each map keeps its own small board of best scores rather than touching the mode boards, and the maker can delete it.
+
+## Challenges
+
+Any finished solo or party game (not the daily, not the crowd-only modes) has a **Share** button in the bottom-left corner of the end screen. It opens a small card with one sentence and a link. Whoever opens the link sees the challenge page — who set it, the mode, their score, who else has played — and plays the exact same rounds. After every guess the sharer's pin appears on the result map in their colour with a dashed line, alongside a running comparison, like racing a ghost. The end screen says who won, and the sharer gets a notification (*so-and-so completed your challenge · 19,800 vs your 21,400*) whose **See** button opens the page with a round-by-round table. A challenge is one retained message (`worlddrop/v1/ch/<id>`) holding the locations, the sharer's guesses and everyone's plays; one attempt per person.
+
+## Duo
+
+The home page has three ways in: **Solo**, **Duo** and **Multiplayer**. A duo is a room for exactly two, same code and invite link as a party, with the two duo-only modes — Duel and Blind — first in the grid and every solo mode after them. The lobby calls the other person your opponent (or partner, in Blind).
 
 ## Play with friends (anywhere)
 
@@ -46,9 +63,9 @@ Multiplayer has no server of its own. The host's browser runs the game; messages
 
 1. The host opens https://silasedel.github.io/pinpoint/ and clicks **Create game**.
 2. The host clicks **Copy invite link** and sends it to friends. The invite link opens the game and joins the lobby automatically. Or send the 4-letter code and they click **Join game** on the same site.
-3. Everyone picks a name and a color (no two players can share a color). The host picks time, rounds and a mode, and presses Start. The game begins immediately.
+3. Everyone picks a name and a colour (no two players can share a colour). If you have a profile photo, a thirteenth tile at the front of the tray is your photo, already selected — it becomes your token in the player list, the strip, the standings and the head of your pin. The host picks time, rounds and a mode, and presses Start. The game begins immediately.
 4. **Voice chat** is built in. The mic button in the bottom-left corner (or the M key) turns your microphone on; click again to mute. It's off until you turn it on, and everyone hears everyone who's live. A green ring shows who's talking.
-5. Every round shows the same panorama to everyone. When all guesses are in, or time runs out, the map shows every pin in its player's color with distances, points, and running totals. The host advances rounds. 2 to 10 players.
+5. Every round shows the same panorama to everyone. When all guesses are in, or time runs out, the map shows every pin in its player's colour with distances, points, and running totals. The host advances rounds. 2 to 10 players. The final map shows every round's real spot and every player's guess for it, each line in that player's colour — for a photo token, the colour that stands out most in the photo.
 
 Running from the launcher instead? It prints a temporary public link (via `cloudflared`) and a same-Wi-Fi address, either of which works the same way.
 
@@ -60,7 +77,7 @@ Leaving the name box empty is fine: A browser that never types a name gets its o
 
 The footer on the home page shows the version as `v<major>.<minor>.<patch>`.
 
-- **major** — a ground-up rework. 1 was the original build; 2 covers everything since the layout, system and branding were rebuilt.
+- **major** — a ground-up rework. 1 was the original build; 2 was the rebuild of the layout, system and branding; 3 is the social game: duos, challenges, custom maps, streaks and Learn.
 - **minor** — a release that adds a capability: a batch of modes, the global leaderboards, the daily drop.
 - **patch** — fixes and polish since the last minor.
 
@@ -72,13 +89,15 @@ A gear button in the top right of the home page, always reading Settings, opens 
 
 ## Accounts
 
-Saving a score needs an account, so the leaderboard is a list of people rather than a list of strangers. There's no sign-up service and no server: an account is one retained MQTT message on the same brokers everything else uses (`worlddrop/v1/acct/<name>`), holding a display name, a random salt and a SHA-256 hash of a four-digit code. Claiming a free name publishes that record; typing a name that already exists checks the code against the hash. Signing in stores the name locally, and every score you save — solo, multiplayer or daily — goes up under it on any device you sign in on. Signing out only signs out this browser: the account, its photo and its friends stay put and you can sign back in any time. Until you do you're a numbered player, who can play everything but can't post a score. Your display name can be changed whenever you like; the @handle you sign in with stays fixed so friends and sign-ins keep working. A profile photo is optional: it's cropped square, shrunk to 96 pixels and stored in the same record, so it follows you between devices and shows up next to your name in a lobby. Map pins and result lines keep using the colour you pick, since a photo can't tint a line.
+Saving a score needs an account, so the leaderboard is a list of people rather than a list of strangers. There's no sign-up service and no server: an account is one retained MQTT message on the same brokers everything else uses (`worlddrop/v1/acct/<name>`), holding a display name, a random salt and a SHA-256 hash of a four-digit code. Claiming a free name publishes that record; typing a name that already exists checks the code against the hash. Signing in stores the name locally, and every score you save — solo, multiplayer or daily — goes up under it on any device you sign in on. Signing out only signs out this browser: the account, its photo and its friends stay put and you can sign back in any time. Until you do you're a numbered player, who can play everything but can't post a score. Your display name can be changed whenever you like; the @handle you sign in with stays fixed so friends and sign-ins keep working. A profile photo is optional: it's cropped square, shrunk to 96 pixels and stored in the same record, so it follows you between devices and shows up next to your name in a lobby. In a room it can be your token instead of a colour, and it sits in the head of your pin; lines take the photo's dominant colour.
+
+**Streaks.** Finish a game on consecutive days (any game — solo, duo, party, daily; days roll at midnight in New York) and the account keeps a day streak. From two days it shows beside your name on the account card with a flame; from five days the number and flame appear next to your name on every leaderboard, for everyone. Miss a day and it's gone. It lives in the account record, so it follows you between devices.
 
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
 ## Notifications
 
-A bell in the top left of the home page. Three kinds land there: a new daily mission (worked out locally from the date and whether you've played), someone following you (read straight from the follow graph), and a game invite. Invites are the only thing anyone writes into your inbox — one retained message per account (`worlddrop/v1/inbox/<name>`), capped and expiring after a couple of hours. Each row acts: add a friend back, join a room, or play the daily. In a lobby, **Invite friends** lists your friends with their photos and sends one straight to their bell.
+A bell in the top left of the home page. Four kinds land there: a new daily mission (worked out locally from the date and whether you've played), someone following you (read straight from the follow graph), a game invite, and someone completing your challenge. Invites are the only thing anyone writes into your inbox — one retained message per account (`worlddrop/v1/inbox/<name>`), capped and expiring after a couple of hours. Each row acts: add a friend back, join a room, or play the daily. In a lobby, **Invite friends** lists your friends with their photos and sends one straight to their bell.
 
 ## Friends
 
@@ -106,6 +125,7 @@ The Copy image button renders the spot as four 90° views in one PNG. The export
 ## How it works
 
 - **Street View without an API key.** The keyless Google Maps JS library is used only for `StreetViewService.getPanorama`, which still answers without a key. The panorama is rendered by Google's public embed iframe using the pano ID from that lookup. The embed's place card and controls are covered so they can't leak the answer.
+- **Pins.** Every guess is a white pin with the player's colour — or photo — in its head. The real location is a bigger red pin with a target in it and a pulsing ring at its foot, so it's never lost among the guesses.
 - **Locations** are random points inside ~65 weighted bounding boxes tagged by continent. Each game shuffles the continents and assigns one per round, so five rounds means five different continents. Points snap to the nearest official Google pano within 15 km.
 - **Maps** are Leaflet with Esri basemaps (National Geographic style, or satellite with labels), which carry English place names worldwide.
 - **Country reveal** uses BigDataCloud's free client reverse geocoder (OpenStreetMap Nominatim as fallback) so a far-off guess in the right country is called out as such.

@@ -73,6 +73,31 @@
   .cardart::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--card),rgba(255,255,255,0) 70%)}
   .cardart.solo{background-image:url(images/mode-classic.jpg)}
   .cardart.mp{background-image:url(images/mode-peek.jpg)}
+  .cardart.duo{background-image:url(images/mode-duel.jpg)}
+  .grid.three{grid-template-columns:1fr 1fr 1fr}
+  .grid.three .card.big h2{font-size:23px}
+  .grid.three .card.big p{min-height:42px}
+  .duo-card .btn,.mp-card .btn{padding:14px;font-size:15px}
+  .solo-card .btn{padding:16px;font-size:17px}
+  @media (max-width:980px){ .grid.three{grid-template-columns:1fr 1fr} .grid.three .solo-card{grid-column:1 / -1} }
+  @media (max-width:640px){ .grid.three{grid-template-columns:1fr} .grid.three .solo-card{grid-column:auto} }
+  .learnbar{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:1.5px solid var(--line);
+    border-radius:16px;padding:13px 18px;margin:-6px 0 20px;background:var(--card);box-shadow:var(--shadow);color:var(--text);transition:transform .15s,border-color .15s}
+  .learnbar:hover{transform:translateY(-1px);border-color:var(--green)}
+  .learnbar .lmark{flex:none;width:42px;height:42px;border-radius:12px;background:var(--green-soft);color:var(--green-dark);display:grid;place-items:center}
+  .learnbar .lmark svg{width:22px;height:22px}
+  .learnbar .ll{flex:1;min-width:0}
+  .learnbar .ll b{display:block;font-size:16px;letter-spacing:-.2px}
+  .learnbar .ll span{display:block;font-size:12.5px;color:var(--muted);margin-top:1px}
+  .learnbar .lr{flex:none;font-weight:800;font-size:13px;color:var(--green-dark);background:var(--green-soft);border-radius:99px;padding:8px 14px}
+  .wbar{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:1.5px solid var(--line);border-radius:14px;
+    padding:14px 18px;margin-top:14px;background:var(--card);color:var(--text);font-weight:800;font-size:15px;transition:border-color .15s,transform .15s}
+  .wbar:hover{border-color:var(--green);transform:translateY(-1px)}
+  .wbar span{font-weight:600;font-size:12.5px;color:var(--muted)}
+  .wbar b{flex:1}
+  .wbar.sm{padding:11px 16px;font-size:13.5px;margin-top:10px;border-style:dashed;box-shadow:none}
+  .wbar .go{flex:none;color:var(--green-dark);font-weight:800;font-size:13px}
+  .wbar.on{border-color:var(--green);background:var(--green-soft);box-shadow:0 0 0 3px var(--green-soft)}
   .dailybtn{display:flex;align-items:center;gap:16px;width:100%;text-align:left;cursor:pointer;font-family:inherit;
     border:0;border-radius:20px;padding:20px 24px;margin-bottom:20px;color:#fff;
     background:linear-gradient(120deg,#14532d,#1f9d55 55%,#2bb673);box-shadow:0 12px 30px rgba(20,60,38,.35);
@@ -322,6 +347,33 @@
   .timer.low{background:var(--red-soft)}
   .timer.low small,.timer.low b{color:var(--red)}
   .hud-brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px}
+  .duel{display:flex;align-items:center;gap:12px}
+  .dside{display:flex;align-items:center;gap:8px;min-width:150px}
+  .dside.them{flex-direction:row-reverse;text-align:right}
+  .dside .pav{flex:none}
+  .dside .dt{display:flex;flex-direction:column;min-width:0;flex:1}
+  .dside .dn{font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+  .dside .dhp{font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+  .dside .dbar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;margin-top:3px;border:1px solid var(--line)}
+  .dside .dbar i{display:block;height:100%;background:linear-gradient(90deg,#2bb673,#1f9d55);border-radius:99px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+  .dside.them .dbar i{background:linear-gradient(90deg,#e63946,#ff6b6b);margin-left:auto}
+  .dside.them .dbar{direction:rtl}
+  .dside .dbar i.low{background:linear-gradient(90deg,#f4772a,#e63946)}
+  .dmult{flex:none;padding:5px 10px;border-radius:99px;background:#fff4d6;color:#7a5200;font-weight:800;font-size:13px;letter-spacing:.02em}
+  .dmult.hot{background:#e63946;color:#fff;animation:pop .5s}
+  @media (max-width:720px){ .dside{min-width:0} .dside .dn{max-width:70px} }
+  .blindhint{position:absolute;left:50%;top:84px;transform:translateX(-50%);z-index:8;padding:9px 16px;border-radius:99px;background:rgba(21,34,25,.85);color:#fff;font-weight:700;font-size:13.5px;backdrop-filter:blur(4px);white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+  .blindhint b{color:#9fe0b8}
+  #game.blind-eyes .mappanel,#game.blind-eyes #guessbar{display:none}
+  #game.blind-map .pano,#game.blind-map #pix{visibility:hidden}
+  #game.blind-map .mappanel{width:100vw;height:calc(100vh - 72px);opacity:1;border-radius:0;transition:none}
+  #game.blind-map .ctl #copyBtn,#game.blind-map .ctl #resetBtn{display:none}
+  #game.blind-map .mappanel .grab{display:none}
+  .duelrow{margin:0 0 8px;padding:10px 12px;border-radius:10px;background:var(--red-soft);color:#a3202c;font-weight:800;font-size:14px;text-align:center;animation:nagIn .35s cubic-bezier(.2,1.3,.4,1) both}
+  .duelrow.win{background:var(--green-soft);color:var(--green-dark)}
+  .duelrow.even{background:var(--hover);color:var(--muted)}
+  .rrow .hpmini{display:inline-block;width:90px;height:8px;border-radius:99px;background:var(--sunk);border:1px solid var(--line);overflow:hidden;vertical-align:middle;margin-left:6px}
+  .rrow .hpmini i{display:block;height:100%;background:#1f9d55;border-radius:99px}
   .hud-brand svg{width:30px;height:30px}
 
   .ctl{position:absolute;left:16px;bottom:16px;z-index:6;display:flex;gap:8px}
@@ -394,8 +446,9 @@
 
   .marker-pin{position:relative;width:32px;height:44px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
   .marker-pin svg{position:relative;display:block}
-  .marker-pin .facepin{position:absolute;left:9px;top:9px;width:14px;height:14px;border-radius:50%;background-size:cover;background-position:center;z-index:2}
-  .marker-true .ring{position:absolute;left:50%;top:42px;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:3px solid #e63946;animation:ring 1.6s ease-out infinite}
+  .marker-pin .facepin{position:absolute;left:8.5px;top:8.5px;width:15px;height:15px;border-radius:50%;background-size:cover;background-position:center;z-index:2}
+  .marker-pin.big{width:40px;height:56px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45))}
+  .marker-true .ring{position:absolute;left:50%;top:54px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:3px solid #e63946;animation:ring 1.6s ease-out infinite}
   @keyframes ring{0%{transform:scale(.4);opacity:.9}100%{transform:scale(3.2);opacity:0}}
   .style-ctl{display:flex;background:var(--raise);border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.3);overflow:hidden}
   .style-ctl button{padding:6px 10px;font-size:12px;font-weight:700;background:var(--raise);color:var(--muted)}
@@ -427,6 +480,14 @@
   .dist b{color:var(--text)}
   .place{font-size:14px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
   .place span b{color:var(--text)}
+  .cluebox{width:min(640px,92vw);background:var(--green-soft);border:1.5px solid var(--green);border-radius:14px;padding:14px 18px 12px;text-align:left}
+  .cluebox .ch{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--green-dark);margin-bottom:6px}
+  .cluebox .ch b{font-size:15px;letter-spacing:-.2px;text-transform:none;color:var(--text);display:block;margin-top:2px}
+  .cluebox ul{margin:0;padding:0 0 0 18px;font-size:14px;line-height:1.5;color:var(--text)}
+  .cluebox li{margin:3px 0}
+  .cluebox li::marker{color:var(--green)}
+  .learncard{background:linear-gradient(120deg,var(--green-soft),var(--card));border:1.5px solid var(--green);margin-bottom:20px}
+  .learncard p{margin:6px 0 0;font-size:14px;color:var(--muted);line-height:1.5}
   .rounds{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:900px}
   .rchip{padding:7px 12px;border-radius:8px;background:var(--hover);border:1px solid var(--line);font-size:13px;color:var(--muted)}
   .rchip b{color:var(--text);margin-left:6px}
@@ -446,6 +507,55 @@
   .save-row input.bad{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft);animation:shake .3s}
   .saved{color:var(--green-dark);font-weight:700;font-size:14px}
   .final-actions{display:flex;gap:10px;margin-top:6px}
+  .sharebox{position:fixed;left:16px;bottom:16px;z-index:21;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+  .sharebtn{padding:11px 18px;font-size:14px;gap:8px;box-shadow:var(--shadow)}
+  .sharebtn svg{width:16px;height:16px}
+  .sharecard{width:min(360px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;animation:nagIn .2s ease-out}
+  .sharecard b{display:block;font-size:15px;letter-spacing:-.2px}
+  .sharecard p{margin:4px 0 10px;font-size:13px;color:var(--muted);line-height:1.5}
+  .sharerow{display:flex;gap:6px}
+  .sharerow input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:12.5px;background:var(--sunk);color:var(--text);outline:none;font-family:inherit}
+  .sharerow .btn{padding:10px 14px;font-size:13px}
+  .sharenote{margin-top:8px;font-size:12px;color:var(--muted);min-height:16px}
+  .rivalline{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;align-items:center;font-size:14px;color:var(--muted);padding:8px 14px;border-radius:12px;background:var(--hover);border:1px solid var(--line)}
+  .rivalline .pav{vertical-align:middle}
+  .rivalline b{color:var(--text)}
+  .rivalline .ahead{color:var(--green-dark);font-weight:800}
+  .rivalline .behind{color:var(--red);font-weight:800}
+  .chrival{display:flex;align-items:center;gap:14px;margin:16px 22px 0;padding:12px 14px;border-radius:12px;background:var(--hover);border:1px solid var(--line)}
+  .chrival .who{flex:1;min-width:0}
+  .chrival .who b{display:block;font-size:16px;letter-spacing:-.2px}
+  .chrival .who span{display:block;font-size:12.5px;color:var(--muted)}
+  .chrival .sc{font-size:26px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+  .chplay{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--raise);margin-bottom:6px;font-size:14px}
+  .chplay .pn{flex:1;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chplay .res{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:99px}
+  .chplay .res.beat{background:var(--green-soft);color:var(--green-dark)} .chplay .res.short{background:var(--red-soft);color:var(--red)} .chplay .res.tie{background:#fff4d6;color:#7a5200}
+  .chplay .sc{font-weight:800;font-variant-numeric:tabular-nums;min-width:60px;text-align:right}
+  table.chrep{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+  .chrep th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+  .chrep td{padding:8px;border-bottom:1px solid var(--hair)}
+  .chrep td.w{font-weight:800;color:var(--green-dark)}
+  .chrep td small{display:block;color:var(--muted);font-weight:500;font-size:12px}
+  #chal,#cmaps,#cmap,#cmake{overflow:auto;padding:30px 20px 60px}
+  .cmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:12px}
+  .cmcard{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--raise);cursor:pointer;text-align:left;font-family:inherit;color:var(--text)}
+  .cmcard:hover{border-color:var(--green);background:var(--green-soft)}
+  .cmcard b{font-size:15px;letter-spacing:-.2px;line-height:1.2}
+  .cmcard .by{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .cmcard .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;margin-top:auto}
+  .cmcard .meta b{font-size:12px;color:var(--text)}
+  .mkmap{height:min(460px,55vh);border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-top:10px;background:#bfd9e8}
+  .mklist{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
+  .mkrow{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--raise);font-size:13px}
+  .mkrow img{width:72px;height:36px;object-fit:cover;border-radius:6px;background:#1a2a20;flex:none}
+  .mkrow .mkt{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mkrow .mkt small{display:block;color:var(--muted);font-weight:500;font-size:11px}
+  .mkrow button{padding:6px 10px;border-radius:8px;background:var(--sunk);font-size:12px;font-weight:700}
+  .mkrow button:hover{background:var(--red-soft);color:var(--red)}
+  .mkrow.busy{opacity:.6}
+  .marker-dot{width:14px;height:14px;border-radius:50%;background:#1f9d55;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+  .cmap-empty{color:var(--muted);font-size:14px;padding:18px 0;text-align:center}
 
   /* ---------- LOBBY / MULTIPLAYER ---------- */
   .friends h3{margin:0;font-size:18px;font-weight:800;letter-spacing:-.3px}
@@ -466,6 +576,12 @@
   .code-box .url{font-size:12px;color:var(--muted);word-break:break-all;margin-top:6px}
   .plist{display:flex;flex-direction:column;gap:6px}
   .prow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--hover);border:1px solid var(--line);font-size:14px}
+  .stk{display:inline-flex;align-items:center;gap:1px;margin-left:6px;font-size:11px;font-weight:800;color:#d9531e;vertical-align:1px;font-variant-numeric:tabular-nums}
+  .stk svg{width:13px;height:13px}
+  .stkbig{display:inline-flex;align-items:center;gap:4px;padding:3px 9px 3px 6px;border-radius:99px;background:#fff1e3;color:#c2410c;font-size:12.5px;font-weight:800;white-space:nowrap}
+  .stkbig svg{width:16px;height:16px}
+  html[data-theme="dark"] .stkbig{background:#3a2114;color:#ffb38a}
+  .namerow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .board .fchip{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--sunk);color:var(--muted);vertical-align:1px}
   .prow .sw{width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);background:#cfd8d2}
   .prow .pn{font-weight:700;flex:1}
@@ -704,6 +820,12 @@
   <circle cx="32" cy="24.5" r="12.3" fill="none" stroke="#0f5c31" stroke-opacity=".55" stroke-width="1"/>
   <path d="M24.2 16.8a11.4 11.4 0 0 1 5.6-3.6" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.8" stroke-linecap="round"/>
 </symbol>
+<symbol id="flame" viewBox="0 0 24 24">
+  <linearGradient id="flameG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset=".55" stop-color="#ff6a2b"/><stop offset="1" stop-color="#d63b2f"/></linearGradient>
+  <linearGradient id="flameIn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset="1" stop-color="#ffc247"/></linearGradient>
+  <path d="M12.6 1.6c.3 3.4 2.4 5.3 4.6 7.6 1.9 2 3.3 4.2 3.3 7 0 4.6-3.6 7.8-8.5 7.8S3.5 20.8 3.5 16.2c0-3 1.6-5.1 3.5-6.8-.2 1.9.6 3.2 2 3.8C8.3 9.4 10.9 5.8 12.6 1.6z" fill="url(#flameG)"/>
+  <path d="M12.2 11.4c.4 1.9 1.6 2.9 2.6 4.1.9 1 1.3 2 1.3 3 0 2.2-1.7 3.7-4.1 3.7S7.9 20.7 7.9 18.5c0-1.5.8-2.6 1.9-3.5 0 1 .5 1.6 1.2 1.9-.2-2 .7-3.7 1.2-5.5z" fill="url(#flameIn)"/>
+</symbol>
 <symbol id="dailymark" viewBox="0 0 64 64">
   <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-opacity=".38" stroke-width="2"/>
   <circle cx="32" cy="32" r="22.5" fill="none" stroke="currentColor" stroke-opacity=".9" stroke-width="2.4"/>
@@ -757,19 +879,31 @@
       </span>
       <span class="dr" id="dailyRight">Open</span>
     </button>
-    <div class="grid">
+    <button class="learnbar" id="learnBtn">
+      <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+      <span class="ll"><b>Learn</b><span>Play like normal — after every round, the one or two things that gave the country away.</span></span>
+      <span class="lr">Open</span>
+    </button>
+    <div class="grid three">
       <div class="card solo-card big">
         <div class="cardart solo"></div>
         <h2>Solo</h2>
         <p>Twenty-six modes, any corner of the world, your own pace.</p>
         <button class="btn btn-primary btn-block" id="soloBtn">Play</button>
       </div>
+      <div class="card duo-card big">
+        <div class="cardart duo"></div>
+        <h2>Duo</h2>
+        <p>Exactly two of you. Duel head to head, or go Blind and talk each other to the pin.</p>
+        <button class="btn btn-primary btn-block" id="duoBtn">Create duo</button>
+        <div class="mp-row"><input id="joinCode2" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn2">Join</button></div>
+      </div>
       <div class="card mp-card big">
         <div class="cardart mp"></div>
         <h2>Multiplayer</h2>
-        <p>Up to ten friends, one room code, voice chat built in.</p>
+        <p>Up to ten players, one room code, voice chat built in.</p>
         <button class="btn btn-primary btn-block" id="hostBtn">Create game</button>
-        <div class="mp-row"><input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn">Join game</button></div>
+        <div class="mp-row"><input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn">Join</button></div>
       </div>
     </div>
     <div class="card wide">
@@ -802,7 +936,7 @@
       <div class="prof">
         <div class="av-big" id="avPreview"></div>
         <div class="profside">
-          <b id="acctWho"></b>
+          <div class="namerow"><b id="acctWho"></b><span class="stkbig" id="acctStreak" hidden></span></div>
           <span class="handle" id="acctHandle"></span>
           <div class="profbtns">
             <button class="btn btn-secondary sm" id="avPick">Choose photo</button>
@@ -885,6 +1019,74 @@
   </div>
 </div>
 
+<!-- ================= CHALLENGE ================= -->
+<div id="chal" class="screen" hidden>
+  <div class="setup-wrap">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="chHome" style="margin-left:auto">Home</button></div>
+    <div class="card dailycard">
+      <div class="dhero" id="chHero">
+        <div class="t"><div class="dkicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M4 4h16v6a8 8 0 0 1-16 0z"/><path d="M8 20h8M12 18v2"/></svg><span>Challenge</span></div><h2 id="chTitle">Loading…</h2></div>
+      </div>
+      <div class="dfacts" id="chFacts"></div>
+      <div class="chrival" id="chRival" hidden></div>
+      <button class="btn btn-primary btn-block big" id="chStart" hidden>Play the same rounds</button>
+      <div class="ddone" id="chDone" hidden></div>
+    </div>
+    <div class="card wide" id="chPlaysCard" hidden><h2 style="margin-bottom:4px">Who's played it</h2><div class="rsub" id="chPlaysSub"></div><div id="chPlays"></div></div>
+    <div class="card wide" id="chReportCard" hidden><h2 style="margin-bottom:10px">Round by round</h2><div id="chReport"></div></div>
+  </div>
+</div>
+
+<!-- ================= CUSTOM MAPS ================= -->
+<div id="cmaps" class="screen" hidden>
+  <div class="setup-wrap">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Custom maps</b></div><button class="btn btn-secondary" id="cmapsBack" style="margin-left:auto">Back</button></div>
+    <div class="card">
+      <input class="tin" id="cmSearch" placeholder="Search maps by name or maker" autocomplete="off" spellcheck="false">
+      <div class="rsub" id="cmSub" style="margin-top:8px">Loading…</div>
+      <div class="cmgrid" id="cmList"></div>
+      <button class="wbar sm" id="cmCreate2"><b>Create a custom map</b><span class="go">New</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="cmap" class="screen" hidden>
+  <div class="setup-wrap">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="cmapBack" style="margin-left:auto">Back</button></div>
+    <div class="card dailycard">
+      <div class="dhero" id="cmHero"><div class="t"><div class="dkicker"><span>Custom map</span></div><h2 id="cmTitle">…</h2></div></div>
+      <div class="dfacts" id="cmFacts"></div>
+      <div style="padding:16px 22px 0">
+        <div class="label" style="margin-top:0">Time per round</div>
+        <div class="seg" id="cmTimeSeg"><button data-t="10">10s</button><button data-t="30">30s</button><button data-t="60" class="on">60s</button><button data-t="0">No limit</button></div>
+        <div class="label">Rounds</div>
+        <div class="seg" id="cmRoundSeg"></div>
+      </div>
+      <button class="btn btn-primary btn-block big" id="cmPlay">Play</button>
+      <div class="ddone" id="cmOwner" hidden></div>
+    </div>
+    <div class="card wide"><h2 style="margin-bottom:4px">Best on this map</h2><div class="rsub" id="cmBoardSub"></div><div id="cmBoard"></div></div>
+    <div class="card wide"><div class="prow2" style="justify-content:space-between"><h2 style="margin:0">Share it</h2><button class="btn btn-secondary sm" id="cmCopy">Copy link</button></div><div class="rsub" style="margin:8px 0 0" id="cmLink"></div></div>
+  </div>
+</div>
+
+<div id="cmake" class="screen" hidden>
+  <div class="setup-wrap">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Create a map</b></div><button class="btn btn-secondary" id="cmakeBack" style="margin-left:auto">Back</button></div>
+    <div class="card">
+      <div class="label" style="margin-top:0">Name</div>
+      <input class="tin" id="mkName" maxlength="32" placeholder="Every McDonald's in Ohio" autocomplete="off">
+      <div class="rsub" style="margin-top:8px">Click the map to add a spot. Each click snaps to the nearest Street View within a couple of miles. Paste coordinates or a Google Maps link to add one exactly.</div>
+      <div id="mkMap" class="mkmap"></div>
+      <div class="coordbar" style="border:0;padding:8px 0 0"><input id="mkCoord" placeholder="Paste coordinates: 48.8584, 2.2945 (or a Google Maps link)" autocomplete="off" spellcheck="false"><button id="mkCoordGo">Add</button></div>
+      <div class="label">Spots <span class="dim" id="mkCount">(0)</span></div>
+      <div class="mklist" id="mkList"><div class="frempty">Nothing yet. Click the map.</div></div>
+      <div class="acctmsg" id="mkMsg"></div>
+      <button class="btn btn-primary btn-block big" id="mkSave" disabled>Publish map</button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= LEADERBOARD PAGE (one per mode) ================= -->
 <div id="board" class="screen" hidden>
   <div class="setup-wrap">
@@ -908,7 +1110,11 @@
 <!-- ================= SOLO SETUP ================= -->
 <div id="setup" class="screen" hidden>
   <div class="setup-wrap">
-    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="setupBack" style="margin-left:auto">Back</button></div>
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px" id="setupTitle">Pinpoint</b></div><button class="btn btn-secondary" id="setupBack" style="margin-left:auto">Back</button></div>
+    <div class="card learncard" id="learnCard" hidden>
+      <h2 style="margin:0">Learn</h2>
+      <p>A normal game — pick a time and a length — but every round ends with the two or three things that give that country away: the side of the road, the lines, the plates, the script, the bollards, the land. Ninety countries, and you'll never see the same spot twice.</p>
+    </div>
     <div class="card">
       <div class="label" style="margin-top:0">Time per round</div>
       <div class="seg" id="timeSeg">
@@ -938,6 +1144,8 @@
     <div class="card modes">
       <h3>Game mode</h3>
       <div class="mode-grid" id="modeGrid"></div>
+      <button class="wbar" id="customBtn"><b>Custom maps</b><span>Play a set of spots someone built — or your own</span><span class="go">Browse</span></button>
+      <button class="wbar sm" id="createBtn"><b>Create a custom map</b><span class="go">New</span></button>
     </div>
   </div>
 </div>
@@ -957,7 +1165,7 @@
         <div class="mic-lobby"><div><b>Voice chat</b> is built in. Use the mic button in the corner to talk.<br><label style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer"><input type="checkbox" id="spkMode"> I'm on speakers, not headphones (turns on echo cancelling)</label></div></div>
       </div>
       <div class="card">
-        <h2>Players <span id="pcount" style="color:var(--muted);font-weight:600;font-size:14px"></span></h2>
+        <h2><span id="plistTitle">Players</span> <span id="pcount" style="color:var(--muted);font-weight:600;font-size:14px"></span></h2>
         <div class="plist" id="plist" style="margin-top:10px"></div>
         <div id="guestPanel" class="waiting" hidden>Waiting for the host to start…</div>
         <div class="countdown" id="countdown" hidden></div>
@@ -968,9 +1176,11 @@
         <div class="label" style="margin-top:0">Time per round</div>
         <div class="seg" id="mpTimeSeg"><button data-t="10">10s</button><button data-t="30">30s</button><button data-t="60" class="on">60s</button><button data-t="0">No limit</button><button data-t="custom">Custom</button></div>
         <div class="custom-row" id="mpTimeCustom" hidden><input type="range" min="1" max="180" value="45"><input type="number" min="1" max="180" value="45"><span>sec</span></div>
+        <div id="mpRoundsBox">
         <div class="label">Rounds</div>
         <div class="seg" id="mpRoundSeg"><button data-r="5" class="on">5</button><button data-r="10">10</button><button data-r="custom">Custom</button></div>
         <div class="custom-row" id="mpRoundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
+        </div>
       <div class="label">Where in the world</div>
       <button class="btn btn-secondary btn-block" id="mpRegionBtn" style="margin-bottom:14px">Anywhere on Earth</button>
       <div class="label">Camera</div>
@@ -979,12 +1189,19 @@
         <button class="chip" data-rule="lock">Camera lock</button>
       </div>
 
+        <div id="blindSetup" hidden>
+          <div class="label">Who looks, who pins?</div>
+          <div class="rsub">One of you gets only the street, the other gets only the map. Turn your mics on — you'll need them.</div>
+          <div class="seg" id="blindSeg"></div>
+          <div class="rules" style="margin-top:10px"><button class="chip" id="blindSwap">Swap roles every round</button></div>
+        </div>
         <button class="btn btn-primary start-big" id="mpStartBtn">Start Classic game</button>
       </div>
     </div>
     <div class="card modes" id="lobbyModes" hidden>
       <h3>Game mode</h3>
       <div class="mode-grid" id="lobbyModeGrid"></div>
+      <button class="wbar" id="lobbyCustomBtn"><b>Custom maps</b><span>Play a set of spots someone built</span><span class="go">Browse</span></button>
     </div>
   </div>
 </div>
@@ -996,6 +1213,7 @@
 
   <div id="loading"><svg class="topo sm" viewBox="0 0 140 140" aria-hidden="true"><path d="M121.5 72.0C123.2 73.2 124.8 74.5 126.0 75.9C127.1 77.2 127.9 78.7 128.4 80.1C128.8 81.6 128.7 83.0 128.4 84.4C128.1 85.8 127.4 87.1 126.6 88.3C125.8 89.5 124.6 90.6 123.5 91.7C122.5 92.8 121.2 93.8 120.0 94.7C118.9 95.7 117.7 96.6 116.4 97.5C115.2 98.4 114.0 99.3 112.7 100.0C111.4 100.8 110.1 101.5 108.7 102.1C107.3 102.7 105.8 103.2 104.2 103.5C102.7 103.8 101.0 104.0 99.4 104.1C97.8 104.2 96.1 104.1 94.5 104.0C93.0 104.0 91.5 103.8 90.0 103.7C88.6 103.7 87.4 103.7 86.1 103.8C84.9 104.0 83.8 104.3 82.7 104.7C81.6 105.2 80.5 105.8 79.4 106.4C78.3 107.0 77.1 107.8 75.9 108.4C74.6 108.9 73.3 109.6 72.0 109.9C70.7 110.2 69.3 110.4 67.9 110.3C66.6 110.2 65.2 109.8 64.0 109.3C62.7 108.8 61.6 108.0 60.5 107.2C59.4 106.5 58.4 105.6 57.4 104.8C56.4 104.1 55.5 103.3 54.5 102.8C53.4 102.3 52.4 101.9 51.1 101.8C49.8 101.6 48.3 101.6 46.7 101.7C45.1 101.7 43.2 101.9 41.3 102.0C39.4 102.1 37.3 102.2 35.3 102.1C33.3 102.0 31.2 101.8 29.5 101.3C27.7 100.8 26.0 100.1 24.6 99.2C23.2 98.3 22.1 97.2 21.2 96.0C20.3 94.9 19.7 93.5 19.3 92.1C18.9 90.8 18.7 89.3 18.6 87.9C18.5 86.5 18.5 85.1 18.6 83.7C18.7 82.3 18.9 81.0 19.2 79.6C19.5 78.3 19.8 77.0 20.4 75.7C20.9 74.4 21.6 73.2 22.5 72.0C23.3 70.8 24.4 69.7 25.6 68.7C26.8 67.7 28.3 66.7 29.7 65.9C31.1 65.1 32.8 64.4 34.1 63.7C35.5 63.0 36.9 62.5 37.9 61.8C38.9 61.2 39.8 60.6 40.3 59.9C40.8 59.1 41.0 58.3 41.0 57.3C41.0 56.3 40.6 55.1 40.3 53.8C40.0 52.5 39.5 51.0 39.2 49.4C38.9 47.9 38.6 46.2 38.6 44.6C38.7 43.1 38.9 41.5 39.5 40.2C40.0 38.9 40.9 37.7 41.9 36.8C43.0 35.9 44.3 35.2 45.7 34.7C47.1 34.1 48.7 33.9 50.2 33.6C51.7 33.4 53.2 33.3 54.7 33.1C56.2 32.9 57.6 32.7 59.1 32.4C60.5 32.1 61.9 31.8 63.3 31.4C64.7 30.9 66.1 30.4 67.5 29.9C69.0 29.5 70.5 28.9 72.0 28.6C73.5 28.3 75.1 28.0 76.7 28.0C78.3 28.0 79.9 28.1 81.4 28.4C82.9 28.8 84.4 29.3 85.8 29.9C87.1 30.5 88.4 31.3 89.7 32.1C91.0 32.9 92.1 33.8 93.3 34.6C94.5 35.4 95.6 36.2 96.7 36.9C97.8 37.7 98.9 38.4 100.0 39.2C101.0 40.0 102.1 40.8 103.0 41.7C103.9 42.6 104.8 43.6 105.4 44.6C106.0 45.7 106.4 46.9 106.6 48.2C106.8 49.4 106.8 50.8 106.6 52.1C106.5 53.4 106.1 54.8 105.8 56.0C105.5 57.2 105.0 58.4 104.8 59.4C104.7 60.5 104.6 61.4 104.9 62.2C105.2 63.0 105.8 63.6 106.8 64.4C107.8 65.1 109.2 65.7 110.7 66.4C112.3 67.2 114.2 67.9 116.0 68.8C117.8 69.8 119.9 70.8 121.5 72.0Z"/><path d="M115.2 70.0C116.4 71.1 117.4 72.3 117.9 73.4C118.4 74.6 118.6 75.9 118.4 77.0C118.2 78.1 117.6 79.3 116.8 80.3C116.0 81.3 114.8 82.2 113.7 83.0C112.5 83.9 111.2 84.6 109.9 85.3C108.7 86.0 107.4 86.5 106.3 87.2C105.1 87.8 104.1 88.4 103.1 89.0C102.1 89.6 101.2 90.2 100.3 90.9C99.4 91.5 98.6 92.1 97.6 92.7C96.7 93.2 95.8 93.8 94.8 94.2C93.8 94.6 92.7 95.0 91.6 95.3C90.5 95.5 89.3 95.7 88.2 95.8C87.1 96.0 85.9 96.0 84.9 96.1C83.8 96.2 82.8 96.3 81.8 96.5C80.8 96.7 79.8 96.9 78.9 97.2C77.9 97.5 77.0 97.9 76.1 98.3C75.1 98.7 74.2 99.2 73.1 99.5C72.1 99.8 71.1 100.2 70.0 100.3C68.9 100.4 67.8 100.5 66.8 100.3C65.7 100.2 64.6 99.9 63.7 99.5C62.7 99.2 61.7 98.6 60.8 98.1C59.9 97.7 59.1 97.1 58.1 96.7C57.2 96.3 56.4 96.0 55.3 95.8C54.3 95.6 53.2 95.6 51.9 95.7C50.7 95.7 49.2 96.0 47.7 96.1C46.1 96.3 44.4 96.6 42.7 96.7C40.9 96.8 39.1 96.9 37.4 96.7C35.8 96.5 34.1 96.2 32.7 95.6C31.4 95.1 30.2 94.3 29.4 93.3C28.5 92.4 28.0 91.2 27.7 90.0C27.4 88.8 27.5 87.5 27.7 86.2C27.8 84.9 28.3 83.6 28.7 82.3C29.2 81.1 29.8 79.9 30.3 78.7C30.8 77.6 31.3 76.5 31.8 75.5C32.3 74.5 32.8 73.6 33.2 72.6C33.7 71.7 34.2 70.8 34.7 70.0C35.2 69.2 35.8 68.4 36.4 67.6C37.0 66.8 37.6 66.1 38.3 65.4C38.9 64.7 39.6 64.1 40.2 63.4C40.7 62.8 41.3 62.2 41.7 61.5C42.0 60.9 42.2 60.2 42.3 59.4C42.4 58.6 42.2 57.7 42.0 56.8C41.9 55.8 41.5 54.7 41.2 53.5C41.0 52.3 40.6 51.0 40.6 49.7C40.5 48.5 40.4 47.1 40.7 46.0C41.0 44.8 41.5 43.7 42.2 42.8C42.9 41.9 43.8 41.2 44.9 40.6C46.0 40.1 47.3 39.7 48.5 39.5C49.8 39.3 51.2 39.2 52.5 39.2C53.7 39.1 55.0 39.1 56.2 39.0C57.4 38.9 58.6 38.8 59.7 38.5C60.8 38.2 61.9 37.8 63.0 37.3C64.1 36.9 65.2 36.3 66.3 35.8C67.5 35.3 68.7 34.7 70.0 34.3C71.3 33.9 72.6 33.6 73.9 33.5C75.2 33.4 76.5 33.5 77.8 33.8C79.0 34.1 80.2 34.7 81.3 35.3C82.4 35.9 83.4 36.8 84.4 37.6C85.3 38.5 86.1 39.4 86.9 40.3C87.6 41.2 88.3 42.1 89.0 43.0C89.7 43.8 90.3 44.6 91.0 45.4C91.6 46.2 92.2 47.0 92.8 47.7C93.4 48.5 93.9 49.2 94.3 50.0C94.8 50.8 95.1 51.7 95.4 52.5C95.7 53.3 95.9 54.2 96.0 55.1C96.2 55.9 96.2 56.7 96.4 57.5C96.6 58.3 96.7 59.0 97.2 59.6C97.6 60.3 98.1 60.8 98.8 61.4C99.6 62.0 100.7 62.4 101.9 63.0C103.1 63.6 104.7 64.1 106.2 64.8C107.7 65.4 109.4 66.2 111.0 67.1C112.5 67.9 114.0 68.9 115.2 70.0Z"/><path d="M105.1 68.0C105.6 68.9 105.9 69.8 105.9 70.7C105.9 71.6 105.6 72.5 105.1 73.4C104.5 74.2 103.6 75.0 102.7 75.6C101.8 76.3 100.6 76.9 99.5 77.4C98.5 77.9 97.3 78.4 96.3 78.8C95.3 79.3 94.3 79.6 93.5 80.1C92.7 80.5 92.1 81.0 91.5 81.5C90.9 82.0 90.5 82.6 90.0 83.1C89.5 83.7 89.1 84.3 88.5 84.8C88.0 85.4 87.5 86.0 86.8 86.4C86.2 86.9 85.5 87.3 84.7 87.6C84.0 87.9 83.1 88.1 82.2 88.2C81.4 88.4 80.5 88.4 79.6 88.5C78.8 88.5 77.9 88.5 77.1 88.6C76.3 88.6 75.6 88.7 74.8 88.8C74.1 89.0 73.3 89.2 72.6 89.3C71.8 89.5 71.1 89.8 70.3 90.0C69.6 90.2 68.8 90.5 68.0 90.6C67.2 90.7 66.4 90.8 65.6 90.8C64.8 90.8 63.9 90.7 63.1 90.6C62.3 90.5 61.6 90.3 60.8 90.1C60.0 90.0 59.2 89.8 58.4 89.7C57.5 89.6 56.7 89.5 55.7 89.5C54.8 89.6 53.8 89.7 52.7 89.8C51.5 89.9 50.3 90.1 49.0 90.2C47.8 90.3 46.4 90.5 45.1 90.4C43.8 90.3 42.4 90.2 41.3 89.9C40.2 89.5 39.1 89.0 38.4 88.4C37.6 87.7 37.1 86.8 36.8 85.9C36.5 85.0 36.5 83.9 36.7 82.8C36.9 81.8 37.3 80.6 37.8 79.5C38.3 78.5 39.0 77.4 39.6 76.5C40.1 75.5 40.8 74.7 41.3 73.9C41.7 73.1 42.2 72.4 42.5 71.7C42.8 71.0 42.9 70.4 43.0 69.8C43.2 69.2 43.1 68.6 43.2 68.0C43.2 67.4 43.2 66.8 43.2 66.2C43.3 65.6 43.3 65.0 43.4 64.4C43.5 63.9 43.6 63.3 43.8 62.7C43.9 62.1 44.0 61.5 44.1 60.9C44.2 60.2 44.3 59.6 44.3 58.9C44.3 58.2 44.2 57.5 44.1 56.7C44.1 55.9 43.9 55.0 43.9 54.2C43.9 53.3 43.9 52.4 44.0 51.5C44.1 50.6 44.3 49.7 44.7 48.9C45.1 48.2 45.7 47.4 46.4 46.9C47.1 46.3 47.9 45.9 48.8 45.5C49.7 45.2 50.7 45.0 51.7 44.9C52.7 44.7 53.8 44.7 54.7 44.6C55.7 44.6 56.6 44.5 57.5 44.4C58.4 44.2 59.2 44.0 60.0 43.7C60.9 43.3 61.7 42.9 62.5 42.5C63.4 42.0 64.2 41.4 65.1 41.0C66.0 40.6 67.0 40.1 68.0 39.8C69.0 39.5 70.1 39.3 71.1 39.4C72.1 39.4 73.1 39.7 74.0 40.1C74.9 40.5 75.8 41.1 76.6 41.8C77.3 42.5 78.0 43.4 78.5 44.3C79.1 45.1 79.6 46.1 80.0 46.9C80.4 47.7 80.8 48.6 81.2 49.3C81.6 50.0 81.9 50.6 82.3 51.2C82.8 51.8 83.2 52.2 83.7 52.7C84.1 53.2 84.6 53.6 85.1 54.0C85.6 54.4 86.1 54.8 86.6 55.2C87.1 55.6 87.6 56.0 88.1 56.5C88.6 56.9 89.0 57.4 89.5 57.8C90.1 58.2 90.6 58.7 91.3 59.1C91.9 59.5 92.6 59.9 93.5 60.4C94.3 60.8 95.3 61.3 96.4 61.8C97.4 62.3 98.6 62.8 99.7 63.4C100.7 64.0 101.9 64.7 102.8 65.5C103.7 66.3 104.6 67.1 105.1 68.0Z"/><path d="M94.3 66.0C94.4 66.6 94.3 67.3 94.1 67.9C93.8 68.6 93.3 69.2 92.8 69.7C92.2 70.3 91.4 70.8 90.7 71.2C90.0 71.6 89.1 72.0 88.3 72.4C87.6 72.7 86.8 73.0 86.2 73.3C85.6 73.7 85.0 74.0 84.6 74.3C84.1 74.7 83.8 75.1 83.6 75.5C83.3 75.9 83.1 76.4 82.9 76.9C82.6 77.4 82.4 77.9 82.1 78.4C81.8 78.9 81.5 79.3 81.0 79.7C80.6 80.1 80.0 80.4 79.4 80.6C78.9 80.8 78.2 80.9 77.5 80.9C76.9 81.0 76.1 80.9 75.5 80.9C74.8 80.9 74.2 80.8 73.5 80.7C72.9 80.7 72.4 80.7 71.8 80.7C71.3 80.8 70.8 80.9 70.2 81.0C69.7 81.2 69.2 81.4 68.7 81.7C68.1 81.9 67.6 82.2 67.0 82.4C66.4 82.6 65.8 82.8 65.2 83.0C64.6 83.2 63.9 83.3 63.3 83.4C62.6 83.5 61.9 83.5 61.3 83.5C60.6 83.5 59.9 83.5 59.2 83.5C58.5 83.5 57.8 83.5 57.0 83.6C56.2 83.6 55.4 83.6 54.6 83.6C53.8 83.6 52.9 83.6 52.0 83.6C51.2 83.5 50.2 83.4 49.4 83.2C48.7 82.9 47.9 82.6 47.3 82.2C46.7 81.7 46.2 81.2 45.9 80.5C45.6 79.9 45.5 79.1 45.5 78.3C45.6 77.6 45.8 76.7 46.1 75.9C46.5 75.1 47.0 74.2 47.4 73.5C47.9 72.7 48.5 72.0 48.9 71.4C49.3 70.8 49.6 70.3 49.9 69.8C50.1 69.3 50.2 68.9 50.1 68.4C50.1 68.0 49.9 67.6 49.7 67.2C49.5 66.8 49.2 66.4 48.9 66.0C48.6 65.6 48.3 65.1 48.1 64.6C47.9 64.2 47.7 63.7 47.6 63.2C47.5 62.7 47.5 62.2 47.5 61.7C47.5 61.2 47.6 60.7 47.7 60.2C47.8 59.7 47.9 59.3 48.0 58.7C48.1 58.2 48.2 57.7 48.4 57.2C48.5 56.6 48.5 56.1 48.7 55.5C48.8 54.9 48.9 54.3 49.2 53.7C49.4 53.2 49.6 52.6 50.0 52.1C50.4 51.6 50.8 51.1 51.3 50.7C51.9 50.3 52.5 50.0 53.1 49.7C53.7 49.5 54.5 49.3 55.1 49.2C55.8 49.0 56.5 48.9 57.2 48.8C57.9 48.6 58.5 48.5 59.1 48.3C59.8 48.1 60.4 47.9 61.0 47.6C61.6 47.3 62.2 47.0 62.8 46.7C63.5 46.3 64.1 46.0 64.8 45.7C65.5 45.5 66.3 45.2 67.0 45.1C67.7 45.1 68.5 45.1 69.2 45.3C69.9 45.5 70.6 45.8 71.2 46.3C71.8 46.8 72.4 47.4 72.9 48.1C73.3 48.7 73.7 49.5 74.0 50.2C74.3 50.9 74.6 51.7 74.8 52.3C75.1 52.9 75.2 53.5 75.5 53.9C75.8 54.3 76.1 54.7 76.4 54.9C76.8 55.2 77.2 55.4 77.7 55.5C78.2 55.7 78.8 55.7 79.4 55.8C80.0 56.0 80.6 56.1 81.2 56.2C81.9 56.4 82.5 56.5 83.1 56.8C83.7 57.0 84.3 57.2 84.9 57.5C85.5 57.8 86.1 58.1 86.6 58.5C87.2 58.8 87.8 59.2 88.4 59.6C89.0 60.0 89.7 60.4 90.3 60.9C90.9 61.3 91.5 61.8 92.1 62.4C92.6 62.9 93.2 63.5 93.6 64.1C93.9 64.7 94.2 65.4 94.3 66.0Z"/><path d="M82.6 64.0C82.5 64.4 82.4 64.8 82.2 65.2C82.0 65.5 81.6 65.9 81.3 66.2C80.9 66.5 80.5 66.8 80.0 67.1C79.6 67.4 79.2 67.6 78.8 67.8C78.4 68.0 78.0 68.2 77.7 68.5C77.4 68.7 77.2 68.9 77.0 69.2C76.8 69.5 76.7 69.8 76.5 70.1C76.4 70.4 76.3 70.7 76.2 71.0C76.1 71.3 75.9 71.7 75.7 72.0C75.5 72.3 75.3 72.5 75.0 72.7C74.6 72.9 74.2 73.1 73.8 73.2C73.4 73.3 73.0 73.3 72.5 73.3C72.1 73.3 71.6 73.2 71.2 73.1C70.8 73.1 70.4 73.0 70.0 73.0C69.6 72.9 69.3 72.9 68.9 73.0C68.6 73.1 68.3 73.2 68.0 73.4C67.7 73.6 67.4 73.8 67.1 74.1C66.7 74.3 66.4 74.6 66.0 74.9C65.6 75.1 65.2 75.4 64.8 75.6C64.3 75.8 63.9 76.0 63.4 76.1C62.9 76.3 62.4 76.3 62.0 76.4C61.5 76.4 61.0 76.4 60.5 76.3C60.0 76.3 59.6 76.2 59.1 76.2C58.6 76.1 58.1 76.0 57.7 75.8C57.2 75.7 56.7 75.6 56.3 75.4C55.8 75.2 55.4 75.0 55.0 74.7C54.7 74.4 54.3 74.1 54.1 73.8C53.9 73.4 53.7 72.9 53.7 72.5C53.6 72.0 53.7 71.5 53.8 71.0C53.9 70.5 54.1 70.0 54.3 69.5C54.5 69.1 54.9 68.6 55.1 68.2C55.3 67.8 55.6 67.4 55.7 67.1C55.8 66.8 55.9 66.5 55.9 66.2C55.8 66.0 55.7 65.8 55.5 65.5C55.3 65.3 55.0 65.1 54.7 64.8C54.4 64.6 54.0 64.3 53.7 64.0C53.4 63.7 53.1 63.4 52.9 63.1C52.7 62.7 52.6 62.4 52.5 62.0C52.4 61.7 52.5 61.4 52.5 61.0C52.6 60.7 52.8 60.4 52.9 60.1C53.1 59.8 53.3 59.5 53.4 59.2C53.6 58.9 53.8 58.6 53.9 58.3C54.1 58.0 54.2 57.6 54.3 57.3C54.5 57.0 54.6 56.6 54.8 56.3C54.9 55.9 55.1 55.6 55.3 55.2C55.5 54.9 55.8 54.6 56.1 54.3C56.4 54.0 56.7 53.8 57.1 53.6C57.5 53.4 57.9 53.2 58.3 53.0C58.7 52.9 59.1 52.8 59.6 52.7C60.0 52.6 60.4 52.4 60.8 52.3C61.2 52.2 61.6 52.1 62.1 51.9C62.5 51.8 62.9 51.6 63.3 51.5C63.7 51.4 64.2 51.2 64.6 51.2C65.1 51.1 65.6 51.1 66.0 51.2C66.4 51.2 66.9 51.4 67.3 51.6C67.7 51.8 68.1 52.2 68.5 52.5C68.8 52.9 69.1 53.4 69.3 53.8C69.6 54.2 69.8 54.7 69.9 55.1C70.1 55.5 70.2 55.9 70.4 56.2C70.6 56.5 70.7 56.8 71.0 56.9C71.2 57.1 71.5 57.2 71.8 57.2C72.2 57.2 72.6 57.2 73.0 57.1C73.5 57.1 74.0 57.0 74.5 57.0C75.1 57.0 75.6 57.0 76.2 57.0C76.7 57.1 77.2 57.1 77.7 57.3C78.2 57.4 78.6 57.6 79.0 57.9C79.4 58.1 79.7 58.4 80.0 58.6C80.3 58.9 80.6 59.2 80.9 59.6C81.1 59.9 81.4 60.2 81.6 60.6C81.8 60.9 82.0 61.3 82.2 61.7C82.4 62.0 82.5 62.4 82.6 62.8C82.7 63.2 82.7 63.6 82.6 64.0Z"/><path d="M72.2 62.5C72.1 62.7 72.1 62.8 72.0 63.0C71.9 63.1 71.8 63.3 71.7 63.4C71.6 63.5 71.4 63.7 71.3 63.8C71.1 63.9 71.0 64.0 70.9 64.1C70.7 64.2 70.6 64.3 70.5 64.4C70.4 64.5 70.3 64.6 70.2 64.7C70.2 64.9 70.1 65.0 70.1 65.1C70.0 65.2 70.0 65.4 69.9 65.5C69.8 65.6 69.7 65.8 69.6 65.9C69.5 66.0 69.4 66.1 69.2 66.2C69.1 66.2 68.9 66.3 68.7 66.3C68.6 66.3 68.3 66.3 68.2 66.3C68.0 66.3 67.8 66.2 67.6 66.2C67.5 66.2 67.3 66.2 67.2 66.2C67.0 66.3 66.9 66.3 66.8 66.4C66.6 66.4 66.5 66.6 66.4 66.7C66.3 66.8 66.1 67.0 66.0 67.1C65.8 67.3 65.7 67.5 65.5 67.6C65.3 67.8 65.1 67.9 64.9 68.0C64.7 68.1 64.5 68.2 64.3 68.3C64.0 68.3 63.8 68.3 63.6 68.3C63.4 68.3 63.2 68.2 63.0 68.1C62.8 68.1 62.6 68.0 62.4 67.9C62.3 67.8 62.1 67.7 62.0 67.5C61.8 67.4 61.7 67.3 61.5 67.2C61.4 67.0 61.3 66.9 61.2 66.7C61.1 66.6 61.0 66.4 60.9 66.3C60.9 66.1 60.8 65.9 60.8 65.7C60.8 65.5 60.8 65.3 60.9 65.2C60.9 65.0 61.0 64.8 61.0 64.6C61.1 64.5 61.1 64.3 61.2 64.2C61.2 64.0 61.3 63.9 61.2 63.8C61.2 63.7 61.2 63.6 61.1 63.5C61.0 63.4 60.9 63.3 60.7 63.2C60.6 63.1 60.4 63.0 60.2 62.9C60.1 62.8 59.9 62.6 59.8 62.5C59.6 62.4 59.5 62.2 59.4 62.1C59.4 61.9 59.4 61.8 59.4 61.6C59.4 61.5 59.4 61.3 59.5 61.2C59.6 61.0 59.7 60.9 59.8 60.8C59.9 60.7 60.0 60.6 60.1 60.4C60.2 60.3 60.3 60.2 60.4 60.1C60.4 59.9 60.5 59.8 60.5 59.7C60.6 59.5 60.6 59.4 60.7 59.2C60.7 59.0 60.8 58.9 60.9 58.7C60.9 58.5 61.0 58.4 61.1 58.2C61.3 58.1 61.4 58.0 61.5 57.9C61.7 57.8 61.9 57.7 62.1 57.6C62.2 57.6 62.4 57.5 62.6 57.5C62.8 57.4 63.0 57.4 63.2 57.4C63.4 57.4 63.6 57.3 63.8 57.3C64.0 57.3 64.2 57.3 64.4 57.3C64.6 57.3 64.8 57.3 64.9 57.3C65.1 57.4 65.3 57.4 65.5 57.5C65.7 57.5 65.9 57.6 66.0 57.7C66.2 57.9 66.3 58.0 66.4 58.1C66.6 58.3 66.7 58.5 66.8 58.6C66.9 58.8 66.9 58.9 67.0 59.0C67.1 59.2 67.2 59.3 67.3 59.3C67.4 59.4 67.5 59.4 67.7 59.4C67.8 59.4 68.0 59.4 68.2 59.4C68.4 59.3 68.6 59.2 68.9 59.2C69.1 59.2 69.4 59.1 69.7 59.1C69.9 59.1 70.2 59.1 70.5 59.1C70.7 59.1 70.9 59.2 71.1 59.3C71.3 59.4 71.5 59.5 71.6 59.6C71.7 59.7 71.8 59.9 71.9 60.1C71.9 60.2 72.0 60.4 72.0 60.6C72.1 60.7 72.1 60.9 72.1 61.0C72.1 61.2 72.2 61.4 72.2 61.5C72.2 61.7 72.2 61.9 72.2 62.0C72.2 62.2 72.2 62.3 72.2 62.5Z"/></svg><div id="loadingText">Finding a location…</div></div>
   <div class="round-intro" id="roundIntro" hidden></div>
+  <div class="blindhint" id="blindHint" hidden></div>
   <div id="blink" hidden><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="lid" fill="#000" fill-rule="evenodd" d=""/></svg></div>
   <div id="pix" hidden><canvas id="pixCanvas" width="128" height="72"></canvas><div class="dev" id="pixDev">Loading…</div></div>
   <div id="trio" hidden></div>
@@ -1028,9 +1246,14 @@
 
   <div class="hud">
     <div class="hud-left">
-      <div class="pill"><small>ROUND</small><b id="roundLbl">1 / 5</b></div>
+      <div class="pill" id="roundPill"><small>ROUND</small><b id="roundLbl">1 / 5</b></div>
       <div class="pill score" id="scorePill" style="position:relative"><small>SCORE</small><b id="scoreLbl">0</b></div>
       <div class="pill modepill" id="modePill" hidden><small>MODE</small><b id="modeLbl"></b></div>
+      <div class="duel" id="duelHud" hidden>
+        <div class="dside me" id="duelMe"></div>
+        <div class="dmult" id="duelMult">×1</div>
+        <div class="dside them" id="duelThem"></div>
+      </div>
     </div>
     <div class="strip" id="strip" hidden></div>
     <div class="hud-brand" id="hudBrand"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#logo"/></svg><span>Pinpoint</span></div>
@@ -1064,6 +1287,8 @@
     <div class="bar"><i id="ptsBar"></i></div>
     <div class="dist" id="distTxt"></div>
     <div class="place" id="placeTxt"></div>
+    <div class="rivalline" id="rivalLine" hidden></div>
+    <div class="cluebox" id="clueBox" hidden></div>
     <div class="leader" id="leaderLine" hidden></div>
     <div class="rank" id="roundRank" hidden></div>
     <button class="btn btn-primary" id="nextBtn">Next round</button>
@@ -1096,6 +1321,7 @@
       <span id="nagSub">Leave now and this game won't be on the leaderboard.</span>
       <div class="row"><button class="btn btn-primary" id="nagSave">Save it</button><button class="btn btn-secondary" id="nagSkip">Leave anyway</button></div>
     </div>
+    <div class="rivalline" id="finalRival" hidden></div>
     <div class="final-actions">
       <button class="btn btn-secondary" id="menuBtn">Home</button>
       <button class="btn btn-secondary" id="viewBoardBtn" hidden>View leaderboard</button>
@@ -1105,6 +1331,15 @@
   </div>
 </div>
 
+<div class="sharebox" id="shareBox" hidden>
+  <div class="sharecard" id="shareCard" hidden>
+    <b>Challenge a friend</b>
+    <p>Share this link and whoever opens it plays the exact same rounds — and sees your pin after every guess.</p>
+    <div class="sharerow"><input id="shareLink" readonly><button class="btn btn-primary" id="shareCopy">Copy</button></div>
+    <div class="sharenote" id="shareNote"></div>
+  </div>
+  <button class="btn btn-secondary sharebtn" id="shareBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button>
+</div>
 <button class="mic" id="micBtn" hidden title="Toggle microphone (M)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/><line class="slash" x1="4" y1="3.5" x2="20" y2="20.5"/></svg></span><span id="micTxt">Mic off</span></button>
 <canvas id="confetti" hidden></canvas>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -1145,9 +1380,15 @@ OC:[['Western Australia',-35,-14,113,129],['Northern Territory',-26,-11,129,138]
     ['New Zealand North',-41.6,-34.4,172.6,178.6],['New Zealand South',-47.3,-40.5,166.4,174.4],['Guam',13.23,13.66,144.6,145],['American Samoa',-14.4,-14.15,-170.9,-170.5],['Vanuatu',-20.3,-13.1,166.5,170.3]],
 };
 const CONTINENTS=['NA','SA','EU','AF','AS','OC'];
-const RECENT_MAX=24;
+const RECENT_MAX=60;
 function recentPlaces(){ try{ return JSON.parse(localStorage.getItem('pp_recent')||'[]'); }catch(e){ return []; } }
 function notePlace(name){ try{ const r=recentPlaces().filter(x=>x!==name); r.push(name); localStorage.setItem('pp_recent',JSON.stringify(r.slice(-RECENT_MAX))); }catch(e){} }
+/* Regions rotate, but two random points in a small box can still snap to the same panorama. So every
+   panorama you have been dropped at is remembered too, and a lookup that lands on one is thrown back. */
+const PANO_MAX=800;
+let _seenPanos=null;
+function seenPanos(){ if(!_seenPanos){ try{ _seenPanos=new Set(JSON.parse(localStorage.getItem('pp_panos')||'[]')); }catch(e){ _seenPanos=new Set(); } } return _seenPanos; }
+function notePano(id){ if(!id) return; const s=seenPanos(); s.delete(id); s.add(id); while(s.size>PANO_MAX){ s.delete(s.values().next().value); } try{ localStorage.setItem('pp_panos',JSON.stringify([...s])); }catch(e){} }
 /* Every pick can run off a supplied generator instead of Math.random, which is what makes the daily
    identical on every device: same seed, same sequence, same five locations. */
 function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
@@ -1315,6 +1556,114 @@ function polMode(m){
   const want=(axis==='p'?POL_BY_POWER:POL_BY_ECON)[i], set=new Set(want);
   return {...m, filter:n=>set.has(countryOfRegion(n)), expect:want};
 }
+/* ---------- Learn: the tells ----------
+   Two or three things you can actually see from the road in each country: which side they drive on, the
+   colour of the lines and the plates, the script on the signs, the bollards, the houses, the land. Written to be
+   read in ten seconds after a round, so you carry one thing into the next one. */
+const CLUES={
+ 'United States':['Yellow centre lines with white edge lines, and green highway signs with white text.','Speed limits on plain black-on-white rectangles, wooden utility poles and roadside mailboxes on posts.','Green street-name blades; plates and scenery change a lot from state to state.'],
+ 'Canada':['Yellow centre lines like the US, but speed signs in km/h and distances in kilometres.','Bilingual English–French signs mean Quebec or New Brunswick; a red \'ARRÊT\' stop sign is Quebec.','Green highway shields with a crown (Ontario) or a fleur-de-lis (Quebec).'],
+ 'Mexico':['\'ALTO\' stop signs, yellow centre lines, and warnings for \'topes\' — the speed bumps that are everywhere.','Spanish signs on white with a red or black border; speed signs read \'MÁXIMA\'.','Brightly painted concrete houses, OXXO corner shops, and plenty of old VW Beetles.'],
+ 'Guatemala':['Chicken buses — old US school buses painted in bright colours — and green volcanic hills.','Spanish signs, yellow centre lines, low concrete houses and \'tienda\' corner shops.'],
+ 'Costa Rica':['\'Pura vida\' on everything, blue-and-white street signs, and steep green hills with tin-roofed houses.','Spanish on yellow-centre-line roads; Toyota pickups and \'pulpería\' shops.'],
+ 'Panama':['Yellow centre lines and Spanish signs; skyscrapers in Panama City, Caribbean colours in the towns.','Concrete utility poles, tropical haze, and \'Diablo Rojo\' buses covered in airbrushed art.'],
+ 'Dominican Republic':['Spanish; motorbikes carrying whole families; colourful concrete houses under palms.','Yellow centre lines, \'colmado\' corner shops, and Presidente beer signs.'],
+ 'Colombia':['Yellow licence plates, front and back — the Colombian giveaway.','Yellow centre lines, red-brick Andean towns, and tuk-tuks in the smaller places.'],
+ 'Ecuador':['Yellow centre lines, Spanish signs, and the Andes never far away.','White plates; Pilsener beer signs; buses painted in bold colours.'],
+ 'Peru':['Yellow centre lines, white plates, and three-wheeled \'mototaxis\'.','A dusty grey desert coast, deep green Andes valleys inland, and political slogans painted on walls.'],
+ 'Bolivia':['High, dry and thin-aired: brown Altiplano hills and towns of unpainted red brick.','Spanish signs, yellow centre lines, and old Japanese minibuses as public transport.'],
+ 'Brazil':['Portuguese on signs (\'Rua\', \'Avenida\'), yellow centre lines, and squarish concrete utility poles.','White Mercosur plates (older ones grey); Ipiranga and Petrobras stations; walls dusted red with clay.'],
+ 'Argentina':['Spanish; black-on-white plates with a blue Mercosur strip on top (older ones black with white text).','Yellow centre lines across wide, flat pampas; YPF fuel stations; concrete poles.'],
+ 'Chile':['White lines only — no yellow centre line — with \'PARE\' stop signs.','Bone-dry desert roads in the north, green fjords and rain in the south, the Andes almost always in view.'],
+ 'Uruguay':['Spanish signs, yellow centre lines, and ANCAP fuel stations you won\'t find anywhere else.','Flat green farmland, low houses with terracotta roofs, and Mercosur plates.'],
+ 'United Kingdom':['Drives on the left; speeds in mph; white front plates and yellow rear plates.','Direction signs: green on main roads, white on local ones, blue on motorways; red pillar postboxes.','Terraced brick houses, hedgerows, dry-stone walls, and double yellow lines along the kerb.'],
+ 'Ireland':['Drives on the left with yellow dashed edge lines — the classic Irish tell.','Signs in Irish and English, speeds in km/h, and green postboxes.','Grey stone walls and wet green fields; white plates carrying the county name in Irish.'],
+ 'France':['Town-entry signs are white with a red border; street names sit on blue enamel plaques.','White plates with a blue EU strip; \'Boulangerie\', \'Tabac\' and \'Mairie\' on every high street.','Bollards are white with a red band on top; plane trees line dead-straight D-roads.'],
+ 'Spain':['\'CEDA EL PASO\' on give-way signs; blue signs on main roads, white on local ones.','White plates with a blue EU strip; bollards with a black top; Repsol and Cepsa stations.','Dry ochre landscapes inland, whitewashed villages, and town names on white with a red border.'],
+ 'Portugal':['Blue direction signs; patterned tiled façades (azulejos) and mosaic-cobbled pavements.','Plates: white with a blue EU strip on the left and, on older cars, a yellow strip on the right.','Galp stations; eucalyptus and orange trees; a rounded typeface on the road signs.'],
+ 'Italy':['Black-on-white town signs; street names on marble-look plaques; blue parking bays.','Green \'Autostrada\' signs, scooters everywhere, and \'Tabacchi\' shops marked with a big T.','White plates with blue strips on both ends.'],
+ 'Germany':['Yellow town-entry signs with black text; leaving town, the name has a line struck through it.','Plates: black on white, a blue EU strip, and a round registration seal after the city code.','Tidy roads, cobbled pavements, bike lanes, and the yellow-diamond \'Vorfahrt\' priority sign.'],
+ 'Netherlands':['Yellow licence plates, front and back.','Flat land, brick houses with huge windows, and red-asphalt cycle paths beside every road.','Bollards white with a red band; canals and dykes never far away.'],
+ 'Belgium':['Red text on white licence plates — nobody else in Europe.','Brick houses, French/Dutch bilingual signs, and grey skies more often than not.','Old concrete-slab roads and a roundabout every kilometre.'],
+ 'Switzerland':['Blue signs on main roads, green on motorways; white plates with the canton\'s coat of arms.','Wooden chalets, immaculate tarmac, and a yellow-diamond priority sign like Germany\'s.','Yellow pedestrian crossings; names in German, French or Italian depending on where you are.'],
+ 'Austria':['Blue town-entry signs with white text.','White plates with a blue EU strip and the red-white-red flag; Bundesland shields on the cars.','Alpine villages with onion-domed churches and wooden balconies full of flowers.'],
+ 'Czech Republic':['Town signs white with black text; \'Náměstí\' (square) and \'ulice\' on street names.','Diacritics like ř, ě, ů and ž in almost every word; Škodas everywhere.','Soviet-era panel apartment blocks beside baroque town squares.'],
+ 'Slovakia':['Slovak — look for ľ, ť, ô and ä; \'Ulica\' on street names.','Hilly forested countryside, painted concrete houses, white plates with the Slovak coat of arms.'],
+ 'Hungary':['Hungarian: \'utca\' (street), \'út\' (road), and long accents like ő and ű.','Flat plains, yellow-washed rural houses, and white plates with a blue strip.'],
+ 'Poland':['White town-entry signs with black text; green direction signs.','Red-brick churches, dense pine forest and flat farmland; Żabka shops.','Bollards white with a red band and a black top.'],
+ 'Denmark':['Danish letters æ, ø and å; \'vej\' means road.','Red-and-white town signs, cycle lanes everywhere, white plates with a red border.'],
+ 'Norway':['Yellow centre lines — Sweden and Finland use white.','Red and white wooden houses, fjords and bare rock; \'vei\' or \'veg\' on signs.','White plates with a blue strip; a tunnel every few minutes.'],
+ 'Sweden':['White centre lines with yellow-on-blue direction signs and yellow-backed warning signs.','Falu-red wooden houses in pine forest; \'väg\' and \'gatan\' on names.','Road-edge posts are white with yellow reflectors.'],
+ 'Finland':['Finnish: long words with double letters (kk, tt, aa); \'tie\' is road, \'katu\' is street.','Yellow-backed warning signs like Sweden\'s, but flatter land, lakes and birch.','Finnish/Swedish bilingual signs near the coast.'],
+ 'Iceland':['Treeless volcanic moss and black gravel, with yellow road-edge posts.','Icelandic ð and þ on signs; single-lane bridges on the ring road.'],
+ 'Estonia':['Estonian: õ, ä, ö, ü; \'tee\' means road, \'tänav\' street.','Flat and forested, with wooden houses and Soviet-era blocks; white plates with a blue strip.'],
+ 'Latvia':['Latvian macrons — ā, ē, ī, ū — and \'iela\' on street names.','Wooden houses, pine forest, and Riga\'s Art Nouveau façades.'],
+ 'Lithuania':['Lithuanian: \'gatvė\' on street names, letters like ė, ų and į.','Flat farmland, wooden farmhouses, and storks\' nests on the poles.'],
+ 'Ukraine':['Cyrillic with ї and є — letters Russian doesn\'t use; \'вулиця\' means street.','Fences, bus stops and kerbs painted blue and yellow; wide flat fields.'],
+ 'Russia':['Cyrillic; \'улица\' (street) and \'проспект\'; black-on-white plates ending in a region number.','Blue direction signs, grey apartment blocks, birch forest, and long straight roads.','Kilometre posts and kerbs painted in black and white.'],
+ 'Romania':['Romanian (ă, â, î, ș, ț) — a Latin language among Slavic neighbours; \'strada\' on names.','Horse carts on the road, yellow taxis, Petrom and Rompetrol stations.','Silver-domed Orthodox churches and rural houses with ornate metal gates.'],
+ 'Bulgaria':['Cyrillic with a lot of ъ; \'ул.\' for street; white plates with a blue strip.','Dry hills, Soviet-era blocks, and red-tiled houses.'],
+ 'Greece':['Greek alphabet, with a Latin transliteration under it on most signs.','Blue direction signs, dry rocky hills, olive trees and whitewashed houses.'],
+ 'Croatia':['Yellow direction signs on main roads; \'ulica\' and the letters č, ć, š, ž.','Red-tiled roofs, stone houses and the Adriatic; plates with the red-and-white checkerboard.'],
+ 'Slovenia':['Slovene (č, š, ž); \'cesta\' (road) and \'ulica\' (street).','Alpine and green, a church spire on every hill; white plates with a blue strip.'],
+ 'Serbia':['Cyrillic and Latin side by side; \'улица\' / \'ulica\'; letters ć and đ.','Unrendered brick houses, plum orchards, and plates with a Cyrillic town code.'],
+ 'North Macedonia':['Cyrillic with letters nobody else uses — ѓ, ќ, ѕ, џ; mountains in every direction.','Red-tiled roofs, minarets and Orthodox churches in the same town.'],
+ 'Albania':['Albanian: ë and ç everywhere; \'Rruga\' on street names.','Mercedes of every age, concrete bunkers in the fields, mountains meeting the sea.'],
+ 'Bosnia and Herzegovina':['Latin and Cyrillic both appear; mosques and churches in the same town.','Steep green valleys, unrendered brick, and white plates with a blue strip.'],
+ 'Turkey':['Turkish: dotless ı, ğ, ş, ç; \'sokak\' (street) and \'caddesi\' (avenue).','Blue direction signs, white plates with a blue strip, red-and-white painted kerbs.','A minaret on every skyline; Migros and BİM shops.'],
+ 'Georgia':['Georgian script — rounded letters unlike anything else — with Latin underneath.','Caucasus mountains, vineyards, old Ladas and Mercedes.'],
+ 'Israel':['Hebrew (with Arabic and English) on signs; yellow licence plates.','Dry stony hills; white apartment blocks with solar water tanks on the roof.'],
+ 'Jordan':['Arabic and English signs; rocky desert and sand-coloured stone houses.','Roundabouts with a flag in the middle; pickups and old Hyundais.'],
+ 'Lebanon':['Arabic and French signs; steep, dense hillside towns with the sea below.','Red plates on taxis; concrete apartment blocks stacked with balconies.'],
+ 'United Arab Emirates':['Arabic and English; wide immaculate roads, desert sand, and glass towers.','White plates with the emirate\'s name; green and blue direction signs.'],
+ 'Oman':['Arabic and English; bare brown mountains and a coast of pale houses.','White forts and low white houses, a mosque in every village.'],
+ 'Egypt':['Arabic (English on main roads); dusty streets and unfinished red-brick apartment blocks.','Palms, the Nile\'s green strip, and desert right at the edge of town.'],
+ 'Tunisia':['Arabic and French; black plates with white text.','Whitewashed houses with blue doors, olive groves and dry hills.'],
+ 'Algeria':['Arabic and French signs; dry hills and unfinished brick buildings.','Long desert roads in the south, Mediterranean towns in the north.'],
+ 'Kenya':['Drives on the left; white front plates, yellow rear.','Red soil, matatu minibuses, and M-Pesa shops painted green.'],
+ 'Uganda':['Drives on the left; red soil, banana plants and boda-boda motorbikes.','White front and yellow rear plates; MTN-yellow shopfronts.'],
+ 'Rwanda':['Drives on the right — unlike its East African neighbours.','Steep green hills, tidy paved roads, and motorbike taxis in matching vests.'],
+ 'Tanzania':['Drives on the left; yellow plates; Swahili signs (\'duka\', \'barabara\').','Red earth, baobabs, and three-wheeled \'bajaji\'.'],
+ 'Ghana':['Drives on the right; English signs; red laterite soil; \'tro-tro\' minibuses.','Concrete houses painted in Vodafone red or MTN yellow as adverts.'],
+ 'Nigeria':['Drives on the right; English signs; yellow taxis in Lagos, okada motorbikes elsewhere.','Red earth, dense busy towns, hand-painted shop signs.'],
+ 'Senegal':['French signs; yellow taxis and colourful \'car rapide\' minibuses.','Sandy streets, baobabs, flat Sahel scrub, and horse-drawn carts.'],
+ 'Cameroon':['French and English signs; red soil, dense green, yellow taxis.','Roadside markets under corrugated roofs.'],
+ 'Madagascar':['French and Malagasy signs; red-earth roads and rice paddies.','Renault 4s and Peugeot 404s still running; steep-roofed brick houses in the highlands.'],
+ 'Ethiopia':['Ge\'ez (Amharic) script on signs; blue-and-white Lada taxis in Addis.','Highland plateaus, eucalyptus, and round thatched \'tukul\' houses.'],
+ 'Democratic Republic of the Congo':['French signs; red earth; dense green; very little coverage outside Kinshasa and the east.','Crowded streets, hand-painted signs, and motorbikes everywhere.'],
+ 'South Africa':['Drives on the left; yellow edge lines with white centre lines — the southern-African tell.','Plates differ by province; walled houses with electric fencing; a \'robot\' is a traffic light.','Dry veld, blue-gum trees and corrugated township roofs.'],
+ 'Namibia':['Drives on the left; gravel roads through empty desert; yellow edge lines.','German street names in Swakopmund and Windhoek; dead-straight roads with the car\'s long shadow.'],
+ 'Botswana':['Drives on the left; flat dry bush with acacia and cattle on the road; yellow edge lines.','White plates starting with B; donkey carts.'],
+ 'Zimbabwe':['Drives on the left; yellow edge lines; kopjes (rocky hills) in dry bush.','Jacaranda-lined streets in Harare; roadside vendors under msasa trees.'],
+ 'Japan':['Drives on the left; kanji and kana everywhere; narrow, immaculate streets under a web of cables.','White plates on cars, yellow on tiny kei cars; a vending machine on every corner.','Blue \'no parking\' circles, and \'止まれ\' (stop) painted on the road itself.'],
+ 'South Korea':['Hangul — circles (ㅇ) and straight strokes — on every sign.','Yellow centre lines, numbered apartment towers, grey concrete poles.','\'로\' (ro) and \'길\' (gil) end street names; taxis in silver or orange.'],
+ 'Taiwan':['Traditional Chinese characters; scooters by the hundred; arcaded pavements under the buildings.','White plates; traffic lights with countdowns; dense green on steep hills.'],
+ 'Thailand':['Thai script — loops and curls; drives on the left.','Red-and-white striped kerbs, pickup trucks, and a 7-Eleven on every corner.','Blue direction signs with Thai above English.'],
+ 'Malaysia':['Drives on the left; Malay in Latin script — \'Jalan\' (road), \'Lorong\'.','Black plates with white text; palm-oil plantations; Petronas stations.'],
+ 'Indonesia':['Drives on the left; Indonesian (\'Jalan\', \'Jl.\'); black plates with white text.','Motorbikes everywhere, red-tiled roofs, Indomaret and Alfamart minimarts.','Rice terraces, volcanoes, and mosques with metal domes.'],
+ 'Philippines':['Drives on the right — unlike most of South-East Asia; Tagalog and English signs.','Jeepneys and tricycles, \'Barangay\' signs, sari-sari stores.'],
+ 'Vietnam':['Vietnamese — Latin letters buried in diacritics (ư, ơ, ă, ộ).','Rivers of motorbikes, tall narrow \'tube houses\', conical hats in the countryside.'],
+ 'Cambodia':['Khmer script — tall, ornate letters; drives on the right.','Angkor beer signs, tuk-tuks, flat rice fields and stilt houses.'],
+ 'Laos':['Lao script — like Thai but rounder; drives on the right.','Yellow licence plates; the Mekong; French colonial shophouses and Beerlao signs.'],
+ 'Mongolia':['Cyrillic; endless steppe with no fences; gers (yurts) beside the road.','Dirt tracks braided across the grass; Toyota Priuses all over Ulaanbaatar.'],
+ 'Kazakhstan':['Cyrillic (with Latin arriving) plus extra letters ә, ғ, қ, ң, ө, ұ, ү; flat steppe.','Soviet blocks next to Astana\'s glass; white plates marked KZ.'],
+ 'Kyrgyzstan':['Cyrillic; jagged snow-capped mountains on most horizons.','Old Audis and Ladas, riders on horseback, and red flags with the yurt-crown sun.'],
+ 'Uzbekistan':['Latin and Cyrillic mixed; white Chevrolets make up most of the traffic.','Dry, flat, irrigated fields; blue-tiled mosques and madrasas.'],
+ 'India':['Drives on the left; many scripts (Devanagari, Tamil…) beside English; auto-rickshaws.','Yellow plates on commercial vehicles, white on private; trucks painted with \'Horn OK Please\'.'],
+ 'Pakistan':['Urdu (Arabic-style script) with English; drives on the left; wildly decorated \'jingle trucks\'.','Dry plains and mountains; motorbikes carrying whole families.'],
+ 'Bangladesh':['Bengali script; drives on the left; cycle rickshaws in every street.','Flat, wet, green and crowded; bright painted rickshaw art.'],
+ 'Sri Lanka':['Drives on the left; Sinhala (rounded) and Tamil scripts plus English on signs.','Tuk-tuks everywhere, coconut palms, red-tiled roofs, Buddhist stupas.'],
+ 'Nepal':['Devanagari script; drives on the left; steep terraced hills.','Red licence plates with white Devanagari; prayer flags and Tata buses.'],
+ 'Bhutan':['Dzongkha script (Tibetan-style); every building in traditional painted style, by law.','Drives on the left; red plates with white text; monasteries on cliffs.'],
+ 'Australia':['Drives on the left; white lines; yellow diamond warning signs with kangaroos.','Wide flat outback of red earth or eucalyptus bush; \'GIVE WAY\' triangles.','Plates by state; wide roads with gravel shoulders; single-storey brick houses with tin roofs.'],
+ 'New Zealand':['Drives on the left; white lines with yellow no-passing lines; \'Give Way\' signs.','Green hills with sheep, tree ferns and cabbage trees; white plates with black text.'],
+};
+function clueFor(country){
+  if(!country) return null;
+  if(CLUES[country]) return {country,tips:CLUES[country]};
+  const k=Object.keys(CLUES).find(c=>sameCountry(c,country));
+  return k?{country:k,tips:CLUES[k]}:null;
+}
 const MODES={
   classic:  {name:'Classic', desc:'The standard game.'},
   gray:     {name:'Grayscale', desc:'No color. Just light and shadow.', gray:true},
@@ -1342,7 +1691,14 @@ const MODES={
   battle:   {name:'Battle Royale', desc:'The farthest guess is knocked out every round. Last one standing wins.', elim:true, mp:true},
   lives:    {name:'Lives', desc:'Three lives each. The farthest guess loses one.', elim:true, lives:3, mp:true},
   peek:     {name:'Peek', desc:'Everyone can see where the others are placing their pins.', peek:true, mp:true},
+  duel:     {name:'Duel', desc:'Head to head. Each round the worse guess loses health equal to the gap. Last one standing.', duel:true, mp:true, duo:true},
+  blind:    {name:'Blind', desc:'One of you sees the street, the other sees only the map. Talk each other to the pin.', blind:true, mp:true, duo:true},
+  learn:    {name:'Learn', desc:'A normal game, and after every round the one or two things that gave the country away.', learn:true, hide:true, filter:n=>!!clueFor(countryOfRegion(n))},
+  custom:   {name:'Custom map', desc:'Somebody\'s own set of spots.', custom:true, hide:true},
 };
+const DUEL_HP=6000;
+/* Damage scales up as a duel goes on, so it always ends: ×1 for three rounds, then half a point more every two. */
+function duelMult(round){ return Math.min(5,1+0.5*Math.max(0,Math.ceil((round-3)/2))); }
 /* Which country a region belongs to (matches the reverse geocoder's names). Tiny territories are left out. */
 const NOT_A_COUNTRY=new Set(['Puerto Rico','Bermuda','Curaçao','Greenland','Galápagos','Réunion','Hong Kong','Macau','Guam','American Samoa','Gibraltar','Faroe Islands','Isle of Man','Svalbard','Borneo','Crete','Malta','Andorra','Luxembourg','Singapore','Qatar','Vanuatu','Eswatini','Lesotho','Montenegro']);
 function countryOfRegion(n){
@@ -1461,13 +1817,14 @@ async function findLocation(continent,mode,rng){
     tried.push(name);
     const cont=pl?(CONTINENTS.find(c=>PLACES[c].includes(pl))||continent):null;
     if(mode.places&&pl&&(pl[2]-pl[1])*(pl[4]-pl[3])>1.5) continue;
-    for(let attempt=0; attempt<14; attempt++){
+    for(let attempt=0; attempt<18; attempt++){
       const p=point();
       try{
         const radius=mode.cities?mode.snap:(attempt<6?(mode.radius||20000):(mode.places?12000:100000));
         const {data}=await svService.getPanorama({ location:p, radius, source: google.maps.StreetViewSource.GOOGLE, preference: google.maps.StreetViewPreference.NEAREST });
         const loc=data&&data.location; if(!loc||!loc.pano||!loc.latLng) continue;
         if(!/google/i.test(data.copyright||'')) continue;     // official Google coverage only: photospheres block image copying
+        if(!rng&&seenPanos().has(loc.pano)&&attempt<12) continue;   // been here before: pick another point (a seeded run must stay identical everywhere)
         const lat=loc.latLng.lat(), lng=loc.latLng.lng();
         let place=null;
         if(mode.remote && MILLION.some(c=>haversine({lat,lng},{lat:c[1],lng:c[2]})<60)) continue;   // nowhere near a big city
@@ -1493,7 +1850,7 @@ async function findLocation(continent,mode,rng){
         if(mode.choice){ pol=POL[matched]; if(!pol) continue; }
         if(mode.slider){ tempF=await tempOf(lat,lng); if(tempF==null) continue; }
         if(mode.face&&mode.cities){ const c=mode.cities.find(x=>x[0]===name); if(c){ const dLon=(c[2]-lng)*Math.PI/180, la1=lat*Math.PI/180, la2=c[1]*Math.PI/180; heading=Math.round((Math.atan2(Math.sin(dLon)*Math.cos(la2),Math.cos(la1)*Math.sin(la2)-Math.sin(la1)*Math.cos(la2)*Math.cos(dLon))*180/Math.PI+360)%360); } }
-        if(!rng) notePlace(name);
+        if(!rng){ notePlace(name); notePano(pano); }
         const out={ pano, lat, lng, heading, place, continent:cont, region:name, key:matched };
         if(pol) out.pol=pol;
         if(tempF!=null) out.tempF=tempF;
@@ -1623,31 +1980,70 @@ function makeMap(id,opts={}){
   allMaps.push(m); applyStyle(m);
   return m;
 }
-const PIN_SVG=(fill)=>`<svg viewBox="0 0 32 44" width="32" height="44"><path d="M16 1C7.7 1 1 7.7 1 16c0 10.5 15 27 15 27s15-16.5 15-27C31 7.7 24.3 1 16 1z" fill="${fill}" stroke="#fff" stroke-width="2"/><circle cx="16" cy="16" r="6" fill="#fff"/></svg>`;
-const guessIcon=L.divIcon({className:'',html:'<div class="marker-pin drop">'+PIN_SVG('#152219')+'</div>',iconSize:[32,44],iconAnchor:[16,42]});
-const colorIcon=(c,late)=>L.divIcon({className:'',html:'<div class="marker-pin drop'+(late?' late':'')+'">'+PIN_SVG(c)+'</div>',iconSize:[32,44],iconAnchor:[16,42]});
-/* A player who is using their photo as their token gets it inside the head of their pin. */
-function playerIcon(p,late){
-  const col=COLORS[(p&&p.color)??0][0];
-  const av=p&&p.face?avOf(p.id):null;
-  if(!av) return colorIcon(col,late);
-  return L.divIcon({className:'',html:'<div class="marker-pin drop'+(late?' late':'')+'"><span class="facepin" style="background-image:url('+av+')"></span>'+PIN_SVG(col)+'</div>',iconSize:[32,44],iconAnchor:[16,42]});
+/* Every guess is a white pin; what sits in its head says whose it is — a colour, or the player's photo. */
+const PIN_BODY='M16 1C7.7 1 1 7.7 1 16c0 10.5 15 27 15 27s15-16.5 15-27C31 7.7 24.3 1 16 1z';
+const PIN_SVG=(inner)=>`<svg viewBox="0 0 32 44" width="32" height="44"><path d="${PIN_BODY}" fill="#fff" stroke="#152219" stroke-width="2"/><circle cx="16" cy="16" r="7.5" fill="${inner}"/></svg>`;
+function pinIcon(inner,av,late){
+  const html='<div class="marker-pin drop'+(late?' late':'')+'">'+(av?'<span class="facepin" style="background-image:url('+av+')"></span>':'')+PIN_SVG(av?'#fff':inner)+'</div>';
+  return L.divIcon({className:'',html,iconSize:[32,44],iconAnchor:[16,42]});
 }
+const SOLO_COL='#1f9d55', RIVAL_COL='#8b5cf6';
+const guessIcon=L.divIcon({className:'',html:'<div class="marker-pin drop">'+PIN_SVG(SOLO_COL)+'</div>',iconSize:[32,44],iconAnchor:[16,42]});
+const colorIcon=(c,late)=>pinIcon(c,null,late);
+/* Your own pin in a solo game: your photo if you have one, otherwise the green. */
+function myIcon(late){ return pinIcon(SOLO_COL,acct.av||null,late); }
+function playerIcon(p,late){ return pinIcon(COLORS[(p&&p.color)??0][0],p&&p.face?avOf(p.id):null,late); }
 /* The little round token beside a name: their photo if they chose it, otherwise their colour. */
 function swStyle(p){
   const av=p&&p.face?avOf(p.id):null;
   return av?`background-image:url(${av});background-size:cover;background-position:center`
            :`background:${COLORS[(p&&p.color)??0][0]}`;
 }
-const TRUE_SVG='<svg viewBox="0 0 32 44" width="32" height="44"><path d="M16 1C7.7 1 1 7.7 1 16c0 10.5 15 27 15 27s15-16.5 15-27C31 7.7 24.3 1 16 1z" fill="#fff" stroke="#152219" stroke-width="2.5"/><circle cx="16" cy="16" r="7" fill="#e63946"/><circle cx="16" cy="16" r="3" fill="#fff"/></svg>';
-const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true drop late"><span class="ring"></span>'+TRUE_SVG+'</div>',iconSize:[32,44],iconAnchor:[16,42]});
+/* Lines on the result maps follow the player's colour. A photo has no colour, so take the one that
+   stands out most in it: the busiest saturated hue, nudged into a range that reads on a map. */
+const domCache={};
+function dominantColor(url){
+  if(!url) return null;
+  if(domCache[url]!==undefined) return domCache[url];
+  domCache[url]=null;
+  const img=new Image();
+  img.onload=()=>{ try{
+    const N=32, c=document.createElement('canvas'); c.width=c.height=N; const x=c.getContext('2d'); x.drawImage(img,0,0,N,N);
+    const d=x.getImageData(0,0,N,N).data; const bins=new Array(24).fill(0), sum=Array.from({length:24},()=>[0,0,0,0]);
+    let fr=0,fg=0,fb=0,fn=0;
+    for(let i=0;i<d.length;i+=4){ const r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255; const mx=Math.max(r,g,b),mn=Math.min(r,g,b); const v=mx, sat=mx?(mx-mn)/mx:0;
+      if(v>0.15&&v<0.97){ fr+=r; fg+=g; fb+=b; fn++; }
+      if(sat<0.28||v<0.2||v>0.95) continue;
+      let h=0; const dl=mx-mn; if(mx===r) h=((g-b)/dl+6)%6; else if(mx===g) h=(b-r)/dl+2; else h=(r-g)/dl+4; const bi=Math.floor(h*4)%24;
+      bins[bi]+=sat; const s0=sum[bi]; s0[0]+=r*sat; s0[1]+=g*sat; s0[2]+=b*sat; s0[3]+=sat; }
+    let best=-1,bw=0; for(let i=0;i<24;i++) if(bins[i]>bw){ bw=bins[i]; best=i; }
+    let r,g,b;
+    if(best>=0&&bw>2){ const s0=sum[best]; r=s0[0]/s0[3]; g=s0[1]/s0[3]; b=s0[2]/s0[3]; }
+    else if(fn){ r=fr/fn; g=fg/fn; b=fb/fn; } else { r=0.55; g=0.36; b=0.96; }
+    // pull it into a lively, mid-lightness colour so a pale or very dark photo still gets a visible line
+    const mx=Math.max(r,g,b),mn=Math.min(r,g,b); let l=(mx+mn)/2; let sa=mx===mn?0:(l>0.5?(mx-mn)/(2-mx-mn):(mx-mn)/(mx+mn));
+    let h=0; if(mx!==mn){ const dl=mx-mn; if(mx===r) h=((g-b)/dl+(g<b?6:0))/6; else if(mx===g) h=((b-r)/dl+2)/6; else h=((r-g)/dl+4)/6; }
+    sa=Math.max(sa,0.62); l=Math.min(0.55,Math.max(0.36,l));
+    const q=l<0.5?l*(1+sa):l+sa-l*sa, pp=2*l-q; const hue=t=>{ t=(t+1)%1; if(t<1/6) return pp+(q-pp)*6*t; if(t<1/2) return q; if(t<2/3) return pp+(q-pp)*(2/3-t)*6; return pp; };
+    const hex=v=>Math.round(v*255).toString(16).padStart(2,'0');
+    domCache[url]='#'+hex(hue(h+1/3))+hex(hue(h))+hex(hue(h-1/3));
+  }catch(e){ domCache[url]='#8b5cf6'; } };
+  img.onerror=()=>{ domCache[url]='#8b5cf6'; };
+  img.src=url;
+  return null;
+}
+function lineColor(p){ const av=p&&p.face?avOf(p.id):null; return (av&&dominantColor(av))||COLORS[(p&&p.color)??0][0]; }
+function myLineColor(){ return (acct.av&&dominantColor(acct.av))||SOLO_COL; }
+/* The real location: bigger, red, unmistakable — a target inside a pin with a pulsing ring at its foot. */
+const TRUE_SVG='<svg viewBox="0 0 40 56" width="40" height="56"><path d="M20 1.5C9.6 1.5 1.5 9.6 1.5 20c0 13.2 18.5 34.5 18.5 34.5S38.5 33.2 38.5 20C38.5 9.6 30.4 1.5 20 1.5z" fill="#e63946" stroke="#7a1520" stroke-width="2.2"/><path d="M8.5 15.5A12.5 12.5 0 0 1 17 8.2" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="20" r="10.5" fill="#fff"/><circle cx="20" cy="20" r="7" fill="#e63946"/><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
+const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-true drop late"><span class="ring"></span>'+TRUE_SVG+'</div>',iconSize:[40,56],iconAnchor:[20,54]});
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-193558';
+const BUILD='20260917-202546';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
-function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
+function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
 
 /* ---------- Global leaderboard ----------
    No server: each mode's board is one retained MQTT message on the same public brokers multiplayer uses.
@@ -1762,11 +2158,11 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
 
 /* ---------- Version ----------
    major.minor.patch, counted from the project's own history.
-   MAJOR  a ground-up rework of the game: 1 was the original, 2 is everything since the layout, system and
-          branding were rebuilt from scratch.
+   MAJOR  a ground-up rework of the game: 1 was the original, 2 was the rebuild of the layout, system and
+          branding, 3 is the social game — duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:2,minor:19,patch:0};
+const VERSION={major:3,minor:0,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -1899,7 +2295,7 @@ function renderBoard(highlightId){
   wrap.innerHTML=`<table class="board"><tr><th>#</th><th>Name</th>${showMode?'<th>Setup</th>':'<th>Date</th>'}<th style="text-align:right">Score</th></tr>`+
     b.slice(0,10).map((e,i)=>{ const em=entryMode(e);
       const setup=`${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}`;
-      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`;
+      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`;
   $('boardCount').textContent=foot;
 }
 /* ---------- Accounts ----------
@@ -1923,16 +2319,39 @@ function paintPrefs(){
 applyPrefs();
 
 const ACCT_ROOT='worlddrop/v1/acct';
-const acct={key:null,name:null,av:null};
+const acct={key:null,name:null,av:null,streak:null};
+/* ---------- Day streak ----------
+   A day counts if you finish any game in it (days roll over at midnight in New York, like the daily).
+   Miss a day and it's gone. The count lives in the account record, so it follows you between devices. */
+function yesterdayDate(){ return dailyDate(new Date(Date.now()-86400000)); }
+function streakNow(st){ if(!st||!st.last||!(st.n>0)) return 0; const t=dailyDate(); return (st.last===t||st.last===yesterdayDate())?st.n:0; }
+async function bumpStreak(){
+  if(!acct.key) return;
+  const today=dailyDate(); const cur=acct.streak||{n:0,last:null};
+  if(cur.last===today) return;
+  const n=streakNow(cur)>0?cur.n+1:1;
+  acct.streak={n,last:today}; acctSave(); paintAcct();
+  if(n>=2) toast(`${n}-day streak`,'ok');
+  try{ const got=await acctFetch(acct.key); if(!got.record) return;
+    const theirs=got.record.streak; let best=acct.streak;
+    if(theirs&&theirs.last===today&&theirs.n>best.n) best=theirs;      // another device already counted today
+    else if(theirs&&theirs.last===yesterdayDate()&&theirs.n+1>best.n) best={n:theirs.n+1,last:today};
+    acct.streak=best; acctSave(); paintAcct();
+    acctPublish({...got.record,streak:best}); if(soc.dir[acct.key]) soc.dir[acct.key].streak=best; lbPaint(); }catch(e){}
+}
+function personStreak(k){ if(!k) return 0; if(k===acct.key) return streakNow(acct.streak); const d=soc.dir[k]; return d?streakNow(d.streak):0; }
+const FLAME='<svg aria-hidden="true"><use href="#flame"/></svg>';
+/* Five days and up shows on the boards, next to the name. */
+function streakTag(e){ const n=e&&e.k?personStreak(e.k):0; return n>=5?` <span class="stk" title="${n}-day streak">${n}${FLAME}</span>`:''; }
 function acctKey(name){ return String(name||'').toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,20); }
 async function acctHash(pin,salt,key){
   const data=new TextEncoder().encode(salt+':'+pin+':'+key);
   const buf=await crypto.subtle.digest('SHA-256',data);
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function acctLoad(){ try{ const a=JSON.parse(localStorage.getItem('pp_acct')||'null'); if(a&&a.key&&a.name){ acct.key=a.key; acct.name=a.name; acct.av=a.av||null; } }catch(e){} }
-function acctSave(){ try{ localStorage.setItem('pp_acct',JSON.stringify({key:acct.key,name:acct.name,av:acct.av||null})); }catch(e){} }
-function acctClear(){ acct.key=null; acct.name=null; acct.av=null; try{ localStorage.removeItem('pp_acct'); }catch(e){} }
+function acctLoad(){ try{ const a=JSON.parse(localStorage.getItem('pp_acct')||'null'); if(a&&a.key&&a.name){ acct.key=a.key; acct.name=a.name; acct.av=a.av||null; acct.streak=a.streak||null; } }catch(e){} }
+function acctSave(){ try{ localStorage.setItem('pp_acct',JSON.stringify({key:acct.key,name:acct.name,av:acct.av||null,streak:acct.streak||null})); }catch(e){} }
+function acctClear(){ acct.key=null; acct.name=null; acct.av=null; acct.streak=null; try{ localStorage.removeItem('pp_acct'); }catch(e){} }
 /* Read one account's retained record: subscribe, wait briefly for the broker to hand it over, unsubscribe. */
 function acctFetch(key){
   const topic=ACCT_ROOT+'/'+key;
@@ -1956,6 +2375,7 @@ function acctPublish(rec){
 }
 function paintAcct(){
   if($('acctWho')) $('acctWho').textContent=acct.name||'';
+  if($('acctStreak')){ const n=streakNow(acct.streak); $('acctStreak').hidden=n<2; $('acctStreak').innerHTML=`${FLAME}${n}-day streak`; }
   if($('acctHandle')) $('acctHandle').textContent=acct.key?'@'+acct.key:'';
   avPaint(); paintPrefs();
   if(acct.key&&!soc.loaded) socWarm().then(()=>{ const c=$('frCount'); if(c&&soc.mine.size) c.textContent=''; });
@@ -1978,7 +2398,7 @@ async function acctContinue(){
     if(got.record){
       const h=await acctHash(pin,got.record.salt||'',key);
       if(h!==got.record.hash){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is taken and the code doesn\'t match it.','bad'); bad('acctPin'); return; }
-      acct.key=key; acct.name=got.record.name||raw.slice(0,16); acct.av=got.record.av||null; acctSave();
+      acct.key=key; acct.name=got.record.name||raw.slice(0,16); acct.av=got.record.av||null; acct.streak=got.record.streak||null; acctSave();
       acctPublish({...got.record,seen:Date.now()});   // republish so the record stays alive on every broker
       acctMsg('acctMsg','Signed in.','ok');
     } else {
@@ -2117,7 +2537,7 @@ function fetchDirectory(ms){
       resolve(soc.dir); };
     const onMsg=(t,payload)=>{ if(!t.startsWith(ACCT_ROOT+'/')) return; const k=t.split('/').pop();
       let rec=null; try{ rec=JSON.parse(payload.toString()); }catch(e){}
-      if(rec&&rec.name) soc.dir[k]={name:rec.name,av:rec.av||null};
+      if(rec&&rec.name) soc.dir[k]={name:rec.name,av:rec.av||null,streak:rec.streak||null};
     };
     for(const l of links){ try{ l.client.on('message',onMsg); l.client.subscribe(wild,{qos:0}); }catch(e){} }
     const timer=setTimeout(finish,ms||2200);
@@ -2236,7 +2656,8 @@ function noteFriends(){
 }
 function allNotes(){
   const inv=notes.items.filter(n=>n&&n.kind==='invite'&&Date.now()-(n.ts||0)<2*3600*1000);
-  return [...inv,...noteFriends(),...noteDaily()];
+  const ch=notes.items.filter(n=>n&&n.kind==='chal'&&Date.now()-(n.ts||0)<7*86400*1000);
+  return [...inv,...ch,...noteFriends(),...noteDaily()];
 }
 function paintBell(){
   const list=allNotes(); const unseen=list.filter(n=>!notes.seen.has(n.id)).length;
@@ -2246,9 +2667,10 @@ function paintBell(){
 function renderNotes(){
   const list=allNotes();
   $('noteList').innerHTML=list.length?list.map(n=>{
-    const face=n.kind==='friend'?frFace(n.who,32):(n.kind==='invite'?frFace(n.from,32):`<span class="pav ini" style="width:32px;height:32px">★</span>`);
+    const face=n.kind==='friend'?frFace(n.who,32):(n.kind==='invite'||(n.kind==='chal'&&n.from))?frFace(n.from,32):`<span class="pav ini" style="width:32px;height:32px">${n.kind==='chal'?'🏁':'★'}</span>`;
     const act=n.kind==='friend'?`<button class="btn btn-primary" data-nadd="${esc(n.who)}">Add</button>`
       :n.kind==='invite'?`<button class="btn btn-primary" data-njoin="${esc(n.code||'')}">Join</button>`
+      :n.kind==='chal'?`<button class="btn btn-primary" data-nch="${esc(n.ch||'')}" data-nfrom="${esc(n.from||n.fromName||'')}">See</button>`
       :`<button class="btn btn-primary" data-ndaily="1">Play</button>`;
     return `<div class="noterow ${notes.seen.has(n.id)?'':'unseen'}">${face}<span class="nt"><b>${esc(n.title)}</b><span>${esc(n.body||'')}</span></span>${act}</div>`;
   }).join(''):'<div class="noteempty">Nothing new.</div>';
@@ -2266,8 +2688,9 @@ $('bellBtn').addEventListener('click',async()=>{
 });
 document.addEventListener('click',e=>{ if(notes.open&&!e.target.closest('.hero-left')){ notes.open=false; $('notePanel').hidden=true; } },true);
 $('noteList').addEventListener('click',e=>{
-  const add=e.target.closest('[data-nadd]'), join=e.target.closest('[data-njoin]'), day=e.target.closest('[data-ndaily]');
-  if(add){ frToggle(add.dataset.nadd,true); renderNotes(); toast('Friends with '+personName(add.dataset.nadd)); }
+  const add=e.target.closest('[data-nadd]'), join=e.target.closest('[data-njoin]'), day=e.target.closest('[data-ndaily]'), see=e.target.closest('[data-nch]');
+  if(see){ notes.open=false; $('notePanel').hidden=true; chalOpen(see.dataset.nch,see.dataset.nfrom); }
+  else if(add){ frToggle(add.dataset.nadd,true); renderNotes(); toast('Friends with '+personName(add.dataset.nadd)); }
   else if(join){ notes.open=false; $('notePanel').hidden=true; mpJoin(join.dataset.njoin); }
   else if(day){ notes.open=false; $('notePanel').hidden=true; renderDaily(); show('daily'); }
 });
@@ -2292,6 +2715,263 @@ $('inviteList').addEventListener('click',async e=>{
     title:(acct.name||acct.key)+' invited you to a game',body:'Room '+mp.code,ts:Date.now()});
   sfx('click');
 });
+
+/* ---------- Challenges ----------
+   A finished game becomes a link. The record holds the exact locations and the sharer's guess for each,
+   so whoever opens it plays the same rounds and sees that pin after every guess — a race against a ghost.
+   One retained message per challenge; everyone who finishes it appends themselves to its list of plays. */
+const CH_ROOT='worlddrop/v1/ch';
+const chal={cur:null, focus:null};
+function chalDone(){ try{ return JSON.parse(localStorage.getItem('pp_chal')||'{}'); }catch(e){ return {}; } }
+function chalMarkDone(id,rec){ try{ const d=chalDone(); d[id]=rec; const keys=Object.keys(d); if(keys.length>200) delete d[keys[0]]; localStorage.setItem('pp_chal',JSON.stringify(d)); }catch(e){} }
+function chalLink(id){ return location.origin+location.pathname+'?c='+id; }
+function chalPublish(rec){ let sent=false; for(const l of lb.links) if(l.ready){ try{ l.client.publish(CH_ROOT+'/'+rec.id,JSON.stringify(rec),{qos:1,retain:true}); sent=true; }catch(e){} } return sent; }
+async function chalFetch(id){ const t0=Date.now(); while(!lbLive()&&Date.now()-t0<9000) await new Promise(r=>setTimeout(r,250)); const got=await fetchMany(CH_ROOT,[id],3600); const r=got[id]; return r&&r.id===id&&Array.isArray(r.locs)?r:null; }
+/* Can this game be shared? Anything you played to the end that isn't the daily or a crowd-only mode. */
+function chalShareable(){ const m=modeOf(state.mode); if(state.daily||state.chal||m.mp||!state.results.length) return false; return state.results.length>=state.totalRounds||(m.bet&&state.bank<=0); }
+function chalRes(r){ const o={g:r.guess&&r.guess.lat!=null?{lat:+(+r.guess.lat).toFixed(5),lng:+(+r.guess.lng).toFixed(5)}:null,pts:r.pts||0};
+  if(r.km!=null) o.km=Math.round(r.km*10)/10; if(r.guess&&r.guess.country) o.c=r.guess.country; if(r.sel!=null) o.s=r.sel; if(r.pick!=null) o.p=r.pick; if(r.bet) o.bet=r.bet.stake; return o; }
+function chalBuild(){
+  const id=Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5);
+  const rec={id,v:1,by:acct.key||'',name:scoreName(),mode:state.mode,time:state.timeLimit,rounds:state.totalRounds,region:state.region,nomove:!!state.nomove,lock:!!state.lock,
+    custom:state.custom?{id:state.custom.id,name:state.custom.name}:null,locs:state.locs.slice(0,state.totalRounds).filter(l=>l&&!(l instanceof Error)).map(locPayload),
+    res:state.results.map(chalRes),score:state.score,made:Date.now(),plays:[]};
+  if(acct.av&&acct.av.length<40000) rec.av=acct.av;
+  return rec;
+}
+let shareRec=null;
+function paintShare(){ const on=!$('final').hidden&&chalShareable(); $('shareBox').hidden=!on; if(!on){ $('shareCard').hidden=true; shareRec=null; } }
+$('shareBtn').addEventListener('click',()=>{
+  const card=$('shareCard'); if(!card.hidden){ card.hidden=true; return; }
+  if(!shareRec){ shareRec=chalBuild(); const ok=chalPublish(shareRec); $('shareNote').textContent=ok?'':'Not connected yet — the link will work once you\'re back online and reopen this screen.'; if(!ok) setTimeout(()=>{ if(shareRec&&chalPublish(shareRec)) $('shareNote').textContent=''; },4000); }
+  $('shareLink').value=chalLink(shareRec.id); card.hidden=false; sfx('click');
+});
+$('shareCopy').addEventListener('click',()=>copyText($('shareLink').value,$('shareCopy'),'Copy'));
+$('shareLink').addEventListener('focus',e=>e.target.select());
+document.addEventListener('click',e=>{ if(!$('shareCard').hidden&&!e.target.closest('.sharebox')) $('shareCard').hidden=true; },true);
+/* The ghost: the sharer's result for the round being shown. */
+function rivalRound(i){ const c=state.chal; return c&&c.res?c.res[i]:null; }
+function rivalName(){ return state.chal?(state.chal.name||'Them'):''; }
+function rivalColor(){ return (state.chal&&state.chal.av&&dominantColor(state.chal.av))||RIVAL_COL; }
+function rivalIcon(){ return pinIcon(RIVAL_COL,state.chal&&state.chal.av||null,true); }
+function rivalFace(size){ const c=state.chal; if(!c) return ''; return c.av?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${c.av})"></span>`:`<span class="pav ini" style="width:${size}px;height:${size}px;background:${RIVAL_COL};color:#fff">${esc((c.name||'?')[0].toUpperCase())}</span>`; }
+function rivalDesc(rv,m){
+  if(!rv) return '—';
+  if(m.trio) return rv.p!=null?`picked ${String.fromCharCode(65+rv.p)}`:'no pick';
+  if(m.country) return rv.c?esc(rv.c):'no pick';
+  if(m.slider) return rv.s!=null?`${rv.s}°F`:'no answer';
+  if(m.choice) return rv.pts>=5000?'both right':rv.pts>0?'half right':'neither';
+  return rv.g?fmtDist(rv.km||0):'no guess';
+}
+function drawRival(layer,truth,idx,map,pts){
+  const rv=rivalRound(idx); if(!rv||!rv.g||!layer) return;
+  L.polyline([rv.g,truth],{color:'#fff',weight:5,opacity:.85}).addTo(layer);
+  L.polyline([rv.g,truth],{color:rivalColor(),weight:3,opacity:1,dashArray:'7 9'}).addTo(layer);
+  L.marker(rv.g,{icon:rivalIcon(),zIndexOffset:-50}).addTo(layer).bindTooltip(rivalName(),{direction:'top',offset:[0,-40]});
+  if(pts) pts.push(rv.g);
+}
+function paintRival(){
+  const el=$('rivalLine'); const c=state.chal; if(!c){ el.hidden=true; return; }
+  const i=state.round-1, rv=rivalRound(i), m=modeOf(state.mode);
+  const mine=state.results.reduce((a,r)=>a+(r.pts||0),0), theirs=(c.res||[]).slice(0,state.round).reduce((a,r)=>a+(r.pts||0),0);
+  const bet=!!m.bet; const my=bet?state.score:mine, th=bet?(1000+theirs):theirs;
+  const cmp=my>th?`<span class="ahead">you're ahead by ${(my-th).toLocaleString()}</span>`:my<th?`<span class="behind">you're behind by ${(th-my).toLocaleString()}</span>`:'<span>dead even</span>';
+  el.hidden=false;
+  el.innerHTML=`<span>${rivalFace(22)} <b>${esc(rivalName())}</b>: ${rivalDesc(rv,m)} · <b>${rv&&rv.pts>0&&!bet?'+':''}${(rv?rv.pts:0).toLocaleString()}</b></span><span>After round ${state.round}: <b>${my.toLocaleString()}</b> vs <b>${th.toLocaleString()}</b> · ${cmp}</span>`;
+}
+/* Finished a challenge: write yourself into its record, tell whoever set it, and say how it went. */
+async function chalFinish(){
+  const c=state.chal; if(!c) return;
+  const pts=state.results.map(r=>r.pts||0); const score=state.score;
+  const fr=$('finalRival'); fr.hidden=false;
+  const verdict=score>c.score?`<span class="ahead">You beat ${esc(c.name)}</span>`:score<c.score?`<span class="behind">${esc(c.name)} holds it</span>`:'<span>A dead heat</span>';
+  fr.innerHTML=`<span>${rivalFace(24)} ${verdict}</span><span><b>${score.toLocaleString()}</b> vs <b>${c.score.toLocaleString()}</b></span>`;
+  if(score>c.score) setTimeout(confetti,600);
+  const done=chalDone(); if(done[c.id]) return;   // recorded already
+  chalMarkDone(c.id,{score,pts,ts:Date.now()});
+  const me={k:acct.key||'',name:scoreName(),score,pts,ts:Date.now()};
+  try{ const fresh=await chalFetch(c.id); const rec=fresh||c;
+    const plays=(rec.plays||[]).filter(pl=>pl&&!(me.k?pl.k===me.k:(!pl.k&&pl.name===me.name)));
+    rec.plays=[...plays,me].slice(-60); chalPublish(rec);
+    if(rec.by&&rec.by!==acct.key) await inboxPush(rec.by,{id:'ch-'+rec.id+'-'+(me.k||me.name),kind:'chal',ch:rec.id,from:me.k,fromName:me.name,score,theirs:rec.score,mode:rec.mode,
+      title:`${me.name} completed your challenge`,body:`${score.toLocaleString()} vs your ${rec.score.toLocaleString()} · ${modeOf(rec.mode).name}`,ts:Date.now()});
+  }catch(e){}
+}
+/* The challenge page: what it is, who set it, who has played, and round by round. */
+async function chalOpen(id,focusKey){
+  chal.focus=focusKey||null; show('chal'); $('chal').scrollTo(0,0);
+  $('chTitle').textContent='Loading…'; $('chFacts').innerHTML=''; $('chRival').hidden=true; $('chStart').hidden=true; $('chDone').hidden=true; $('chPlaysCard').hidden=true; $('chReportCard').hidden=true;
+  $('chHero').style.backgroundImage='';
+  const rec=await chalFetch(id);
+  if(!rec){ $('chTitle').textContent='Challenge not found'; $('chDone').hidden=false; $('chDone').textContent='That link doesn\'t point at a challenge any more.'; return; }
+  chal.cur=rec; if(rec.av) dominantColor(rec.av);
+  renderChal();
+}
+function renderChal(){
+  const rec=chal.cur; if(!rec) return; const m=modeOf(rec.mode);
+  $('chHero').style.backgroundImage=`url(images/mode-${m.custom?'custom':rec.mode}.jpg)`;
+  $('chTitle').textContent=`${rec.name}'s ${m.custom&&rec.custom?rec.custom.name:m.name} challenge`;
+  const bits=[['Mode',m.custom&&rec.custom?rec.custom.name:m.name],['Rounds',rec.rounds],['Time per round',rec.time?rec.time+'s':'no limit']];
+  if(rec.region&&rec.region.type!=='all') bits.push(['Where',regionLabel(rec.region)]);
+  if(rec.nomove||rec.lock) bits.push(['Camera',rec.lock?'locked':'no move']);
+  $('chFacts').innerHTML=bits.map(([k,v])=>`<div class="dfact"><small>${k}</small><b>${esc(String(v))}</b></div>`).join('');
+  const face=rec.av?`<span class="pav" style="width:44px;height:44px;background-image:url(${rec.av})"></span>`:`<span class="pav ini" style="width:44px;height:44px;font-size:18px">${esc((rec.name||'?')[0].toUpperCase())}</span>`;
+  $('chRival').hidden=false; $('chRival').innerHTML=`${face}<span class="who"><b>${esc(rec.name)}</b><span>set this ${new Date(rec.made).toLocaleDateString(undefined,{month:'short',day:'numeric'})}${rec.by?' · @'+esc(rec.by):''}</span></span><span class="sc">${(rec.score||0).toLocaleString()}</span>`;
+  const done=chalDone()[rec.id]; const mine=rec.by&&rec.by===acct.key;
+  $('chStart').hidden=!!(done||mine); $('chStart').textContent=`Play the same ${rec.rounds} round${rec.rounds===1?'':'s'}`;
+  $('chDone').hidden=!(done||mine);
+  if(mine) $('chDone').textContent='This is your challenge. Send the link around and you\'ll get a notification whenever someone finishes it.';
+  else if(done) $('chDone').innerHTML=`You played this: <b>${done.score.toLocaleString()}</b> against ${esc(rec.name)}'s ${rec.score.toLocaleString()}.`;
+  const plays=(rec.plays||[]).slice().sort((a,b)=>b.score-a.score);
+  $('chPlaysCard').hidden=false; $('chPlaysSub').textContent=plays.length?`${plays.length} ${plays.length===1?'person has':'people have'} taken it on`:'Nobody yet. You could be first.';
+  $('chPlays').innerHTML=plays.map(pl=>{ const res=pl.score>rec.score?['beat','Beat it']:pl.score<rec.score?['short','Short by '+(rec.score-pl.score).toLocaleString()]:['tie','Tied'];
+    return `<div class="chplay" data-k="${esc(pl.k||'')}">${pl.k?frFace(pl.k,26):`<span class="pav ini" style="width:26px;height:26px">${esc((pl.name||'?')[0].toUpperCase())}</span>`}<span class="pn">${esc(pl.name)}${pl.k?friendTag({k:pl.k,name:pl.name}):''}</span><span class="res ${res[0]}">${res[1]}</span><span class="sc">${pl.score.toLocaleString()}</span></div>`; }).join('');
+  // round by round: the sharer against whoever this page is about — the notified player, or you
+  let other=null;
+  if(chal.focus) other=plays.find(pl=>(pl.k&&pl.k===chal.focus)||pl.name===chal.focus)||null;
+  if(!other&&done) other={name:'You',pts:done.pts,score:done.score,me:true};
+  if(!other&&!mine&&acct.key) other=plays.find(pl=>pl.k===acct.key)||null;
+  const rows=rec.res||[];
+  $('chReportCard').hidden=!rows.length;
+  const on=other&&Array.isArray(other.pts);
+  $('chReport').innerHTML=`<table class="chrep"><tr><th>Round</th><th>${esc(rec.name)}</th>${on?`<th>${esc(other.me?'You':other.name)}</th>`:''}</tr>`+
+    rows.map((rv,i)=>{ const a=rv.pts||0, b=on?(other.pts[i]||0):null; return `<tr><td>${i+1}</td><td class="${on&&a>b?'w':''}">${a.toLocaleString()}<small>${rivalDesc(rv,m)}</small></td>${on?`<td class="${b>a?'w':''}">${b.toLocaleString()}</td>`:''}</tr>`; }).join('')+
+    `<tr><td><b>Total</b></td><td class="${on&&rec.score>other.score?'w':''}"><b>${(rec.score||0).toLocaleString()}</b></td>${on?`<td class="${other.score>rec.score?'w':''}"><b>${other.score.toLocaleString()}</b></td>`:''}</tr></table>`;
+}
+$('chStart').addEventListener('click',()=>{ const rec=chal.cur; if(!rec) return; if(chalDone()[rec.id]){ toast('You\'ve already played this one'); return; } startGame({chal:rec}); });
+$('chHome').addEventListener('click',()=>{ renderBoard(); show('menu'); });
+$('chPlays').addEventListener('click',e=>{ const row=e.target.closest('.chplay'); if(!row) return; chal.focus=row.dataset.k||row.querySelector('.pn').textContent; renderChal(); });
+
+/* ---------- Custom maps ----------
+   Anyone can drop a set of spots and give it a name. Each map is one retained message; the list is a
+   wildcard read of all of them. Playing one is Classic scoring over that map's spots; each map keeps its own
+   small board of best scores. */
+const CM_ROOT='worlddrop/v1/cmap';
+const cm={cur:null, all:{}, time:60, rounds:5, mk:null};
+function cmapLink(id){ return location.origin+location.pathname+'?m='+id; }
+function cmapPublish(rec){ let sent=false; for(const l of lb.links) if(l.ready){ try{ l.client.publish(CM_ROOT+'/'+rec.id,JSON.stringify(rec),{qos:1,retain:true}); sent=true; }catch(e){} } return sent; }
+async function cmapFetch(id){ const t0=Date.now(); while(!lbLive()&&Date.now()-t0<9000) await new Promise(r=>setTimeout(r,250)); const got=await fetchMany(CM_ROOT,[id],3600); const r=got[id]; return r&&r.id===id&&Array.isArray(r.pins)?r:null; }
+function cmapClean(r){ if(!r||!r.id||!r.name||!Array.isArray(r.pins)) return null; const pins=r.pins.filter(p=>p&&isFinite(+p.lat)&&isFinite(+p.lng)&&p.pano).slice(0,300); if(!pins.length) return null; return {...r,pins,name:String(r.name).slice(0,32),plays:+r.plays||0,top:Array.isArray(r.top)?r.top:[]}; }
+/* Every map on the brokers, gathered from the wildcard. */
+function cmapList(ms){
+  const links=lb.links.filter(l=>l.ready); if(!links.length) return Promise.resolve(cm.all);
+  const wild=CM_ROOT+'/+';
+  return new Promise(resolve=>{ let done=false;
+    const finish=()=>{ if(done) return; done=true; clearTimeout(timer); for(const l of links){ try{ l.client.removeListener('message',onMsg); l.client.unsubscribe(wild); }catch(e){} } resolve(cm.all); };
+    const onMsg=(t,payload)=>{ if(!t.startsWith(CM_ROOT+'/')) return; let rec=null; try{ rec=cmapClean(JSON.parse(payload.toString())); }catch(e){} if(rec) cm.all[rec.id]=rec; };
+    for(const l of links){ try{ l.client.on('message',onMsg); l.client.subscribe(wild,{qos:0}); }catch(e){} }
+    const timer=setTimeout(finish,ms||2600); });
+}
+/* The rounds of a game on this map: a shuffle of its spots, as location objects the game understands. */
+async function customLocs(map,n){ const pins=shuffle(map.pins.slice()).slice(0,Math.max(1,Math.min(n,map.pins.length))); return pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:Math.floor(Math.random()*360),place:null,continent:null,region:map.name})); }
+async function openCmaps(from){
+  cm.from=from||'setup'; show('cmaps'); $('cmaps').scrollTo(0,0); $('cmSearch').value='';
+  $('cmSub').textContent='Loading…'; renderCmaps();
+  await cmapList(); renderCmaps();
+}
+function renderCmaps(){
+  const q=$('cmSearch').value.trim().toLowerCase();
+  let list=Object.values(cm.all);
+  if(q) list=list.filter(r=>r.name.toLowerCase().includes(q)||String(r.byName||'').toLowerCase().includes(q)||String(r.by||'').toLowerCase().includes(q));
+  list.sort((a,b)=>(b.plays||0)-(a.plays||0)||(b.made||0)-(a.made||0));
+  $('cmSub').textContent=Object.keys(cm.all).length?`${Object.keys(cm.all).length} map${Object.keys(cm.all).length===1?'':'s'}${q?` · ${list.length} match`:''}`:(lbLive()?'No custom maps yet. Make the first one.':'Connecting…');
+  $('cmList').innerHTML=list.map(r=>`<button class="cmcard" data-id="${esc(r.id)}"><b>${esc(r.name)}</b><span class="by">${r.by?frFace(r.by,18):''}${esc(r.byName||r.by||'someone')}</span><span class="meta"><span><b>${r.pins.length}</b> spots</span><span><b>${(r.plays||0).toLocaleString()}</b> plays</span></span></button>`).join('');
+}
+$('cmSearch').addEventListener('input',renderCmaps);
+$('cmList').addEventListener('click',e=>{ const b=e.target.closest('.cmcard'); if(b) cmapOpen(b.dataset.id); });
+$('cmapsBack').addEventListener('click',()=>{ show(cm.from==='lobby'?'lobby':'setup'); });
+async function cmapOpen(id){
+  show('cmap'); $('cmap').scrollTo(0,0);
+  $('cmTitle').textContent='Loading…'; $('cmFacts').innerHTML=''; $('cmBoard').innerHTML=''; $('cmOwner').hidden=true;
+  const rec=cm.all[id]||await cmapFetch(id);
+  if(!rec){ $('cmTitle').textContent='Map not found'; $('cmOwner').hidden=false; $('cmOwner').textContent='That link doesn\'t point at a map any more.'; $('cmPlay').hidden=true; return; }
+  cm.all[rec.id]=rec; cm.cur=rec; cm.rounds=Math.min(5,rec.pins.length); renderCmap();
+}
+function renderCmap(){
+  const rec=cm.cur; const lobby=mp.role==='host';
+  $('cmHero').style.backgroundImage='url(images/mode-custom.jpg)';
+  $('cmTitle').textContent=rec.name;
+  $('cmFacts').innerHTML=[['Spots',rec.pins.length],['By',rec.byName||rec.by||'someone'],['Plays',(rec.plays||0).toLocaleString()]].map(([k,v])=>`<div class="dfact"><small>${k}</small><b>${esc(String(v))}</b></div>`).join('');
+  const opts=[3,5,10,20].filter(n=>n<=rec.pins.length); if(!opts.includes(rec.pins.length)&&rec.pins.length<20) opts.push(rec.pins.length);
+  if(!opts.includes(cm.rounds)) cm.rounds=opts[opts.length-1];
+  $('cmRoundSeg').innerHTML=opts.map(n=>`<button data-r="${n}" class="${n===cm.rounds?'on':''}">${n===rec.pins.length&&n!==5&&n!==10?'All '+n:n}</button>`).join('');
+  [...$('cmTimeSeg').children].forEach(b=>b.classList.toggle('on',+b.dataset.t===cm.time));
+  $('cmPlay').hidden=false; $('cmPlay').textContent=lobby?`Use this map for the room`:`Play ${rec.name}`;
+  $('cmOwner').hidden=!(acct.key&&rec.by===acct.key); if(!$('cmOwner').hidden) $('cmOwner').innerHTML='This is your map. <button class="link" id="cmDelete">Delete it</button>';
+  const top=(rec.top||[]).slice().sort((a,b)=>b.score-a.score||a.ts-b.ts);
+  $('cmBoardSub').textContent=top.length?`${top.length} score${top.length===1?'':'s'} · ${cm.rounds} rounds scores separately from other lengths`:'Nobody has played it yet.';
+  $('cmBoard').innerHTML=top.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th style="text-align:right">Score</th></tr>`+top.slice(0,15).map((e,i)=>`<tr><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${e.k?friendTag({k:e.k,name:e.name}):''}${e.k?streakTag({k:e.k}):''}</td><td class="mode">${e.rounds} rounds · ${e.time?e.time+'s':'no limit'}</td><td class="score">${(+e.score).toLocaleString()}</td></tr>`).join('')+'</table>':'<div class="cmap-empty">Be the first.</div>';
+  $('cmLink').textContent=cmapLink(rec.id);
+}
+$('cmTimeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cm.time=+b.dataset.t; renderCmap(); sfx('click'); });
+$('cmRoundSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cm.rounds=+b.dataset.r; renderCmap(); sfx('click'); });
+$('cmCopy').addEventListener('click',()=>copyText(cmapLink(cm.cur.id),$('cmCopy'),'Copy link'));
+$('cmapBack').addEventListener('click',()=>openCmaps(cm.from));
+$('cmOwner').addEventListener('click',async e=>{ if(!e.target.closest('#cmDelete')||!cm.cur) return; if(!confirm(`Delete "${cm.cur.name}" for everyone?`)) return;
+  for(const l of lb.links) if(l.ready){ try{ l.client.publish(CM_ROOT+'/'+cm.cur.id,'',{qos:1,retain:true}); }catch(e){} } delete cm.all[cm.cur.id]; toast('Map deleted','ok'); openCmaps(cm.from); });
+$('cmPlay').addEventListener('click',()=>{
+  const rec=cm.cur; if(!rec) return;
+  if(mp.role==='host'){ mp.customPins=rec.pins; mp.settings.custom={id:rec.id,name:rec.name,n:rec.pins.length}; mp.settings.mode='custom'; mp.settings.rounds=cm.rounds; mp.settings.time=cm.time; mp.locPromise=null; hostSync(); show('lobby'); toast(`Room set to ${rec.name}`,'ok'); return; }
+  state.mode='custom'; state.custom=rec; state.region={type:'all',value:null}; state.userTime=cm.time; state.userRounds=cm.rounds; state.timeLimit=cm.time; state.totalRounds=cm.rounds;
+  rec.plays=(rec.plays||0)+1; cmapPublish(rec);
+  startGame();
+});
+/* A finished game on a custom map lands on that map's own board. */
+async function cmapFinish(){
+  const map=state.custom; if(!map||!acct.key||state.chal) return;
+  try{ const fresh=await cmapFetch(map.id); const rec=fresh||map; if(!rec.pins) return;
+    const top=(rec.top||[]).filter(e=>e&&e.k!==acct.key); top.push({k:acct.key,name:acct.name,score:state.score,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()});
+    rec.top=top.sort((a,b)=>b.score-a.score).slice(0,30); cm.all[rec.id]=rec; cmapPublish(rec); }catch(e){}
+}
+/* ----- the builder ----- */
+function openMake(){
+  if(!acct.key){ toast('Sign in to build a map — it needs a name on it'); show('acct'); return; }
+  show('cmake'); $('cmake').scrollTo(0,0); $('mkMsg').textContent='';
+  if(!cm.mk){ cm.mk={map:makeMap('mkMap'),pins:[],layer:null}; cm.mk.layer=L.layerGroup().addTo(cm.mk.map);
+    cm.mk.map.on('click',e=>mkAdd(e.latlng.lat,e.latlng.lng)); }
+  setTimeout(()=>{ cm.mk.map.invalidateSize(); if(!cm.mk.pins.length) cm.mk.map.fitBounds([[-55,-170],[72,180]],{animate:false}); },60);
+  renderMk();
+}
+const dotIcon=L.divIcon({className:'',html:'<div class="marker-dot"></div>',iconSize:[14,14],iconAnchor:[7,7]});
+async function mkAdd(lat,lng){
+  const mk=cm.mk; if(!mk||mk.busy) return; if(mk.pins.length>=300){ toast('300 spots is the limit'); return; }
+  mk.busy=true; $('mkMsg').textContent='Looking for Street View there…';
+  try{ await gmapsReady; svService=svService||new google.maps.StreetViewService();
+    const {data}=await svService.getPanorama({location:{lat,lng},radius:3500,source:google.maps.StreetViewSource.GOOGLE,preference:google.maps.StreetViewPreference.NEAREST});
+    const loc=data&&data.location; if(!loc||!loc.pano) throw new Error('none');
+    const plat=loc.latLng.lat(), plng=loc.latLng.lng();
+    if(mk.pins.some(p=>p.pano===loc.pano)){ $('mkMsg').textContent='That spot is already on the map.'; mk.busy=false; return; }
+    const pin={pano:loc.pano,lat:+plat.toFixed(5),lng:+plng.toFixed(5),heading:Math.floor(Math.random()*360),label:(loc.description||'').slice(0,60)};
+    mk.pins.push(pin); $('mkMsg').textContent='';
+    placeOf(plat,plng).then(p=>{ if(p){ pin.label=[p.city||p.locality||p.region,p.country].filter(Boolean).join(', ').slice(0,60); renderMk(); } });
+    renderMk(); sfx('pin');
+  }catch(e){ $('mkMsg').textContent='No Street View within a couple of miles of there. Try somewhere with roads.'; $('mkMsg').className='acctmsg bad'; setTimeout(()=>{ $('mkMsg').className='acctmsg'; },1500); }
+  mk.busy=false;
+}
+function renderMk(){
+  const mk=cm.mk; if(!mk) return;
+  mk.layer.clearLayers(); mk.pins.forEach(p=>L.marker([p.lat,p.lng],{icon:dotIcon}).addTo(mk.layer).bindTooltip(p.label||`${p.lat}, ${p.lng}`));
+  $('mkCount').textContent=`(${mk.pins.length})`;
+  $('mkList').innerHTML=mk.pins.length?mk.pins.map((p,i)=>`<div class="mkrow"><img src="${SV_TILE(p.pano,0,0,0)}" alt=""><span class="mkt">${esc(p.label||'Spot '+(i+1))}<small>${p.lat}, ${p.lng}</small></span><button data-del="${i}">Remove</button></div>`).join(''):'<div class="frempty">Nothing yet. Click the map.</div>';
+  $('mkSave').disabled=mk.pins.length<2||$('mkName').value.trim().length<2;
+  $('mkSave').textContent=mk.pins.length<2?`Add ${2-mk.pins.length} more spot${mk.pins.length===1?'':'s'}`:$('mkName').value.trim().length<2?'Give it a name':`Publish ${$('mkName').value.trim()} · ${mk.pins.length} spots`;
+}
+$('mkName').addEventListener('input',renderMk);
+$('mkList').addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(!b) return; cm.mk.pins.splice(+b.dataset.del,1); renderMk(); });
+function mkCoordAdd(){ const c=parseCoords($('mkCoord').value); if(!c||!isFinite(c.lat)||!isFinite(c.lng)||Math.abs(c.lat)>90||Math.abs(c.lng)>180){ toast('Couldn\'t read those coordinates'); return; } $('mkCoord').value=''; cm.mk.map.setView([c.lat,c.lng],Math.max(cm.mk.map.getZoom(),8)); mkAdd(c.lat,c.lng); }
+$('mkCoordGo').addEventListener('click',mkCoordAdd);
+$('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); mkCoordAdd(); } });
+$('mkSave').addEventListener('click',()=>{
+  const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<2||name.length<2) return;
+  const rec={id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],pins:mk.pins.map(p=>({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}))};
+  if(!cmapPublish(rec)){ $('mkMsg').textContent='Not connected — try again in a moment.'; return; }
+  cm.all[rec.id]=rec; mk.pins=[]; $('mkName').value=''; renderMk(); toast('Map published','ok'); cmapOpen(rec.id);
+});
+$('cmakeBack').addEventListener('click',()=>openCmaps(cm.from));
+$('customBtn').addEventListener('click',()=>openCmaps('setup'));
+$('createBtn').addEventListener('click',()=>{ cm.from='setup'; openMake(); });
+$('cmCreate2').addEventListener('click',openMake);
+$('lobbyCustomBtn').addEventListener('click',()=>openCmaps('lobby'));
 
 /* ---------- Where in the world: pick a continent, then narrow to a country ---------- */
 let regionCont=null;
@@ -2395,7 +3075,7 @@ function renderDailyBoard(wrapId,subId){
   const me=dailyDone(); const mineId=me&&me.date===dailyDate()?me.id:null;
   const wrap=$(wrapId); if(!wrap) return;
   wrap.innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th style="text-align:right">Score</th></tr>`+
-    rows.slice(0,10).map((e,i)=>`<tr class="${e.id===mineId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}</td><td class="score">${e.score.toLocaleString()}</td></tr>`).join('')+`</table>`
+    rows.slice(0,10).map((e,i)=>`<tr class="${e.id===mineId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="score">${e.score.toLocaleString()}</td></tr>`).join('')+`</table>`
     :`<div class="empty">${lbLive()?'Nobody has played today yet. Go first.':'Connecting…'}</div>`;
   if($(subId)) $(subId).textContent=rows.length?`${rows.length} player${rows.length===1?'':'s'} today`:'Everyone plays the same five locations';
   if($('menuDailyCount')) $('menuDailyCount').textContent=rows.length?`${rows.length} played today`:'';
@@ -2429,10 +3109,10 @@ function renderBoardPage(){
 
   $('bpWrap').innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th>Date</th><th style="text-align:right">Score</th></tr>`+
     rows.slice(0,25).map((e,i)=>{ const em=entryMode(e);
-      return `<tr class="${e.id===bp.highlight?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}</td><td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="mode">${new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`
+      return `<tr class="${e.id===bp.highlight?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="mode">${new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`
     :`<div class="empty">${all.length?'No scores with these settings.':'Finish a game in this mode and save your score.'}</div>`;
   $('bpCount').textContent=rows.length?`${rows.length} game${rows.length===1?'':'s'} shown`:'';
-  $('bpModes').innerHTML=Object.entries(MODES).filter(([id,mm])=>!mm.mp).map(([id,mm])=>{
+  $('bpModes').innerHTML=Object.entries(MODES).filter(([id,mm])=>!mm.mp&&!mm.custom).map(([id,mm])=>{
     const n=boardFor('all','all',id).length;
     return `<button class="bpmode ${id===bp.mode?'on':''} ${n?'':'empty'}" data-mode="${id}"><img src="images/mode-${id}.jpg" alt=""><span style="min-width:0"><b>${esc(mm.name)}</b><span>${n?n+' saved':'no scores yet'}</span></span></button>`;
   }).join('');
@@ -2515,7 +3195,7 @@ function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); renderDailyBoard('me
 $('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
 $('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
 
-function show(id){ for(const s of ['menu','setup','acct','friends','region','daily','board','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
+function show(id){ for(const s of ['menu','setup','acct','friends','region','daily','board','lobby','game','result','final','chal','cmaps','cmake','cmap']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); if(id!=='final'){ $('shareBox').hidden=true; $('shareCard').hidden=true; } }
 
 /* ---------- Game flow ---------- */
 function ensureGuessMap(){
@@ -2550,31 +3230,36 @@ function ensureGuessMap(){
   }
 }
 function resetGameState(){
-  const m=modeOf(state.mode); $('modePill').hidden=state.mode==='classic'; $('modeLbl').textContent=m.name;
+  const m=modeOf(state.mode); $('modePill').hidden=state.mode==='classic'; $('modeLbl').textContent=m.custom&&state.custom?state.custom.name:m.name;
   $('blink').hidden=true; stopPixel(); $('game').classList.toggle('gray',!!m.gray); $('game').classList.toggle('trio',!!m.trio);
   $('game').classList.toggle('nomap',!!(m.slider||m.choice)); resetGuessBar();
   $('bettray').hidden=!m.bet; state.bank=1000; state.bet=0; state.pick=null; $('trio').hidden=true; $('tmap').hidden=true; if(m.bet) renderBet();
-  state.chain=[]; state.daily=null; peekClear();
+  state.chain=[]; state.daily=null; state.chal=null; peekClear(); $('rivalLine').hidden=true; $('finalRival').hidden=true; $('game').classList.remove('blind-eyes','blind-map'); $('blindHint').hidden=true; $('duelHud').hidden=true; $('roundPill').hidden=false; $('scorePill').hidden=false;
   state.round=0; state.score=0; state.results=[]; state.locs=[]; state.guess=null; state.saved=false; preload.idx=-1; preload.promise=null;
   panos.forEach(f=>{ f.onload=null; f.src='about:blank'; });
   ensureGuessMap();
 }
 async function startGame(opts){
   if(mp.role) mpLeave();
-  const daily=opts&&opts.daily||null;
+  const daily=opts&&opts.daily||null, ch=opts&&opts.chal||null;
   const rng=daily?mulberry32(seedFrom('pinpoint-'+daily.date)):null;
-  if(daily){ state.mode=daily.mode; state.region=daily.region; state.nomove=false; state.lock=false; }
+  if(daily){ state.mode=daily.mode; state.region=daily.region; state.nomove=false; state.lock=false; state.custom=null; }
+  if(ch){ state.mode=MODES[ch.mode]?ch.mode:'classic'; state.region=ch.region||{type:'all',value:null}; state.nomove=!!ch.nomove; state.lock=!!ch.lock; state.custom=ch.custom||null; }
   const m=modeOf(state.mode);
-  state.timeLimit=daily?daily.time:(m.time!=null?m.time:state.userTime);
-  state.totalRounds=daily?daily.rounds:(m.rounds!=null?m.rounds:state.userRounds);
+  state.timeLimit=ch?(ch.time||0):daily?daily.time:(m.time!=null?m.time:state.userTime);
+  state.totalRounds=ch?Math.max(1,Math.min(ch.rounds||ch.locs.length,ch.locs.length)):daily?daily.rounds:(m.rounds!=null?m.rounds:state.userRounds);
+  if(state.custom&&!ch) state.totalRounds=Math.min(state.totalRounds,state.custom.pins.length);
   resetGameState();
-  state.daily=daily;
+  state.daily=daily; state.chal=ch;
+  if(ch&&ch.av) dominantColor(ch.av);
   $('startBtn').disabled=true; const __lbl=$('startBtn').textContent; $('startBtn').textContent='Loading…';
   show('game'); $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true; sfx('start');
   const plan=continentPlan(state.totalRounds,rng);
   const pm=regionOK(state.mode)?applyRegion(m,state.region):m;
   if(m.country){ $('loadingText').textContent='Loading borders…'; try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); show('setup'); $('startBtn').disabled=false; $('startBtn').textContent=__lbl; return; } }
-  (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{
+  if(ch){ state.locs=ch.locs.slice(0,state.totalRounds).map(l=>({...l})); state.chain=state.locs.map(l=>l.key).filter(Boolean); }
+  else if(state.custom){ state.locs=await customLocs(state.custom,state.totalRounds); }
+  else (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{
       if(m.deported){ const l=await deportStep(state.chain,m); state.locs[i]=l; state.chain.push(l.key); }
       else state.locs[i]=m.trio?await findTrio(plan[i],m):await findLocation(plan[i],m.choice?polMode(m):pm,rng);
     }catch(e){ state.locs[i]=e; } } })();
@@ -2583,7 +3268,7 @@ async function startGame(opts){
 }
 
 async function waitForLoc(i){
-  while(state.locs[i]===undefined) await new Promise(r=>setTimeout(r,120));
+  while(state.locs[i]===undefined){ if($('game').hidden&&$('result').hidden) throw new Error('left'); await new Promise(r=>setTimeout(r,120)); }
   if(state.locs[i] instanceof Error) throw state.locs[i];
   return state.locs[i];
 }
@@ -2592,6 +3277,7 @@ async function nextRound(){
   state.round++; state.guess=null; state.locked=false; state.fitDone=false; state.pick=null; state.choice=null; state.bet=0; resetGuessBar(); if(modeOf(state.mode).bet) renderBet();
   show('game');
   if(!paintLives()) $('roundLbl').textContent = (mp.role&&modeOf(state.mode).elim) ? `${state.round} · ${alivePlayers().length} left` : `${state.round} / ${state.totalRounds}`;
+  paintDuel(); applyBlind();
   const last=state.results[state.results.length-1];
   if(last){ countUp($('scoreLbl'),state.score-last.pts,state.score,900); $('scorePill').classList.remove('pop'); void $('scorePill').offsetWidth; $('scorePill').classList.add('pop');
     if(last.pts>0){ const f=document.createElement('span'); f.className='floater'; f.textContent='+'+last.pts.toLocaleString(); $('scorePill').appendChild(f); setTimeout(()=>f.remove(),1400); } }
@@ -2636,30 +3322,33 @@ async function nextRound(){
   }
   else stopPixel();
   $('loading').classList.add('fade');
-  const ri=$('roundIntro'); ri.innerHTML=`<div>Round ${state.round} <span>/ ${state.totalRounds}</span></div>`; ri.hidden=false; setTimeout(()=>{ ri.hidden=true; },1100);
+  const ri=$('roundIntro'); const isDuel=mp.role&&modeOf(state.mode).duel;
+  ri.innerHTML=isDuel?`<div><small>damage ×${duelMult(state.round)}</small>Round ${state.round}</div>`:`<div>Round ${state.round} <span>/ ${state.totalRounds}</span></div>`; ri.hidden=false; setTimeout(()=>{ ri.hidden=true; },1100);
   if(state.mode==='blink'){ const r0=state.round; setTimeout(()=>{ if(state.round===r0&&!$('game').hidden){ runBlink(); startTimer(); } },1250); }   // intro first, then the glimpse and the clock together
   else startTimer();
   if(!modeOf(state.mode).trio&&!canvasRound) preloadRound(idx+1);
 }
 
 function setGuess(latlng){
-  if(amOut()) return;
+  if(amOut()||blindRole()==='eyes') return;
   const ll=L.latLng(latlng.lat, ((latlng.lng+180)%360+360)%360-180);
   state.guess=ll;
-  if(guessMarker) guessMarker.setLatLng(ll); else guessMarker=L.marker(ll,{icon:mp.role&&mp.players[mp.me.id]?playerIcon(mp.players[mp.me.id]):guessIcon}).addTo(guessMap);
+  if(guessMarker) guessMarker.setLatLng(ll); else guessMarker=L.marker(ll,{icon:mp.role&&mp.players[mp.me.id]?playerIcon(mp.players[mp.me.id]):myIcon()}).addTo(guessMap);
   sfx('pin');
   const gb=$('guessBtn'); if(gb.disabled&&!modeOf(state.mode).bet){ gb.disabled=false; gb.textContent='Guess'; gb.classList.remove('ready'); void gb.offsetWidth; gb.classList.add('ready'); }
   if(modeOf(state.mode).bet) renderBet();
   if(mp.role&&modeOf(state.mode).peek) peekSend();
 }
 
-function startTimer(){
-  state.timeLeft=state.timeLimit;
-  if(!state.timeLimit) return;
-  state.timeLeft=state.timeLimit; const end=Date.now()+state.timeLimit*1000;
+function startTimer(limit){
+  const lim=limit||state.timeLimit;
+  state.timeLeft=lim;
+  if(!lim) return;
+  const end=Date.now()+lim*1000;
   const fill=$('timeFill'); fill.style.transition='none'; fill.style.width='100%'; fill.className=''; void fill.offsetWidth; fill.style.transition='';
+  $('timerLbl').textContent=fmtTime(lim);
   state.timer=setInterval(()=>{
-    const ms=Math.max(0,end-Date.now()); const left=Math.ceil(ms/1000); const frac=ms/(state.timeLimit*1000);
+    const ms=Math.max(0,end-Date.now()); const left=Math.ceil(ms/1000); const frac=ms/(lim*1000);
     fill.style.width=(frac*100)+'%'; fill.className= left<=10?'low': frac<.5?'mid':'';
     if(left!==state.timeLeft){ state.timeLeft=left; $('timerLbl').textContent=fmtTime(left); if(left<=5&&left>0&&!state.locked) sfx('low'); if(modeOf(state.mode).countdown) $('timerPill').querySelector('small').textContent='WORTH ×'+countdownMult(left,state.timeLimit).toFixed(2); }
     $('timerPill').classList.toggle('low',left<=10);
@@ -2671,7 +3360,7 @@ function stopTimer(){ if(state.timer){ clearInterval(state.timer); state.timer=n
 /* Payout multiplier from the base score: 5× for a bullseye, sliding down with distance. Break-even is about 1,200 km; beyond that you lose part or all of the stake. */
 function betMult(base){ return Math.round(5*Math.pow(Math.max(0,Math.min(5000,base))/5000,2)*100)/100; }
 function submitGuess(auto=false){
-  if(state.locked||amOut()) return;
+  if(state.locked||amOut()||blindRole()==='eyes') return;
   const m=modeOf(state.mode);
   if(m.trio){ if(state.pick==null && !auto) return; }
   else if(m.slider){ if(state.choice==null && !auto) return; }
@@ -2715,7 +3404,7 @@ function submitGuess(auto=false){
 
 /* ---------- Round result ---------- */
 function showResult(r){
-  show('result'); $('roundRank').hidden=true; $('leaderLine').hidden=true; $('nextBtn').hidden=false; $('nextWait').hidden=true;
+  show('result'); $('roundRank').hidden=true; $('leaderLine').hidden=true; $('nextBtn').hidden=false; $('nextWait').hidden=true; $('clueBox').hidden=true;
   if(r.trio){ showTrioResult(r); return; }
   if(r.country){ showCountryResult(r); return; }
   if(r.slider||r.gov){ showChoiceResult(r); return; }
@@ -2726,12 +3415,13 @@ function showResult(r){
   const hid=false; let line=null, casing=null;
   if(r.guess){
     if(!hid){ casing=L.polyline([r.guess,r.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
-    line=L.polyline([r.guess,r.truth],{color:'#1f9d55',weight:3,opacity:1}).addTo(resultLayer); }
-    L.marker(r.guess,{icon:guessIcon}).addTo(resultLayer);
+    line=L.polyline([r.guess,r.truth],{color:myLineColor(),weight:3,opacity:1}).addTo(resultLayer); }
+    L.marker(r.guess,{icon:myIcon()}).addTo(resultLayer);
   }
   if(!hid) L.marker(r.truth,{icon:trueIcon}).addTo(resultLayer);
-  const fit=()=>{ resultMap.invalidateSize(); if(hid){ resultMap.setView(r.guess||[20,0],r.guess?4:2,{animate:false}); return; } if(r.guess) resultMap.fitBounds(L.latLngBounds([r.guess,r.truth]),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(r.truth,5,{animate:false}); };
-  fit(); setTimeout(fit,150); sfx('reveal');
+  const rpts=[r.truth]; if(r.guess) rpts.push(r.guess); drawRival(resultLayer,r.truth,state.round-1,resultMap,rpts);
+  const fit=()=>{ resultMap.invalidateSize(); if(hid){ resultMap.setView(r.guess||[20,0],r.guess?4:2,{animate:false}); return; } if(rpts.length>1) resultMap.fitBounds(L.latLngBounds(rpts),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(r.truth,5,{animate:false}); };
+  fit(); setTimeout(fit,150); sfx('reveal'); paintRival();
   if(line) setTimeout(()=>{ for(const pl of [casing,line]){ const el=pl.getElement(); if(!el) continue; const len=el.getTotalLength(); el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.classList.add('draw-line'); void el.getBoundingClientRect(); el.style.strokeDashoffset=0; } },350);
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(r.pts>=4000) pe.classList.add('great');
   setTimeout(()=>{ pe.classList.add('pop'); if(r.pts>=4500){ confetti(); flash(); sfx(r.pts>=4900?'perfect':'great'); } },1000);
@@ -2768,6 +3458,14 @@ function renderVerdict(r){
   if(gp) parts.push(hide?(gp.region?`<span>Your pin: <b>${esc(gp.region)}</b></span>`:''):`<span>Your pin: <b>${esc(gp.region?gp.region+', ':'')}${esc(gp.country)}</b></span>`);
   else if(r.guess && tp) parts.push(`<span>Your pin: <b>in the ocean</b></span>`);
   $('placeTxt').innerHTML=parts.join('');
+  paintClues(tp);
+}
+/* Learn mode: after the round, the tells for the country you were just in. */
+function paintClues(tp){
+  const box=$('clueBox'); const want=state.mode==='learn';
+  const c=want&&tp?clueFor(tp.country):null;
+  box.hidden=!c; if(!c) return;
+  box.innerHTML=`<div class="ch">The giveaways<b>${esc(c.country)}</b></div><ul>${c.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
 }
 $('nextBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpHostNext(); return; } if(mp.role) return; if(state.round>=state.totalRounds||(modeOf(state.mode).bet&&state.bank<=0)) showFinal(); else nextRound(); });
 
@@ -2783,6 +3481,7 @@ function flash(){ const f=$('flash'); if(!f) return; f.classList.remove('go'); v
 
 /* ---------- Final ---------- */
 function showFinal(){
+  bumpStreak();
   show('final'); $('standings').hidden=true; $('roundChips').hidden=false; $('finalWait').hidden=true; $('againBtn').hidden=false;
   $('viewBoardBtn').hidden=!!state.daily; $('saveRow').hidden=false;
   $('againBtn').hidden=!!state.daily;   // one drop a day, so there is nothing to play again
@@ -2798,14 +3497,15 @@ function showFinal(){
   finalLayer=L.layerGroup().addTo(finalMap);
   const pts=[];
   plainStyle(finalMap,false);
-  for(const r of state.results){
+  state.results.forEach((r,i)=>{
     pts.push(r.truth);
     if(r.guess&&!r.country){ pts.push(r.guess);
       L.polyline([r.guess,r.truth],{color:'#fff',weight:5,opacity:.9}).addTo(finalLayer);
-      L.polyline([r.guess,r.truth],{color:'#1f9d55',weight:2.5,opacity:1}).addTo(finalLayer);
-      L.marker(r.guess,{icon:guessIcon}).addTo(finalLayer); }
+      L.polyline([r.guess,r.truth],{color:myLineColor(),weight:2.5,opacity:1}).addTo(finalLayer);
+      L.marker(r.guess,{icon:myIcon()}).addTo(finalLayer); }
+    if(!r.country) drawRival(finalLayer,r.truth,i,finalMap,pts);
     L.marker(r.truth,{icon:trueIcon}).addTo(finalLayer);
-  }
+  });
   const fit=()=>{ finalMap.invalidateSize(); finalMap.fitBounds(L.latLngBounds(pts),{padding:[60,60]}); };
   fit(); setTimeout(fit,150);
 
@@ -2821,12 +3521,15 @@ function showFinal(){
   if(pct>=.8) setTimeout(confetti,900);
   $('roundChips').innerHTML=state.results.map(r=>`<div class="rchip ${(r.trio?r.ok:r.pts>=4500)?'top':''}">R${r.round} · ${r.trio?(r.ok?'correct':'wrong'):(r.loc.place?esc(r.loc.place.country):(r.guess?fmtDist(r.km):'no guess'))}<b>${(r.bet&&r.pts>0?'+':'')+r.pts.toLocaleString()}</b></div>`).join('');
 
+  chalFinish(); $('againBtn').textContent=state.chal?'New game':'Play again';
   // Leaderboard save
   state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false; hideNag();
   const signedIn=!!acct.name; $('signUp').hidden=signedIn; $('saveRow').hidden=!signedIn;
   $('nameInput').value=''; $('nameInput').placeholder=acct.name||'';
   const rank=boardFor(state.totalRounds,state.timeLimit,state.mode).filter(e=>e.score>state.score).length+1;
   $('saveBtn').textContent = rank<=10 ? `Save to leaderboard · #${rank} in ${modeLabel()}` : 'Save to leaderboard';
+  if(state.custom) { $('saveRow').hidden=true; $('signUp').hidden=true; $('viewBoardBtn').hidden=true; cmapFinish(); }
+  paintShare();
 }
 /* Every finished game lands on the board the same way, solo or with friends. */
 function recordScore(name){
@@ -3123,7 +3826,7 @@ function trioResultMap(loc,lie){
   const fit=()=>{ resultMap.invalidateSize(); resultMap.fitBounds(L.latLngBounds(pts),{padding:[70,70],maxZoom:6,animate:false}); }; fit(); setTimeout(fit,150);
 }
 function showTrioResult(r){
-  trioResultMap(r.loc,r.lie);
+  trioResultMap(r.loc,r.lie); paintRival();
   const v=$('verdict'); v.textContent=r.timedOut?"Time's up — no pick":(r.ok?'Correct!':`Nope. The lie was ${String.fromCharCode(65+r.lie)}`); v.className='verdict '+(r.ok?'good':'bad');
   $('distTxt').innerHTML=r.ok?'You spotted the lie.':(r.pick!=null?`You picked ${String.fromCharCode(65+r.pick)}.`:'');
   $('placeTxt').innerHTML='';
@@ -3202,7 +3905,7 @@ function countryResultMap(truthLL,truthName,guesses){
   if(tf){ L.geoJSON(tf,{style:{color:'#0f7a3f',weight:2.5,fillColor:'#1f9d55',fillOpacity:.45}}).addTo(resultLayer); pts.push(...extent(tf)); }
   const drawn=new Set();
   for(const g of guesses){ if(!g.country) continue; const f=find(g.country); if(!f) continue; if(g.country!==truthName&&!drawn.has(g.country)){ drawn.add(g.country); L.geoJSON(f,{style:{color:'#b3202e',weight:2,fillColor:'#e63946',fillOpacity:.35}}).addTo(resultLayer); }
-    const c=geoCenter(f); pts.push(...extent(f)); if(g.color!=null||g.face) L.marker(c,{icon:playerIcon(g)}).addTo(resultLayer).bindTooltip(g.name,{direction:'top',offset:[0,-40]}); }
+    const c=geoCenter(f); pts.push(...extent(f)); if(g.rival) L.marker(c,{icon:rivalIcon()}).addTo(resultLayer).bindTooltip(g.name,{direction:'top',offset:[0,-40]}); else if(g.color!=null||g.face) L.marker(c,{icon:playerIcon(g)}).addTo(resultLayer).bindTooltip(g.name,{direction:'top',offset:[0,-40]}); }
   L.marker(truthLL,{icon:trueIcon}).addTo(resultLayer);
   const fit=()=>{ resultMap.invalidateSize(); resultMap.fitBounds(L.latLngBounds(pts),{padding:[60,60],maxZoom:6,animate:false}); }; fit(); setTimeout(fit,150);
 }
@@ -3213,7 +3916,8 @@ function countryResultText(ok,picked,truthName,pts,timedOut){
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(ok) pe.classList.add('great'); setTimeout(()=>{ pe.classList.add('pop'); if(ok) confetti(); },900);
 }
 function showCountryResult(r){
-  countryResultMap(r.truth,r.truthCountry,r.guess?[{country:r.guess.country}]:[]);
+  const rv=rivalRound(state.round-1); const gs=r.guess?[{country:r.guess.country}]:[]; if(rv&&rv.c) gs.push({country:rv.c,name:rivalName(),rival:true});
+  countryResultMap(r.truth,r.truthCountry,gs); paintRival();
   countryResultText(r.ok,r.guess&&r.guess.country,r.truthCountry,r.pts,r.timedOut);
   $('nextBtn').textContent = state.round>=state.totalRounds ? 'See results' : 'Next round';
   const round=state.round; (async()=>{ const tp=r.loc.place||await placeOf(r.truth.lat,r.truth.lng); r.loc.place=tp; if(tp&&state.round===round&&!$('result').hidden) $('placeTxt').innerHTML=`<span>📍 Location: <b>${esc(tp.region?tp.region+', ':'')}${esc(tp.country)}</b></span>`; })();
@@ -3284,7 +3988,7 @@ function choiceText(kind,sel,ans,pts,ok,err){
   setTimeout(()=>{ pe.classList.add('pop'); if(pts>=4500) confetti(); },900);
 }
 function showChoiceResult(r){
-  truthOnlyMap(r.truth);
+  truthOnlyMap(r.truth); paintRival();
   choiceText(r.slider?'slider':'gov',r.sel,r.ans,r.pts,r.ok,r.err);
   $('nextBtn').textContent = state.round>=state.totalRounds ? 'See results' : 'Next round';
   $('placeTxt').innerHTML='';
@@ -3377,7 +4081,7 @@ window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resu
    ========================================================= */
 const COLORS=[['#e63946','Red'],['#ff6b6b','Coral'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#9acd32','Lime'],['#2bb673','Green'],['#12a5a0','Teal'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#6f42c1','Indigo'],['#b23fd0','Purple'],['#e84393','Pink']];
 const BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081'];
-const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpeer:null}, code:'', settings:{time:60,rounds:5,mode:'classic',nomove:false,lock:false,region:{type:'all',value:null}}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby',
+const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpeer:null}, code:'', settings:{time:60,rounds:5,mode:'classic',nomove:false,lock:false,region:{type:'all',value:null},kind:'party',blind:{eyes:'host',swap:true},custom:null}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby',
            links:[], link:null, seen:{}, hb:null, hostSeen:0, joinTimer:null, brokerIdx:0 };
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ';
 function mkCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.random()*CODE_CHARS.length|0]; return c; }
@@ -3430,12 +4134,12 @@ function openVoicePeer(){
 }
 
 /* ---- host ---- */
-async function mpHost(){
+async function mpHost(kind){
   const code=mkCode();
-  mpSetup('host',code);
+  mpSetup('host',code,kind||'party');
   mp.me.id='host';
   mp.players['host']={id:'host',name:mp.me.name,color:null,face:!!acct.av,score:0,host:true,vpeer:null};
-  if(acct.av) avCache['host']=acct.av; else delete avCache['host'];
+  avSet('host',acct.av);
   renderLobby(); voiceShow();
   // Connect to every broker so guests can reach us through whichever one works for them.
   for(const url of BROKERS){
@@ -3478,10 +4182,13 @@ async function mpJoin(code){
   mp.hb=setInterval(()=>{ if(mp.link){ mpSend({t:'hb'}); if(mp.hostSeen&&Date.now()-mp.hostSeen>30000){ toast('Lost the host'); mpLeave(); show('menu'); } } },5000);
   openVoicePeer();
 }
-function mpSetup(role,code){
+function mpSetup(role,code,kind){
   closeLinks();
-  mp.role=role; mp.code=code; mp.players={}; mp.guesses={}; mp.phase='lobby'; mp.cd=null; mp.seen={}; mp.hostSeen=0; mp.pending={};
+  mp.role=role; mp.code=code; mp.players={}; mp.guesses={}; mp.phase='lobby'; mp.cd=null; mp.seen={}; mp.hostSeen=0; mp.pending={}; mp.revs=[]; mp.sentUpTo=-1;
   mp.me={id:null,name:myName(),color:null,vpeer:null};
+  if(role==='host'){ mp.settings.kind=kind||'party'; mp.settings.mode=mp.settings.kind==='duo'?'duel':'classic'; mp.settings.rounds=5; mp.settings.time=60;
+    mp.settings.custom=null; mp.settings.blind={eyes:'host',swap:true}; mp.settings.region={type:'all',value:null}; mp.settings.nomove=false; mp.settings.lock=false;
+    $('lobbyModeGrid').innerHTML=modeTiles(mp.settings.kind); }
   diag.t0=Date.now(); diag.log=[];
   $('mpName').value=mp.me.name;
   $('roomCode').textContent=code;
@@ -3514,10 +4221,25 @@ function connFailed(why){
 }
 
 /* ----- host side ----- */
-function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null})); }
+function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null,hp:p.hp??null})); }
+/* The wire form of a location: everything a guest needs to load and score it, nothing else. */
+function locPayload(l){ return {pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,pol:l.pol,key:l.key,from:l.from,fresh:l.fresh}; }
+/* A duel has no fixed length, so the host keeps finding spots a few rounds ahead and hands them over as it goes. */
+async function duelPrefetch(){
+  const m0=modeOf(mp.settings.mode); const m=regionOK(mp.settings.mode)?applyRegion(m0,mp.settings.region):m0;
+  mp.duelDone=false;
+  while(mp.role==='host'&&mp.phase!=='lobby'&&m0.duel&&!mp.duelDone){
+    if(state.locs.length<state.round+4){ try{ state.locs.push(await findLocation(CONTINENTS[Math.random()*6|0],m)); }catch(e){ try{ state.locs.push(await findLocation(null,m)); }catch(e2){ await new Promise(r=>setTimeout(r,1500)); } } }
+    else await new Promise(r=>setTimeout(r,300));
+  }
+}
+function hostPending(){ const add=[]; for(let i=mp.sentUpTo+1;i<state.locs.length;i++){ const l=state.locs[i]; if(l&&!(l instanceof Error)) add.push({i,loc:locPayload(l)}); } if(add.length) mp.sentUpTo=add[add.length-1].i; return add; }
+/* One player has guessed, so the other gets a short clock: no sitting on a guess to run the round out. */
+function hurryLocal(secs){ if(state.locked||$('game').hidden) return; if(!state.timeLimit||state.timeLeft>secs){ stopTimer(); startTimer(secs); const p=$('timerPill'); p.classList.add('low'); toast(`Your opponent has guessed — ${secs} seconds!`); } }
 /* Photos are far too heavy to repeat in every lobby sync, so they travel once and are cached by player. */
 const avCache={};
 function avOf(id){ return avCache[id]||null; }
+function avSet(id,url){ if(url){ avCache[id]=url; dominantColor(url); } else delete avCache[id]; }
 function avTag(id,name,size,cls){
   const url=avOf(id); const initial=esc((name||'?')[0].toUpperCase());
   return url ? `<span class="pav ${cls||''}" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`
@@ -3534,7 +4256,8 @@ function hostOnMessage(from,m,link){
   if(m.t==='hello'){
     if(mp.players[from]){ mp.players[from].link=link||mp.players[from].link; mp.seen[from]=Date.now(); mpSendTo(from,{t:'welcome'}); hostSync(); return; }
     if(mp.phase!=='lobby'){ mpSendTo(from,{t:'reject',why:'That game is already in progress.'}); return; }
-    if(playerList().length>=10){ mpSendTo(from,{t:'reject',why:'That game is full (10 players).'}); return; }
+    const cap=mp.settings.kind==='duo'?2:10;
+    if(playerList().length>=cap){ mpSendTo(from,{t:'reject',why:cap===2?'That duo already has its two players.':'That game is full (10 players).'}); return; }
     mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link};
     mp.seen[from]=Date.now(); dlog('joined '+from); mpSendTo(from,{t:'welcome'}); hostSync();
     setTimeout(()=>mpSendTo(from,{t:'avall',map:avCache}),300);   // hand the newcomer everyone's photo, including the host's
@@ -3545,7 +4268,7 @@ function hostOnMessage(from,m,link){
   if(m.t==='hb') return;
   if(m.t==='leave'){ hostDrop(from); return; }
   if(m.t==='vpeer'){ pl.vpeer=m.vpeer; hostSync(); return; }
-  if(m.t==='av'){ avCache[from]=m.av||null;
+  if(m.t==='av'){ avSet(from,m.av||null);
     if(m.av&&!pl.chose&&!pl.face){ pl.face=true; pl.color=null; }   // your photo is your token by default
     mpBroadcast({t:'av',id:from,av:m.av||''});
     if(mp.phase==='lobby') hostSync(); else { mpBroadcast({t:'players',players:pubPlayers()}); renderLobby(); updateStrip(); }
@@ -3564,7 +4287,10 @@ function hostOnMessage(from,m,link){
     const gm=modeOf(mp.settings.mode);
     mp.guesses[from]=(gm.slider||gm.choice)?(m.choice!=null?{choice:m.choice}:null)
       :m.guess?{lat:m.guess.lat,lng:m.guess.lng,left:m.left,bet:m.bet,country:m.guess.country||null}:(m.pick!=null?{pick:m.pick,bet:m.bet}:(gm.bet?{bet:m.bet||1}:null));
+    if(gm.blind){ for(const p of alivePlayers()) mp.guesses[p.id]=mp.guesses[from]; }   // one pin for the pair
     mpBroadcast({t:'guessed',id:from,n:Object.keys(mp.guesses).length,total:alivePlayers().length}); updateStrip(); updateWaitList();
+    if(gm.duel&&Object.keys(mp.guesses).length===1&&alivePlayers().length>1){ const secs=15; mpBroadcast({t:'hurry',secs}); hurryLocal(secs);
+      if(mp.deadline) clearTimeout(mp.deadline); mp.deadline=setTimeout(()=>{ for(const p of alivePlayers()) if(mp.guesses[p.id]===undefined) mp.guesses[p.id]=null; hostReveal(); },(secs+3)*1000); }
     hostCheckRound();
   }
 }
@@ -3605,21 +4331,34 @@ function hostReveal(){
              outIds:tied.filter(r=>r.out).map(r=>r.id)};
     }
   }
+  let duel=null;
+  if(mm.duel){
+    const mult=duelMult(state.round); const [a,b]=results; let dmg=0, loser=null;
+    if(a&&b&&a.pts!==b.pts){ loser=a.pts<b.pts?a:b; dmg=Math.round(Math.abs(a.pts-b.pts)*mult); const p=mp.players[loser.id]; if(p) p.hp=Math.max(0,(p.hp??DUEL_HP)-dmg); }
+    duel={mult,dmg,loser:loser?loser.id:null,hp:Object.fromEntries(playerList().map(p=>[p.id,p.hp??DUEL_HP]))};
+  }
   const rev={t:'reveal',round:state.round,truth,place:loc.place||null,results,lie:loc.lie,extra:loc.extra?loc.extra.map(e=>({lat:e.lat,lng:e.lng})):null,truthCountry:mm.country?tn:undefined,ans:(mm.slider||mm.choice)?{tempF:loc.tempF??null,pol:loc.pol||null}:undefined,
-             elim,players:mm.elim?pubPlayers():null,over:mm.elim?alivePlayers().length<=1:false};
+             elim,duel,players:(mm.elim||mm.duel)?pubPlayers():null,over:mm.elim?alivePlayers().length<=1:(mm.duel?(playerList().length<2||playerList().some(p=>(p.hp??DUEL_HP)<=0)):false),add:mm.duel?hostPending():undefined};
   mpBroadcast(rev); showResultMP(rev);
 }
-function mpHostNext(){
-  if(state.round>=state.totalRounds||(modeOf(mp.settings.mode).elim&&alivePlayers().length<=1)){ const fin={t:'final',players:pubPlayers()}; mpBroadcast(fin); showFinalMP(fin); }
-  else { mpBroadcast({t:'round',i:state.round}); mpRound(); }
+async function mpHostNext(){
+  const mm=modeOf(mp.settings.mode);
+  const over=state.round>=state.totalRounds||(mm.elim&&alivePlayers().length<=1)||(mm.duel&&(playerList().length<2||playerList().some(p=>(p.hp??DUEL_HP)<=0)));
+  if(over){ mp.duelDone=true; const fin={t:'final',players:pubPlayers()}; mpBroadcast(fin); showFinalMP(fin); return; }
+  if(mm.duel){ $('nextBtn').disabled=true; $('nextBtn').textContent='Finding the next spot…';
+    const t0=Date.now(); while(state.locs[state.round]===undefined&&Date.now()-t0<25000) await new Promise(r=>setTimeout(r,150));
+    $('nextBtn').disabled=false; if(state.locs[state.round]===undefined){ toast('Could not find another spot. Ending the duel.'); const fin={t:'final',players:pubPlayers()}; mpBroadcast(fin); showFinalMP(fin); return; } }
+  mpBroadcast({t:'round',i:state.round,add:mm.duel?hostPending():undefined}); mpRound();
 }
 function findGameLocations(){
-  const rounds=mp.settings.rounds;
+  let rounds=mp.settings.rounds;
+  if(modeOf(mp.settings.mode).custom&&mp.customPins) rounds=mp.settings.rounds=Math.min(rounds,mp.customPins.length);
   if(mp.locPromise&&mp.locRounds===rounds) return mp.locPromise;
   mp.locRounds=rounds;
   const m0=modeOf(mp.settings.mode);
   const m=regionOK(mp.settings.mode)?applyRegion(m0,mp.settings.region):m0;
-  mp.locPromise=(async()=>{ const plan=continentPlan(rounds); const locs=[]; const chain=[];
+  if(m0.custom&&mp.settings.custom){ mp.locPromise=customLocs({...mp.settings.custom,pins:mp.customPins||[]},rounds); return mp.locPromise; }
+  mp.locPromise=(async()=>{ const plan=continentPlan(m0.duel?3:rounds); const locs=[]; const chain=[];
     for(let i=0;i<plan.length;i++){
       if(m.deported){ const l=await deportStep(chain,m); locs[i]=l; chain.push(l.key); continue; }
       const rm=m.choice?polMode(m):m;
@@ -3646,13 +4385,15 @@ async function hostStartGame(){
     for(const p of playerList()) p.lives=em.lives||null; }
   if(mp.me.color===null) mp.me.color=mp.players[mp.me.id].color;
   if(modeOf(mp.settings.mode).country){ try{ await loadGeo(); }catch(e){ toast('Could not load country borders. Check your connection.'); mp.starting=false; $('mpStartBtn').disabled=false; $('mpStartBtn').textContent='Start game'; return; } }
+  if(em.duel) for(const p of playerList()) p.hp=DUEL_HP;
   const locs=await findGameLocations();
   mp.locPromise=null;   // next game gets fresh spots
-  const payload=locs.map(l=>({pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,pol:l.pol,key:l.key,from:l.from,fresh:l.fresh}));
+  const payload=locs.map(locPayload); mp.sentUpTo=locs.length-1;
   mp.phase='round'; mp.starting=false;
   if(modeOf(mp.settings.mode).bet) for(const p of playerList()) p.score=1000;
   mpBroadcast({t:'start',settings:mp.settings,locs:payload,players:pubPlayers()});
   mpStartGameLocal(mp.settings,locs);
+  if(em.duel) duelPrefetch();
 }
 
 /* ----- guest side ----- */
@@ -3667,12 +4408,13 @@ function guestOnMessage(m){
   else if(m.t==='countdown'){ if(m.secs>0){ runCountdown(m.secs,()=>{}); } else { if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=false; $('countdown').textContent=m.msg||'Starting…'; } }
   else if(m.t==='cancel'){ if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=true; }
   else if(m.t==='start'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; mp.me.color=mp.players[mp.me.id].color; mp.phase='round'; mpStartGameLocal(m.settings,m.locs); }
-  else if(m.t==='round'){ mp.phase='round'; mpRound(); }
+  else if(m.t==='round'){ if(m.add) for(const a of m.add) state.locs[a.i]=a.loc; mp.phase='round'; mpRound(); }
+  else if(m.t==='hurry'){ hurryLocal(m.secs||15); }
   else if(m.t==='guessed'){ mp.guesses[m.id]=true; updateStrip(); updateWaitList(m.n,m.total); }
   else if(m.t==='pin'){ if(m.id!==mp.me.id) peekShow(m.id,m.lat,m.lng); }
-  else if(m.t==='av'){ avCache[m.id]=m.av||null; renderLobby(); updateStrip(); }
-  else if(m.t==='avall'){ if(m.map&&typeof m.map==='object') for(const k of Object.keys(m.map)){ if(k!==mp.me.id&&typeof m.map[k]==='string') avCache[k]=m.map[k]; } renderLobby(); updateStrip(); }
-  else if(m.t==='reveal'){ mp.phase='reveal'; showResultMP(m); }
+  else if(m.t==='av'){ avSet(m.id,m.av||null); renderLobby(); updateStrip(); }
+  else if(m.t==='avall'){ if(m.map&&typeof m.map==='object') for(const k of Object.keys(m.map)){ if(k!==mp.me.id&&typeof m.map[k]==='string') avSet(k,m.map[k]); } renderLobby(); updateStrip(); }
+  else if(m.t==='reveal'){ if(m.add) for(const a of m.add) state.locs[a.i]=a.loc; mp.phase='reveal'; showResultMP(m); }
   else if(m.t==='final'){ showFinalMP(m); }
   else if(m.t==='lobby-return'){ mpToLobby(); }
 }
@@ -3686,11 +4428,11 @@ function runCountdown(secs,done){
   mp.cd=setInterval(()=>{ mp.cdLeft--; if(mp.cdLeft<=0){ clearInterval(mp.cd); mp.cd=null; done(); } else paint(); },1000);
 }
 async function mpStartGameLocal(settings,locs){
-  state.mode=settings.mode||'classic';
+  state.mode=settings.mode||'classic'; state.custom=settings.custom||null;
   resetGameState();
-  state.timeLimit=settings.time; state.totalRounds=settings.rounds; state.locs=locs.map(l=>({...l}));
+  state.timeLimit=settings.time; state.totalRounds=modeOf(state.mode).duel?99:settings.rounds; state.locs=locs.map(l=>({...l}));
   state.nomove=!!settings.nomove; state.lock=!!settings.lock;
-  mp.guesses={};
+  mp.guesses={}; mp.revs=[];
   const mm=modeOf(state.mode);
   if(mm.country){ try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); } }
   show('game'); $('hudBrand').hidden=true; $('strip').hidden=false; $('waitOverlay').hidden=true; updateStrip();
@@ -3731,9 +4473,34 @@ function paintLives(){
   livesShown=left;
   return true;
 }
+/* Duel HUD: two health bars where the round and score pills usually sit. */
+function paintDuel(){
+  const on=!!(mp.role&&modeOf(state.mode).duel); $('duelHud').hidden=!on; $('roundPill').hidden=on; $('scorePill').hidden=on; if(!on) return;
+  const me=mp.players[mp.me.id], them=playerList().find(p=>p.id!==mp.me.id);
+  const side=(el,p,mine)=>{ if(!p){ el.innerHTML=''; return; } const hp=Math.max(0,p.hp??DUEL_HP); const pct=hp/DUEL_HP*100;
+    el.innerHTML=`${avTag(p.id,p.name,28)}<span class="dt"><b class="dn">${mine?'You':esc(p.name||'Opponent')}</b><span class="dhp">${hp.toLocaleString()} HP</span><span class="dbar"><i class="${pct<=25?'low':''}" style="width:${pct}%"></i></span></span>`; };
+  side($('duelMe'),me,true); side($('duelThem'),them,false);
+  const mult=duelMult(state.round||1); const dm=$('duelMult'); dm.textContent='×'+mult; dm.classList.toggle('hot',mult>=2);
+}
+/* Blind: which half of the game this player gets this round. */
+function blindRole(){
+  if(!mp.role||!modeOf(state.mode).blind) return null;
+  const b=mp.settings.blind||{eyes:'host',swap:true}; let eyes=b.eyes||'host';
+  if(b.swap&&state.round%2===0){ const o=playerList().find(p=>p.id!==eyes); if(o) eyes=o.id; }
+  return mp.me.id===eyes?'eyes':'map';
+}
+function applyBlind(){
+  const role=blindRole(); const g=$('game');
+  g.classList.toggle('blind-eyes',role==='eyes'); g.classList.toggle('blind-map',role==='map');
+  const h=$('blindHint'); h.hidden=!role;
+  if(role){ const o=playerList().find(p=>p.id!==mp.me.id); const on=o&&o.name?esc(o.name):'your partner';
+    h.innerHTML=role==='eyes'?`<b>You're the eyes.</b> Describe what you see — ${on} has the map.`:`<b>You're the map.</b> Listen to ${on}, then drop the pin.`;
+    if(role==='map'){ $('mappanel').classList.add('open','pinned'); $('pinBtn').classList.add('on'); state.fitDone=false; setTimeout(()=>{ guessMap.invalidateSize(); guessMap.fitBounds([[-55,-170],[72,180]],{animate:false}); state.fitDone=true; },80); }
+    else { $('mappanel').classList.remove('open','pinned'); $('pinBtn').classList.remove('on'); } }
+}
 function updateStrip(){
   const el=$('strip'); if(!mp.role) return;
-  paintLives();
+  paintLives(); paintDuel();
   el.innerHTML=playerList().map(p=>{ const av=p.face?avOf(p.id):null; const done=mp.guesses[p.id]!==undefined&&!p.out;
     const face=p.out?'✕':(done?'✓':(av?'':esc((p.name||'?')[0].toUpperCase())));
     const bg=av&&!p.out&&!done?`background-image:url(${av});background-size:cover;`:'';
@@ -3744,9 +4511,20 @@ function updateWaitList(n,total){
   $('waitList').innerHTML=ps.map(p=>`<div class="prow" style="padding:6px 10px"><span class="sw" style="${swStyle(p)}"></span><span class="pn">${esc(p.name||'…')}</span><span class="${mp.guesses[p.id]!==undefined?'ok':'tag'}">${mp.guesses[p.id]!==undefined?'✓ guessed':'thinking'}</span></div>`).join('');
   const w=$('waitTxt'); if(w.textContent.indexOf('Waiting')>=0) w.textContent=`Waiting for the others… ${done}/${total||ps.length} in`;
 }
+function renderBlindSetup(){
+  const on=mp.role==='host'&&mp.settings.mode==='blind'; $('blindSetup').hidden=!on; if(!on) return;
+  const ps=playerList(); const b=mp.settings.blind||(mp.settings.blind={eyes:'host',swap:true});
+  if(!ps.some(p=>p.id===b.eyes)) b.eyes='host';
+  $('blindSeg').innerHTML=ps.map(p=>{ const o=ps.find(q=>q.id!==p.id); return `<button data-eyes="${p.id}" class="${b.eyes===p.id?'on':''}">${esc(p.name||'…')} looks · ${esc((o&&o.name)||'…')} pins</button>`; }).join('');
+  $('blindSwap').classList.toggle('on',!!b.swap);
+}
 function renderLobby(){
   const ps=playerList();
-  $('pcount').textContent=ps.length?`(${ps.length}/10)`:'';
+  const duo=mp.settings.kind==='duo', cap=duo?2:10, lm=modeOf(mp.settings.mode);
+  $('pcount').textContent=ps.length?`(${ps.length}/${cap})`:'';
+  $('plistTitle').textContent=duo?(lm.blind?'Partner':'Opponent'):'Players';
+  if($('mpRoundsBox')) $('mpRoundsBox').hidden=!!lm.duel;
+  renderBlindSetup();
   const pend=Object.keys(mp.pending||{}).filter(id=>!mp.players[id]);
   $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}">${avTag(p.id,p.name,26)}<span class="sw" style="${p.color===null&&!p.face?'background:#cfd8d2':swStyle(p)}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
   const meP=ps.find(p=>p.id===mp.me.id), myAv=avOf(mp.me.id)||acct.av;
@@ -3754,10 +4532,15 @@ function renderLobby(){
   $('swatches').innerHTML=faceTile+COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i&&!p.face); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
     return `<div class="swatch ${mine?'mine':''} ${taken?'taken':''}" data-i="${i}" style="background:${c}" ${taken?`data-owner="${esc(owner.name||'taken')}"`:''} title="${n}">${mine?'✓':''}</div>`; }).join('');
   paintRules($('mpRules'),mp.settings); paintRegion();
-  if(mp.role==='host'){ mpTimePick.mark(mp.settings.time); mpRoundPick.mark(mp.settings.rounds); const cur=mp.settings.mode||'classic'; markTiles($('lobbyModeGrid'),cur); $('mpStartBtn').textContent=`Start ${modeOf(cur).name} game`; }
-  else { const m=modeOf(mp.settings.mode); $('guestPanel').textContent=`Waiting for the host to start… (${m.name} · ${mp.settings.rounds} rounds · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`; }
+  if(mp.role==='host'){ mpTimePick.mark(mp.settings.time); mpRoundPick.mark(mp.settings.rounds); const cur=mp.settings.mode||'classic'; markTiles($('lobbyModeGrid'),cur);
+    const cmm=modeOf(cur); $('mpStartBtn').textContent=cmm.duel?'Start the duel':cmm.blind?'Start Blind':cmm.custom&&mp.settings.custom?`Start ${mp.settings.custom.name}`:`Start ${cmm.name} game`;
+    $('lobbyCustomBtn').classList.toggle('on',!!(cmm.custom&&mp.settings.custom)); $('lobbyCustomBtn').querySelector('b').textContent=cmm.custom&&mp.settings.custom?`Custom map: ${mp.settings.custom.name}`:'Custom maps'; }
+  else { const m=modeOf(mp.settings.mode); const host=ps.find(p=>p.host); const what=m.custom&&mp.settings.custom?mp.settings.custom.name:m.name;
+    $('guestPanel').textContent=`Waiting for ${duo&&host&&host.name?host.name:'the host'} to start… (${what}${m.duel?'':' · '+mp.settings.rounds+' rounds'} · ${mp.settings.time?mp.settings.time+'s':'no limit'} per round)`; }
 }
-function mpToLobby(){ setTimeout(sendAvatar,400);
+$('blindSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b||mp.role!=='host') return; mp.settings.blind.eyes=b.dataset.eyes; hostSync(); sfx('click'); });
+$('blindSwap').addEventListener('click',()=>{ if(mp.role!=='host') return; mp.settings.blind.swap=!mp.settings.blind.swap; hostSync(); sfx('click'); });
+function mpToLobby(){ setTimeout(sendAvatar,400); mp.duelDone=true;
   mp.phase='lobby'; mp.starting=false; mp.locPromise=null; mp.guesses={}; for(const p of playerList()){ p.score=0; p.out=false; p.outRound=null; p.lives=null; }
   $('countdown').hidden=true; $('mpStartBtn').disabled=false;
   $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
@@ -3766,7 +4549,8 @@ function mpToLobby(){ setTimeout(sendAvatar,400);
 
 /* ----- multiplayer result screens ----- */
 function showResultMP(rev){
-  show('result'); $('nextBtn').hidden=mp.role!=='host'; $('nextWait').hidden=mp.role==='host'; $('roundRank').hidden=false;
+  mp.revs=mp.revs||[]; if(!mp.revs.some(x=>x.round===rev.round)) mp.revs.push(rev);
+  show('result'); $('clueBox').hidden=true; $('nextBtn').hidden=mp.role!=='host'; $('nextWait').hidden=mp.role==='host'; $('roundRank').hidden=false;
   if(rev.players){ for(const p of rev.players){ if(mp.players[p.id]) Object.assign(mp.players[p.id],p); } updateStrip(); paintLives(); }
   if(rev.lie!=null&&rev.extra){ showTrioResultMP(rev); return; }
   if(rev.truthCountry!==undefined){ showCountryResultMP(rev); return; }
@@ -3779,7 +4563,7 @@ function showResultMP(rev){
   const hid=false; const pts=[rev.truth]; const lines=[];
   for(const r of rev.results){ if(!r.guess) continue; pts.push(r.guess);
     if(!hid){ L.polyline([r.guess,rev.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
-    lines.push(L.polyline([r.guess,rev.truth],{color:COLORS[r.color??0][0],weight:3,opacity:1}).addTo(resultLayer)); }
+    lines.push(L.polyline([r.guess,rev.truth],{color:lineColor(r),weight:3,opacity:1}).addTo(resultLayer)); }
     L.marker(r.guess,{icon:playerIcon(r)}).addTo(resultLayer).bindTooltip(r.name,{direction:'top',offset:[0,-40]});
   }
   if(!hid) L.marker(rev.truth,{icon:trueIcon}).addTo(resultLayer);
@@ -3803,9 +4587,24 @@ function showResultMP(rev){
   const lead=overall[0]; const myPos=overall.findIndex(r=>r.id===mp.me.id)+1; const tied=overall.length>1&&overall[1].total===lead.total;
   const ord=n=>n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
   $('leaderLine').hidden=false;
-  $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="${swStyle(lead)}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
+  if(modeOf(state.mode).blind){ $('leaderLine').innerHTML=`<span class="crown" style="background:var(--green-soft);color:var(--green-dark)">Together · <b>${lead.total.toLocaleString()}</b></span><span>${rev.round<state.totalRounds?`${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:'last round'}</span>`;
+    $('roundRank').innerHTML=''; return; }
+  if(rev.duel){ const me=mp.players[mp.me.id], them=playerList().find(p=>p.id!==mp.me.id); const hp=p=>Math.max(0,(p&&p.hp)??DUEL_HP).toLocaleString();
+    $('leaderLine').innerHTML=`<span class="crown" style="background:var(--green-soft);color:var(--green-dark)">You · <b>${hp(me)} HP</b></span><span>${them?esc(them.name)+' · <b>'+hp(them)+' HP</b>':''}</span><span>Round ${rev.round} · damage ×${rev.duel.mult}</span>`; }
+  else $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="${swStyle(lead)}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=elimBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out||r.lives!=null?' '+heartRow(r.lives??0,modeOf(state.mode).lives||3,!!r.out,14):''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
+  $('roundRank').innerHTML=elimBanner(rev)+duelBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out||r.lives!=null?' '+heartRow(r.lives??0,modeOf(state.mode).lives||3,!!r.out,14):''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
+}
+/* Duel: who took the hit this round, and how hard. */
+function duelBanner(rev){
+  const d=rev.duel; if(!d) return '';
+  paintDuel();
+  const mine=d.loser===mp.me.id; const them=playerList().find(p=>p.id!==mp.me.id); const tn=them&&them.name?esc(them.name):'Your opponent';
+  if(!d.loser||!d.dmg) return `<div class="duelrow even">Even round — no damage</div>`;
+  const left=d.hp&&d.hp[d.loser]!=null?d.hp[d.loser]:null; const ko=left!=null&&left<=0;
+  if(mine){ sfx(ko?'out':'hurt'); return `<div class="duelrow">You take <b>${d.dmg.toLocaleString()}</b> damage · ×${d.mult}${ko?' · knocked out':''}</div>`; }
+  sfx('great');
+  return `<div class="duelrow win">You deal <b>${d.dmg.toLocaleString()}</b> damage to ${tn} · ×${d.mult}${ko?' · knockout!':''}</div>`;
 }
 /* One line on the result screen naming whoever just lost a life or got knocked out. */
 function elimBanner(rev){
@@ -3826,32 +4625,47 @@ function elimBanner(rev){
   return `<div class="elimrow ${mine?'me':''}">${mine?"You're knocked out":names+(e.ids.length===1?' is':' are')+' knocked out'} · ${far}</div>`;
 }
 function showFinalMP(fin){
-  show('final'); $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true; $('viewBoardBtn').hidden=false;
+  bumpStreak();
+  show('final'); $('finalRival').hidden=true; $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true; $('viewBoardBtn').hidden=false;
   $('againBtn').hidden=mp.role!=='host'; $('finalWait').hidden=mp.role==='host'; $('againBtn').textContent='Back to lobby';
   const max=state.totalRounds*5000;
   if(!finalMap) finalMap=makeMap('finalmap');
   if(finalLayer) finalLayer.remove();
   finalLayer=L.layerGroup().addTo(finalMap);
   const pts=[];
-  for(const r of state.results){ pts.push(r.truth); L.marker(r.truth,{icon:trueIcon}).addTo(finalLayer); }
+  /* Every round's real spot, and every player's guess for it, each line in that player's colour. */
+  const revs=(mp.revs&&mp.revs.length)?mp.revs:state.results.map(r=>({truth:r.truth,results:[]}));
+  for(const rev of revs){ pts.push(rev.truth); L.marker(rev.truth,{icon:trueIcon}).addTo(finalLayer);
+    for(const r of rev.results||[]){ if(!r.guess||r.guess.lat==null) continue; pts.push(r.guess);
+      L.polyline([r.guess,rev.truth],{color:'#fff',weight:5,opacity:.9}).addTo(finalLayer);
+      L.polyline([r.guess,rev.truth],{color:lineColor(r),weight:2.5,opacity:1}).addTo(finalLayer);
+      L.marker(r.guess,{icon:playerIcon(r)}).addTo(finalLayer).bindTooltip(r.name||'',{direction:'top',offset:[0,-40]}); } }
   const fit=()=>{ finalMap.invalidateSize(); if(pts.length) finalMap.fitBounds(L.latLngBounds(pts),{padding:[60,60]}); };
   fit(); setTimeout(fit,150);
   $('finalPct').innerHTML=pctLine(state.mode,'g',state.score/max*50,'finished '+modeOf(state.mode).name+' games');
-  const elimMode=!!modeOf(state.mode).elim;
-  const ps=fin.players.slice().sort((a,b)=> elimMode ? ((a.out?1:0)-(b.out?1:0))||((b.outRound||0)-(a.outRound||0))||((b.lives??0)-(a.lives??0))||(b.score-a.score) : b.score-a.score);
+  const fm=modeOf(state.mode); const elimMode=!!fm.elim, duelMode=!!fm.duel, blindMode=!!fm.blind;
+  const ps=fin.players.slice().sort((a,b)=> duelMode ? ((b.hp??0)-(a.hp??0))||(b.score-a.score) : elimMode ? ((a.out?1:0)-(b.out?1:0))||((b.outRound||0)-(a.outRound||0))||((b.lives??0)-(a.lives??0))||(b.score-a.score) : b.score-a.score);
   const winner=ps[0]; const me=ps.find(p=>p.id===mp.me.id)||{score:0};
-  $('finalMax').textContent=`/ ${max.toLocaleString()}`;
-  $('finalBar').style.width='0%'; countUp($('finalNum'),0,me.score,1400);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('finalBar').style.width=(me.score/max*100)+'%'; }));
+  const shown=duelMode?Math.max(0,me.hp??0):me.score, shownMax=duelMode?DUEL_HP:max;
+  $('finalMax').textContent=duelMode?`/ ${DUEL_HP.toLocaleString()} HP left`:`/ ${max.toLocaleString()}`;
+  $('finalBar').style.width='0%'; countUp($('finalNum'),0,shown,1400);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('finalBar').style.width=(shown/shownMax*100)+'%'; }));
+  if(duelMode) $('finalPct').innerHTML='';
   const fv=$('finalVerdict'); const iWon=winner&&winner.id===mp.me.id;
   const lastStanding=elimMode&&ps.filter(p=>!p.out).length===1;
-  fv.textContent = lastStanding ? (iWon?'🏆 Last one standing!':`${winner?winner.name:'Someone'} is the last one standing`) : (iWon ? '🏆 You win!' : `${winner?winner.name:'Someone'} wins`);
-  fv.className='verdict '+(iWon?'good':'mid');
+  const wn=winner?esc(winner.name):'Someone';
+  if(duelMode){ const ko=ps.some(p=>(p.hp??0)<=0); fv.innerHTML = iWon ? (ko?'🏆 Knockout — you win the duel':'🏆 You win the duel') : `${wn} wins the duel${ko?' by knockout':''}`; }
+  else if(blindMode){ const pct=state.score/max; fv.textContent = pct>=.9?'Perfect teamwork':pct>=.7?'Great teamwork':pct>=.5?'Not bad, you two':'Talk more next time'; }
+  else fv.textContent = lastStanding ? (iWon?'🏆 Last one standing!':`${winner?winner.name:'Someone'} is the last one standing`) : (iWon ? '🏆 You win!' : `${winner?winner.name:'Someone'} wins`);
+  fv.className='verdict '+(duelMode?(iWon?'good':'bad'):blindMode?(state.score/max>=.6?'good':'mid'):(iWon?'good':'mid'));
   plainStyle(finalMap,false);
-  if(iWon) setTimeout(confetti,900);
-  $('signUp').hidden=canSave(); $('saveRow').hidden=true;
-  if(canSave()&&!state.saved){ const e=recordScore(acct.name); state.saved=true; state.savedId=e.id; }
-  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(p)}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd" title="${p.out?'knocked out in round '+p.outRound:'still standing'}">${modeOf(state.mode).lives?heartRow(p.lives??0,modeOf(state.mode).lives,!!p.out,17):heartRow(p.out?0:1,1,!!p.out,17)}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
+  if((iWon&&!blindMode)||(blindMode&&state.score/max>=.7)) setTimeout(confetti,900);
+  $('signUp').hidden=canSave()||duelMode; $('saveRow').hidden=true;
+  if(canSave()&&!state.saved&&!duelMode&&!state.custom){ const e=recordScore(acct.name); state.saved=true; state.savedId=e.id; }
+  if(duelMode||state.custom) $('viewBoardBtn').hidden=true;
+  if(state.custom){ $('signUp').hidden=true; cmapFinish(); }
+  paintShare();
+  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(p)}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd" title="${p.out?'knocked out in round '+p.outRound:'still standing'}">${modeOf(state.mode).lives?heartRow(p.lives??0,modeOf(state.mode).lives,!!p.out,17):heartRow(p.out?0:1,1,!!p.out,17)}</span>`:''}${duelMode?`<span class="rd">${Math.max(0,p.hp??0).toLocaleString()} HP<span class="hpmini"><i style="width:${Math.max(0,p.hp??0)/DUEL_HP*100}%"></i></span></span>`:''}<span class="rp">${duelMode?p.score.toLocaleString()+' pts':p.score.toLocaleString()}</span></div>`).join('');
 }
 
 /* =========================================================
@@ -4017,34 +4831,52 @@ async function copyText(t,btn,label){ try{ await navigator.clipboard.writeText(t
 $('copyLink').addEventListener('click',()=>copyText(inviteLink(),$('copyLink'),'Copy invite link'));
 $('copyCode').addEventListener('click',()=>copyText(mp.code,$('copyCode'),'Copy code'));
 // Auto-join from an invite link: pinpoint.example/?join=ABCD
-(function(){ const c=new URLSearchParams(location.search).get('join'); if(c&&/^[A-Za-z]{4}$/.test(c)){ $('joinCode').value=c.toUpperCase(); history.replaceState(null,'',location.pathname); setTimeout(()=>mpJoin(c),300); } })();
-$('hostBtn').addEventListener('click',()=>mpHost());
+(function(){ const q=new URLSearchParams(location.search); const c=q.get('join'); if(c&&/^[A-Za-z]{4}$/.test(c)){ $('joinCode').value=c.toUpperCase(); history.replaceState(null,'',location.pathname); setTimeout(()=>mpJoin(c),300); }
+  const ch=q.get('c'); if(ch&&/^[a-z0-9]{6,12}$/i.test(ch)){ history.replaceState(null,'',location.pathname); setTimeout(()=>chalOpen(ch),200); }
+  const cm=q.get('m'); if(cm&&/^[a-z0-9]{6,12}$/i.test(cm)){ history.replaceState(null,'',location.pathname); setTimeout(()=>cmapOpen(cm),200); } })();
+$('hostBtn').addEventListener('click',()=>mpHost('party'));
+$('duoBtn').addEventListener('click',()=>mpHost('duo'));
 $('joinBtn').addEventListener('click',()=>mpJoin($('joinCode').value));
+$('joinBtn2').addEventListener('click',()=>mpJoin($('joinCode2').value));
 $('joinCode').addEventListener('keydown',e=>{ if(e.key==='Enter') mpJoin($('joinCode').value); });
+$('joinCode2').addEventListener('keydown',e=>{ if(e.key==='Enter') mpJoin($('joinCode2').value); });
 $('leaveBtn').addEventListener('click',()=>{ mpLeave(); show('menu'); });
 window.addEventListener('pagehide',()=>{ if(mp.role) mpLeave(); });
 $('mpName').addEventListener('input',()=>{ mp.me.name=$('mpName').value.trim().slice(0,16); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
 /* Share your photo once the room knows who you are. */
-function sendAvatar(){ if(mp.role&&acct.av){ avCache[mp.me.id]=acct.av; mpSend({t:'av',av:acct.av}); } }
+function sendAvatar(){ if(mp.role&&acct.av){ avSet(mp.me.id,acct.av); mpSend({t:'av',av:acct.av}); } }
 $('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return;
   const me=mp.players[mp.me.id];
   if(sw.dataset.i==='av'){ if(me&&me.face) return; mpSend({t:'color',color:'av'}); if(mp.role==='guest'&&me){ me.face=true; me.color=null; renderLobby(); } return; }
   const i=+sw.dataset.i; const drop=me&&!me.face&&me.color===i;
   mpSend({t:'color',color:drop?null:i});
   if(mp.role==='guest'){ mp.me.color=drop?null:i; if(me){ me.color=drop?null:i; me.face=false; renderLobby(); } } });
-function modeTiles(withMp){ return Object.entries(MODES).filter(([id,m])=>withMp||!m.mp).map(([id,m])=>`<button class="tile" data-mode="${id}" style="background-image:url(images/mode-${id}.jpg)" title="${m.name}"><span class="ribbon">${m.name}</span><span class="cap">${m.desc}</span></button>`).join(''); }
+/* Which modes a screen offers: solo gets everything single-player, a party adds the crowd modes, a duo gets its own two first. */
+function modeTiles(kind){
+  let ids=Object.keys(MODES).filter(id=>{ const m=MODES[id]; if(m.hide) return false; if(kind==='duo') return !!m.duo||!m.mp; if(kind==='party') return !m.duo; return !m.mp; });
+  if(kind==='duo') ids=ids.filter(id=>MODES[id].duo).concat(ids.filter(id=>!MODES[id].duo));
+  return ids.map(id=>{ const m=MODES[id]; return `<button class="tile" data-mode="${id}" style="background-image:url(images/mode-${id}.jpg)" title="${m.name}"><span class="ribbon">${m.name}</span><span class="cap">${m.desc}</span></button>`; }).join('');
+}
 function markTiles(grid,id){ [...grid.children].forEach(t=>t.classList.toggle('on',t.dataset.mode===id)); }
-$('modeGrid').innerHTML=modeTiles(false);
-function setSoloMode(id){ state.mode=id; markTiles($('modeGrid'),id); $('startBtn').textContent='Play '+modeOf(id).name; if(modeOf(id).country) loadGeo().catch(()=>{}); }
+$('modeGrid').innerHTML=modeTiles('solo');
+function setSoloMode(id){ state.mode=id; state.custom=null; markTiles($('modeGrid'),id); $('startBtn').textContent='Play '+modeOf(id).name; if(modeOf(id).country) loadGeo().catch(()=>{}); }
 $('modeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); if(b) setSoloMode(b.dataset.mode); });
-$('soloBtn').addEventListener('click',()=>{ setSoloMode('classic'); paintRegion(); show('setup'); $('setup').scrollTo(0,0); });
+/* The same setup screen serves Solo and Learn; Learn just hides the mode grid and explains itself. */
+function openSetup(learn){
+  setSoloMode(learn?'learn':'classic'); paintRegion();
+  $('learnCard').hidden=!learn; document.querySelector('#setup .card.modes').hidden=!!learn; $('setupTitle').textContent=learn?'Learn':'Pinpoint';
+  if(learn) $('startBtn').textContent='Start learning';
+  show('setup'); $('setup').scrollTo(0,0);
+}
+$('soloBtn').addEventListener('click',()=>openSetup(false));
+$('learnBtn').addEventListener('click',()=>openSetup(true));
 $('setupBack').addEventListener('click',()=>show('menu'));
-$('lobbyModeGrid').innerHTML=modeTiles(true);
-function setLobbyMode(id){ mp.settings.mode=id; if(!regionOK(id)) mp.settings.region={type:'all',value:null}; const m=modeOf(id); if(m.time!=null) mp.settings.time=m.time; if(m.rounds!=null) mp.settings.rounds=m.rounds; mp.locPromise=null; if(m.country) loadGeo().catch(()=>{}); hostSync(); }
+$('lobbyModeGrid').innerHTML=modeTiles('party');
+function setLobbyMode(id){ mp.settings.mode=id; if(!regionOK(id)) mp.settings.region={type:'all',value:null}; const m=modeOf(id); if(m.time!=null) mp.settings.time=m.time; if(m.rounds!=null) mp.settings.rounds=m.rounds; if(!m.custom) mp.settings.custom=null; mp.locPromise=null; if(m.country) loadGeo().catch(()=>{}); hostSync(); }
 $('lobbyModeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); if(b) setLobbyMode(b.dataset.mode); });
 const mpTimePick=picker('mpTimeSeg','mpTimeCustom','t',1,180,v=>{ mp.settings.time=v; hostSync(); });
 const mpRoundPick=picker('mpRoundSeg','mpRoundCustom','r',1,100,v=>{ mp.settings.rounds=v; hostSync(); });
-$('mpStartBtn').addEventListener('click',()=>{ if(playerList().length<2){ toast('You need at least one more player'); return; } hostStartGame(); });
+$('mpStartBtn').addEventListener('click',()=>{ if(playerList().length<2){ toast(mp.settings.kind==='duo'?'Your opponent hasn\'t joined yet':'You need at least one more player'); return; } hostStartGame(); });
 
 /* ---------- Menu extras: live hero panorama (double-buffered) + page loader ---------- */
 const heroFrames=[document.getElementById('hero0'),document.getElementById('hero1')];
@@ -4093,7 +4925,8 @@ function toast(msg,kind){ const t=document.createElement('div'); t.className='to
 /* First paint of the pieces defined further down the file. */
 paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion(); paintAcct();
 paintBell(); setTimeout(paintBell,0);   // the daily's state settles a tick after the rest of the boot
-setTimeout(()=>{ paintBell(); if(acct.key){ socWarming=null; socWarm(); loadInbox(); } },4000);   // the brokers are up by now
+setTimeout(()=>{ paintBell(); if(acct.key){ socWarming=null; socWarm(); loadInbox(); } else fetchDirectory().then(lbPaint); },4000);   // the brokers are up by now
+setInterval(()=>{ fetchDirectory().then(lbPaint); },6*60*1000);   // streaks on the boards stay current
 setInterval(()=>{ paintBell(); if(acct.key&&!notes.open) loadInbox(); },90000);
 
 </script>
