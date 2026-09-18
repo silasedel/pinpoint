@@ -1039,7 +1039,7 @@
     </div>
     <button class="learnbar" id="learnBtn">
       <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
-      <span class="ll"><b>Learn</b><span>Play like normal, and after every round see the two or three things that gave the country away.</span></span>
+      <span class="ll"><b>Learn</b><span>Hand-picked spots. After every round, the two or three things in that view that gave it away.</span></span>
       <span class="lr">Open</span>
     </button>
     <button class="learnbar" id="makeBar">
@@ -1090,7 +1090,7 @@
             <button class="btn btn-secondary sm" id="avPick">Choose photo</button>
             <button class="btn btn-secondary sm" id="avClear">Remove</button>
             <button class="btn btn-secondary sm" id="nameEdit">Edit name</button>
-            <button class="btn btn-secondary sm" id="colorEdit" hidden><span class="cdot" id="colorDot"></span>Line colour</button>
+            <button class="btn btn-secondary sm" id="colorEdit" hidden><span class="cdot" id="colorDot"></span>Line color</button>
           </div>
         </div>
       </div>
@@ -1098,7 +1098,7 @@
       <div id="colorBox" hidden>
         <div class="rsub" style="margin:4px 0 10px">Your lines on the map, wherever your photo is your token. Tap or drag on the wheel.</div>
         <div class="wheelwrap"><canvas id="wheel" width="240" height="240"></canvas>
-          <div class="wheelside"><div class="cprev" id="cprev"><span class="pav" id="cprevAv"></span></div><div class="cval" id="cval"></div><button class="btn btn-primary sm" id="colorSave">Use this colour</button><button class="btn btn-secondary sm" id="colorAuto">Pick from photo</button></div>
+          <div class="wheelside"><div class="cprev" id="cprev"><span class="pav" id="cprevAv"></span></div><div class="cval" id="cval"></div><button class="btn btn-primary sm" id="colorSave">Use this color</button><button class="btn btn-secondary sm" id="colorAuto">Pick from photo</button></div>
         </div>
       </div>
       <div id="nameBox" hidden><div class="prow2"><input class="tin" id="nameNew" maxlength="16" placeholder="New display name" spellcheck="false"><button class="btn btn-primary" id="nameSave">Save</button></div></div>
@@ -1131,7 +1131,7 @@
         <div class="acctmsg" id="adminMsg"></div>
       </div>
       <div id="adminOn" hidden>
-        <div class="rsub" style="margin-top:8px">Admin mode is on for this visit. Every leaderboard row and every custom map now has a red trash button. Removed scores go on a block list that every player's browser honours, so they stay gone.</div>
+        <div class="rsub" style="margin-top:8px">Admin mode is on for this visit. Every leaderboard row and every custom map now has a red trash button. Removed scores go on a block list that every player's browser honors, so they stay gone.</div>
         <div class="label">Remove an account by handle</div>
         <div class="prow2"><input class="tin" id="adminAcct" placeholder="handle" autocomplete="off" spellcheck="false"><button class="btn btn-secondary danger" id="adminAcctGo">Remove</button></div>
         <div class="acctmsg" id="adminMsg2"></div>
@@ -1290,7 +1290,7 @@
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px" id="setupTitle">Pinpoint</b></div><button class="btn btn-secondary" id="setupBack" style="margin-left:auto">Back</button></div>
     <div class="card learncard" id="learnCard" hidden>
       <h2 style="margin:0">Learn</h2>
-      <p>A normal game, pick a time and a length, but every round ends with the two or three things that give that place away and where in the country they hold: the side of the road, the lines, the plates, the script, the bollards, the land. Ninety-six countries, and you'll never see the same spot twice.</p>
+      <p>A normal game, pick a time and a length, on a set of hand-picked spots. Every round ends with the two or three things in that exact view that give the place away, and where else you'd see them. New spots come first, so you won't repeat one until you've seen them all.</p>
     </div>
     <div class="card">
       <div class="label" style="margin-top:0">Time per round</div>
@@ -1690,14 +1690,14 @@ const SNOW_SOUTH=[];   // southern-hemisphere roads are rarely white when Google
 const HIGH=[['Bolivian Altiplano',-20,-15,-69.5,-66],['Peru Highlands',-16,-10,-76,-70],['Ecuador Highlands',-2.5,0.5,-79.2,-78],['Bogotá Highlands',4.3,5.9,-74.6,-73.5],['Chilean Altiplano',-24,-18,-70,-67.5],['Jujuy',-24.5,-22.5,-66.5,-65],['Mexican Highlands',19,19.9,-99.6,-98.5],['Colorado Rockies',37.5,40.5,-108,-105],['Wasatch',40.4,41,-111.8,-111.4],['Yellowstone',43.8,45,-111,-109.5],['Sierra Nevada',37.5,38.5,-119.8,-119],['Swiss Alps',45.9,46.6,7.2,10.3],['Tyrol',46.8,47.3,10,12.5],['Dolomites',46.3,46.7,11.4,12.3],['French Alps',44.9,45.9,6.4,7.1],['Andorra',42.45,42.65,1.45,1.75],['Nepal',27.4,28.3,84,86.5],['Bhutan',27.2,27.7,89.4,90.6],['Ladakh & Himachal',31.5,34.3,76.5,78.5],['Kyrgyzstan',41.2,42.7,74,78],['Almaty Mountains',42.9,43.25,76.8,77.3],['Ethiopian Highlands',8.5,10.2,37.5,39.5],['Lesotho',-30.2,-28.7,27.3,29.3],['Drakensberg',-29.7,-28.5,28.9,29.6],['Eastern Anatolia',38.5,40,41,44],['Caucasus',41.9,42.7,43.3,45.5],['Western Mongolia',46,50,88,96],['Rwanda',-2.5,-1.3,29.2,30],['Kenya Highlands',-1.5,0.5,35.5,37.5],['Mauna Kea',19.7,19.85,-155.55,-155.4],['Hehuanshan',24.1,24.2,121.2,121.35],['Japanese Alps',36.1,36.8,137.4,137.9]];
 /* Truly dense cores only: the picks stay within about three quarters of a mile of these points. */
 const DENSE=[['Manhattan',40.755,-73.985],['Downtown Chicago',41.882,-87.63],['Downtown Toronto',43.65,-79.382],['Downtown San Francisco',37.789,-122.401],['Central Tokyo',35.69,139.7],['Shinjuku',35.694,139.7],['Shibuya',35.659,139.7],['Osaka Umeda',34.702,135.497],['Seoul Gangnam',37.498,127.028],['Seoul Jongno',37.57,126.985],['Hong Kong Central',22.282,114.158],['Mong Kok',22.319,114.17],['Taipei Xinyi',25.034,121.565],['Singapore CBD',1.284,103.851],['Bangkok Silom',13.728,100.53],['Kuala Lumpur KLCC',3.157,101.712],['Jakarta Thamrin',-6.195,106.823],['Manila Makati',14.556,121.023],['Ho Chi Minh District 1',10.775,106.7],['Mumbai Fort',18.935,72.835],['Delhi Connaught Place',28.632,77.219],['Dubai Marina',25.08,55.14],['Istanbul Beyoğlu',41.036,28.978],['Paris Opéra',48.871,2.332],['London City',51.514,-0.09],['Madrid Sol',40.417,-3.703],['Barcelona Eixample',41.392,2.165],['Milan Duomo',45.464,9.19],['Berlin Mitte',52.52,13.405],['Vienna Innere Stadt',48.208,16.372],['Prague Old Town',50.087,14.42],['Warsaw Śródmieście',52.232,21.012],['Moscow Tverskaya',55.762,37.606],['Mexico City Centro',19.433,-99.14],['São Paulo Centro',-23.548,-46.638],['Buenos Aires Microcentro',-34.604,-58.38],['Santiago Centro',-33.44,-70.65],['Bogotá Centro',4.6,-74.075],['Lima Centro',-12.047,-77.031],['Johannesburg CBD',-26.205,28.04],['Nairobi CBD',-1.284,36.82],['Cairo Downtown',30.045,31.238],['Sydney CBD',-33.868,151.208],['Melbourne CBD',-37.814,144.963]];
-/* Capitals: capital cities with official coverage. Picks land within about 2 km of the centre. [name, lat, lng] */
+/* Capitals: capital cities with official coverage. Picks land within about 2 km of the center. [name, lat, lng] */
 const CAPITALS=[['London',51.5074,-0.1278],['Paris',48.8566,2.3522],['Berlin',52.52,13.405],['Madrid',40.4168,-3.7038],['Rome',41.9028,12.4964],['Lisbon',38.7223,-9.1393],['Amsterdam',52.3676,4.9041],['Brussels',50.8503,4.3517],['Vienna',48.2082,16.3738],['Bern',46.948,7.4474],['Prague',50.0755,14.4378],['Warsaw',52.2297,21.0122],['Budapest',47.4979,19.0402],['Bratislava',48.1486,17.1077],['Ljubljana',46.0569,14.5058],['Zagreb',45.815,15.9819],['Belgrade',44.7866,20.4489],['Sarajevo',43.8563,18.4131],['Podgorica',42.4304,19.2594],['Skopje',41.9981,21.4254],['Tirana',41.3275,19.8187],['Athens',37.9838,23.7275],['Sofia',42.6977,23.3219],['Bucharest',44.4268,26.1025],['Kyiv',50.4501,30.5234],['Vilnius',54.6872,25.2797],['Riga',56.9496,24.1052],['Tallinn',59.437,24.7536],['Helsinki',60.1699,24.9384],['Stockholm',59.3293,18.0686],['Oslo',59.9139,10.7522],['Copenhagen',55.6761,12.5683],['Reykjavík',64.1466,-21.9426],['Dublin',53.3498,-6.2603],['Luxembourg',49.6116,6.1319],['Valletta',35.8989,14.5146],['Andorra la Vella',42.5063,1.5218],['Monaco',43.7384,7.4246],['San Marino',43.9356,12.4473],['Vaduz',47.141,9.5209],['Moscow',55.7558,37.6173],['Ankara',39.9334,32.8597],['Nicosia',35.1856,33.3823],['Tbilisi',41.7151,44.8271],
  ['Tokyo',35.6762,139.6503],['Seoul',37.5665,126.978],['Taipei',25.033,121.5654],['Manila',14.5995,120.9842],['Jakarta',-6.2088,106.8456],['Kuala Lumpur',3.139,101.6869],['Singapore',1.2903,103.852],['Bangkok',13.7563,100.5018],['Phnom Penh',11.5564,104.9282],['Vientiane',17.9757,102.6331],['Hanoi',21.0285,105.8542],['Ulaanbaatar',47.8864,106.9057],['Astana',51.1694,71.4491],['Bishkek',42.8746,74.5698],['Tashkent',41.2995,69.2401],['New Delhi',28.6139,77.209],['Dhaka',23.8103,90.4125],['Kathmandu',27.7172,85.324],['Thimphu',27.4728,89.639],['Colombo',6.9271,79.8612],['Amman',31.9454,35.9284],['Beirut',33.8938,35.5018],['Doha',25.2854,51.531],['Abu Dhabi',24.4821,54.3552],['Muscat',23.588,58.3829],
  ['Pretoria',-25.7479,28.2293],['Gaborone',-24.6282,25.9231],['Windhoek',-22.5609,17.0658],['Maseru',-29.3151,27.4869],['Mbabane',-26.3054,31.1367],['Nairobi',-1.2921,36.8219],['Kampala',0.3476,32.5825],['Kigali',-1.9441,30.0619],['Accra',5.6037,-0.187],['Abuja',9.0765,7.3986],['Dakar',14.7167,-17.4677],['Tunis',36.8065,10.1815],['Antananarivo',-18.921,47.5311],['Cairo',30.0291,31.2593],
  ['Washington, D.C.',38.9072,-77.0369],['Ottawa',45.4215,-75.6972],['Mexico City',19.4326,-99.1332],['Guatemala City',14.6349,-90.5069],['San José',9.9281,-84.0907],['Panama City',8.9824,-79.5199],['Santo Domingo',18.4861,-69.9312],['Bogotá',4.711,-74.0721],['Quito',-0.1807,-78.4678],['Lima',-12.0464,-77.0428],['La Paz',-16.4897,-68.1193],['Santiago',-33.4489,-70.6693],['Buenos Aires',-34.6037,-58.3816],['Montevideo',-34.9011,-56.1645],['Brasília',-15.8267,-47.9218],['Canberra',-35.2809,149.13],['Wellington',-41.2865,174.7762]];
 /* Politics: two separate questions per round.
    POWER is the structure of government (who actually runs the state).
-   ECON is how the economy is organised, the capitalism/socialism axis, which is a different thing entirely. */
+   ECON is how the economy is organized, the capitalism/socialism axis, which is a different thing entirely. */
 const POWER=[
  {name:'Presidential republic', short:'Presidential', blurb:'An elected president runs the government directly.'},
  {name:'Parliamentary republic', short:'Parliamentary', blurb:'Parliament picks the government; the president is mostly ceremonial.'},
@@ -1742,114 +1742,83 @@ function polMode(m){
   const want=(axis==='p'?POL_BY_POWER:POL_BY_ECON)[i], set=new Set(want);
   return {...m, filter:n=>set.has(countryOfRegion(n)), expect:want};
 }
-/* ---------- Learn: the tells ----------
-   Two or three things you can actually see from the road in each country: which side they drive on, the
-   colour of the lines and the plates, the script on the signs, the bollards, the houses, the land. Written to be
-   read in ten seconds after a round, so you carry one thing into the next one. */
-const CLUES={
- 'United States':['Yellow centre lines with white edge lines, and green highway signs with white text, are nationwide: you are in the US before you have read a word.','Speed limits on plain black-on-white rectangles, wooden utility poles, and roadside mailboxes on posts, along every rural road from coast to coast.','Narrowing it down: the state is on the plates and on the road-number shields. Adobe and desert in the Southwest, brick and hardwoods in the Northeast, pines and red clay in the Southeast, big skies and grain in the Plains.'],
- 'Canada':['Yellow centre lines like the US, but speed signs in km/h and green signs with distances in kilometres, nationwide.','Bilingual English and French signs put you in Quebec (or New Brunswick); a red ARRÊT stop sign is Quebec only.','Green highway shields with a crown are Ontario, a fleur-de-lis shield is Quebec, dead-flat prairie with grain elevators is Saskatchewan or Manitoba, and the Rockies mean Alberta or British Columbia.'],
- 'Mexico':['ALTO on the stop signs and warnings for topes (speed bumps) are nationwide, as are yellow centre lines.','Speed signs read MÁXIMA, town signs are white with a black or red border, and OXXO shops and painted concrete houses are in every town.','Dry scrub and long straight roads are the north (Chihuahua, Sonora, Coahuila); tropical green and pastel colonial towns are the south (Oaxaca, Chiapas, Yucatán).'],
- 'Guatemala':['Chicken buses, old US school buses painted in bright colours, run everywhere in the highlands around Guatemala City, Antigua and Lake Atitlán.','Yellow centre lines, green volcanic hills, low concrete houses and tienda corner shops, nationwide.'],
- 'Costa Rica':['Pura vida on signs and shopfronts nationwide, and blue-and-white square street signs in the towns.','Steep green hills with tin-roofed houses in the Central Valley around San José; flat, dry cattle country in Guanacaste in the north-west; rainforest and the sea on the Caribbean side.'],
- 'Panama':['Yellow centre lines and Spanish signs; a skyscraper skyline means Panama City, small Caribbean-coloured towns mean anywhere else.','Diablo Rojo buses covered in airbrushed art are a Panama City thing.'],
- 'Dominican Republic':['Motorbikes carrying whole families and colmado corner shops are nationwide, most of them with a Presidente beer sign.','Yellow centre lines, palms, and brightly painted concrete houses; on an island this size the sea is never far.'],
- 'Colombia':['Yellow licence plates, front and back, nationwide: the single best Colombia tell.','Yellow centre lines; red-brick towns in the Andes around Bogotá and Medellín; mototaxis (tuk-tuks) in the hot lowlands and on the Caribbean coast.'],
- 'Ecuador':['Yellow centre lines and Spanish; the Andes fill the horizon in the central highlands (Quito, Cuenca), while the coast is flat with banana and cacao plantations.','White plates, Pilsener beer signs, and buses painted in bold colours, nationwide.'],
- 'Peru':['Yellow centre lines, white plates, and three-wheeled mototaxis, nationwide.','A dusty grey desert coast along the Pan-American and around Lima; deep green Andes valleys inland around Cusco and Arequipa; political slogans painted on walls everywhere.'],
- 'Bolivia':['The Altiplano around La Paz, El Alto and Oruro is high, dry and brown; towns of unpainted red brick are the norm nationwide.','Spanish signs, yellow centre lines, and old Japanese minibuses as public transport.'],
- 'Brazil':['Portuguese on the signs (Rua, Avenida) and squarish concrete utility poles, nationwide.','Yellow centre lines; white Mercosur plates (older ones grey); Ipiranga and Petrobras stations.','Red-clay dust on walls in the interior (Goiás, Minas Gerais, Mato Grosso); flat green pampas in the far south (Rio Grande do Sul); palms and pastel colonial towns in the north-east (Bahia, Pernambuco).'],
- 'Argentina':['Black-on-white plates with a blue Mercosur strip on top (older cars: black plates with white text), nationwide.','Yellow centre lines across the flat pampas around Buenos Aires; YPF fuel stations; concrete poles.','Dry scrub and wind in Patagonia (Chubut, Santa Cruz); vineyards under the Andes wall in Mendoza; red earth and subtropical green in Misiones in the north-east.'],
- 'Chile':['White lines only, no yellow centre line, and PARE on the stop signs, nationwide.','The Andes on the eastern horizon almost everywhere; bone-dry desert in the north (Atacama, Antofagasta), rain, forest and fjords in the south (Los Lagos, Aysén).'],
- 'Uruguay':['ANCAP fuel stations exist only in Uruguay; Spanish signs and yellow centre lines.','Flat green farmland with low houses under terracotta roofs, and Mercosur plates.'],
- 'United Kingdom':['Drives on the left, speeds in mph, white front plates and yellow rear plates, nationwide.','Direction signs: green on main A-roads, white on local roads, blue on motorways; red pillar postboxes.','Terraced red brick in northern England and the Midlands; honey-coloured stone in the Cotswolds; grey stone and dry-stone walls in Yorkshire and Scotland; Welsh on every sign in Wales.'],
- 'Ireland':['Yellow dashed edge lines on left-hand-drive roads, nationwide: the Irish tell.','Signs in Irish and English, speeds in km/h, green postboxes.','Grey stone walls and small wet fields in the west (Galway, Clare, Kerry); flatter, greener farmland in the midlands and east.'],
- 'France':['Town-entry signs are white with a red border and street names sit on blue enamel plaques, nationwide.','Bollards are white with a red band on top; plane trees line the straight D-roads, especially in the south.','Half-timbered houses mean Alsace or Normandy; ochre stone, cypresses and dry hills mean Provence; grey slate roofs mean Brittany and the north.'],
- 'Spain':['CEDA EL PASO on give-way signs nationwide; blue signs on main roads, white on local ones.','Bollards with a black top; Repsol and Cepsa stations; town names on white with a red border.','Whitewashed villages and olive groves are Andalusia; wet green hills are Galicia and Asturias; the dry ochre plateau is Castile; Catalan on the signs means Catalonia.'],
- 'Portugal':['Blue direction signs and mosaic-cobbled pavements (calçada) nationwide; patterned tile façades (azulejos) on older houses.','Plates are white with a blue EU strip on the left and, on older cars, a yellow strip on the right.','Eucalyptus and pine in the centre and north; flat cork-oak plains in the Alentejo; whitewash and the sea in the Algarve.'],
- 'Italy':['Black-on-white town signs, blue parking bays, and scooters everywhere, nationwide.','Green Autostrada signs; Tabacchi shops marked with a big T; white plates with blue strips at both ends.','Cypresses and terracotta hill towns are Tuscany and Umbria; pale limestone and dry hills are Puglia and Sicily; wood and stone under the Alps is the north.'],
- 'Germany':['Yellow town-entry signs with black text nationwide; leaving town, the name has a line struck through it.','Plates are black on white with a blue EU strip and a round registration seal after the city letters.','Half-timbered houses mean Hesse, Lower Saxony or Franconia; onion-domed churches and Alpine meadows mean Bavaria; flat farmland and brick mean the north.'],
- 'Netherlands':['Yellow licence plates, front and back, nationwide: the Dutch tell.','Flat land, brick houses with big windows, and red-asphalt cycle paths beside every road.','Bollards white with a red band. Canals and dykes are the west (North and South Holland); heath and forest are the east (the Veluwe).'],
- 'Belgium':['Red text on white licence plates, nationwide, and nobody else in Europe.','Brick houses, concrete-slab roads, and a roundabout every kilometre.','Dutch on the signs is Flanders (north), French is Wallonia (south), both together is Brussels.'],
- 'Switzerland':['Blue signs on main roads, green on motorways, and white plates with the canton\'s coat of arms, nationwide.','A yellow-diamond priority sign like Germany\'s; yellow pedestrian crossings.','German in the centre and east, French in the west (Geneva, Lausanne), Italian in Ticino; wooden chalets in the Alps.'],
- 'Austria':['Blue town-entry signs with white text, nationwide.','White plates with a blue EU strip and the red-white-red flag; Bundesland shields on the cars.','Onion-domed churches and wooden balconies full of flowers in Tyrol and Salzburg; flatter vineyards and plains east of Vienna.'],
- 'Czech Republic':['Town signs white with black text; náměstí (square) and ulice (street) on names, nationwide.','Diacritics like ř, ě, ů and ž in almost every word; Škodas everywhere.','Soviet-era panel blocks beside baroque squares in most towns; forested hills along the borders.'],
- 'Slovakia':['Slovak letters ľ, ť, ô and ä, and ulica on street names, nationwide.','Hilly forested countryside with painted concrete houses; the Tatras rise along the northern border.'],
- 'Hungary':['utca (street) and út (road), with long accents like ő and ű, nationwide.','Flat plains east of the Danube (the Great Alföld); yellow-washed rural houses; white plates with a blue strip.'],
- 'Poland':['White town-entry signs with black text and green direction signs, nationwide.','Red-brick churches, dense pine forest and flat farmland; Żabka shops in every town.','Bollards white with a red band and a black top; mountains only along the southern border (Tatras, Sudetes).'],
- 'Denmark':['Danish letters æ, ø and å; vej means road, nationwide.','Red-and-white town signs, cycle lanes everywhere, white plates with a red border.'],
- 'Norway':['Yellow centre lines nationwide; Sweden and Finland use white.','Red and white wooden houses, fjords and bare rock along the west coast; vei or veg on signs.','White plates with a blue strip; a tunnel every few minutes in the west; flatter forest and farmland around Oslo.'],
- 'Sweden':['White centre lines with yellow-on-blue direction signs and yellow-backed warning signs, nationwide.','Falu-red wooden houses in pine forest; väg and gatan on names.','Road-edge posts are white with yellow reflectors; the far north (Norrland) is birch, bog and hardly anyone.'],
- 'Finland':['Finnish, with long words and double letters (kk, tt, aa); tie is road, katu is street, nationwide.','Yellow-backed warning signs like Sweden\'s, but flatter land, lakes everywhere, and birch.','Finnish and Swedish together on signs along the west and south coasts (Vaasa, Turku, Helsinki).'],
- 'Iceland':['Treeless volcanic moss, black gravel and yellow road-edge posts, nationwide.','Icelandic ð and þ on signs; single-lane bridges on the ring road.'],
- 'Estonia':['Estonian õ, ä, ö, ü; tee means road, tänav street, nationwide.','Flat, forested, wooden houses and Soviet-era blocks; white plates with a blue strip.'],
- 'Latvia':['Latvian macrons ā, ē, ī, ū and iela on street names, nationwide.','Wooden houses and pine forest; Art Nouveau façades in Riga.'],
- 'Lithuania':['gatvė on street names and letters ė, ų, į, nationwide.','Flat farmland, wooden farmhouses, storks\' nests on the poles.'],
- 'Ukraine':['Cyrillic with ї and є, letters Russian does not use; вулиця means street, nationwide.','Fences, bus stops and kerbs painted blue and yellow; wide flat black-earth fields in the centre and east.'],
- 'Russia':['Cyrillic; улица (street) and проспект; black-on-white plates ending in a region number, nationwide.','Blue direction signs, grey apartment blocks, birch forest, long straight roads.','Kilometre posts and kerbs painted black and white; the region number on the plates is the fastest way to place a Russian round.'],
- 'Romania':['Romanian (ă, â, î, ș, ț) is a Latin language among Slavic neighbours; strada on names, nationwide.','Horse carts on the road, yellow taxis, Petrom and Rompetrol stations.','Silver-domed Orthodox churches; ornate metal gates on village houses, especially in Transylvania and Maramureș.'],
- 'Bulgaria':['Cyrillic with a lot of ъ; ул. for street; white plates with a blue strip, nationwide.','Dry hills, Soviet-era blocks and red-tiled houses; the Balkan range runs east to west across the middle.'],
- 'Greece':['Greek alphabet with a Latin transliteration under it on most signs, nationwide.','Blue direction signs; dry rocky hills, olive trees and whitewashed houses; white cube houses with blue shutters mean the islands.'],
- 'Croatia':['Yellow direction signs on main roads; ulica and the letters č, ć, š, ž, nationwide.','Red-tiled roofs, stone houses and the Adriatic on the Dalmatian coast; flatter farmland in Slavonia in the east.'],
- 'Slovenia':['Slovene č, š, ž; cesta (road) and ulica (street), nationwide.','Alpine and green with a church spire on every hill; white plates with a blue strip.'],
- 'Serbia':['Cyrillic and Latin side by side; улица and ulica; letters ć and đ, nationwide.','Unrendered brick houses, plum orchards, and plates with a Cyrillic town code.'],
- 'North Macedonia':['Cyrillic with letters nobody else uses (ѓ, ќ, ѕ, џ); mountains in every direction, nationwide.','Red-tiled roofs, minarets and Orthodox churches in the same town.'],
- 'Albania':['Albanian ë and ç everywhere; Rruga on street names, nationwide.','Mercedes of every age, concrete bunkers in the fields, mountains meeting the sea.'],
- 'Bosnia and Herzegovina':['Latin and Cyrillic both appear; mosques and churches in the same town, nationwide.','Steep green valleys, unrendered brick, white plates with a blue strip.'],
- 'Turkey':['Turkish, with dotless ı, ğ, ş, ç; sokak (street) and caddesi (avenue), nationwide.','Blue direction signs, white plates with a blue strip, red-and-white painted kerbs.','A minaret on every skyline; dry Anatolian plateau in the centre, green and wet along the Black Sea coast, pines and the Mediterranean in the south.'],
- 'Georgia':['Georgian script, rounded letters unlike anything else, with Latin underneath, nationwide.','Caucasus mountains, vineyards in Kakheti in the east, old Ladas and Mercedes.'],
- 'Israel':['Hebrew (with Arabic and English) on signs and yellow licence plates, nationwide.','Dry stony hills; white apartment blocks with solar water tanks on the roof; irrigated green farmland in the north.'],
- 'Jordan':['Arabic and English signs; rocky desert and sand-coloured stone houses, nationwide.','Roundabouts with a flag in the middle; pickups and old Hyundais.'],
- 'Lebanon':['Arabic and French signs; steep, dense hillside towns with the sea below, nationwide.','Red plates on taxis; concrete apartment blocks stacked with balconies.'],
- 'United Arab Emirates':['Arabic and English; wide immaculate roads, desert sand and glass towers, nationwide.','White plates with the emirate\'s name; green and blue direction signs.'],
- 'Oman':['Arabic and English; bare brown mountains and a coast of pale houses, nationwide.','White forts and low white houses, a mosque in every village.'],
- 'Egypt':['Arabic (English on main roads); dusty streets and unfinished red-brick apartment blocks, nationwide.','Palms, the Nile\'s green strip, and desert right at the edge of town.'],
- 'Tunisia':['Arabic and French; black plates with white text, nationwide.','Whitewashed houses with blue doors, olive groves and dry hills.'],
- 'Algeria':['Arabic and French signs; dry hills and unfinished brick buildings, nationwide.','Long desert roads in the south, Mediterranean towns in the north.'],
- 'Kenya':['Drives on the left; white front plates, yellow rear, nationwide.','Red soil, matatu minibuses, and M-Pesa shops painted green; the Rift Valley and tea estates lie west of Nairobi.'],
- 'Uganda':['Drives on the left; red soil, banana plants and boda-boda motorbikes, nationwide.','White front and yellow rear plates; MTN-yellow shopfronts.'],
- 'Rwanda':['Drives on the right, unlike its East African neighbours.','Steep green hills, tidy paved roads, motorbike taxis in matching vests; Kigali is unusually clean.'],
- 'Tanzania':['Drives on the left; yellow plates; Swahili signs (duka, barabara), nationwide.','Red earth, baobabs, and three-wheeled bajaji.'],
- 'Ghana':['Drives on the right; English signs; red laterite soil; tro-tro minibuses, nationwide.','Concrete houses painted in Vodafone red or MTN yellow as adverts.'],
- 'Nigeria':['Drives on the right; English signs; yellow taxis in Lagos, okada motorbikes elsewhere.','Red earth, dense busy towns, hand-painted shop signs, nationwide.'],
- 'Senegal':['French signs; yellow taxis and colourful car rapide minibuses in Dakar.','Sandy streets, baobabs, flat Sahel scrub and horse-drawn carts, nationwide.'],
- 'Cameroon':['French and English signs; red soil, dense green, yellow taxis, nationwide.','Roadside markets under corrugated roofs.'],
- 'Madagascar':['French and Malagasy signs; red-earth roads and rice paddies, nationwide.','Renault 4s and Peugeot 404s still running; steep-roofed brick houses in the central highlands around Antananarivo.'],
- 'Ethiopia':['Ge\'ez (Amharic) script on signs nationwide; blue-and-white Lada taxis in Addis Ababa.','Highland plateaus, eucalyptus, and round thatched tukul houses.'],
- 'Democratic Republic of the Congo':['French signs, red earth, dense green; coverage is mostly Kinshasa and the east.','Crowded streets, hand-painted signs, motorbikes everywhere.'],
- 'South Africa':['Drives on the left; yellow edge lines with white centre lines, nationwide: the southern-African tell.','Plates differ by province (GP is Gauteng, WC the Western Cape, KZN KwaZulu-Natal); a robot is a traffic light; walled houses with electric fencing.','Dry veld and blue-gum trees inland; vineyards and Table Mountain around Cape Town; sugar cane and humidity in KwaZulu-Natal.'],
- 'Namibia':['Drives on the left; gravel roads through empty desert; yellow edge lines, nationwide.','German street names in Swakopmund and Windhoek; dead-straight roads with the car\'s long shadow.'],
- 'Botswana':['Drives on the left; flat dry bush with acacia and cattle on the road; yellow edge lines, nationwide.','White plates starting with B; donkey carts.'],
- 'Zimbabwe':['Drives on the left; yellow edge lines; kopjes (rocky hills) in dry bush, nationwide.','Jacaranda-lined streets in Harare; roadside vendors under msasa trees.'],
- 'Japan':['Drives on the left; kanji and kana everywhere; narrow, immaculate streets under a web of cables, nationwide.','Red-and-white striped arrows hanging above the road edge are snow poles, marking where the shoulder is under drifts: Hokkaido or the Sea of Japan side (Niigata, Akita, Aomori, Nagano), never the south.','White plates on cars, yellow on tiny kei cars; a vending machine on every corner; blue no-parking circles and 止まれ (stop) painted on the road itself.'],
- 'South Korea':['Hangul, circles (ㅇ) and straight strokes, on every sign, nationwide.','Yellow centre lines, numbered apartment towers, grey concrete poles.','로 (ro) and 길 (gil) end street names; taxis in silver or orange; green-roofed farm buildings in the countryside.'],
- 'Taiwan':['Traditional Chinese characters; scooters by the hundred; arcaded pavements under the buildings, nationwide.','White plates; traffic lights with countdowns; dense green on the steep hills inland, flat and built-up on the west coast.'],
- 'Thailand':['Thai script, loops and curls; drives on the left, nationwide.','Red-and-white striped kerbs, pickup trucks, and a 7-Eleven on every corner.','Blue direction signs with Thai above English; rice paddies on the central plain, hills in the north (Chiang Mai), palms and beaches in the south.'],
- 'Malaysia':['Drives on the left; Malay in Latin script, Jalan (road) and Lorong, nationwide.','Black plates with white text; palm-oil plantations; Petronas stations; Chinese characters on shop signs in the towns.'],
- 'Indonesia':['Drives on the left; Indonesian (Jalan, Jl.); black plates with white text, nationwide.','Motorbikes everywhere, red-tiled roofs, Indomaret and Alfamart minimarts.','Rice terraces and volcanoes on Java and Bali; mosques with metal domes; Hindu temples and daily offerings mean Bali.'],
- 'Philippines':['Drives on the right, unlike most of South-East Asia; Tagalog and English signs, nationwide.','Jeepneys and tricycles, Barangay signs, sari-sari stores.'],
- 'Vietnam':['Vietnamese, Latin letters buried in diacritics (ư, ơ, ă, ộ), nationwide.','Rivers of motorbikes, tall narrow tube houses, conical hats in the countryside; the Mekong delta is flat and wet, the north hilly.'],
- 'Cambodia':['Khmer script, tall ornate letters; drives on the right, nationwide.','Angkor beer signs, tuk-tuks, flat rice fields and stilt houses.'],
- 'Laos':['Lao script, like Thai but rounder; drives on the right, nationwide.','Yellow licence plates; the Mekong; French colonial shophouses and Beerlao signs.'],
- 'Mongolia':['Cyrillic; endless steppe with no fences; gers (yurts) beside the road, nationwide.','Dirt tracks braided across the grass; Toyota Priuses all over Ulaanbaatar.'],
- 'Kazakhstan':['Cyrillic (with Latin arriving) plus extra letters ә, ғ, қ, ң, ө, ұ, ү; flat steppe, nationwide.','Soviet blocks next to Astana\'s glass; white plates marked KZ; mountains only in the far south-east around Almaty.'],
- 'Kyrgyzstan':['Cyrillic; jagged snow-capped mountains on most horizons, nationwide.','Old Audis and Ladas, riders on horseback, red flags with the yurt-crown sun.'],
- 'Uzbekistan':['Latin and Cyrillic mixed; white Chevrolets make up most of the traffic, nationwide.','Dry, flat, irrigated cotton fields; blue-tiled mosques and madrasas in Samarkand and Bukhara.'],
- 'India':['Drives on the left; auto-rickshaws; English plus the local script, nationwide.','Yellow plates on commercial vehicles, white on private; trucks painted with Horn OK Please.','The script places you: Devanagari in the north (Hindi), Tamil in the far south, Kannada in Karnataka, Bengali in the east.'],
- 'Pakistan':['Urdu (Arabic-style script) with English; drives on the left; wildly decorated jingle trucks, nationwide.','Dry plains in Punjab and Sindh, mountains in the north; motorbikes carrying whole families.'],
- 'Bangladesh':['Bengali script; drives on the left; cycle rickshaws in every street, nationwide.','Flat, wet, green and crowded; bright painted rickshaw art.'],
- 'Sri Lanka':['Drives on the left; Sinhala (rounded) and Tamil scripts plus English on signs, nationwide.','Tuk-tuks everywhere, coconut palms, red-tiled roofs, Buddhist stupas; tea estates in the hill country around Kandy and Nuwara Eliya.'],
- 'Nepal':['Devanagari script; drives on the left; steep terraced hills, nationwide.','Red licence plates with white Devanagari; prayer flags and Tata buses.'],
- 'Bhutan':['Dzongkha script (Tibetan-style); every building in traditional painted style, by law, nationwide.','Drives on the left; red plates with white text; monasteries on cliffs.'],
- 'Australia':['Drives on the left; white lines; yellow diamond warning signs with kangaroos, nationwide.','Wide flat outback of red earth or eucalyptus bush; GIVE WAY triangles; wide roads with gravel shoulders.','The state is on the plates. Tropical green and sugar cane is Queensland; red dirt and termite mounds is the Northern Territory; gum-lined roads and cool hills are Victoria and Tasmania.'],
- 'New Zealand':['Drives on the left; white lines with yellow no-passing lines; Give Way signs, nationwide.','Green hills with sheep, tree ferns and cabbage trees; white plates with black text.','Snowy peaks and braided rivers are the South Island; volcanoes and Māori place names everywhere are the North Island.'],
-};
-function clueFor(country){
-  if(!country) return null;
-  if(CLUES[country]) return {country,tips:CLUES[country]};
-  const k=Object.keys(CLUES).find(c=>sameCountry(c,country));
-  return k?{country:k,tips:CLUES[k]}:null;
-}
+/* ---------- Learn: hand-picked spots ----------
+   Every one of these was looked at before it was written up. The tips describe what is in that panorama, and say
+   where in the world that particular thing is common. The spot's own heading points at the view the tips describe. */
+const LEARN_SPOTS=[
+ {pano:'jW3ZjiT4KHQ13j7nn_TfEQ',lat:43.34993,lng:142.3801,heading:213,where:'Furano, Hokkaido, Japan',tips:['Detached houses with steep metal roofs and open carports beside them: built for heavy snow, which means Hokkaido or the Sea of Japan side of Honshu, not Tokyo or the south.','Wide gravel gaps between the houses and utility poles carrying gray transformer drums: small-town Japan; the clipped pines and tidy hedges are Japanese anywhere.','Driving on the left with a plain white edge line and no curb: a Japanese residential street.']},
+ {pano:'H86EG5D7V5aW5IzNu51g1w',lat:35.00379,lng:135.7672,heading:177,where:'Kyoto, Japan',tips:['A red taxi and a wide, wide zebra crossing on a dead-flat boulevard: a Japanese city center. Kyoto is a grid of flat straight avenues, unlike hilly Tokyo, Kobe or Nagasaki.','A covered shopping arcade (shotengai) opening off the street with hanging kanji signs: every Japanese city has them; Kyoto and Osaka have the most.','Low white and beige commercial buildings with rooftop signs, and people waiting neatly at the light: Kansai.']},
+ {pano:'umQLdg3wu0wVyipwvFPdzA',lat:35.6602,lng:139.65011,heading:187,where:'Tokyo suburb, Japan',tips:['A lane barely wider than a car, no sidewalk, a single white edge line and house walls right on the road: Tokyo\'s residential neighborhoods, repeated across the whole Kanto plain.','Concrete-block and white-rendered garden walls, a tangle of cables overhead, compact hatchbacks parked tight: Japan; this density says Tokyo or Yokohama rather than a country town.','Left-hand driving and small kanji signs on the poles.']},
+ {pano:'v3L8_U5EzeqrySGafv5FPg',lat:62.09942,lng:7.20381,heading:212,where:'Geiranger, Norway',tips:['Grass-covered mountainsides rising straight from the valley floor, with waterfalls in the gullies: western Norway\'s fjord country between Ålesund and Bergen.','A campground full of motorhomes and a red-painted wooden hut: fjord villages in summer, where the road along the valley is the only way in.','Gravel parking, lush low grass and no trees above the cliff line: the height and the wet climate of the west coast.']},
+ {pano:'qmYzh44FGfjh1817Hnx3SA',lat:68.14786,lng:13.60643,heading:235,where:'Lofoten, Norway',tips:['Wooden clapboard houses painted white, yellow and red with steep gray roofs: Norway; the mix of colors with the sea right behind the houses says the north, Lofoten and the coast above Bodø.','A narrow wet road with no center line, and a Norwegian flag on a garden flagpole: Norwegians fly the flag at home more than any neighbor.','Birch and low shrubs but no tall trees: the Arctic coast, not the forested south.']},
+ {pano:'iK68wABjGKj9ySWRHK2kzg',lat:52.37003,lng:4.89018,heading:145,where:'Amsterdam, Netherlands',tips:['Dark brown brick with tall white-framed sash windows and a courtyard paved in small brick setts: Amsterdam\'s canal-belt architecture.','Ornate green cast-iron lamp posts and a wooden bench: the old center. Leiden, Haarlem and Utrecht use the same brick, with narrower streets.','Completely flat, everything at walking scale: the Netherlands.']},
+ {pano:'BkWdhx-ZChzYu3FHaub5xA',lat:52.12126,lng:5.19823,heading:30,where:'Utrecht countryside, Netherlands',tips:['Red asphalt bike paths on both sides of a tree-lined road, with the speed limit painted on the pavement: the Netherlands, nationwide. The big oaks and villas say the wooded Utrecht hills, not the flat west.','A white dashed center line, white bike-lane edges and a roundabout ahead: Dutch road design.','A detached villa with a hipped tile roof behind hedges: the wealthy commuter belt east of Utrecht.']},
+ {pano:'P4F0n24_iy2dgwToaTenEg',lat:53.55201,lng:-9.777,heading:94,where:'Connemara, Ireland',tips:['Brown blanket bog with bare mountains behind and no trees except a planted shelterbelt of pine: Connemara and Mayo, the far west of Ireland.','A single-track lane with grass down the middle and dry-stone walls of gray granite: rural west Ireland, where the fields are tiny.','A pink-washed cottage with a red tin roof (look behind you): west-of-Ireland farmhouses.']},
+ {pano:'bNgFcXoDeaSOJTEORi5HlQ',lat:51.8808,lng:-1.76114,heading:44,where:'Cotswolds, England',tips:['Honey-colored limestone on every house, even the modern bungalows, with brown tile roofs: the Cotswolds, the hills between Oxford and Gloucester. No other part of Britain builds in this stone.','A cul-de-sac with a grass island, dropped curbs and cars on the driveway, driving on the left: an English housing estate.','A quiet road with no center line and stone garden walls: the edge of a Cotswold village.']},
+ {pano:'79Tt7h5N2Z6jtt3oOyCYlQ',lat:57.10579,lng:-4.71994,heading:208,where:'Scottish Highlands',tips:['An A-road with white center dashes, a short white edge line and a red-topped marker post, no fence: Britain. The Scots pines, birch and brown heather hills say the Highlands north of Perth.','Bracken on the verge and a single carriageway with pull-ins: the roads around Loch Ness and the A9 corridor.','Conifers planted in blocks with open moor beyond: Scottish forestry land.']},
+ {pano:'yd_dgfqPZ4xn2vuUuF24Jg',lat:35.16709,lng:-113.69846,heading:159,where:'Route 66, Arizona, USA',tips:['A graded dirt road through sagebrush and pinyon-juniper scrub with a mountain range on the horizon: the high desert of northern Arizona and New Mexico, around 5,000 feet.','Pale sandy soil, low dark junipers and a deep blue sky: the Colorado Plateau between Flagstaff and Kingman.','No fences, no poles, no buildings: public land off Route 66.']},
+ {pano:'zCr6OuxDSjXaG_bKLH6k7A',lat:30.26986,lng:-97.74003,heading:285,where:'Austin, Texas, USA',tips:['A downtown alley between a buff yellow-brick warehouse and a white-painted building, with a parking garage behind: a US city center; the buff brick and the wall-mounted AC units say Texas.','Fire escapes, rooftop units and a loading dock with towers behind: Austin\'s warehouse district near the river.','Curbs painted red and a dumpster in the alley: American downtown service lanes.']},
+ {pano:'dOc8dwpoS3GulMF3yFps5A',lat:44.25994,lng:-72.5798,heading:19,where:'Vermont, USA',tips:['Red-brick mill buildings and a new brick apartment block below a forested hill: a New England town. Vermont\'s small cities (Montpelier, Barre) sit in valleys exactly like this.','A green steel truss bridge over a river with a yellow pedestrian sign beside it (behind you): the Northeast US; the wooded hills are the Green Mountains.','A yellow center line and a wide, empty street: small-town America.']},
+ {pano:'OQNM6DYoSKMgEVqKL5C8_w',lat:25.75995,lng:-80.19008,heading:283,where:'Miami, Florida, USA',tips:['Glass condo towers, royal palms in the median and a yellow center line: Brickell in Miami. Palms and towers together say South Florida.','White concrete curbs, a cafe with blue umbrellas and hard flat light: the Florida coast.','The bay visible at the end of the street (behind you): Biscayne Bay.']},
+ {pano:'cKb1czBv9UZZeFGz3lvSFQ',lat:-23.69985,lng:133.8796,heading:215,where:'Alice Springs, Australia',tips:['Red-brick pavers on the sidewalks and a bright dry light over a low-rise town: Alice Springs, the middle of Australia. The red pavers are a Northern Territory habit.','White-trunked river gums in the street and a 1980s concrete office block (NT House): outback towns.','Left-hand driving with white lines, wide roads and hardly a cloud: central Australia.']},
+ {pano:'OTqoauC5WRRKFwYmefPfjA',lat:-33.88067,lng:151.19895,heading:10,where:'Sydney, Australia',tips:['Terracotta-brick apartment blocks with balconies, sandstone retaining walls and gum trees: Sydney\'s inner suburbs. Sandstone plus red brick is the city\'s signature.','A park of lomandra and spiky native grasses under gum trees, city towers behind: Sydney or Brisbane rather than Melbourne.','Cars parked on the left, nose to tail: Australia.']},
+ {pano:'Y-4fAN1n44JjiJMugbNxqw',lat:-44.00179,lng:170.47955,heading:180,where:'Lake Tekapo, New Zealand',tips:['A rocky gray lakeshore with scattered Douglas firs and a turquoise lake against bare brown hills: Lake Tekapo in the Mackenzie Basin, South Island.','No road at all, just gravel and tussock: the South Island high country, where glacial lakes are milky blue from rock flour.','Dry treeless hills with snow on the far peaks: the eastern side of the Southern Alps.']},
+ {pano:'iBeLSWl8mI_dY2PbZHnzEg',lat:-26.19988,lng:28.04969,heading:174,where:'Johannesburg, South Africa',tips:['White Toyota minibus taxis by the dozen: South Africa. This many together is a city taxi rank, here downtown Johannesburg.','1930s to 60s office blocks with shops at street level and bars on the windows: the Johannesburg CBD.','Traders on the sidewalk under the buildings and hand-painted shop signs: inner-city Johannesburg and Durban.']},
+ {pano:'vSOXBrr-vovU7x3wLyRyNw',lat:-1.29067,lng:36.81852,heading:64,where:'Nairobi, Kenya',tips:['A dual carriageway with a grass median and an elevated expressway on tall concrete pillars: the Nairobi Expressway, opened 2022, along Mombasa Road and Uhuru Highway.','Red umbrellas over street vendors on the verge and red soil showing through the grass: Nairobi.','White dashed lines, a metal guardrail and office towers behind: Kenya\'s capital, not a provincial town.']},
+ {pano:'zNtG2GJESV0XKADZFM-L-g',lat:-1.94039,lng:30.06064,heading:276,where:'Kigali, Rwanda',tips:['Orange-red dirt, a half-built brick building and a white Toyota minibus: Rwanda. The earth is this color across the whole country.','Concrete-block walls with steel gates around every plot and a hillside of houses behind: Kigali climbs its hills in every direction.','Cars on the right side of the road (behind you): Rwanda drives on the right, unlike Kenya, Uganda and Tanzania.']},
+ {pano:'3TlfeqXcRKzXoFMMRm29Yw',lat:6.45044,lng:3.40011,heading:105,where:'Lagos, Nigeria',tips:['An unpaved sandy street between a half-finished concrete building and stalls under blue tarps: Lagos. Sand rather than red laterite means the coastal lagoon side of the city.','White Volkswagen and Toyota minibuses (danfos) along the road: Lagos public transport.','A jungle of cables on wooden and concrete poles, and a red-and-white radio mast: Nigerian cities.']},
+ {pano:'Mv9ERDmJo_2WauT-IQUIqA',lat:5.60012,lng:-0.19,heading:259,where:'Accra, Ghana',tips:['A road with white edge lines and a wide gravel shoulder, cream-painted compound walls and palms: Accra\'s newer suburbs (East Legon, Airport), Ghana.','Green metal fencing and tall grass beside neat lawns: residential Accra.','Driving on the right, like Nigeria and Ivory Coast either side.']},
+ {pano:'sk_nQGuFJcSJmPclCxiypw',lat:14.70024,lng:-17.45965,heading:139,where:'Dakar, Senegal',tips:['Wide sandy verges, red-and-white striped curbs and flat-topped neem trees: Dakar, Senegal.','Sand everywhere, even beside paved roads: the Cap-Vert peninsula is built on dunes.','Concrete apartment blocks and an old Mercedes on the corner: Dakar, where old Mercedes and Peugeots rule.']},
+ {pano:'tOKdLPvYg4NL1ycU6ZjfAA',lat:-23.54995,lng:-46.62944,heading:226,where:'São Paulo, Brazil',tips:['Gray stone and concrete buildings tagged with pichação lettering, black-and-white striped curbs at the corner: central São Paulo.','A crosswalk of wide white stripes and a motorcycle courier with a red box: Brazil\'s biggest city.','A Petrobras station with a green-and-yellow canopy (behind you): Brazil.']},
+ {pano:'FQghZICYMndlp7Ai-SthLg',lat:-19.90025,lng:-43.99996,heading:332,where:'Minas Gerais, Brazil',tips:['A dense web of cables on a concrete pole above a wide zebra crossing: Brazilian cities. The small two-story houses with rolled shutters and bright paint are a Minas Gerais town.','A faded yellow center line and a corner bar painted red: interior Brazil.','PARE painted on the road: the Portuguese stop marking, Brazil.']},
+ {pano:'pL5_I0JmIVAtq9-QSQQkWQ',lat:-34.59946,lng:-58.39922,heading:305,where:'Buenos Aires, Argentina',tips:['A red-painted planter wall and gray stone paving around a parking lot: Buenos Aires civic buildings. The tall 1960s apartment slabs and ornate French-style stone blocks together (behind you) are the city center.','White cars with black-on-white Mercosur plates: Argentina since 2016.','Plane trees and jacarandas along wide avenues: Buenos Aires.']},
+ {pano:'DdvXwK6uSfPA29u3IvogNA',lat:-42.90022,lng:-71.29978,heading:224,where:'Esquel, Patagonia, Argentina',tips:['A wide gravel street lined with tall poplars and cypresses planted as windbreaks: the towns of Argentine Patagonia.','A yellow Renault 12 and a Ford F-100 pickup (behind you): classic Argentine cars, still common in the south.','Half-built brick and cinder-block houses with corrugated roofs and bare mountains behind: the Andes foothills of Chubut and Río Negro.']},
+ {pano:'un5aoFG_eBZW1u0sJRUbYg',lat:-22.89987,lng:-68.19986,heading:322,where:'San Pedro de Atacama, Chile',tips:['Adobe and mud-brick walls the color of the desert, flat roofs and a dust road: San Pedro de Atacama, northern Chile.','A Chilean flag on a pole and cinder-block walls rendered tan: Chile\'s desert north.','Cloudless deep-blue sky, no grass, only pepper and tamarugo trees: the driest desert on Earth.']},
+ {pano:'leDrzC9wI4ltxw05E8wa2w',lat:-13.52039,lng:-71.97061,heading:6,where:'Cusco, Peru',tips:['Red-tiled roofs climbing a hillside behind billboards on tall posts: Cusco, Peru. Terracotta tiles on every roof is the Andean city look.','Concrete pillars holding advertising over a taxi rank, and a red-and-white curb: Peruvian cities.','Colonial stone walls next to modern glass shopfronts (behind you): central Cusco.']},
+ {pano:'6ilPixCDx9yF778X-Kkm6Q',lat:-16.50324,lng:-68.1514,heading:21,where:'La Paz, Bolivia',tips:['Unrendered red-brick buildings stacked up a steep hill, some six stories with shops below: La Paz and El Alto, Bolivia.','A street that dips and climbs at once with bare hillsides above: a city built inside a canyon at 12,000 feet.','Small Japanese sedans and a minibus on white plates: Bolivia.']},
+ {pano:'wPftkC-TyXAYuXHI0hprUA',lat:6.24993,lng:-75.56972,heading:202,where:'Medellín, Colombia',tips:['A pedestrian shopping street packed with stalls under umbrellas: central Medellín, Colombia.','Storefronts with big vinyl signs selling shoes and clothes, and a tall brick church behind: Colombian city centers.','Everyone in jeans and short sleeves, nobody in a coat: the year-round spring of Medellín at 5,000 feet.']},
+ {pano:'Ejw05uC1KCUa8GGTcewUCg',lat:17.05999,lng:-96.72,heading:282,where:'Oaxaca, Mexico',tips:['Single-story houses with thick walls painted white and blue, iron window grilles and flat roofs: Oaxaca\'s colonial center, southern Mexico.','A flame tree in orange blossom over a narrow one-way street: southern Mexico and Central America.','A hotel sign and a farmacia with a red cross: Mexican town centers.']},
+ {pano:'RhjbhTz6QktL9Du-0k9RWw',lat:14.55995,lng:-90.72958,heading:358,where:'Antigua, Guatemala',tips:['Cobblestones, plain windowless colonial walls in ochre and mustard, and a volcano at the end of the street: Antigua, Guatemala.','Heavy wooden doors and tiled roofs behind the walls: Spanish colonial towns; the volcano (Agua) makes it Antigua.','Motorbikes and a tuk-tuk on the cobbles: Central America.']},
+ {pano:'nKlzIkzJ8GJvexkwL0VQTg',lat:55.80013,lng:37.49938,heading:59,where:'Moscow, Russia',tips:['Yellow-and-white Stalin-era apartment blocks with a decorative brick pattern under big lime trees: Moscow\'s older districts.','Green-painted iron fences around every patch of lawn and a white GAZelle van: Russia.','A courtyard drive between the blocks with no markings at all: Russian city housing.']},
+ {pano:'FbmJx_hWASPF9cBSX0WiVA',lat:56.3011,lng:38.09895,heading:60,where:'Moscow region, Russia',tips:['A dirt track between overgrown lots fenced with green corrugated metal, and a highway sound wall behind: the dacha belt around Moscow.','Tall weeds, birch and a metal water tank on a shed: rural Russia in summer.','Wooden power poles with a single wire and open meadow (behind you): the countryside north of Moscow.']},
+ {pano:'d7VlCqKZDzSlrTjVWUSn3Q',lat:50.06017,lng:19.93917,heading:26,where:'Kraków, Poland',tips:['Pastel townhouses, a cobbled square with cafe terraces full of flowers and a horse-carriage stand: Kraków\'s old town, Poland.','A hotel flying the EU and Polish flags, arched doorways and stone window frames: Central European old towns.','Granite setts and a blue Volkswagen van: Poland.']},
+ {pano:'YGrm_KK8w2AW9xSiIBVZZQ',lat:50.05006,lng:14.35001,heading:322,where:'Prague, Czech Republic',tips:['Concrete panel apartment blocks (paneláky) repainted in yellows and browns, with parking lots between them: the outer districts of Prague and every Czech city.','Pines planted in the estate and modern glass offices behind: Prague\'s southwestern suburbs.','Cars parked bumper to bumper along the block: Czech housing estates.']},
+ {pano:'Lt-YOPJN_3KqfimnkVaFWw',lat:47.75928,lng:11.55937,heading:117,where:'Bad Tölz, Bavaria, Germany',tips:['White and cream rendered houses with green and gray shutters, and a painted saint in a wall niche (behind you): Upper Bavaria. The niche statue is a Catholic south-German habit.','A narrow village street with no sidewalk, cars half on the road, and a No Parking sign with a red slash: Germany.','Wooden shutters and deep roof overhangs: the Alpine foothills.']},
+ {pano:'cpfHlPL-04W2BWwoc_zMhQ',lat:43.89998,lng:5.0001,heading:171,where:'Provence, France',tips:['Tall cypress hedges planted as windbreaks against the mistral, and vines under white protective netting: the Rhône valley of Provence, France.','A narrow lane with no markings between a cypress row and a vineyard: southern France; the netting is for table grapes or cherries.','Dry ground under the vines and a gray sky: Provence in autumn.']},
+ {pano:'Jgrcb_lth1gGyHvD3d_Oxg',lat:48.16918,lng:7.29966,heading:108,where:'Riquewihr, Alsace, France',tips:['Rows of vines on a slope above a village of steep roofs, with the Rhine plain flat to the horizon: the Alsace wine road, France.','A narrow paved road with a grass verge and no center line: French vineyard lanes.','Bare vines on wooden stakes in winter and a church spire in the village: Alsace.']},
+ {pano:'aQMdugK4F3-PYh0Fzjy7ZQ',lat:36.74066,lng:-5.15935,heading:24,where:'Ronda, Andalusia, Spain',tips:['A whitewashed town on a rocky ridge with a white barn and a gravel lane below it: Andalusia, southern Spain. Ronda sits on a cliff above the valley.','Cypress trees and gates painted green and pink: Spanish country houses.','Dry pale ground and olive trees on the slope: inland Andalusia.']},
+ {pano:'wgAZpPCvKwpTZT215L1CEw',lat:38.70993,lng:-9.14015,heading:334,where:'Lisbon, Portugal',tips:['Cream stone facades with iron balconies, a sidewalk of black-and-white mosaic cobbles (calçada) and a carved wooden door: central Lisbon, Portugal.','A blue P parking sign and a white Renault van on a narrow one-way street: Portugal.','Pink and yellow buildings with tiled roofs (behind you): Lisbon\'s Chiado.']},
+ {pano:'bYHlBBGwOx67_voj0Q9umA',lat:43.06932,lng:11.59735,heading:336,where:'Val d\'Orcia, Tuscany, Italy',tips:['A gravel farm lane under holm oaks with a ruined brick farmhouse: the Val d\'Orcia south of Siena, Tuscany.','Dry grass, a leaning fence post and dappled shade: the Tuscan countryside in summer.','Brick, not stone, on the farm building: southern Tuscany\'s clay hills.']},
+ {pano:'lts9dguM5foeTMqXHXl9oA',lat:40.85027,lng:14.27114,heading:187,where:'Naples, Italy',tips:['Peeling ochre plaster, a street so narrow the balconies almost touch, and a scooter parked at the door: the old center of Naples, Italy.','Laundry on the balcony and graffiti on the wall: the Spanish Quarter.','Bright Mediterranean light at the end of the alley: southern Italy.']},
+ {pano:'yS4mf9ufs3oTVZpL_tJvwQ',lat:36.42012,lng:25.43196,heading:168,where:'Fira, Santorini, Greece',tips:['White cube houses with blue doors and trim, a tour-bus office and rented quads: Fira on Santorini, Greece.','A narrow road full of white vans and scooters: the Cyclades in tourist season.','Bougainvillea and an olive tree in a white-walled yard: the Greek islands.']},
+ {pano:'cxnl6Y5CAfhXIjt9aTh9og',lat:46.62029,lng:8.04023,heading:258,where:'Grindelwald, Switzerland',tips:['Steep hay meadows right up to the road, a wooden chalet on a stone base and a snowy peak behind: Grindelwald in the Bernese Oberland, Switzerland.','A single-lane paved road with no markings between meadows and a wooden hut: Swiss alpine villages.','Raw timber cladding on a new house and a covered woodpile (behind you): the Bernese Alps.']},
+ {pano:'sYvZvdK3DWdF_s4vCP5Teg',lat:63.41804,lng:-19.00192,heading:112,where:'Vík, Iceland',tips:['A blue keep-right arrow, yellow road markings and dark gray pavement: Iceland. Yellow lines on asphalt are an Icelandic tell.','Gray corrugated-metal commercial buildings under low cloud: the Ring Road villages of south Iceland.','Green mountainsides with no trees at all and a cloud sitting on the ridge (behind you): the south coast.']},
+ {pano:'1mn7eKJT8z7KBdhfEHxnSA',lat:62.90024,lng:27.70003,heading:273,where:'Kuopio, Finland',tips:['Snowbanks along the street in spring, a wooden garage and a wooden house painted ochre: Finland; Kuopio in the Lakeland.','Pine and birch between the houses, a red tiled roof on a wooden apartment house (behind you): Finnish towns.','Muddy melting snow and a yard with a car: April in eastern Finland.']},
+ {pano:'tO52SyZnNex0JQhJZ0DDww',lat:60.59902,lng:15.5976,heading:140,where:'Dalarna, Sweden',tips:['A tall pine forest with a straight road and a drainage ditch beside it: central Sweden; Dalarna\'s sandy pine heaths.','A blue-and-white street-name sign on a post and a yellow-and-blue chevron: Swedish signage.','Sparse heather and lingonberry under the pines: Swedish forest.']},
+ {pano:'6gC2M0GBUikN8IeBQFP91g',lat:13.75004,lng:100.50065,heading:9,where:'Bangkok, Thailand',tips:['A white marble pavilion with a gold-tipped roof, clipped topiary and a bodhi tree: the grounds of a Bangkok temple (wat), Thailand.','Orange-and-green tiled roofs with pointed gable ends and gilded finials (behind you): Thai temple architecture.','Paved courtyards and glazed ceramic decoration: central Thailand.']},
+ {pano:'pARaIkjAlKEY8LWx2DCgVA',lat:21.03001,lng:105.85007,heading:146,where:'Hanoi, Vietnam',tips:['French colonial buildings in cream with green shutters, big old trees along the street and scooters everywhere: Hanoi\'s French Quarter, Vietnam.','Red flags with a gold star on the shopfronts and a red-and-white striped pole: Vietnam.','A Circle K and a bakery sign in Vietnamese with diacritics (behind you): Hanoi.']},
+ {pano:'VKf6-WNfAbEDRvtdncUSvg',lat:13.3599,lng:103.86004,heading:108,where:'Siem Reap, Cambodia',tips:['A wide quiet road with a yellow center line, a new shophouse-style building and palms: Siem Reap, Cambodia.','A canal lined with big rain trees and a green-painted curb (behind you): Siem Reap\'s river road.','Scooters with two riders and no helmets: Cambodia.']},
+ {pano:'oOHrWM9CSqGGAjBEsqV3UA',lat:-8.42991,lng:115.27859,heading:186,where:'Ubud, Bali, Indonesia',tips:['A narrow lane through dense palms and banana trees with a cafe parking sign: Ubud on Bali, Indonesia.','Terracotta tile roofs with pointed Balinese gable ornaments (behind you), and a black-and-white checkered cloth on a shrine: Bali, nowhere else in Indonesia.','A Toyota Avanza minivan and scooters: Indonesia.']},
+ {pano:'HBCilvF6NL_8Xv0LWQBe3g',lat:14.59885,lng:120.97971,heading:145,where:'Manila, Philippines',tips:['A street corner with a bank in a white Art Deco building and cables bundled on concrete poles: Manila, Philippines.','Red-painted iron posts and Spanish-era arcades (behind you): Manila\'s Binondo and Escolta districts.','A motorbike with a sidecar (a tricycle): the Philippines.']},
+ {pano:'z_CEm5zt3qVX7Du50MtCXA',lat:3.15018,lng:101.70092,heading:167,where:'Kuala Lumpur, Malaysia',tips:['A yellow double center line on a steep lane with tropical undergrowth and banana plants, glass towers behind: Kuala Lumpur, Malaysia.','Concrete monsoon drains with metal grates along the road edge: Malaysia and Singapore.','A British colonial building beside the towers: the KL city center.']},
+ {pano:'fXqwqZrUbUSKTMhFF0GIag',lat:37.54984,lng:126.98036,heading:39,where:'Seoul, South Korea',tips:['Red-brick villas with green-tinted glass sunrooms and a parking space tucked under the building: Seoul\'s residential streets, South Korea.','Hangul on the building sign and a yellow-and-black stripe on the curb: Korea.','A steep narrow lane without sidewalks between three-story brick houses: Seoul neighborhoods like Yeonhui-dong.']},
+ {pano:'AHXRdSQwPyaPbCyAn2ZQOw',lat:25.03916,lng:121.55076,heading:2,where:'Taipei, Taiwan',tips:['Six-story apartment blocks tiled in gray and beige with barred windows and a tin rooftop addition: Taipei, Taiwan.','Scooters parked in rows along the curb and a yellow cross-hatched box at the corner (behind you): Taiwan.','Traditional Chinese characters on a vertical sign: Taiwan or Hong Kong, and these buildings say Taiwan.']},
+ {pano:'Jv19p82P4iYHGxOs7DJnfw',lat:7.29026,lng:80.63025,heading:317,where:'Kandy, Sri Lanka',tips:['A steep narrow lane between rough-plastered walls painted cream and gray, green hills behind: Kandy, Sri Lanka\'s hill capital.','A green tuk-tuk on the road (behind you): Sri Lanka.','Cream concrete houses with red tin roofs on the hillside: the Sri Lankan hill country.']},
+ {pano:'2L8QLiQmD8TsbTXQOO1jpw',lat:27.46991,lng:89.63975,heading:326,where:'Thimphu, Bhutan',tips:['Every building with the same painted timber window frames and a Bhutanese gabled roof, required by law: Thimphu, Bhutan.','A woman in a kira, the ankle-length dress, and a Toyota Land Cruiser: Bhutan.','Steep green mountains right behind the town and no traffic lights: Thimphu is the only capital without one.']},
+ {pano:'uS_eYD3TrMlI3k3mXeIy3g',lat:47.9,lng:106.89991,heading:187,where:'Ulaanbaatar, Mongolia',tips:['A red-brick Soviet apartment block, a dusty courtyard parking lot and a three-story yellow block behind: Ulaanbaatar, Mongolia.','Bare ground, no lawn and a pale dry sky: the steppe climate.','Old Japanese and Korean cars parked at random: Ulaanbaatar.']},
+ {pano:'ReCz7ifTy1QfZsTMWXe4iA',lat:43.23837,lng:76.89937,heading:91,where:'Almaty, Kazakhstan',tips:['A blue glass tower behind a row of yellow autumn trees, wide boulevards and a big zebra crossing: Almaty, Kazakhstan.','Soviet apartment blocks beside modern towers, with yellow-leafed poplars and oaks: Almaty in October.','Toyota Camrys and Lexus SUVs and Cyrillic on the signs: Kazakhstan\'s biggest city.']},
+ {pano:'xI1tWq_-sR4FMn1fySvdaw',lat:25.2003,lng:55.27061,heading:97,where:'Dubai, UAE',tips:['A concrete flyover on huge pillars, glass towers behind, manicured hedges and palms in the median: Dubai, UAE.','Sand-colored walls and a ten-story beige parking garage (behind you): Dubai\'s Business Bay.','Traffic lights on a red post and a spotless road: the Gulf.']},
+ {pano:'PfTH_6FW9FSnapVxqwSDMg',lat:32.07963,lng:34.78009,heading:318,where:'Tel Aviv, Israel',tips:['Bauhaus-style beige apartment blocks with balconies, date palms and a blue-and-white bus: Tel Aviv, Israel.','Hebrew on the blue highway sign and yellow license plates: Israel.','Light-rail tracks with overhead wires (behind you): Tel Aviv\'s new red line.']},
+ {pano:'L5urnL2DZ0ap9at5JDEDGg',lat:31.94923,lng:35.93013,heading:79,where:'Amman, Jordan',tips:['Every wall built of pale limestone blocks, a stone-paved street and a cypress hedge: Amman, Jordan, where stone facing is required on buildings.','A green-and-white taxi (behind you): Jordan.','Pine and cypress in dry gardens: the hills of west Amman.']},
+ {pano:'Br_At0fPpHDWxyaHb4VlyA',lat:36.8684,lng:10.34103,heading:243,where:'Sidi Bou Said, Tunisia',tips:['Whitewashed walls with blue trim under Aleppo pines and cypresses, and a smooth road with a white center line: Sidi Bou Said, Tunisia.','Bougainvillea over white walls and a red Tunisian flag: the coast north of Tunis.','A black sedan with white plates and Arabic-and-French signs: Tunisia.']},
+ {pano:'SGUo7W1IOb5AUZYGHkCucg',lat:47.50053,lng:19.05012,heading:264,where:'Budapest, Hungary',tips:['Ornate 19th-century stone buildings with carved window surrounds, a cobbled pedestrian street and a green dome at the end: Zrínyi utca in Budapest, looking at St. Stephen\'s Basilica.','Wrought-iron lamp posts with flower baskets and cafe terraces: central Budapest.','A white delivery truck on the pedestrian street: Hungarian city centers.']},
+ {pano:'xp-lWDJiRbztRPGwZMGM4Q',lat:46.13335,lng:24.52017,heading:91,where:'Biertan, Transylvania, Romania',tips:['Village houses painted pink, green and ochre, gable-end to the street with big arched gates: the Saxon villages of Transylvania, Romania.','A wide unpaved verge, a tractor trailer and green hills: rural Transylvania.','Tiled roofs with a small attic window and a fortified church up the hill: Biertan and its neighbors.']},
+ {pano:'5rJIiRWsOClj1fRKS3MkIw',lat:43.50118,lng:16.44046,heading:94,where:'Split, Croatia',tips:['A ferry terminal with palm trees, a yellow tow truck and old warehouses behind: the port of Split, Croatia.','A white dashed center line, cars parked on the shoulder and palms on the quay (behind you): the Dalmatian coast.','Bright Adriatic light and a cruise ship at the pier: Split.']},
+ {pano:'hIw-LiSoeJHcWrZSQo2H9g',lat:59.44055,lng:24.74969,heading:355,where:'Tallinn, Estonia',tips:['Cobbled streets, limestone-fronted houses with red tile roofs and a yellow baroque facade: Tallinn\'s Old Town, Estonia.','A gray limestone building with a Gothic doorway (behind you): Tallinn is built of local gray limestone.','Small cars on Estonian plates and a Bolt van: Estonia.']},
+ {pano:'-zQB5ojrEgdEE9bQvqd8eQ',lat:46.80997,lng:-71.21,heading:138,where:'Quebec City, Canada',tips:['Stone and stucco houses with steep roofs and dormers on a narrow tree-lined street: Old Quebec, Canada.','A yellow-painted crosswalk and green street signs in French (behind you): Quebec.','Maples in full leaf and a wooden bench: Quebec City\'s Upper Town.']},
+ {pano:'8M8DIlrH-kdNCdLM8WQR9Q',lat:27.70982,lng:85.32006,heading:5,where:'Kathmandu, Nepal',tips:['A yellow-and-black striped curb and a jumble of cables on a concrete pole: Kathmandu, Nepal.','Four-story concrete buildings with shops below and a tall brick temple wall: Nepal\'s capital.','A white Suzuki taxi with a yellow roof sign and scooters everywhere: Kathmandu.']},
+ {pano:'hzXMA-AscNHUIkRz07l8TQ',lat:28.63003,lng:77.21954,heading:5,where:'Connaught Place, Delhi, India',tips:['Yellow-and-green auto-rickshaws and yellow Delhi Police barricades: Delhi, India. The barricade lettering is the city\'s own.','White colonnaded buildings in a circle: Connaught Place, central New Delhi.','A wide road with a zebra crossing under a hazy white sky: north Indian cities.']},
+];
 const MODES={
   classic:  {name:'Classic', desc:'The standard game.'},
   gray:     {name:'Grayscale', desc:'No color. Just light and shadow.', gray:true},
@@ -1879,7 +1848,7 @@ const MODES={
   peek:     {name:'Peek', desc:'Everyone can see where the others are placing their pins.', peek:true, mp:true},
   duel:     {name:'Duel', desc:'Head to head. Each round the worse guess loses health equal to the gap. Last one standing.', duel:true, mp:true, duo:true},
   blind:    {name:'Blind', desc:'One of you sees the street, the other sees only the map. Talk each other to the pin.', blind:true, mp:true, duo:true},
-  learn:    {name:'Learn', desc:'A normal game, and after every round the one or two things that gave the country away.', learn:true, hide:true, filter:n=>!!clueFor(countryOfRegion(n))},
+  learn:    {name:'Learn', desc:'A normal game, and after every round the two or three things in that view that give the place away.', learn:true, hide:true},
   custom:   {name:'Custom map', desc:'Somebody\'s own set of spots.', custom:true, hide:true},
 };
 const DUEL_HP=6000;
@@ -1898,7 +1867,7 @@ function countryOfRegion(n){
 const CTRY_STOP=new Set(['of','the','and','republic','federation','islamic','plurinational','bolivarian','democratic','socialist','province','united','kingdom','states','state']);
 function ctryWords(a){ return String(a||'').toLowerCase().replace(/\(.*?\)/g,' ').replace(/[^a-z\u00c0-\u024f ]/g,' ').split(/\s+/).filter(w=>w&&!CTRY_STOP.has(w)); }
 function sameCountry(a,b){ if(!a||!b) return false; if(String(a).toLowerCase()===String(b).toLowerCase()) return true; const wa=ctryWords(a), wb=ctryWords(b); if(!wa.length||!wb.length) return false; return wa.every(w=>wb.includes(w))||wb.every(w=>wa.includes(w)); }
-/* Deported: land borders between countries the game can actually drop you in. Islands with no reachable neighbour are left out. */
+/* Deported: land borders between countries the game can actually drop you in. Islands with no reachable neighbor are left out. */
 const NEIGHBORS={
  'Albania':['Greece','North Macedonia'],'Algeria':['Tunisia'],'Argentina':['Chile','Bolivia','Brazil','Uruguay'],
  'Austria':['Germany','Czech Republic','Slovakia','Hungary','Slovenia','Italy','Switzerland'],'Bangladesh':['India'],
@@ -1949,7 +1918,7 @@ async function deportStep(chain,m){
   }
   return await findDeported(chain,m);   // one last go; if this throws the round is genuinely unavailable
 }
-/* One Deported round. Every result is either a neighbour of the last country or an explicit fresh start , 
+/* One Deported round. Every result is either a neighbor of the last country or an explicit fresh start , 
    a failed lookup can no longer silently drop you somewhere unrelated. */
 async function findDeported(chain,m){
   const prev=chain[chain.length-1];
@@ -1959,7 +1928,7 @@ async function findDeported(chain,m){
       try{ const l=await findLocation(null,rm); l.from=prev; l.key=deportKey(l,rm.expect); dlog(`deported ${prev} → ${l.key}`); return l; }
       catch(e){ dlog(`deported: nothing found next to ${prev} (pass ${pass+1}): ${e.message}`); }
     }
-    // Last resort before giving up on the chain: each neighbour on its own, with a wider snap.
+    // Last resort before giving up on the chain: each neighbor on its own, with a wider snap.
     for(const c of shuffle(NEIGHBORS[prev].slice())){
       try{ const l=await findLocation(null,{...m,filter:n=>countryOfRegion(n)===c,expect:[c],radius:40000});
         l.from=prev; l.key=c; dlog(`deported ${prev} → ${c} (wide search)`); return l; }
@@ -1973,7 +1942,7 @@ async function findDeported(chain,m){
   dlog(`deported: ${prev?'new chain from ':'start at '}${l.key}`);
   return l;
 }
-/* Deported chain: the next round is in a neighbour of the last country, never straight back where you came from. */
+/* Deported chain: the next round is in a neighbor of the last country, never straight back where you came from. */
 function deportMode(m,chain){
   const prev=chain[chain.length-1];
   let allow=prev&&NEIGHBORS[prev]?NEIGHBORS[prev].slice():DEPORT_START.slice();
@@ -1984,6 +1953,11 @@ function deportMode(m,chain){
 }
 function modeOf(id){ return MODES[id]||MODES.classic; }
 
+/* Learn rounds: a shuffle of the hand-picked spots you haven't been to yet, then the rest. */
+function learnLocs(n){
+  const seen=seenPanos(); const fresh=shuffle(LEARN_SPOTS.filter(sp=>!seen.has(sp.pano))), old=shuffle(LEARN_SPOTS.filter(sp=>seen.has(sp.pano)));
+  return fresh.concat(old).slice(0,Math.max(1,Math.min(n,LEARN_SPOTS.length))).map(sp=>{ notePano(sp.pano); return {pano:sp.pano,lat:sp.lat,lng:sp.lng,heading:sp.heading,place:null,continent:null,region:sp.where,tips:sp.tips,where:sp.where}; });
+}
 /* ---------- Street View lookup (keyless service) ---------- */
 const gmapsReady = new Promise(res=>{ window.__gmapsReady = res; });
 let svService=null;
@@ -2055,7 +2029,7 @@ async function snowScore(pano,tiles){
     const c=document.createElement('canvas'); c.width=cols*512; c.height=rows*512; const x=c.getContext('2d',{willReadFrequently:true});
     const jobs=[]; for(let ty=0;ty<rows;ty++) for(let tx=0;tx<cols;tx++) jobs.push(fetchBitmap(SV_TILE(pano,1,tx,ty),0).then(b=>x.drawImage(b,tx*512,ty*512)).catch(()=>{}));
     await Promise.all(jobs);
-    // The tiles are centred on the driving direction, so the road runs through the middle and the edges; the quarter points look sideways,
+    // The tiles are centerd on the driving direction, so the road runs through the middle and the edges; the quarter points look sideways,
     // off the road. Snow is bright and neutral-to-cool there; pale dust, sand and concrete are warm (red above blue) or only on the road.
     const y0=Math.round(H*0.50), y1=Math.round(H*0.74);
     const side=(u0,u1)=>{ const x0=Math.round(W*u0), x1=Math.round(W*u1); const d=x.getImageData(x0,y0,x1-x0,y1-y0).data; let n=0,w=0;
@@ -2166,7 +2140,7 @@ function makeMap(id,opts={}){
   allMaps.push(m); applyStyle(m);
   return m;
 }
-/* Every guess is a white pin; what sits in its head says whose it is, a colour, or the player's photo. */
+/* Every guess is a white pin; what sits in its head says whose it is, a color, or the player's photo. */
 const PIN_BODY='M16 1C7.7 1 1 7.7 1 16c0 10.5 15 27 15 27s15-16.5 15-27C31 7.7 24.3 1 16 1z';
 const PIN_SVG=(inner)=>`<svg viewBox="0 0 32 44" width="32" height="44"><path d="${PIN_BODY}" fill="#fff" stroke="#152219" stroke-width="2"/><circle cx="16" cy="16" r="9.5" fill="${inner}"/></svg>`;
 function pinIcon(inner,av,late){
@@ -2179,13 +2153,13 @@ const colorIcon=(c,late)=>pinIcon(c,null,late);
 /* Your own pin in a solo game: your photo if you have one, otherwise the green. */
 function myIcon(late){ return pinIcon(SOLO_COL,acct.av||null,late); }
 function playerIcon(p,late){ return pinIcon(COLORS[(p&&p.color)??0][0],p&&p.face?avOf(p.id):null,late); }
-/* The little round token beside a name: their photo if they chose it, otherwise their colour. */
+/* The little round token beside a name: their photo if they chose it, otherwise their color. */
 function swStyle(p){
   const av=p&&p.face?avOf(p.id):null;
   return av?`background-image:url(${av});background-size:cover;background-position:center`
            :`background:${COLORS[(p&&p.color)??0][0]}`;
 }
-/* Lines on the result maps follow the player's colour. A photo has no colour, so take the one that
+/* Lines on the result maps follow the player's color. A photo has no color, so take the one that
    stands out most in it: the busiest saturated hue, nudged into a range that reads on a map. */
 const domCache={};
 function dominantColor(url){
@@ -2206,7 +2180,7 @@ function dominantColor(url){
     let r,g,b;
     if(best>=0&&bw>2){ const s0=sum[best]; r=s0[0]/s0[3]; g=s0[1]/s0[3]; b=s0[2]/s0[3]; }
     else if(fn){ r=fr/fn; g=fg/fn; b=fb/fn; } else { r=0.55; g=0.36; b=0.96; }
-    // pull it into a lively, mid-lightness colour so a pale or very dark photo still gets a visible line
+    // pull it into a lively, mid-lightness color so a pale or very dark photo still gets a visible line
     const mx=Math.max(r,g,b),mn=Math.min(r,g,b); let l=(mx+mn)/2; let sa=mx===mn?0:(l>0.5?(mx-mn)/(2-mx-mn):(mx-mn)/(mx+mn));
     let h=0; if(mx!==mn){ const dl=mx-mn; if(mx===r) h=((g-b)/dl+(g<b?6:0))/6; else if(mx===g) h=((b-r)/dl+2)/6; else h=((r-g)/dl+4)/6; }
     sa=Math.max(sa,0.62); l=Math.min(0.55,Math.max(0.36,l));
@@ -2227,7 +2201,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-224344';
+const BUILD='20260917-225903';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2357,7 +2331,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:0};
+const VERSION={major:3,minor:5,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2673,7 +2647,7 @@ function avPaint(){
   const big=$('avPreview'); if(big){ big.style.backgroundImage=url?`url(${url})`:''; big.textContent=url?'':(acct.name?acct.name[0].toUpperCase():'?'); big.style.setProperty('--avring',myLineColor()); }
   if($('colorEdit')){ $('colorEdit').hidden=!url; $('colorDot').style.background=myLineColor(); if(!url) $('colorBox').hidden=true; }
 }
-/* ---------- Line colour: a hue wheel, white in the middle, drawn once on a canvas ---------- */
+/* ---------- Line color: a hue wheel, white in the middle, drawn once on a canvas ---------- */
 function okColor(v){ return typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v)?v.toLowerCase():null; }
 const wheel={drawn:false,pick:null,R:120};
 function hsvHex(h,sat,v){ const c=v*sat, x=c*(1-Math.abs((h/60)%2-1)), m=v-c; let r,g,b; if(h<60){r=c;g=x;b=0;}else if(h<120){r=x;g=c;b=0;}else if(h<180){r=0;g=c;b=x;}else if(h<240){r=0;g=x;b=c;}else if(h<300){r=x;g=0;b=c;}else{r=c;g=0;b=x;}
@@ -2716,7 +2690,7 @@ $('colorSave').addEventListener('click',async()=>{
   acct.color=wheel.pick; acctSave(); avPaint(); paintAcct();
   const got=await acctFetch(acct.key);
   if(got.record) acctPublish({...got.record,color:acct.color});
-  acctMsg('acctMsg2','Colour saved.','ok'); $('colorBox').hidden=true;
+  acctMsg('acctMsg2','Color saved.','ok'); $('colorBox').hidden=true;
   if(mp.role) sendAvatar();
 });
 function avFromFile(file){
@@ -2743,7 +2717,7 @@ $('avFile').addEventListener('change',async e=>{
     const rec={...(got.record||{}),key:acct.key,name:acct.name,av:url};
     if(!rec.hash){ acctMsg('acctMsg2','Could not reach your account record. Try again.','bad'); return; }
     acct.av=url; acct.color=null; acctSave(); dominantColor(url); avPaint(); paintAcct();
-    acctMsg('acctMsg2',acctPublish(rec)?'Photo saved. Now pick the colour for your lines.':'Saved here, but the server didn\'t take it.','ok');
+    acctMsg('acctMsg2',acctPublish(rec)?'Photo saved. Now pick the color for your lines.':'Saved here, but the server didn\'t take it.','ok');
     if(mp.role) sendAvatar();
     setTimeout(()=>{ $('colorBox').hidden=true; openColor(); },350);
   }catch(err){ acctMsg('acctMsg2','That file didn\'t work. Try a jpg or png.','bad'); }
@@ -3585,6 +3559,7 @@ async function startGame(opts){
   state.timeLimit=ch?(ch.time||0):daily?daily.time:(m.time!=null?m.time:state.userTime);
   state.totalRounds=ch?Math.max(1,Math.min(ch.rounds||ch.locs.length,ch.locs.length)):daily?daily.rounds:(m.rounds!=null?m.rounds:state.userRounds);
   if(state.custom&&!ch) state.totalRounds=Math.min(state.totalRounds,state.custom.pins.length);
+  if(m.learn&&!ch) state.totalRounds=Math.min(state.totalRounds,LEARN_SPOTS.length);
   resetGameState();
   state.daily=daily; state.chal=ch;
   if(ch&&ch.av) dominantColor(ch.av);
@@ -3594,6 +3569,7 @@ async function startGame(opts){
   const pm=regionOK(state.mode)?applyRegion(m,state.region):m;
   if(m.country){ $('loadingText').textContent='Loading borders…'; try{ await loadGeo(); ensureCountryLayer(); }catch(e){ toast('Could not load country borders. Check your connection.'); show('setup'); $('startBtn').disabled=false; $('startBtn').textContent=__lbl; return; } }
   if(ch){ state.locs=ch.locs.slice(0,state.totalRounds).map(l=>({...l})); state.chain=state.locs.map(l=>l.key).filter(Boolean); }
+  else if(m.learn){ state.locs=learnLocs(state.totalRounds); }
   else if(state.custom){ state.locs=await customLocs(state.custom,state.totalRounds); }
   else (async()=>{ for(let i=0;i<state.totalRounds;i++){ try{
       if(m.deported){ const l=await deportStep(state.chain,m); state.locs[i]=l; state.chain.push(l.key); }
@@ -3798,11 +3774,9 @@ function renderVerdict(r){
 }
 /* Learn mode: after the round, the tells for the country you were just in. */
 function paintClues(tp){
-  const box=$('clueBox'); const want=state.mode==='learn';
-  const c=want&&tp?clueFor(tp.country):null;
-  box.hidden=!c; if(!c) return;
-  const where=tp&&tp.region?`${esc(tp.region)}, ${esc(c.country)}`:esc(c.country);
-  box.innerHTML=`<div class="ch">How to spot it next time<b>${where}</b></div><ul>${c.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
+  const box=$('clueBox'); const loc=state.current; const tips=state.mode==='learn'&&loc&&Array.isArray(loc.tips)?loc.tips:null;
+  box.hidden=!tips; if(!tips) return;
+  box.innerHTML=`<div class="ch">What gave it away<b>${esc(loc.where||(tp&&tp.country)||'')}</b></div><ul>${tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
 }
 $('nextBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpHostNext(); return; } if(mp.role) return; if(state.round>=state.totalRounds||(modeOf(state.mode).bet&&state.bank<=0)) showFinal(); else nextRound(); });
 
@@ -3973,7 +3947,7 @@ async function buildCopyImage(pano){
   }
   return c;
 }
-/* The copy should look like the round you're playing: grey stays grey, pixelated stays blocky. */
+/* The copy should look like the round you're playing: gray stays gray, pixelated stays blocky. */
 function modeLook(ctx,canvas,x,y,m){
   if(state.mode==='pixel'){
     const bw=Math.round(VIEW_W/9), bh=Math.round(VIEW_H/9);   // same blockiness as the in-game canvas
@@ -4300,7 +4274,7 @@ function showCountryResultMP(rev){
   if(rev.place) $('placeTxt').innerHTML=`<span>📍 Location: <b>${esc(rev.place.region?rev.place.region+', ':'')}${esc(rev.place.country)}</b></span>`;
   mpRankRows(rev,r=>r.country?esc(r.country):'no pick');
 }
-/* Deported: the countries you've been walked through, and whether the next one really is a neighbour. */
+/* Deported: the countries you've been walked through, and whether the next one really is a neighbor. */
 function deportTrail(r){
   const here=(r.loc&&r.loc.key)||(r.loc&&r.loc.place&&r.loc.place.country)||'?';
   const parts=[];
@@ -4745,7 +4719,7 @@ async function hostStartGame(){
   $('mpStartBtn').disabled=true; $('mpStartBtn').textContent='Finding locations…';
   mpBroadcast({t:'countdown',secs:0,msg:'Starting…'});
   // Auto-assign colors and names
-  for(const p of playerList()) if(p.face) p.color=null;   // photo players get a fresh line colour each game
+  for(const p of playerList()) if(p.face) p.color=null;   // photo players get a fresh line color each game
   const taken=new Set(playerList().map(p=>p.color).filter(c=>c!==null));
   let n=1; for(const p of playerList()){ if(!p.name) p.name='Player '+(n++); if(p.color===null){ const c=COLORS.findIndex((_,i)=>!taken.has(i)); p.color=c<0?0:c; taken.add(p.color); } p.score=0; p.out=false; p.outRound=null; p.lives=null; }
   const em=modeOf(mp.settings.mode);
@@ -4845,7 +4819,7 @@ function paintLives(){
   livesShown=left;
   return true;
 }
-/* Health colour: green while comfortable, orange once it's getting low, red when a round could end it. */
+/* Health color: green while comfortable, orange once it's getting low, red when a round could end it. */
 function hpClass(pct){ return pct<=25?'low':pct<=50?'mid':''; }
 /* Duel HUD: two health bars where the round and score pills usually sit. */
 function paintDuel(){
@@ -5007,7 +4981,7 @@ function showFinalMP(fin){
   if(finalLayer) finalLayer.remove();
   finalLayer=L.layerGroup().addTo(finalMap);
   const pts=[];
-  /* Every round's real spot, and every player's guess for it, each line in that player's colour. */
+  /* Every round's real spot, and every player's guess for it, each line in that player's color. */
   const revs=(mp.revs&&mp.revs.length)?mp.revs:state.results.map(r=>({truth:r.truth,results:[]}));
   for(const rev of revs){ pts.push(rev.truth); L.marker(rev.truth,{icon:trueIcon}).addTo(finalLayer);
     for(const r of rev.results||[]){ if(!r.guess||r.guess.lat==null) continue; pts.push(r.guess);
