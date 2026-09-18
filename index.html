@@ -1162,11 +1162,10 @@
       <div class="label">Sound</div>
       <div class="seg" id="soundSeg"><button data-snd="1">On</button><button data-snd="0">Off</button></div>
     </div>
-    <div class="card wide" id="adminCard" hidden>
+    <div class="card wide" id="adminCard">
       <h2 style="margin:0 0 4px">Admin</h2>
       <div id="adminOff">
-        <div class="rsub" style="margin-top:8px">Enter the admin phrase once on this device.</div>
-        <div class="prow2" style="margin-top:10px"><input class="tin" id="adminPhrase" placeholder="admin phrase" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="adminGo">Unlock</button></div>
+        <div class="prow2" style="margin-top:12px"><input class="tin code" id="adminPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" style="max-width:180px"><button class="btn btn-secondary" id="adminGo">Enter admin mode</button></div>
         <div class="acctmsg" id="adminMsg"></div>
       </div>
       <div id="adminHid" hidden>
@@ -1174,14 +1173,14 @@
         <button class="btn btn-secondary btn-block" id="adminShow" style="margin-top:10px">Show admin controls</button>
       </div>
       <div id="adminOn" hidden>
-        <div class="rsub" style="margin-top:8px">Admin is on whenever @silas is signed in on this device. Leaderboard rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.</div>
+        <div class="rsub" style="margin-top:8px" id="adminWhy">Admin is on. Leaderboard rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.</div>
         <div class="label">Rename an account</div>
         <div class="prow2"><input class="tin" id="adminRnKey" placeholder="handle" autocomplete="off" spellcheck="false"><input class="tin" id="adminRnName" maxlength="16" placeholder="new name" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="adminRnGo">Rename</button></div>
         <div class="label">Remove or ban an account</div>
         <div class="prow2"><input class="tin" id="adminAcct" placeholder="handle" autocomplete="off" spellcheck="false"><button class="btn btn-secondary danger" id="adminAcctGo">Remove</button><button class="btn btn-secondary danger" id="adminBanGo">Ban</button></div>
         <div class="rsub" style="margin-top:8px">Remove deletes the account. Ban also wipes its scores and maps and stops the handle being claimed again.</div>
         <div class="acctmsg" id="adminMsg2"></div>
-        <div class="twobtn"><button class="btn btn-secondary sm" id="adminHide">Hide controls this visit</button><button class="btn btn-secondary sm" id="adminForget">Forget the phrase on this device</button></div>
+        <div class="twobtn"><button class="btn btn-secondary sm" id="adminHide">Hide controls this visit</button><button class="btn btn-secondary sm" id="adminExit" hidden>Exit admin mode</button></div>
       </div>
     </div>
   </div>
@@ -2284,7 +2283,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-234804';
+const BUILD='20260917-235128';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2312,10 +2311,9 @@ function lbClean(e){
    so a removed score can't creep back from the browser that saved it. */
 const BAN_ROOT='worlddrop/v1/ban';
 lb.ban=new Set(); lb.banK=new Set();
-/* Admin belongs to one account. The phrase's hash lives here; the phrase itself never does. */
-const ADMIN_KEY='silas', ADMIN_HASH='cf3409ff012df9e16b8af95ff83e0f4bb5e3c1e39d66f8da0453f5530526b74f';
-const admin={on:false,unlocked:false,hidden:false,ready:false};
-try{ admin.unlocked=localStorage.getItem('pp_adm')===ADMIN_HASH; }catch(e){}
+/* Admin is the @silas account, automatically. A code also turns it on for one visit. */
+const ADMIN_KEY='silas', ADMIN_CODE='6996';
+const admin={on:false,temp:false,hidden:false,ready:false};
 function banMerge(list){ if(Array.isArray(list)) for(const id of list.slice(-800)) if(typeof id==='string') lb.ban.add(id); }
 function banKMerge(list){ if(Array.isArray(list)) for(const k of list.slice(-800)) if(typeof k==='string'&&k!==ADMIN_KEY) lb.banK.add(k); }
 function banPublish(){ const payload=JSON.stringify([...lb.ban].slice(-800)); for(const l of lb.links) if(l.ready){ try{ l.client.publish(BAN_ROOT+'/ids',payload,{qos:1,retain:true}); }catch(e){} } }
@@ -2422,7 +2420,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:1};
+const VERSION={major:3,minor:4,patch:2};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2683,7 +2681,7 @@ async function acctContinue(){
       acctPublish({...got.record,seen:Date.now()});   // republish so the record stays alive on every broker
       acctMsg('acctMsg','Signed in.','ok');
     } else {
-      if(key===ADMIN_KEY&&!admin.unlocked){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is reserved.','bad'); bad('acctName'); return; }
+      if(key===ADMIN_KEY&&!admin.temp){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is reserved.','bad'); bad('acctName'); return; }
       const salt=Math.random().toString(36).slice(2,10);
       const hash=await acctHash(pin,salt,key);
       const rec={key,name:cleanName(raw).slice(0,16)||key,salt,hash,made:Date.now()};
@@ -3579,28 +3577,26 @@ $('statsBtn').addEventListener('click',openStats);
 $('statsBack').addEventListener('click',()=>{ show('acct'); });
 
 /* ---------- Admin mode ----------
-   Admin belongs to one account, @silas. It takes two things: that account signed in, and the admin phrase
-   entered once on this device (only its hash is kept). Nobody else can turn it on, the handle can't be
-   claimed fresh, and rewriting the account record on a broker gets you nothing without the phrase.
-   Everything admin removes, renames or bans goes to the brokers, so it changes for everyone. */
-async function sha256hex(str){ const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str)); return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
-function adminSync(){ admin.on=admin.unlocked&&acct.key===ADMIN_KEY&&!admin.hidden; paintAdmin(); }
+   Signed in as @silas, admin is simply on. The code turns it on for one visit from any account.
+   The handle can't be claimed fresh. Everything admin removes, renames or bans goes to the brokers,
+   so it changes for everyone. */
+function adminSync(){ admin.on=(acct.key===ADMIN_KEY||admin.temp)&&!admin.hidden; paintAdmin(); }
 function paintAdmin(){
-  const me=acct.key===ADMIN_KEY;
-  $('adminCard').hidden=!me;
-  $('adminOff').hidden=admin.unlocked; $('adminOn').hidden=!(admin.unlocked&&!admin.hidden); $('adminHid').hidden=!(admin.unlocked&&admin.hidden);
+  const me=acct.key===ADMIN_KEY, has=me||admin.temp;
+  $('adminOff').hidden=has; $('adminOn').hidden=!(has&&!admin.hidden); $('adminHid').hidden=!(has&&admin.hidden);
+  $('adminWhy').textContent=me?'Admin is on because you are @silas. Leaderboard rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.':'Admin mode is on for this visit. Leaderboard rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.';
+  $('adminExit').hidden=me;
 }
-$('adminGo').addEventListener('click',async()=>{
-  const h=await sha256hex('pinpoint-admin:'+$('adminPhrase').value.trim().toLowerCase()); $('adminPhrase').value='';
-  if(h!==ADMIN_HASH){ acctMsg('adminMsg','Wrong phrase.','bad'); $('adminPhrase').classList.remove('bad'); void $('adminPhrase').offsetWidth; $('adminPhrase').classList.add('bad'); return; }
-  admin.unlocked=true; try{ localStorage.setItem('pp_adm',h); }catch(e){}
-  acctMsg('adminMsg',''); adminSync(); lbPaint(); toast('Admin on','ok'); sfx('lock');
+$('adminGo').addEventListener('click',()=>{
+  const v=$('adminPin').value.trim(); $('adminPin').value='';
+  if(v!==ADMIN_CODE){ acctMsg('adminMsg','Wrong code.','bad'); $('adminPin').classList.remove('bad'); void $('adminPin').offsetWidth; $('adminPin').classList.add('bad'); return; }
+  admin.temp=true; acctMsg('adminMsg',''); adminSync(); lbPaint(); toast('Admin mode on','ok'); sfx('lock');
 });
-$('adminPhrase').addEventListener('keydown',e=>{ if(e.key==='Enter') $('adminGo').click(); });
-$('adminPhrase').addEventListener('input',e=>e.target.classList.remove('bad'));
+$('adminPin').addEventListener('keydown',e=>{ if(e.key==='Enter') $('adminGo').click(); });
+$('adminPin').addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').slice(0,4); e.target.classList.remove('bad'); });
+$('adminExit').addEventListener('click',()=>{ admin.temp=false; adminSync(); lbPaint(); toast('Admin mode off','ok'); });
 $('adminHide').addEventListener('click',()=>{ admin.hidden=true; adminSync(); lbPaint(); toast('Admin controls hidden until you reload','ok'); });
 $('adminShow').addEventListener('click',()=>{ admin.hidden=false; adminSync(); lbPaint(); });
-$('adminForget').addEventListener('click',()=>{ if(!confirm('Forget the admin phrase on this device? You can enter it again any time.')) return; admin.unlocked=false; try{ localStorage.removeItem('pp_adm'); }catch(e){} adminSync(); lbPaint(); });
 const TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>';
 const PENCIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 function trashCell(id,board){ return admin.on?`<td class="adm"><button class="pencil" data-edit="${esc(id)}" data-board="${esc(board)}" title="Change the name on this row for everyone">${PENCIL}</button><button class="trash" data-trash="${esc(id)}" data-board="${esc(board)}" title="Remove this score for everyone">${TRASH}</button></td>`:''; }
