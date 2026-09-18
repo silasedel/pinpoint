@@ -1388,6 +1388,9 @@
       <div class="label">Start view <span class="dim">(where the guess map opens for players)</span></div>
       <div class="prow2" style="flex-wrap:wrap"><button class="btn btn-secondary sm" id="mkStartSet">Use the current map view</button><button class="btn btn-secondary sm" id="mkStartClear" hidden>Back to the whole world</button></div>
       <div class="rsub" id="mkStartNote" style="margin-top:6px">Players start zoomed out to the whole world. For a city or state map, zoom the map above into it and press the button.</div>
+      <div class="label">Scoring <span class="dim" id="mkScaleWord"></span></div>
+      <div class="prow2"><span class="dim" style="font-size:12px">Tight</span><input type="range" id="mkScale" min="0" max="100" value="100" style="flex:1"><span class="dim" style="font-size:12px">Whole world</span><button class="btn btn-secondary sm" id="mkScaleAuto">Auto</button></div>
+      <div class="rsub" id="mkScaleNote" style="margin-top:6px"></div>
       <div class="label">Progress <span class="dim" id="mkCount">0 of 10 minimum</span></div>
       <div class="mkprog"><i id="mkProg"></i></div>
       <div class="rsub" id="mkNeed" style="margin:6px 0 10px">10 spots minimum. After that there is no limit.</div>
@@ -2248,7 +2251,15 @@ function haversine(a,b){
   const s=Math.sin(dLat/2)**2+Math.cos(toR(a.lat))*Math.cos(toR(b.lat))*Math.sin(dLng/2)**2;
   return 2*R*Math.asin(Math.sqrt(s));
 }
-function scoreFor(km){ if(km<0.025) return 5000; return Math.round(5000*Math.exp(-km/1492.7)); }
+/* Points fall off with distance. The constant is the world's (about 1,500 km); a custom map can carry its own,
+   so a wrong side of Austin scores like a wrong side of the planet. */
+const WORLD_SCALE=1492.7;
+function scoreScale(){ const c=state.custom; if(!c) return WORLD_SCALE; const sc=+c.scale>0?+c.scale:(Array.isArray(c.pins)&&c.pins.length>1?autoScale(c.pins):WORLD_SCALE); return Math.min(WORLD_SCALE,Math.max(1,sc)); }
+function scoreFor(km){ if(km<0.025) return 5000; return Math.round(5000*Math.exp(-km/scoreScale())); }
+function scaleWord(km){ return !(km>0)||km>=WORLD_SCALE*0.9?'World':km>=400?'Continent':km>=60?'Country':km>=8?'Region':'City'; }
+function spreadKm(pins){ if(!pins||pins.length<2) return 0; let a=90,b=-90,c=180,d=-180; for(const p of pins){ a=Math.min(a,+p.lat); b=Math.max(b,+p.lat); c=Math.min(c,+p.lng); d=Math.max(d,+p.lng); } return haversine({lat:a,lng:c},{lat:b,lng:d}); }
+function autoScale(pins){ return Math.min(WORLD_SCALE,Math.max(1,spreadKm(pins)/6)); }   // a city 26 km across: wrong side of town scores under 100
+const sliderToKm=v=>2*Math.pow(WORLD_SCALE/2,v/100), kmToSlider=km=>Math.round(100*Math.log(Math.max(2,km)/2)/Math.log(WORLD_SCALE/2));
 /* Countdown mode: points are worth less the longer you wait. Full value at the start, a quarter at zero. */
 function countdownMult(left,total){ return total?0.25+0.75*Math.max(0,Math.min(1,left/total)):1; }
 function fmtDist(km){ const mi=km*0.621371; return mi<0.1 ? `${Math.round(mi*5280)} ft` : mi<100 ? `${mi.toFixed(1)} mi` : `${Math.round(mi).toLocaleString()} mi`; }
@@ -2352,7 +2363,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-005634';
+const BUILD='20260918-013706';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2503,7 +2514,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:7};
+const VERSION={major:3,minor:4,patch:8};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3325,7 +3336,7 @@ const cm={cur:null, all:{}, time:60, rounds:5, mk:null, loaded:false, from:'menu
 function cmapLink(id){ return location.origin+location.pathname+'?m='+id; }
 function cmapPublish(rec){ let sent=false; for(const l of lb.links) if(l.ready){ try{ l.client.publish(CM_ROOT+'/'+rec.id,JSON.stringify(rec),{qos:1,retain:true}); sent=true; }catch(e){} } return sent; }
 async function cmapFetch(id){ const t0=Date.now(); while(!lbLive()&&Date.now()-t0<9000) await new Promise(r=>setTimeout(r,250)); const got=await fetchMany(CM_ROOT,[id],3600); const r=got[id]; return r&&r.id===id&&Array.isArray(r.pins)?r:null; }
-function cmapClean(r){ if(!r||!r.id||!r.name||!Array.isArray(r.pins)) return null; const pins=r.pins.filter(p=>p&&isFinite(+p.lat)&&isFinite(+p.lng)&&p.pano).slice(0,300); if(!pins.length) return null; return {...r,pins,name:String(r.name).slice(0,32),plays:+r.plays||0,top:Array.isArray(r.top)?r.top:[],likes:Array.isArray(r.likes)?r.likes.filter(k=>typeof k==='string'):[],stats:r.stats&&typeof r.stats==='object'?r.stats:{},thumb:r.thumb&&typeof r.thumb==='object'?r.thumb:null,start:r.start&&isFinite(+r.start.lat)?r.start:null}; }
+function cmapClean(r){ if(!r||!r.id||!r.name||!Array.isArray(r.pins)) return null; const pins=r.pins.filter(p=>p&&isFinite(+p.lat)&&isFinite(+p.lng)&&p.pano).slice(0,300); if(!pins.length) return null; return {...r,pins,name:String(r.name).slice(0,32),plays:+r.plays||0,top:Array.isArray(r.top)?r.top:[],likes:Array.isArray(r.likes)?r.likes.filter(k=>typeof k==='string'):[],stats:r.stats&&typeof r.stats==='object'?r.stats:{},thumb:r.thumb&&typeof r.thumb==='object'?r.thumb:null,start:r.start&&isFinite(+r.start.lat)?r.start:null,scale:+r.scale>0?+r.scale:null}; }
 /* Every map has a picture: the one its maker chose, or a slice of one of its spots. */
 function hashStr(t){ let h=0; for(const c of String(t)) h=(h*31+c.charCodeAt(0))>>>0; return h; }
 function thumbOf(rec){
@@ -3413,7 +3424,7 @@ function renderCmap(){
   $('cmHero').style.backgroundImage=`url("${thumbOf(rec)}")`;
   $('cmTitle').textContent=rec.name;
   const likes=Array.isArray(rec.likes)?rec.likes:[]; const liked=!!acct.key&&likes.includes(acct.key);
-  $('cmFacts').innerHTML=[['Spots',rec.pins.length],['By',rec.byName||rec.by||'someone',rec.by],['Plays',(rec.plays||0).toLocaleString()],['Likes',likes.length.toLocaleString()]].map(([k,v,pk])=>`<div class="dfact"${pk?` data-prof="${esc(pk)}" style="cursor:pointer"`:''}><small>${k}</small><b>${esc(String(v))}</b></div>`).join('');
+  $('cmFacts').innerHTML=[['Spots',rec.pins.length],['By',rec.byName||rec.by||'someone',rec.by],['Plays',(rec.plays||0).toLocaleString()],['Likes',likes.length.toLocaleString()],['Scoring',scaleWord(rec.scale>0?rec.scale:autoScale(rec.pins))]].map(([k,v,pk])=>`<div class="dfact"${pk?` data-prof="${esc(pk)}" style="cursor:pointer"`:''}><small>${k}</small><b>${esc(String(v))}</b></div>`).join('');
   $('cmLike').textContent=liked?`♥ Liked · ${likes.length}`:`♡ Like · ${likes.length}`; $('cmLike').classList.toggle('on',liked);
   const N=rec.pins.length; const opts=[5,10].filter(n=>n<=N); if(N>10) opts.push(N);   // 5 or 10, and everything if there is more than 10
   if(!opts.includes(cm.rounds)) cm.rounds=opts[0];
@@ -3438,7 +3449,7 @@ $('cmOwner').addEventListener('click',async e=>{ if(!e.target.closest('#cmDelete
 $('cmEdit').addEventListener('click',()=>{ if(cm.cur) openMake(cm.cur); });
 $('cmPlay').addEventListener('click',()=>{
   const rec=cm.cur; if(!rec) return;
-  if(mp.role==='host'){ mp.customPins=rec.pins; mp.settings.custom={id:rec.id,name:rec.name,n:rec.pins.length,start:rec.start||null}; mp.settings.mode='custom'; mp.settings.rounds=cm.rounds; mp.settings.time=cm.time; mp.locPromise=null; hostSync(); show('lobby'); toast(`Room set to ${rec.name}`,'ok'); return; }
+  if(mp.role==='host'){ mp.customPins=rec.pins; mp.settings.custom={id:rec.id,name:rec.name,n:rec.pins.length,start:rec.start||null,scale:+rec.scale>0?+rec.scale:autoScale(rec.pins)}; mp.settings.mode='custom'; mp.settings.rounds=cm.rounds; mp.settings.time=cm.time; mp.locPromise=null; hostSync(); show('lobby'); toast(`Room set to ${rec.name}`,'ok'); return; }
   state.mode='custom'; state.custom=rec; state.region={type:'all',value:null}; state.userTime=cm.time; state.userRounds=cm.rounds; state.timeLimit=cm.time; state.totalRounds=cm.rounds;
   startGame();   // the play is counted when it finishes, on a fresh copy of the record
 });
@@ -3480,7 +3491,8 @@ function openMake(rec){
   if(rec&&Array.isArray(rec.pins)){   // editing a published map: its spots come in, and Save puts them back under the same id
     mk.edit=rec; $('mkName').value=rec.name; mk.pins=rec.pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:0,label:p.label||''})); mkLabels();
     mk.thumb=rec.thumb&&rec.thumb.img?{...rec.thumb}:null; mk.thMode=mk.thumb?(mk.thumb.pano?'spot':'upload'):'auto'; mk.start=rec.start&&isFinite(+rec.start.lat)?{lat:+rec.start.lat,lng:+rec.start.lng,z:+rec.start.z||3}:null;
-  } else if(mk.edit){ mk.edit=null; mk.pins=[]; $('mkName').value=''; mk.thumb=null; mk.thMode='auto'; mk.start=null; }
+    mk.scale=+rec.scale>0?+rec.scale:null;   // older maps have none, so they get Auto until saved
+  } else if(mk.edit){ mk.edit=null; mk.pins=[]; $('mkName').value=''; mk.thumb=null; mk.thMode='auto'; mk.start=null; mk.scale=null; }
   $('mkTitle').textContent=mk.edit?'Edit map':'Create a map';
   tview.pano=null; tview.band=null; paintThumb(); paintStart();
   if(mk.thMode==='spot'&&mk.thumb){ paintThumbSel(); const i=mk.pins.findIndex(p=>p.pano===mk.thumb.pano); if(i>=0) $('mkThumbSel').value=String(i); thumbLook(); }
@@ -3532,6 +3544,7 @@ function renderMk(){
   paintThumbSel();
   $('mkList').innerHTML=mk.pins.length?mk.pins.map((p,i)=>`<div class="mkrow${p.dead?' dead':''}"><img src="${SV_TILE(p.pano,0,0,0)}" alt="" data-look="${i}" title="Look at this spot"><span class="mkt">${esc(p.label||'Spot '+(i+1))}<small>${p.dead?'Gone from Street View · ':''}${p.lat}, ${p.lng}</small></span><button class="look" data-look="${i}">Look</button><button data-del="${i}">Remove</button></div>`).join(''):'<div class="frempty">Nothing yet. Click the map.</div>';
   $('mkTools').hidden=!n; $('mkDropDead').hidden=!mk.pins.some(p=>p.dead);
+  paintScale();
   const verb=mk.edit?'Save':'Publish', nm=$('mkName').value.trim();
   $('mkSave').disabled=n<MIN||nm.length<2;
   $('mkSave').textContent=n<MIN?`${verb} map (${n}/${MIN})`:nm.length<2?`Name it to ${verb.toLowerCase()}`:mk.edit?`Save changes to ${nm}`:`Publish ${nm}`;
@@ -3602,11 +3615,11 @@ $('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefau
 $('mkSave').addEventListener('click',()=>{
   const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<10||name.length<2) return;
   const pins=mk.pins.map(p=>({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading,label:(p.label||'').slice(0,40)}));
-  const thumb=mk.thumb&&mk.thumb.img?mk.thumb:null, start=mk.start||null;
-  const rec=mk.edit?{...mk.edit,name,pins,thumb,start,edited:Date.now()}
-    :{id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],likes:[],stats:{},thumb,start,pins};
+  const thumb=mk.thumb&&mk.thumb.img?mk.thumb:null, start=mk.start||null, scale=Math.round(mkScaleKm()*100)/100;
+  const rec=mk.edit?{...mk.edit,name,pins,thumb,start,scale,edited:Date.now()}
+    :{id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],likes:[],stats:{},thumb,start,scale,pins};
   if(!cmapPublish(rec)){ $('mkMsg').textContent='Not connected, try again in a moment.'; return; }
-  const was=!!mk.edit; cm.all[rec.id]=rec; mk.edit=null; mk.pins=[]; mk.thumb=null; mk.thMode='auto'; mk.start=null; $('mkName').value=''; renderMk(); paintThumb(); paintStart(); toast(was?'Map updated':'Map published','ok'); cmapOpen(rec.id);
+  const was=!!mk.edit; cm.all[rec.id]=rec; mk.edit=null; mk.pins=[]; mk.thumb=null; mk.thMode='auto'; mk.start=null; mk.scale=null; $('mkName').value=''; renderMk(); paintThumb(); paintStart(); toast(was?'Map updated':'Map published','ok'); cmapOpen(rec.id);
 });
 /* ----- thumbnail: auto, a spot at a chosen angle (rendered here from the tiles), or an uploaded image ----- */
 function paintThumb(){
@@ -3663,6 +3676,16 @@ $('mkThumbFile').addEventListener('click',()=>$('mkThumbInput').click());
 $('mkThumbInput').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return; const url=URL.createObjectURL(f); const im=new Image();
   im.onload=()=>{ const c=document.createElement('canvas'); c.width=480; c.height=270; const ctx=c.getContext('2d'); const s=Math.max(480/im.width,270/im.height); const w=im.width*s,h=im.height*s; ctx.drawImage(im,(480-w)/2,(270-h)/2,w,h); cm.mk.thumb={img:c.toDataURL('image/jpeg',0.8)}; URL.revokeObjectURL(url); paintThumb(); sfx('click'); };
   im.onerror=()=>{ URL.revokeObjectURL(url); toast('That image could not be read'); }; im.src=url; });
+/* ----- scoring scale: how fast points fall off with distance on this map ----- */
+function mkScaleKm(){ const mk=cm.mk; return mk.scale>0?mk.scale:autoScale(mk.pins); }
+function paintScale(){
+  const mk=cm.mk; if(!mk) return; const km=mkScaleKm(); const auto=!(mk.scale>0);
+  $('mkScale').value=kmToSlider(km); $('mkScaleWord').textContent=(auto?'Auto · ':'')+scaleWord(km); $('mkScaleAuto').disabled=auto;
+  const pts=d=>Math.round(5000*Math.exp(-d/km)).toLocaleString(); const mi=1.609344;
+  $('mkScaleNote').textContent=mk.pins.length<2?'Add spots and this sets itself from how far apart they are.':`A guess 1 mi off scores ${pts(mi)}, 5 mi off ${pts(5*mi)}, 20 mi off ${pts(20*mi)}, 100 mi off ${pts(100*mi)}.${auto?' Auto fits the spread of your spots; drag to change it.':''}`;
+}
+$('mkScale').addEventListener('input',e=>{ cm.mk.scale=sliderToKm(+e.target.value); paintScale(); });
+$('mkScaleAuto').addEventListener('click',()=>{ cm.mk.scale=null; paintScale(); sfx('click'); });
 /* ----- start view ----- */
 function paintStart(){ const mk=cm.mk; if(!mk) return; $('mkStartClear').hidden=!mk.start;
   $('mkStartNote').textContent=mk.start?`Players start at zoom ${mk.start.z} around ${mk.start.lat.toFixed(2)}, ${mk.start.lng.toFixed(2)}. Move the map and press the button again to change it.`:'Players start zoomed out to the whole world. For a city or state map, zoom the map above into it and press the button.'; }

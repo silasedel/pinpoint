@@ -57,6 +57,8 @@ Anyone signed in can build a map: give it a name, click spots on a world map (ea
 
 **Start view.** Zoom the builder map into a city, state or country and press Use the current map view, and players' guess map opens there on every round instead of the whole world. Rooms get it too.
 
+**Scoring scale.** Points fall off with distance, and the constant that sets how fast is the world's (about 1,500 km) for normal play. A custom map carries its own: the builder has a Scoring slider from Tight to Whole world, defaulting to Auto, which is the spread of the map's spots divided by six (a city 26 km across gives about 4 km, so the wrong side of town scores under 100 and a mile off about 3,400). The note under the slider spells out what 1, 5, 20 and 100 miles off would score at the current setting. The map page shows the setting as a word (City, Region, Country, Continent, World). Maps made before this got Auto, and rooms use the same scale as solo play.
+
 **Rounds.** A map offers 5 or 10 rounds, and All when it has more than 10 spots. The builder's counter reads "3 of 10 minimum" and then "14 spots", with a note that there is no upper limit.
 
 **The map's board, likes and comments.** Finishing a game on a custom map puts you on that map's board (one row per account, your best score), and the final screen says where you landed with a View map board button. Anyone signed in can like a map (a heart on the map page, the count on every card) and comment on it; comments live in their own retained message (`worlddrop/v1/cmc/<id>`, newest first, 150 kept), the maker gets a bell notification with an Open button, and a comment can be deleted by its author, the maker or admin.
