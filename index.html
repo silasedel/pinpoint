@@ -805,7 +805,7 @@
   .chatbtn .ico{background:var(--green-soft);color:var(--green-dark)}
   .chatbtn .ico svg{width:19px;height:19px}
   .chatbtn.open .ico{background:var(--green);color:#fff}
-  .chatbtn .badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:99px;background:var(--red);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .chatbtn .badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;border-radius:99px;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;padding:0 6px;border:2px solid var(--card);box-shadow:0 2px 6px rgba(0,0,0,.35);animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
   .chatpeek{position:absolute;bottom:60px;right:0;max-width:min(320px,70vw);padding:8px 12px;border-radius:12px;background:var(--text);color:#fff;font-size:13px;line-height:1.35;box-shadow:var(--shadow);animation:nagIn .2s ease-out;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   body.in-game .chatpeek{right:auto;left:0}
   .chatpeek b{color:#9fe0b8;margin-right:6px}
@@ -2186,7 +2186,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-214544';
+const BUILD='20260917-214819';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2308,7 +2308,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:3,patch:1};
+const VERSION={major:3,minor:3,patch:2};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2335,17 +2335,32 @@ function note({f=440,to=null,t=0.5,v=0.16,delay=0,attack=0.02,shine=0.28,type='s
     const gg=a.createGain(); gg.gain.value=mul===1?1:shine; o.connect(gg).connect(g); o.start(t0); o.stop(t0+t+0.06); };
   mk(f,1,type); if(shine>0) mk(f*2,2,'triangle');
 }
+/* A click: a few milliseconds of filtered noise with a tiny thump under it. No pitch, so it reads as a
+   mechanical sound rather than a synth. Used for pins and buttons. */
+let noiseBuf=null;
+function snap({f=2600,q=1.1,t=0.028,v=0.5,delay=0,thump=0}={}){
+  const a=ac(), b=bus(); if(!a||!b||!sfxOn.v) return;
+  if(!noiseBuf){ noiseBuf=a.createBuffer(1,a.sampleRate*0.06,a.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; }
+  const t0=a.currentTime+delay;
+  const src=a.createBufferSource(); src.buffer=noiseBuf;
+  const bp=a.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=f; bp.Q.value=q;
+  const g=a.createGain(); g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(v,t0+0.003); g.gain.exponentialRampToValueAtTime(0.0001,t0+t);
+  src.connect(bp).connect(g).connect(b); src.start(t0); src.stop(t0+t+0.02);
+  if(thump>0){ const o=a.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(170,t0); o.frequency.exponentialRampToValueAtTime(70,t0+0.05);
+    const gg=a.createGain(); gg.gain.setValueAtTime(0.0001,t0); gg.gain.linearRampToValueAtTime(thump,t0+0.004); gg.gain.exponentialRampToValueAtTime(0.0001,t0+0.06);
+    o.connect(gg).connect(b); o.start(t0); o.stop(t0+0.08); }
+}
 /* A chord that swells instead of an arpeggio that rattles. */
 function chord(freqs,{t=0.9,v=0.13,delay=0,attack=0.05}={}){ freqs.forEach((f,i)=>note({f,t:t-i*0.04,v:v*(1-i*0.12),delay:delay+i*0.015,attack,shine:0.2})); }
 const SFX={
-  pin:    ()=>note({f:587,to:392,t:0.22,v:0.15,attack:0.006,shine:0.15}),
-  click:  ()=>note({f:494,t:0.12,v:0.07,attack:0.008,shine:0.1}),
-  lock:   ()=>{ note({f:440,t:0.3,v:0.13,attack:0.012,shine:0.2}); note({f:659,t:0.42,v:0.11,delay:0.07,attack:0.02,shine:0.2}); },
+  pin:    ()=>snap({f:1500,q:0.9,t:0.045,v:0.55,thump:0.22}),          // the pin going into the map
+  click:  ()=>snap({f:3000,q:1.4,t:0.022,v:0.32}),                      // buttons and chips
+  lock:   ()=>{ snap({f:2200,q:1.2,t:0.03,v:0.45}); snap({f:1200,q:0.9,t:0.05,v:0.5,delay:0.07,thump:0.25}); },   // lock in: click, then a heavier latch
   reveal: ()=>{ note({f:330,to:247,t:0.85,v:0.1,attack:0.09,shine:0.12}); note({f:494,to:370,t:0.7,v:0.07,delay:0.05,attack:0.12,shine:0.1}); },
   count:  (ms)=>note({f:330,to:660,t:Math.max(0.4,Math.min(1.4,(ms||900)/1000)),v:0.05,attack:0.06,shine:0.08}),
   great:  ()=>chord([523,659,784],{t:1.0,v:0.13}),
   perfect:()=>{ chord([523,659,784,1047],{t:1.3,v:0.13}); note({f:1568,t:0.9,v:0.06,delay:0.22,attack:0.08,shine:0.15}); },
-  low:    ()=>note({f:392,t:0.16,v:0.08,attack:0.006,shine:0.05}),
+  low:    ()=>snap({f:2400,q:2,t:0.02,v:0.2}),                           // a quiet tick as the clock runs down
   hurt:   ()=>{ note({f:392,to:262,t:0.42,v:0.13,attack:0.008,shine:0.12}); note({f:196,to:147,t:0.5,v:0.08,delay:0.04,attack:0.02,shine:0}); },
   out:    ()=>{ note({f:294,to:147,t:0.9,v:0.12,attack:0.03,shine:0.1}); note({f:196,to:98,t:1.1,v:0.09,delay:0.05,attack:0.05,shine:0}); },
   start:  ()=>{ note({f:392,t:0.35,v:0.11,attack:0.02,shine:0.18}); note({f:587,t:0.5,v:0.1,delay:0.12,attack:0.03,shine:0.18}); },
