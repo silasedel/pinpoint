@@ -953,6 +953,9 @@
   .update.gone{transform:translate(-50%,40px);opacity:0}
   .toast{position:fixed;left:50%;top:80px;transform:translateX(-50%);z-index:60;padding:10px 18px;border-radius:10px;background:var(--red);color:#fff;font-weight:600;box-shadow:var(--shadow);animation:toastin .35s cubic-bezier(.2,1.2,.4,1)}
   .toast.ok{background:var(--green);padding:10px 22px;font-weight:700}
+  .toast.need{background:var(--text);pointer-events:auto;max-width:min(92vw,520px);text-align:center;line-height:1.4}
+  .toast .tlink{background:none;color:#8fe3a8;text-decoration:underline;font-weight:800;padding:0;margin-left:4px;font-size:inherit;font-family:inherit;cursor:pointer}
+  .chatneed{padding:10px 12px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);text-align:center} .chatneed button{background:none;color:var(--green-dark);text-decoration:underline;font-weight:800;padding:0 0 0 4px;font-size:inherit;font-family:inherit}
   @keyframes toastin{from{opacity:0;transform:translate(-50%,-14px)}to{opacity:1;transform:translate(-50%,0)}}
 
   /* ---------- v3.1.1 look: a pastel ground, white cards and buttons with a bottom edge that presses in ---------- */
@@ -1672,6 +1675,7 @@
   <div class="chathead"><b>Room chat</b><span class="dim" id="chatWho"></span><button class="x" id="chatClose" title="Close">✕</button></div>
   <div class="chatlog" id="chatLog"><div class="chatempty">Nothing yet. Say hi.</div></div>
   <form class="chatform" id="chatForm"><input id="chatIn" maxlength="200" placeholder="Say something…" autocomplete="off" spellcheck="true"><button class="btn btn-primary" type="submit">Send</button></form>
+  <div class="chatneed" id="chatNeed" hidden>You need an account to chat.<button type="button" id="chatNeedGo">Create one or sign in</button></div>
 </div>
 <div class="microw" id="micRow">
 <div class="chatpeek" id="chatPeek" hidden></div>
@@ -2375,7 +2379,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-151651';
+const BUILD='20260918-175338';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2526,7 +2530,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:25};
+const VERSION={major:3,minor:4,patch:26};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3239,6 +3243,7 @@ function chalBuild(){
 let shareRec=null;
 function paintShare(){ const on=!$('final').hidden&&chalShareable(); $('shareBox').hidden=!on; if(!on){ $('shareCard').hidden=true; shareRec=null; } }
 $('shareBtn').addEventListener('click',()=>{
+  if(!acct.key) return needAcct('share a challenge');
   const card=$('shareCard'); if(!card.hidden){ card.hidden=true; return; }
   if(!shareRec){ shareRec=chalBuild(); const ok=chalPublish(shareRec); $('shareNote').textContent=ok?'':'Not connected yet, the link will work once you\'re back online and reopen this screen.'; if(!ok) setTimeout(()=>{ if(shareRec&&chalPublish(shareRec)) $('shareNote').textContent=''; },4000); }
   $('shareLink').value=chalLink(shareRec.id); card.hidden=false; sfx('click');
@@ -3399,7 +3404,7 @@ async function cmapOpen(id){
 }
 /* ----- likes ----- */
 $('cmLike').addEventListener('click',async()=>{
-  if(!acct.key){ toast('Sign in to like maps'); return; } const rec=cm.cur; if(!rec||cm.liking) return; cm.liking=true;
+  if(!acct.key) return needAcct('like maps'); const rec=cm.cur; if(!rec||cm.liking) return; cm.liking=true;
   try{ const fresh=await cmapFetch(rec.id); const r=fresh||rec; const likes=new Set(Array.isArray(r.likes)?r.likes:[]);
     const had=likes.has(acct.key); if(had) likes.delete(acct.key); else likes.add(acct.key);
     const day=dailyDate(); const st=r.stats&&typeof r.stats==='object'?r.stats:{}; const cur=Array.isArray(st[day])?st[day]:[0,0,0]; st[day]=[+cur[0]||0,+cur[1]||0,Math.max(0,(+cur[2]||0)+(had?-1:1))]; r.stats=st;
@@ -3414,12 +3419,12 @@ function cmcPublish(id,list){ const payload=JSON.stringify(list.slice(-150)); fo
 async function cmcLoad(id){ cm.comments=[]; renderCmc(); const list=await cmcFetch(id); if(cm.cur&&cm.cur.id===id){ cm.comments=list; renderCmc(); } }
 function renderCmc(){
   const rec=cm.cur; if(!rec) return; const list=(cm.comments||[]).slice().sort((a,b)=>b.ts-a.ts);
-  $('cmcCount').textContent=list.length?String(list.length):''; $('cmcWrite').hidden=!acct.key; $('cmcSignIn').hidden=!!acct.key;
+  $('cmcCount').textContent=list.length?String(list.length):''; $('cmcWrite').hidden=false; $('cmcSignIn').hidden=true;
   const canDel=c=>acct.key&&(c.k===acct.key||rec.by===acct.key||admin.on);
   $('cmcList').innerHTML=list.length?list.map(c=>`<div class="cmc">${frFace(c.k,30)}<div class="body"><div class="who lnk" data-prof="${esc(c.k)}">${esc(c.name)}${adminTag(c.k)}${c.k===rec.by?' <span class="dim">maker</span>':''}<small>${agoTxt(c.ts)}</small></div><div class="txt">${esc(c.text)}</div>${canDel(c)?`<button class="del" data-cdel="${esc(c.id)}">Delete</button>`:''}</div></div>`).join(''):'<div class="frempty">No comments yet. Say something about this map.</div>';
 }
 async function cmcPost(){
-  const rec=cm.cur; if(!rec||!acct.key) return; const text=cleanName($('cmcText').value).slice(0,280); if(text.length<1) return;
+  const rec=cm.cur; if(!rec) return; if(!acct.key) return needAcct('comment on maps'); const text=cleanName($('cmcText').value).slice(0,280); if(text.length<1) return;
   $('cmcPost').disabled=true;
   try{ const list=await cmcFetch(rec.id); list.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),k:acct.key,name:acct.name,text,ts:Date.now()});
     cmcPublish(rec.id,list); cm.comments=list; $('cmcText').value=''; renderCmc(); sfx('click');
@@ -3494,7 +3499,7 @@ async function paintCustomSave(){
 }
 /* ----- the builder ----- */
 function openMake(rec){
-  if(!acct.key){ toast('To make a map you need an account'); acctMsg('acctMsg','Create an account or sign in to make a map.'); show('acct'); $('acct').scrollTo(0,0); return; }
+  if(!acct.key) return needAcct('make a map');
   show('cmake'); $('cmake').scrollTo(0,0); $('mkMsg').textContent='';
   if(!cm.mk){ cm.mk={map:makeMap('mkMap'),pins:[],layer:null,edit:null,thumb:null,start:null,thMode:'auto'}; cm.mk.layer=L.layerGroup().addTo(cm.mk.map);
     cm.mk.map.on('click',e=>mkAdd(e.latlng.lat,e.latlng.lng,{})); }
@@ -3837,7 +3842,7 @@ function paintProfile(d,loading){
   let btns='';
   if(me) btns=`<button class="btn btn-secondary sm" id="profEdit">Edit in Settings</button>`;
   else if(acct.key){ const f=iFollow(k); btns=`<button class="btn ${f?'btn-secondary':'btn-primary'} sm" id="profFollow">${f?(fr?'Remove friend':'Cancel request'):(followsMe(k)?'Accept friend':'Add friend')}</button><button class="btn btn-secondary sm" id="profReport">Report</button>`; }
-  else btns=`<button class="btn btn-secondary sm" id="profSignIn">Sign in to add friends</button>`;
+  else btns=`<button class="btn btn-primary sm" id="profSignIn">Add friend</button><button class="btn btn-secondary sm" id="profSignIn2">Report</button>`;
   $('profBtns').innerHTML=btns;
   $('profAdmin').hidden=!(admin.on&&!me&&k!==ADMIN_KEY);
   if(!$('profAdmin').hidden){ $('profAdminSub').textContent=`Everything here reaches @${k} and every player's browser.`; $('profUnban').hidden=!u; }
@@ -3846,7 +3851,8 @@ $('profBack').addEventListener('click',()=>{ const to=prof.from==='profile'?'men
 $('profBtns').addEventListener('click',async e=>{
   const b=e.target.closest('button'); if(!b) return; const k=prof.key;
   if(b.id==='profEdit'){ show('acct'); $('acct').scrollTo(0,0); return; }
-  if(b.id==='profSignIn'){ acctMsg('acctMsg',''); paintAcct(); show('acct'); return; }
+  if(b.id==='profSignIn') return needAcct('add friends');
+  if(b.id==='profSignIn2') return needAcct('report a player');
   if(b.id==='profFollow'){ await frToggle(k,!iFollow(k)); paintProfile(soc.dir[k]||{name:k},false); return; }
   if(b.id==='profReport'){ const why=await ask({title:`Report @${k}`,body:'Tell the admin what is wrong. Cheating, a bad name, or something in a comment or map.',input:true,placeholder:'What happened',max:200,ok:'Send report'}); if(!why||!cleanName(why)) return;
     try{ await inboxPush(ADMIN_KEY,{id:'rep-'+k+'-'+Date.now(),kind:'report',from:acct.key,fromName:acct.name,about:k,text:cleanName(why).slice(0,200),ts:Date.now()}); acctMsg('profMsg','Report sent.','ok'); if(acct.key===ADMIN_KEY) admLog('Reported',k,cleanName(why).slice(0,120)); }catch(err){ acctMsg('profMsg','Could not send it. Try again.','bad'); } }
@@ -3889,7 +3895,7 @@ function statChart(per,metric){
   return `<svg viewBox="0 0 ${W} ${H}" class="statchart" aria-hidden="true">${grid}${area}<polyline points="${pts.join(' ')}" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${per.length<2?`<circle cx="${x(0)}" cy="${y(vals[0]||0)}" r="4" fill="var(--green)"/>`:''}${labels}</svg>`;
 }
 async function openStats(){
-  if(!acct.key){ toast('Sign in to see analytics for your maps'); acctMsg('acctMsg','Create an account or sign in to see your map analytics.'); show('acct'); $('acct').scrollTo(0,0); return; }
+  if(!acct.key) return needAcct('see analytics for your maps');
   show('cmstats'); $('cmstats').scrollTo(0,0); $('statsTitle').textContent='Loading…'; $('statsTiles').innerHTML=''; $('statsChart').innerHTML=''; $('statsTop').innerHTML='';
   await cmapList(); renderStats();
 }
@@ -5856,9 +5862,11 @@ function renderChat(){
 function chatToggle(force){
   chat.open=force!=null?force:!chat.open;
   $('chatPanel').hidden=!chat.open; $('chatBtn').classList.toggle('open',chat.open);
-  if(chat.open){ chat.unread=0; $('chatPeek').hidden=true; renderChat(); setTimeout(()=>$('chatIn').focus(),50); }
+  if(chat.open){ chat.unread=0; $('chatPeek').hidden=true; renderChat(); const need=!acct.key; $('chatForm').hidden=need; $('chatNeed').hidden=!need; if(!need) setTimeout(()=>$('chatIn').focus(),50); }
 }
+$('chatNeedGo').addEventListener('click',()=>{ chatToggle(false); needAcct('chat in rooms'); document.querySelector('.toast.need .tlink').click(); });
 function chatSend(){
+  if(!acct.key) return needAcct('chat in rooms');
   const inp=$('chatIn'); const text=inp.value.trim().slice(0,200); if(!text||!mp.role) return;
   inp.value='';
   const m={t:'chat',text,ts:Date.now()};
@@ -6063,6 +6071,13 @@ async function checkUpdate(){
     if(v&&v!==BUILD&&v!==updateDismissed&&!document.getElementById('updateBar')){ const d=document.createElement('div'); d.id='updateBar'; d.className='update'; d.innerHTML='A newer version of Pinpoint is available <button>Update</button><button class="x" title="Dismiss">✕</button>'; d.querySelector('button').onclick=()=>location.reload(true); const dismiss=()=>{ d.classList.add('gone'); updateDismissed=v; setTimeout(()=>d.remove(),250); }; d.querySelector('.x').onclick=dismiss; let sy=null; d.addEventListener('touchstart',e=>{ sy=e.touches[0].clientY; },{passive:true}); d.addEventListener('touchmove',e=>{ if(sy!=null&&e.touches[0].clientY-sy>40) dismiss(); },{passive:true}); document.body.appendChild(d); } }catch(e){}
 }
 if(location.protocol==='https:'){ setTimeout(checkUpdate,3000); setInterval(checkUpdate,90000); }
+/* Things that need an account say so, with the way in one tap away. */
+function needAcct(what){
+  document.querySelectorAll('.toast.need').forEach(t=>t.remove());
+  const t=document.createElement('div'); t.className='toast need'; t.innerHTML=`You need an account to ${esc(what)}. <button class="tlink" type="button">Create one or sign in</button>`;
+  t.querySelector('button').onclick=()=>{ t.remove(); acctMsg('acctMsg',`Create an account or sign in to ${what}.`); paintAcct(); show('acct'); $('acct').scrollTo(0,0); if(!acct.name) $('acctName').focus(); };
+  document.body.appendChild(t); setTimeout(()=>t.remove(),7000); return false;
+}
 function toast(msg,kind){ const t=document.createElement('div'); t.className='toast'+(kind?' '+kind:''); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),kind==='ok'?1800:3500); }
 /* First paint of the pieces defined further down the file. */
 paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion(); paintAcct();

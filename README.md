@@ -119,6 +119,10 @@ Delete account sits beside Sign out: it explains what goes (name, photo, passcod
 
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
+## What needs an account
+
+Playing, guessing, rooms and the daily are open to everyone. Room chat, liking a map, commenting on one, making a map, sharing a challenge link, adding friends, reporting a player and map analytics need an account. Try one signed out and a dark banner says "You need an account to like maps. Create one or sign in"; tapping the link opens Settings with the same sentence above the sign-in form. The chat panel opens for reading but swaps its input for the same line.
+
 ## Compass
 
 Every round has a compass at the right edge, just above the map panel, that turns as you look around. In the Street View rounds it is Google's own (the page cannot read the embed's heading, so on desktop the map panel now leaves a 64 px strip down the right edge where Google's compass, pegman toggle and zoom buttons stay visible). In the rounds the app draws itself (Pixelated and the other canvas modes) it is Pinpoint's, a red-north needle with an N that rotates with the view.
