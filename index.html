@@ -7,22 +7,22 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 3C20.1 3 10.5 12.6 10.5 24.5c0 10.4 13.4 27 18.3 32.6a4 4 0 0 0 6.4 0c4.9-5.6 18.3-22.2 18.3-32.6C53.5 12.6 43.9 3 32 3z' fill='%231f9d55'/%3E%3Ccircle cx='32' cy='24.5' r='13' fill='%23fff'/%3E%3Ccircle cx='32' cy='24.5' r='11.6' fill='%236fc3e8'/%3E%3Cpath d='M22 19c3-3 6-2 7 1s5 2 6 5-4 5-3 8-4 4-6 1-6-4-6-8 1-6 2-7z' fill='%232f9d57'/%3E%3Cpath d='M40 15c4 0 7 3 6 6s-4 2-4 5 3 4 2 7-5 2-6-2-3-5-2-9 2-7 4-7z' fill='%232f9d57'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root{
-    --bg:#e3f0e7; --card:#ffffff; --line:#cfe2d6; --text:#132419; --muted:#5e7267;
-    --sunk:#eaf4ee; --hover:#f1f8f3; --raise:#ffffff; --hair:#e3efe8;
+    --bg:#e3f0e7; --card:#f6fbf7; --line:#cfe2d6; --text:#132419; --muted:#5e7267;
+    --sunk:#e8f2ec; --hover:#eef6f1; --raise:#fbfdfb; --hair:#e0ece5;
     --green:#18a356; --green-dark:#0f7f42; --green-soft:#dcf1e4; --red:#d64545; --red-soft:#fbeaea; --amber:#c98a12;
     --edge:#c4dccd; --edge-primary:#0d6a38;
-    --font:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --font:'Outfit',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     --radius:12px; --shadow:0 3px 0 rgba(15,64,36,.05),0 12px 28px rgba(15,64,36,.10);
   }
   html[data-theme="dark"]{
     --bg:#0f1714; --card:#182220; --line:#2a3733; --text:#e8efea; --muted:#95a79d;
     --sunk:#121b18; --hover:#1f2b27; --raise:#202c28; --hair:#233029;
-    --green:#2bb367; --green-dark:#6fd79b; --green-soft:#17301f; --red:#e06a6a; --red-soft:#3a1f1f; --amber:#d9a441;
-    --edge:#0a1410; --edge-primary:#0a4a28;
+    --green:#35c77c; --green-dark:#93e8b8; --green-soft:#1d4029; --red:#e06a6a; --red-soft:#3a1f1f; --amber:#d9a441;
+    --edge:#0a1410; --edge-primary:#0d5a32;
     --shadow:0 3px 0 rgba(0,0,0,.35),0 12px 28px rgba(0,0,0,.45);
     color-scheme:dark;
   }
@@ -55,15 +55,20 @@
   .hero-shade{z-index:2}
   .hero-content{z-index:3}
   .hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,20,12,.55) 0%,rgba(8,20,12,.25) 45%,rgba(8,20,12,.85) 100%)}
-  .hero-content{position:relative;max-width:1320px;margin:0 auto;padding:32px 24px 100px;height:100%;display:flex;flex-direction:column;justify-content:space-between;color:#fff}
+  .hero-content{position:relative;max-width:1320px;margin:0 auto;padding:78px 24px 120px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff}
+  .hero-brand{display:flex;align-items:center;gap:18px}
+  .hero-brand svg{width:104px;height:104px;filter:drop-shadow(0 10px 22px rgba(0,0,0,.45))}
+  .hero-brand b{font-size:clamp(52px,7.5vw,92px);font-weight:800;letter-spacing:-.045em;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,.5)}
+  .hero-sub{margin:16px 0 0;font-size:18px;max-width:560px;color:rgba(255,255,255,.92);text-shadow:0 1px 8px rgba(0,0,0,.5);line-height:1.5}
+  .hero-top,.hero-left{z-index:6}
   .lockup{display:flex;align-items:center;gap:12px}
   .lockup svg{width:48px;height:48px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
   .lockup b{font-size:28px;font-weight:800;letter-spacing:-.6px;text-shadow:0 2px 12px rgba(0,0,0,.4)}
   .hero h1{margin:0 0 10px;font-size:clamp(34px,5.5vw,60px);font-weight:800;letter-spacing:-1.5px;line-height:1.02;text-shadow:0 2px 18px rgba(0,0,0,.45);max-width:720px}
   .hero p{margin:0;font-size:17px;max-width:560px;color:rgba(255,255,255,.9);text-shadow:0 1px 8px rgba(0,0,0,.5);line-height:1.5}
-  .live{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:8px 12px 8px 10px;border-radius:99px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);width:max-content;max-width:100%}
+  .live{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:9px 14px;border-radius:99px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);width:max-content;max-width:100%}
   .live:hover{background:rgba(0,0,0,.6)}
-  .live .dot{width:8px;height:8px;border-radius:50%;background:#ff4b4b;box-shadow:0 0 0 0 rgba(255,75,75,.7);animation:pulse 1.6s infinite}
+  .live:disabled{cursor:default;background:rgba(0,0,0,.55)}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,75,75,.7)}70%{box-shadow:0 0 0 8px rgba(255,75,75,0)}100%{box-shadow:0 0 0 0 rgba(255,75,75,0)}}
   .menu-wrap{max-width:1320px;margin:-64px auto 0;padding:0 24px 60px;position:relative;z-index:5}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
@@ -77,11 +82,14 @@
   .cardart.mp{background-image:url(images/mode-peek.jpg)}
   .cardart.duo{background-image:url(images/mode-duel.jpg)}
   .grid.three{grid-template-columns:1fr 1fr 1fr;gap:22px}
-  .grid.three .card.big h2{font-size:25px}
-  .grid.three .card.big p{min-height:42px}
+  .grid.three .card.big{justify-content:flex-start}
+  .grid.three .card.big h2{font-size:34px;text-align:center;margin:18px 0 0;letter-spacing:-.8px}
+  .grid.three .card.big p{min-height:0;text-align:center;margin:2px 0 18px;font-size:15px}
   .grid.three .cardart{height:150px}
-  .duo-card .btn,.mp-card .btn{padding:15px;font-size:15.5px}
-  .solo-card .btn{padding:18px;font-size:18px}
+  .grid.three .card.big .btn{padding:16px;font-size:17px}
+  .grid.three .mp-row{margin-top:10px}
+  .grid.three .mp-row .btn{padding:14px;font-size:15px}
+  .grid.three .mp-row.one{grid-template-columns:1fr}
   @media (max-width:1100px){ .grid.three{grid-template-columns:1fr 1fr} .grid.three .solo-card{grid-column:1 / -1} .grid.three .cardart{height:120px} }
   @media (max-width:640px){ .grid.three{grid-template-columns:1fr} .grid.three .solo-card{grid-column:auto} }
   .learnbar{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:1.5px solid var(--line);
@@ -102,7 +110,7 @@
   .wbar .go{flex:none;color:var(--green-dark);font-weight:800;font-size:13px}
   .wbar.on{border-color:var(--green);background:var(--green-soft);box-shadow:0 0 0 3px var(--green-soft)}
   .dailybtn{display:flex;align-items:center;gap:16px;width:100%;text-align:left;cursor:pointer;font-family:inherit;
-    border:0;border-radius:20px;padding:20px 24px;margin-bottom:20px;color:#fff;
+    border:0;border-radius:20px;padding:20px 24px;margin:20px 0 0;color:#fff;
     background:linear-gradient(120deg,#14532d,#1f9d55 55%,#2bb673);box-shadow:0 12px 30px rgba(20,60,38,.35);
     position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
   .dailybtn::after{content:'';position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.09)}
@@ -117,9 +125,7 @@
   .dailybtn .dr{position:relative;z-index:1;flex:none;background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.4);
     border-radius:99px;padding:10px 20px;font-weight:800;font-size:15px}
   @media (max-width:560px){ .dailybtn{flex-direction:column;align-items:flex-start;gap:12px} .dailybtn .dr{align-self:stretch;text-align:center} }
-  .solo-card{display:flex;flex-direction:column;justify-content:center}
-  .solo-card .btn{padding:22px;font-size:20px}
-  .mp-card .btn{padding:16px;font-size:16px}
+  .solo-card{display:flex;flex-direction:column}
   .mp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
   .mp-row input{padding:14px;border:1px solid var(--line);border-radius:10px;font-size:16px;text-transform:uppercase;letter-spacing:.2em;font-weight:700;text-align:center;outline:none;width:100%}
   .mp-row input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
@@ -206,8 +212,8 @@
   .seg button{flex:1}
   html[data-size="1"]{font-size:17.5px} html[data-size="2"]{font-size:19px}
   .acctchip.out .av{background:var(--line);color:var(--muted)}
-  .hero-top{position:absolute;top:18px;right:20px;z-index:3}
-  .hero-left{position:absolute;top:18px;left:20px;z-index:4}
+  .hero-top{position:absolute;top:18px;right:20px;z-index:6}
+  .hero-left{position:absolute;top:18px;left:20px;z-index:7}
   .acctchip.bell{padding:9px 14px;position:relative}
   .acctchip.bell svg{width:20px;height:20px}
   .bellcount{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:99px;background:var(--red);color:#fff;
@@ -291,12 +297,12 @@
   #pix.fixed{cursor:default;pointer-events:none}
   #pix .dev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;opacity:.8}
   .modepill{background:#efe7ff}.modepill small{color:#5b3fb8}
-  .postcards h3{text-align:center;font-family:'Caveat',cursive;font-size:30px;font-weight:600;color:var(--green-dark);margin:0 0 6px}
+  .postcards h3{text-align:center;font-family:var(--font);font-size:30px;font-weight:600;color:var(--green-dark);margin:0 0 6px}
   .postcards .sub{text-align:center;color:var(--muted);font-size:14px;margin:0 0 26px}
   .board-wall{display:flex;flex-wrap:wrap;justify-content:center;gap:22px 18px}
   .postcard{position:relative;background:#fff;padding:8px 8px 30px;box-shadow:0 8px 22px rgba(20,34,25,.18);width:200px;transition:transform .2s;text-decoration:none;color:inherit}
   .postcard img{display:block;width:184px;height:132px;object-fit:cover;background:#dfe9e3}
-  .postcard figcaption{position:absolute;left:8px;right:8px;bottom:6px;font-family:'Caveat',cursive;font-size:19px;color:#2a3a30;text-align:center;line-height:1}
+  .postcard figcaption{position:absolute;left:8px;right:8px;bottom:6px;font-family:var(--font);font-size:19px;color:#2a3a30;text-align:center;line-height:1}
   .postcard::before{content:"";position:absolute;left:50%;top:-8px;width:14px;height:14px;border-radius:50%;background:var(--red);transform:translateX(-50%);box-shadow:0 2px 4px rgba(0,0,0,.35),inset -2px -2px 3px rgba(0,0,0,.25)}
   .postcard:nth-child(odd){transform:rotate(-3deg)} .postcard:nth-child(even){transform:rotate(2.5deg)} .postcard:nth-child(3n){transform:rotate(-1deg)}
   .postcard:hover{transform:rotate(0) scale(1.06);z-index:2}
@@ -586,7 +592,8 @@
   html[data-theme="dark"] .stkbig{background:#3a2114;color:#ffb38a}
   .namerow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .board .fchip{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--sunk);color:var(--muted);vertical-align:1px}
-  .prow .sw{width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);background:#cfd8d2}
+  .prow .sw{width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);background:#cfd8d2;flex:none}
+  .prow .sw.big{width:28px;height:28px;background-size:cover;background-position:center}
   .prow .pn{font-weight:700;flex:1}
   .prow .tag{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
   .prow .ok{color:var(--green-dark);font-weight:800}
@@ -751,10 +758,10 @@
   .microw{position:fixed;right:16px;bottom:16px;z-index:20;display:flex;align-items:center;gap:8px}
   body.in-game .microw{left:16px;right:auto;flex-direction:row-reverse}
   .mic{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:99px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);font-weight:700;font-size:14px;color:var(--text)}
-  .chatbtn{position:relative;width:50px;height:50px;border-radius:50%;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--text)}
-  .chatbtn:hover{background:var(--hover)}
-  .chatbtn svg{width:22px;height:22px}
-  .chatbtn.open{background:var(--green);border-color:var(--green);color:#fff}
+  .chatbtn{position:relative}
+  .chatbtn .ico{background:var(--green-soft);color:var(--green-dark)}
+  .chatbtn .ico svg{width:17px;height:17px}
+  .chatbtn.open .ico{background:var(--green);color:#fff}
   .chatbtn .badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:99px;background:var(--red);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
   .chatpeek{position:absolute;bottom:60px;right:0;max-width:min(320px,70vw);padding:8px 12px;border-radius:12px;background:var(--text);color:#fff;font-size:13px;line-height:1.35;box-shadow:var(--shadow);animation:nagIn .2s ease-out;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   body.in-game .chatpeek{right:auto;left:0}
@@ -846,7 +853,11 @@
   @media (max-width:820px){
     .grid{grid-template-columns:1fr}
     .hero{height:auto;min-height:0}
-    .hero-content{padding:28px 20px 90px}
+    .hero-content{padding:76px 20px 96px}
+    .hero-brand{gap:12px}
+    .hero-brand svg{width:64px;height:64px}
+    .hero-sub{font-size:15.5px}
+    .hero-top{top:14px;right:14px} .hero-left{top:14px;left:14px}
     .menu-wrap{margin-top:-70px}
     .mappanel{width:100vw;height:34vh;border-radius:14px 14px 0 0;opacity:1;transition:height .2s ease-out}
     .mappanel.open{height:62vh}
@@ -934,16 +945,41 @@
     </div>
     <div class="hero-top"><button class="acctchip" id="acctChip" title="Settings"><svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.35.4.65.73.84H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></button></div>
     <div class="hero-content">
-      <div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#logo"/></svg><b>Pinpoint</b></div>
-      <div>
-        <h1>Where in the world are you?</h1>
-        <p>You get dropped into Google Street View somewhere on Earth. Read the signs, the roads, the plants, the cars. Then pin it.</p>
-        <button class="live" id="liveChip" type="button"><span class="dot"></span><span id="liveTxt">Live: a real spot somewhere on Earth. Know where? Click to reveal.</span></button>
-      </div>
+      <div class="hero-brand"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#logo"/></svg><b>Pinpoint</b></div>
+      <p class="hero-sub">You get dropped into Google Street View somewhere on Earth. Guess where you are.</p>
+      <button class="live" id="liveChip" type="button"><span id="liveTxt">Know where this background is? Click to reveal.</span></button>
     </div>
   </section>
 
   <div class="menu-wrap">
+    <div class="grid three">
+      <div class="card solo-card big">
+        <div class="cardart solo"></div>
+        <h2>Solo</h2>
+        <p>Play by yourself</p>
+        <button class="btn btn-primary btn-block" id="soloBtn">Play</button>
+        <div class="mp-row one"><button class="btn btn-secondary" id="soloBoards">Leaderboards</button></div>
+      </div>
+      <div class="card duo-card big">
+        <div class="cardart duo"></div>
+        <h2>Duo</h2>
+        <p>Play with an opponent</p>
+        <button class="btn btn-primary btn-block" id="duoBtn">Create duo</button>
+        <div class="mp-row"><input id="joinCode2" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn2">Join</button></div>
+      </div>
+      <div class="card mp-card big">
+        <div class="cardart mp"></div>
+        <h2>Multiplayer</h2>
+        <p>Play with up to ten people</p>
+        <button class="btn btn-primary btn-block" id="hostBtn">Create game</button>
+        <div class="mp-row"><input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn">Join</button></div>
+      </div>
+    </div>
+    <button class="learnbar" id="learnBtn">
+      <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+      <span class="ll"><b>Learn</b><span>Play like normal, and after every round see the two or three things that gave the country away.</span></span>
+      <span class="lr">Open</span>
+    </button>
     <button class="dailybtn" id="dailyBtn">
       <span class="dmark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#dailymark"/></svg></span>
       <span class="dl">
@@ -952,33 +988,6 @@
         <span class="s">Five rounds, one shot. Nobody knows what it is until they open it.</span>
       </span>
       <span class="dr" id="dailyRight">Open</span>
-    </button>
-    <div class="grid three">
-      <div class="card solo-card big">
-        <div class="cardart solo"></div>
-        <h2>Solo</h2>
-        <p>Twenty-six modes, any corner of the world, your own pace.</p>
-        <button class="btn btn-primary btn-block" id="soloBtn">Play</button>
-      </div>
-      <div class="card duo-card big">
-        <div class="cardart duo"></div>
-        <h2>Duo</h2>
-        <p>Exactly two of you. Duel head to head, or go Blind and talk each other to the pin.</p>
-        <button class="btn btn-primary btn-block" id="duoBtn">Create duo</button>
-        <div class="mp-row"><input id="joinCode2" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn2">Join</button></div>
-      </div>
-      <div class="card mp-card big">
-        <div class="cardart mp"></div>
-        <h2>Multiplayer</h2>
-        <p>Up to ten players, one room code, everyone on the same spot.</p>
-        <button class="btn btn-primary btn-block" id="hostBtn">Create game</button>
-        <div class="mp-row"><input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn">Join</button></div>
-      </div>
-    </div>
-    <button class="learnbar" id="learnBtn">
-      <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
-      <span class="ll"><b>Learn</b><span>Play like normal — after every round, the one or two things that gave the country away.</span></span>
-      <span class="lr">Open</span>
     </button>
     <div class="card wide">
       <h2>Today's leaderboard<span class="board-tag" id="menuDailyTag">Daily</span></h2>
@@ -995,15 +1004,13 @@
   <div class="setup-wrap narrow">
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Settings</b></div><button class="btn btn-secondary" id="acctBack" style="margin-left:auto">Home</button></div>
     <div class="card" id="acctOut">
-      <h2 style="margin:0 0 4px">Your name, kept</h2>
-      <div class="rsub">Pick a name and a four-digit code. Use them on any device and your scores show up under the same name.</div>
+      <h2 style="margin:0 0 14px">Create an account or sign in</h2>
       <div class="label" style="margin-top:0">Username</div>
       <input class="tin" id="acctName" maxlength="16" placeholder="silas" autocomplete="username" spellcheck="false">
       <div class="label">Passcode <span class="dim">(4-digit code)</span></div>
       <input class="tin code" id="acctPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off">
       <div class="acctmsg" id="acctMsg"></div>
       <button class="btn btn-primary btn-block" id="acctGo">Continue</button>
-      <div class="fineprint">A new name is yours the moment you claim it. If the name already exists, the code signs you into it. The code keeps a friend from typing your name by accident, nothing more, so don't reuse a real password.</div>
     </div>
     <div class="card" id="acctIn" hidden>
       <h2 style="margin:0 0 16px">Account</h2>
@@ -1187,7 +1194,7 @@
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px" id="setupTitle">Pinpoint</b></div><button class="btn btn-secondary" id="setupBack" style="margin-left:auto">Back</button></div>
     <div class="card learncard" id="learnCard" hidden>
       <h2 style="margin:0">Learn</h2>
-      <p>A normal game — pick a time and a length — but every round ends with the two or three things that give that country away: the side of the road, the lines, the plates, the script, the bollards, the land. Ninety countries, and you'll never see the same spot twice.</p>
+      <p>A normal game, pick a time and a length, but every round ends with the two or three things that give that place away and where in the country they hold: the side of the road, the lines, the plates, the script, the bollards, the land. Ninety-six countries, and you'll never see the same spot twice.</p>
     </div>
     <div class="card">
       <div class="label" style="margin-top:0">Time per round</div>
@@ -1218,7 +1225,7 @@
     <div class="card modes">
       <h3>Game mode</h3>
       <div class="mode-grid" id="modeGrid"></div>
-      <button class="wbar" id="customBtn"><b>Custom maps</b><span>Play a set of spots someone built — or your own</span><span class="go">Browse</span></button>
+      <button class="wbar" id="customBtn"><b>Custom maps</b><span>Play a set of spots someone built, or your own</span><span class="go">Browse</span></button>
       <button class="wbar sm" id="createBtn"><b>Create a custom map</b><span class="go">New</span></button>
     </div>
   </div>
@@ -1265,7 +1272,7 @@
 
         <div id="blindSetup" hidden>
           <div class="label">Who looks, who pins?</div>
-          <div class="rsub">One of you gets only the street, the other gets only the map. Turn your mics on — you'll need them.</div>
+          <div class="rsub">One of you gets only the street, the other gets only the map. Turn your mics on, you'll need them.</div>
           <div class="seg" id="blindSeg"></div>
           <div class="rules" style="margin-top:10px"><button class="chip" id="blindSwap">Swap roles every round</button></div>
         </div>
@@ -1386,9 +1393,8 @@
       <span class="saved" id="savedMsg" hidden></span>
     </div>
     <div class="signup" id="signUp" hidden>
-      <b>Sign in to keep this score</b>
-      <span>The leaderboard is by name, so scores need an account. It takes a username and a four-digit passcode.</span>
-      <button class="btn btn-primary" id="signUpBtn">Create an account</button>
+      <b>Save this score</b>
+      <button class="btn btn-primary" id="signUpBtn" style="margin-top:8px">Create an account or sign in</button>
     </div>
     <div class="savenag" id="saveNag" hidden>
       <b id="nagTitle">Save your score first?</b>
@@ -1408,7 +1414,7 @@
 <div class="sharebox" id="shareBox" hidden>
   <div class="sharecard" id="shareCard" hidden>
     <b>Challenge a friend</b>
-    <p>Share this link and whoever opens it plays the exact same rounds — and sees your pin after every guess.</p>
+    <p>Share this link and whoever opens it plays the exact same rounds, and sees your pin after every guess.</p>
     <div class="sharerow"><input id="shareLink" readonly><button class="btn btn-primary" id="shareCopy">Copy</button></div>
     <div class="sharenote" id="shareNote"></div>
   </div>
@@ -1421,7 +1427,7 @@
 </div>
 <div class="microw" id="micRow">
 <div class="chatpeek" id="chatPeek" hidden></div>
-<button class="chatbtn" id="chatBtn" hidden title="Room chat (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H8l-5 3 1.2-4.2A8 8 0 1 1 21 12z"/></svg><span class="badge" id="chatBadge" hidden>0</span></button>
+<button class="mic chatbtn" id="chatBtn" hidden title="Room chat (C)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg></span><span>Chat</span><span class="badge" id="chatBadge" hidden>0</span></button>
 <button class="mic" id="micBtn" hidden title="Toggle microphone (M)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/><line class="slash" x1="4" y1="3.5" x2="20" y2="20.5"/></svg></span><span id="micTxt">Mic off</span></button>
 </div>
 <canvas id="confetti" hidden></canvas>
@@ -1563,7 +1569,7 @@ const REMOTE=['Mongolia','Kazakhstan','Kyrgyzstan','Northern Territory','Western
 const MILLION=[['Tokyo',35.68,139.76],['Osaka',34.69,135.5],['Nagoya',35.17,136.9],['Sapporo',43.06,141.35],['Fukuoka',33.59,130.4],['Seoul',37.56,126.98],['Busan',35.18,129.08],['Taipei',25.04,121.56],['Kaohsiung',22.63,120.3],['Hong Kong',22.32,114.17],['Singapore',1.3,103.85],['Bangkok',13.75,100.5],['Kuala Lumpur',3.15,101.7],['Jakarta',-6.2,106.85],['Surabaya',-7.26,112.75],['Manila',14.6,120.98],['Cebu City',10.32,123.9],['Ho Chi Minh City',10.78,106.7],['Hanoi',21.03,105.85],['Phnom Penh',11.56,104.92],['Mumbai',19.08,72.88],['Delhi',28.63,77.22],['Bengaluru',12.97,77.59],['Chennai',13.08,80.27],['Kolkata',22.57,88.36],['Hyderabad',17.39,78.49],['Dhaka',23.73,90.41],['Dubai',25.2,55.27],['Istanbul',41.01,28.97],['Ankara',39.93,32.85],['Izmir',38.42,27.13],['Athens',37.98,23.73],['Rome',41.9,12.5],['Milan',45.46,9.19],['Naples',40.85,14.27],['Madrid',40.42,-3.7],['Barcelona',41.39,2.17],['Paris',48.86,2.35],['London',51.51,-0.13],['Birmingham',52.48,-1.9],['Berlin',52.52,13.4],['Hamburg',53.55,10.0],['Munich',48.14,11.58],['Cologne',50.94,6.96],['Vienna',48.21,16.37],['Prague',50.08,14.43],['Warsaw',52.23,21.01],['Budapest',47.5,19.04],['Bucharest',44.43,26.1],['Belgrade',44.8,20.47],['Kyiv',50.45,30.52],['Moscow',55.75,37.62],['Saint Petersburg',59.93,30.32],['Novosibirsk',55.03,82.92],['Yekaterinburg',56.84,60.6],['Kazan',55.79,49.12],['Almaty',43.24,76.89],['New York',40.75,-73.98],['Chicago',41.88,-87.63],['Los Angeles',34.05,-118.25],['Houston',29.76,-95.37],['Phoenix',33.45,-112.07],['Philadelphia',39.95,-75.16],['San Antonio',29.42,-98.49],['San Diego',32.72,-117.16],['Dallas',32.78,-96.8],['San Jose',37.34,-121.89],['Toronto',43.65,-79.38],['Montreal',45.5,-73.57],['Calgary',51.05,-114.07],['Mexico City',19.43,-99.13],['Guadalajara',20.67,-103.35],['Monterrey',25.67,-100.31],['Puebla',19.04,-98.2],['Tijuana',32.52,-117.03],['Bogotá',4.65,-74.08],['Medellín',6.25,-75.56],['Cali',3.45,-76.53],['Lima',-12.05,-77.04],['Quito',-0.22,-78.51],['Guayaquil',-2.19,-79.89],['Santiago',-33.45,-70.66],['Buenos Aires',-34.6,-58.38],['Córdoba',-31.42,-64.18],['Rosario',-32.95,-60.65],['São Paulo',-23.55,-46.63],['Rio de Janeiro',-22.91,-43.2],['Brasília',-15.79,-47.88],['Salvador',-12.97,-38.51],['Fortaleza',-3.72,-38.54],['Belo Horizonte',-19.92,-43.94],['Curitiba',-25.43,-49.27],['Recife',-8.05,-34.9],['Porto Alegre',-30.03,-51.23],['Montevideo',-34.9,-56.19],['Santa Cruz de la Sierra',-17.78,-63.18],['Johannesburg',-26.2,28.04],['Cape Town',-33.92,18.42],['Durban',-29.86,31.02],['Nairobi',-1.29,36.82],['Lagos',6.52,3.38],['Kano',12.0,8.52],['Accra',5.56,-0.2],['Dakar',14.72,-17.47],['Kampala',0.35,32.58],['Dar es Salaam',-6.8,39.28],['Cairo',30.05,31.24],['Alexandria',31.2,29.92],['Tunis',36.8,10.18],['Sydney',-33.87,151.21],['Melbourne',-37.81,144.96],['Brisbane',-27.47,153.03],['Perth',-31.95,115.86],['Auckland',-36.85,174.76]];
 /* Coastline: spots on or beside the sea. [name, lat, lng] */
 const COAST=[['Big Sur',36.27,-121.81],['Malibu',34.03,-118.78],['Oregon Coast',45.5,-123.95],['Florida Keys',24.72,-81.1],['Outer Banks',35.67,-75.48],['Cape Cod',41.93,-70.02],['Maine Coast',44.3,-68.3],['Nova Scotia',44.42,-64.0],['Tofino',49.15,-125.9],['Seward',60.1,-149.44],['Cabo',22.89,-109.92],['Cancún',21.13,-86.75],['Cartagena',10.4,-75.55],['Copacabana',-22.97,-43.18],['Florianópolis',-27.6,-48.43],['Punta del Este',-34.96,-54.94],['Mar del Plata',-38.0,-57.53],['Valparaíso',-33.03,-71.63],['Lima Coast',-12.13,-77.04],['Cornwall',50.12,-5.55],['Pembrokeshire',51.75,-5.1],['NC500',58.4,-4.6],['Wild Atlantic Way',52.98,-9.42],['Brittany',48.4,-4.75],['Côte d\'Azur',43.7,7.3],['Costa Brava',41.97,3.22],['Galicia',43.35,-8.4],['Algarve',37.1,-8.5],['Nazaré',39.6,-9.07],['Amalfi',40.63,14.6],['Cinque Terre',44.13,9.68],['Dubrovnik Coast',42.65,18.09],['Split Coast',43.5,16.44],['Santorini',36.42,25.43],['Crete Coast',35.34,25.13],['Antalya',36.86,30.7],['Tel Aviv Beach',32.08,34.77],['Muscat',23.62,58.59],['Dubai Corniche',25.21,55.24],['Essaouira',31.51,-9.77],['Dakar Corniche',14.7,-17.48],['Cape Town',-34.13,18.4],['Chapman\'s Peak',-34.09,18.36],['Durban Beachfront',-29.85,31.03],['Diani Beach',-4.28,39.59],['Tofo',-23.85,35.55],['Mauritius Coast',-20.28,57.76],['Réunion Coast',-21.04,55.23],['Kerala',8.47,76.95],['Sri Lanka South',5.95,80.5],['Krabi',8.05,98.83],['Phuket Coast',7.88,98.29],['Da Nang',16.05,108.25],['Bali Coast',-8.72,115.17],['Palawan',9.75,118.75],['Enoshima',35.3,139.48],['Okinawa Coast',26.43,127.79],['Jeju Coast',33.24,126.42],['Taiwan East Coast',23.55,121.45],['Gold Coast',-28.0,153.43],['Great Ocean Road',-38.68,143.4],['Bondi',-33.89,151.28],['Cottesloe',-31.99,115.75],['Tasmania East',-42.15,148.3],['Bay of Islands',-35.26,174.09],['Kaikoura',-42.4,173.68],['Coromandel',-36.8,175.5],['Hawaii Big Island',19.6,-155.98],['Maui Coast',20.9,-156.44],['Iceland South Coast',63.45,-19.0],['Faroe Coast',62.05,-6.8],['Lofoten',68.15,13.6],['Bohuslän',58.35,11.4],['Skagen',57.72,10.58],['Estonia Coast',59.43,24.6],['Vladivostok',43.1,131.9],['Bermuda Coast',32.3,-64.78],['Curaçao Coast',12.15,-68.95],['Puerto Rico Coast',18.45,-66.1]];
-/* Landmarks: world-famous only. [name, targetLat, targetLng, viewLat, viewLng] — the pick stands near the viewpoint and faces the target. */
+/* Landmarks: world-famous only. [name, targetLat, targetLng, viewLat, viewLng], the pick stands near the viewpoint and faces the target. */
 const LANDMARKS=[
  ['Eiffel Tower',48.8584,2.2945,48.8600,2.2920],['Arc de Triomphe',48.8738,2.2950,48.8722,2.2988],['Louvre Pyramid',48.8610,2.3358,48.8611,2.3345],['Notre-Dame',48.8530,2.3499,48.8534,2.3480],['Sacré-Cœur',48.8867,2.3431,48.8855,2.3431],['Palace of Versailles',48.8049,2.1204,48.8040,2.1230],
  ['Colosseum',41.8902,12.4922,41.8895,12.4905],['Trevi Fountain',41.9009,12.4833,41.9008,12.4829],['St. Peter\'s Basilica',41.9022,12.4539,41.9020,12.4600],['Leaning Tower of Pisa',43.7230,10.3966,43.7220,10.3950],['St. Mark\'s Basilica',45.4345,12.3398,45.4340,12.3380],['Milan Cathedral',45.4641,9.1919,45.4640,9.1900],['Florence Cathedral',43.7731,11.2560,43.7728,11.2550],
@@ -1594,7 +1600,7 @@ const CAPITALS=[['London',51.5074,-0.1278],['Paris',48.8566,2.3522],['Berlin',52
  ['Washington, D.C.',38.9072,-77.0369],['Ottawa',45.4215,-75.6972],['Mexico City',19.4326,-99.1332],['Guatemala City',14.6349,-90.5069],['San José',9.9281,-84.0907],['Panama City',8.9824,-79.5199],['Santo Domingo',18.4861,-69.9312],['Bogotá',4.711,-74.0721],['Quito',-0.1807,-78.4678],['Lima',-12.0464,-77.0428],['La Paz',-16.4897,-68.1193],['Santiago',-33.4489,-70.6693],['Buenos Aires',-34.6037,-58.3816],['Montevideo',-34.9011,-56.1645],['Brasília',-15.8267,-47.9218],['Canberra',-35.2809,149.13],['Wellington',-41.2865,174.7762]];
 /* Politics: two separate questions per round.
    POWER is the structure of government (who actually runs the state).
-   ECON is how the economy is organised — the capitalism/socialism axis, which is a different thing entirely. */
+   ECON is how the economy is organised, the capitalism/socialism axis, which is a different thing entirely. */
 const POWER=[
  {name:'Presidential republic', short:'Presidential', blurb:'An elected president runs the government directly.'},
  {name:'Parliamentary republic', short:'Parliamentary', blurb:'Parliament picks the government; the president is mostly ceremonial.'},
@@ -1644,102 +1650,102 @@ function polMode(m){
    colour of the lines and the plates, the script on the signs, the bollards, the houses, the land. Written to be
    read in ten seconds after a round, so you carry one thing into the next one. */
 const CLUES={
- 'United States':['Yellow centre lines with white edge lines, and green highway signs with white text.','Speed limits on plain black-on-white rectangles, wooden utility poles and roadside mailboxes on posts.','Green street-name blades; plates and scenery change a lot from state to state.'],
- 'Canada':['Yellow centre lines like the US, but speed signs in km/h and distances in kilometres.','Bilingual English–French signs mean Quebec or New Brunswick; a red \'ARRÊT\' stop sign is Quebec.','Green highway shields with a crown (Ontario) or a fleur-de-lis (Quebec).'],
- 'Mexico':['\'ALTO\' stop signs, yellow centre lines, and warnings for \'topes\' — the speed bumps that are everywhere.','Spanish signs on white with a red or black border; speed signs read \'MÁXIMA\'.','Brightly painted concrete houses, OXXO corner shops, and plenty of old VW Beetles.'],
- 'Guatemala':['Chicken buses — old US school buses painted in bright colours — and green volcanic hills.','Spanish signs, yellow centre lines, low concrete houses and \'tienda\' corner shops.'],
- 'Costa Rica':['\'Pura vida\' on everything, blue-and-white street signs, and steep green hills with tin-roofed houses.','Spanish on yellow-centre-line roads; Toyota pickups and \'pulpería\' shops.'],
- 'Panama':['Yellow centre lines and Spanish signs; skyscrapers in Panama City, Caribbean colours in the towns.','Concrete utility poles, tropical haze, and \'Diablo Rojo\' buses covered in airbrushed art.'],
- 'Dominican Republic':['Spanish; motorbikes carrying whole families; colourful concrete houses under palms.','Yellow centre lines, \'colmado\' corner shops, and Presidente beer signs.'],
- 'Colombia':['Yellow licence plates, front and back — the Colombian giveaway.','Yellow centre lines, red-brick Andean towns, and tuk-tuks in the smaller places.'],
- 'Ecuador':['Yellow centre lines, Spanish signs, and the Andes never far away.','White plates; Pilsener beer signs; buses painted in bold colours.'],
- 'Peru':['Yellow centre lines, white plates, and three-wheeled \'mototaxis\'.','A dusty grey desert coast, deep green Andes valleys inland, and political slogans painted on walls.'],
- 'Bolivia':['High, dry and thin-aired: brown Altiplano hills and towns of unpainted red brick.','Spanish signs, yellow centre lines, and old Japanese minibuses as public transport.'],
- 'Brazil':['Portuguese on signs (\'Rua\', \'Avenida\'), yellow centre lines, and squarish concrete utility poles.','White Mercosur plates (older ones grey); Ipiranga and Petrobras stations; walls dusted red with clay.'],
- 'Argentina':['Spanish; black-on-white plates with a blue Mercosur strip on top (older ones black with white text).','Yellow centre lines across wide, flat pampas; YPF fuel stations; concrete poles.'],
- 'Chile':['White lines only — no yellow centre line — with \'PARE\' stop signs.','Bone-dry desert roads in the north, green fjords and rain in the south, the Andes almost always in view.'],
- 'Uruguay':['Spanish signs, yellow centre lines, and ANCAP fuel stations you won\'t find anywhere else.','Flat green farmland, low houses with terracotta roofs, and Mercosur plates.'],
- 'United Kingdom':['Drives on the left; speeds in mph; white front plates and yellow rear plates.','Direction signs: green on main roads, white on local ones, blue on motorways; red pillar postboxes.','Terraced brick houses, hedgerows, dry-stone walls, and double yellow lines along the kerb.'],
- 'Ireland':['Drives on the left with yellow dashed edge lines — the classic Irish tell.','Signs in Irish and English, speeds in km/h, and green postboxes.','Grey stone walls and wet green fields; white plates carrying the county name in Irish.'],
- 'France':['Town-entry signs are white with a red border; street names sit on blue enamel plaques.','White plates with a blue EU strip; \'Boulangerie\', \'Tabac\' and \'Mairie\' on every high street.','Bollards are white with a red band on top; plane trees line dead-straight D-roads.'],
- 'Spain':['\'CEDA EL PASO\' on give-way signs; blue signs on main roads, white on local ones.','White plates with a blue EU strip; bollards with a black top; Repsol and Cepsa stations.','Dry ochre landscapes inland, whitewashed villages, and town names on white with a red border.'],
- 'Portugal':['Blue direction signs; patterned tiled façades (azulejos) and mosaic-cobbled pavements.','Plates: white with a blue EU strip on the left and, on older cars, a yellow strip on the right.','Galp stations; eucalyptus and orange trees; a rounded typeface on the road signs.'],
- 'Italy':['Black-on-white town signs; street names on marble-look plaques; blue parking bays.','Green \'Autostrada\' signs, scooters everywhere, and \'Tabacchi\' shops marked with a big T.','White plates with blue strips on both ends.'],
- 'Germany':['Yellow town-entry signs with black text; leaving town, the name has a line struck through it.','Plates: black on white, a blue EU strip, and a round registration seal after the city code.','Tidy roads, cobbled pavements, bike lanes, and the yellow-diamond \'Vorfahrt\' priority sign.'],
- 'Netherlands':['Yellow licence plates, front and back.','Flat land, brick houses with huge windows, and red-asphalt cycle paths beside every road.','Bollards white with a red band; canals and dykes never far away.'],
- 'Belgium':['Red text on white licence plates — nobody else in Europe.','Brick houses, French/Dutch bilingual signs, and grey skies more often than not.','Old concrete-slab roads and a roundabout every kilometre.'],
- 'Switzerland':['Blue signs on main roads, green on motorways; white plates with the canton\'s coat of arms.','Wooden chalets, immaculate tarmac, and a yellow-diamond priority sign like Germany\'s.','Yellow pedestrian crossings; names in German, French or Italian depending on where you are.'],
- 'Austria':['Blue town-entry signs with white text.','White plates with a blue EU strip and the red-white-red flag; Bundesland shields on the cars.','Alpine villages with onion-domed churches and wooden balconies full of flowers.'],
- 'Czech Republic':['Town signs white with black text; \'Náměstí\' (square) and \'ulice\' on street names.','Diacritics like ř, ě, ů and ž in almost every word; Škodas everywhere.','Soviet-era panel apartment blocks beside baroque town squares.'],
- 'Slovakia':['Slovak — look for ľ, ť, ô and ä; \'Ulica\' on street names.','Hilly forested countryside, painted concrete houses, white plates with the Slovak coat of arms.'],
- 'Hungary':['Hungarian: \'utca\' (street), \'út\' (road), and long accents like ő and ű.','Flat plains, yellow-washed rural houses, and white plates with a blue strip.'],
- 'Poland':['White town-entry signs with black text; green direction signs.','Red-brick churches, dense pine forest and flat farmland; Żabka shops.','Bollards white with a red band and a black top.'],
- 'Denmark':['Danish letters æ, ø and å; \'vej\' means road.','Red-and-white town signs, cycle lanes everywhere, white plates with a red border.'],
- 'Norway':['Yellow centre lines — Sweden and Finland use white.','Red and white wooden houses, fjords and bare rock; \'vei\' or \'veg\' on signs.','White plates with a blue strip; a tunnel every few minutes.'],
- 'Sweden':['White centre lines with yellow-on-blue direction signs and yellow-backed warning signs.','Falu-red wooden houses in pine forest; \'väg\' and \'gatan\' on names.','Road-edge posts are white with yellow reflectors.'],
- 'Finland':['Finnish: long words with double letters (kk, tt, aa); \'tie\' is road, \'katu\' is street.','Yellow-backed warning signs like Sweden\'s, but flatter land, lakes and birch.','Finnish/Swedish bilingual signs near the coast.'],
- 'Iceland':['Treeless volcanic moss and black gravel, with yellow road-edge posts.','Icelandic ð and þ on signs; single-lane bridges on the ring road.'],
- 'Estonia':['Estonian: õ, ä, ö, ü; \'tee\' means road, \'tänav\' street.','Flat and forested, with wooden houses and Soviet-era blocks; white plates with a blue strip.'],
- 'Latvia':['Latvian macrons — ā, ē, ī, ū — and \'iela\' on street names.','Wooden houses, pine forest, and Riga\'s Art Nouveau façades.'],
- 'Lithuania':['Lithuanian: \'gatvė\' on street names, letters like ė, ų and į.','Flat farmland, wooden farmhouses, and storks\' nests on the poles.'],
- 'Ukraine':['Cyrillic with ї and є — letters Russian doesn\'t use; \'вулиця\' means street.','Fences, bus stops and kerbs painted blue and yellow; wide flat fields.'],
- 'Russia':['Cyrillic; \'улица\' (street) and \'проспект\'; black-on-white plates ending in a region number.','Blue direction signs, grey apartment blocks, birch forest, and long straight roads.','Kilometre posts and kerbs painted in black and white.'],
- 'Romania':['Romanian (ă, â, î, ș, ț) — a Latin language among Slavic neighbours; \'strada\' on names.','Horse carts on the road, yellow taxis, Petrom and Rompetrol stations.','Silver-domed Orthodox churches and rural houses with ornate metal gates.'],
- 'Bulgaria':['Cyrillic with a lot of ъ; \'ул.\' for street; white plates with a blue strip.','Dry hills, Soviet-era blocks, and red-tiled houses.'],
- 'Greece':['Greek alphabet, with a Latin transliteration under it on most signs.','Blue direction signs, dry rocky hills, olive trees and whitewashed houses.'],
- 'Croatia':['Yellow direction signs on main roads; \'ulica\' and the letters č, ć, š, ž.','Red-tiled roofs, stone houses and the Adriatic; plates with the red-and-white checkerboard.'],
- 'Slovenia':['Slovene (č, š, ž); \'cesta\' (road) and \'ulica\' (street).','Alpine and green, a church spire on every hill; white plates with a blue strip.'],
- 'Serbia':['Cyrillic and Latin side by side; \'улица\' / \'ulica\'; letters ć and đ.','Unrendered brick houses, plum orchards, and plates with a Cyrillic town code.'],
- 'North Macedonia':['Cyrillic with letters nobody else uses — ѓ, ќ, ѕ, џ; mountains in every direction.','Red-tiled roofs, minarets and Orthodox churches in the same town.'],
- 'Albania':['Albanian: ë and ç everywhere; \'Rruga\' on street names.','Mercedes of every age, concrete bunkers in the fields, mountains meeting the sea.'],
- 'Bosnia and Herzegovina':['Latin and Cyrillic both appear; mosques and churches in the same town.','Steep green valleys, unrendered brick, and white plates with a blue strip.'],
- 'Turkey':['Turkish: dotless ı, ğ, ş, ç; \'sokak\' (street) and \'caddesi\' (avenue).','Blue direction signs, white plates with a blue strip, red-and-white painted kerbs.','A minaret on every skyline; Migros and BİM shops.'],
- 'Georgia':['Georgian script — rounded letters unlike anything else — with Latin underneath.','Caucasus mountains, vineyards, old Ladas and Mercedes.'],
- 'Israel':['Hebrew (with Arabic and English) on signs; yellow licence plates.','Dry stony hills; white apartment blocks with solar water tanks on the roof.'],
- 'Jordan':['Arabic and English signs; rocky desert and sand-coloured stone houses.','Roundabouts with a flag in the middle; pickups and old Hyundais.'],
- 'Lebanon':['Arabic and French signs; steep, dense hillside towns with the sea below.','Red plates on taxis; concrete apartment blocks stacked with balconies.'],
- 'United Arab Emirates':['Arabic and English; wide immaculate roads, desert sand, and glass towers.','White plates with the emirate\'s name; green and blue direction signs.'],
- 'Oman':['Arabic and English; bare brown mountains and a coast of pale houses.','White forts and low white houses, a mosque in every village.'],
- 'Egypt':['Arabic (English on main roads); dusty streets and unfinished red-brick apartment blocks.','Palms, the Nile\'s green strip, and desert right at the edge of town.'],
- 'Tunisia':['Arabic and French; black plates with white text.','Whitewashed houses with blue doors, olive groves and dry hills.'],
- 'Algeria':['Arabic and French signs; dry hills and unfinished brick buildings.','Long desert roads in the south, Mediterranean towns in the north.'],
- 'Kenya':['Drives on the left; white front plates, yellow rear.','Red soil, matatu minibuses, and M-Pesa shops painted green.'],
- 'Uganda':['Drives on the left; red soil, banana plants and boda-boda motorbikes.','White front and yellow rear plates; MTN-yellow shopfronts.'],
- 'Rwanda':['Drives on the right — unlike its East African neighbours.','Steep green hills, tidy paved roads, and motorbike taxis in matching vests.'],
- 'Tanzania':['Drives on the left; yellow plates; Swahili signs (\'duka\', \'barabara\').','Red earth, baobabs, and three-wheeled \'bajaji\'.'],
- 'Ghana':['Drives on the right; English signs; red laterite soil; \'tro-tro\' minibuses.','Concrete houses painted in Vodafone red or MTN yellow as adverts.'],
- 'Nigeria':['Drives on the right; English signs; yellow taxis in Lagos, okada motorbikes elsewhere.','Red earth, dense busy towns, hand-painted shop signs.'],
- 'Senegal':['French signs; yellow taxis and colourful \'car rapide\' minibuses.','Sandy streets, baobabs, flat Sahel scrub, and horse-drawn carts.'],
- 'Cameroon':['French and English signs; red soil, dense green, yellow taxis.','Roadside markets under corrugated roofs.'],
- 'Madagascar':['French and Malagasy signs; red-earth roads and rice paddies.','Renault 4s and Peugeot 404s still running; steep-roofed brick houses in the highlands.'],
- 'Ethiopia':['Ge\'ez (Amharic) script on signs; blue-and-white Lada taxis in Addis.','Highland plateaus, eucalyptus, and round thatched \'tukul\' houses.'],
- 'Democratic Republic of the Congo':['French signs; red earth; dense green; very little coverage outside Kinshasa and the east.','Crowded streets, hand-painted signs, and motorbikes everywhere.'],
- 'South Africa':['Drives on the left; yellow edge lines with white centre lines — the southern-African tell.','Plates differ by province; walled houses with electric fencing; a \'robot\' is a traffic light.','Dry veld, blue-gum trees and corrugated township roofs.'],
- 'Namibia':['Drives on the left; gravel roads through empty desert; yellow edge lines.','German street names in Swakopmund and Windhoek; dead-straight roads with the car\'s long shadow.'],
- 'Botswana':['Drives on the left; flat dry bush with acacia and cattle on the road; yellow edge lines.','White plates starting with B; donkey carts.'],
- 'Zimbabwe':['Drives on the left; yellow edge lines; kopjes (rocky hills) in dry bush.','Jacaranda-lined streets in Harare; roadside vendors under msasa trees.'],
- 'Japan':['Drives on the left; kanji and kana everywhere; narrow, immaculate streets under a web of cables.','White plates on cars, yellow on tiny kei cars; a vending machine on every corner.','Blue \'no parking\' circles, and \'止まれ\' (stop) painted on the road itself.'],
- 'South Korea':['Hangul — circles (ㅇ) and straight strokes — on every sign.','Yellow centre lines, numbered apartment towers, grey concrete poles.','\'로\' (ro) and \'길\' (gil) end street names; taxis in silver or orange.'],
- 'Taiwan':['Traditional Chinese characters; scooters by the hundred; arcaded pavements under the buildings.','White plates; traffic lights with countdowns; dense green on steep hills.'],
- 'Thailand':['Thai script — loops and curls; drives on the left.','Red-and-white striped kerbs, pickup trucks, and a 7-Eleven on every corner.','Blue direction signs with Thai above English.'],
- 'Malaysia':['Drives on the left; Malay in Latin script — \'Jalan\' (road), \'Lorong\'.','Black plates with white text; palm-oil plantations; Petronas stations.'],
- 'Indonesia':['Drives on the left; Indonesian (\'Jalan\', \'Jl.\'); black plates with white text.','Motorbikes everywhere, red-tiled roofs, Indomaret and Alfamart minimarts.','Rice terraces, volcanoes, and mosques with metal domes.'],
- 'Philippines':['Drives on the right — unlike most of South-East Asia; Tagalog and English signs.','Jeepneys and tricycles, \'Barangay\' signs, sari-sari stores.'],
- 'Vietnam':['Vietnamese — Latin letters buried in diacritics (ư, ơ, ă, ộ).','Rivers of motorbikes, tall narrow \'tube houses\', conical hats in the countryside.'],
- 'Cambodia':['Khmer script — tall, ornate letters; drives on the right.','Angkor beer signs, tuk-tuks, flat rice fields and stilt houses.'],
- 'Laos':['Lao script — like Thai but rounder; drives on the right.','Yellow licence plates; the Mekong; French colonial shophouses and Beerlao signs.'],
- 'Mongolia':['Cyrillic; endless steppe with no fences; gers (yurts) beside the road.','Dirt tracks braided across the grass; Toyota Priuses all over Ulaanbaatar.'],
- 'Kazakhstan':['Cyrillic (with Latin arriving) plus extra letters ә, ғ, қ, ң, ө, ұ, ү; flat steppe.','Soviet blocks next to Astana\'s glass; white plates marked KZ.'],
- 'Kyrgyzstan':['Cyrillic; jagged snow-capped mountains on most horizons.','Old Audis and Ladas, riders on horseback, and red flags with the yurt-crown sun.'],
- 'Uzbekistan':['Latin and Cyrillic mixed; white Chevrolets make up most of the traffic.','Dry, flat, irrigated fields; blue-tiled mosques and madrasas.'],
- 'India':['Drives on the left; many scripts (Devanagari, Tamil…) beside English; auto-rickshaws.','Yellow plates on commercial vehicles, white on private; trucks painted with \'Horn OK Please\'.'],
- 'Pakistan':['Urdu (Arabic-style script) with English; drives on the left; wildly decorated \'jingle trucks\'.','Dry plains and mountains; motorbikes carrying whole families.'],
- 'Bangladesh':['Bengali script; drives on the left; cycle rickshaws in every street.','Flat, wet, green and crowded; bright painted rickshaw art.'],
- 'Sri Lanka':['Drives on the left; Sinhala (rounded) and Tamil scripts plus English on signs.','Tuk-tuks everywhere, coconut palms, red-tiled roofs, Buddhist stupas.'],
- 'Nepal':['Devanagari script; drives on the left; steep terraced hills.','Red licence plates with white Devanagari; prayer flags and Tata buses.'],
- 'Bhutan':['Dzongkha script (Tibetan-style); every building in traditional painted style, by law.','Drives on the left; red plates with white text; monasteries on cliffs.'],
- 'Australia':['Drives on the left; white lines; yellow diamond warning signs with kangaroos.','Wide flat outback of red earth or eucalyptus bush; \'GIVE WAY\' triangles.','Plates by state; wide roads with gravel shoulders; single-storey brick houses with tin roofs.'],
- 'New Zealand':['Drives on the left; white lines with yellow no-passing lines; \'Give Way\' signs.','Green hills with sheep, tree ferns and cabbage trees; white plates with black text.'],
+ 'United States':['Yellow centre lines with white edge lines, and green highway signs with white text, are nationwide: you are in the US before you have read a word.','Speed limits on plain black-on-white rectangles, wooden utility poles, and roadside mailboxes on posts, along every rural road from coast to coast.','Narrowing it down: the state is on the plates and on the road-number shields. Adobe and desert in the Southwest, brick and hardwoods in the Northeast, pines and red clay in the Southeast, big skies and grain in the Plains.'],
+ 'Canada':['Yellow centre lines like the US, but speed signs in km/h and green signs with distances in kilometres, nationwide.','Bilingual English and French signs put you in Quebec (or New Brunswick); a red ARRÊT stop sign is Quebec only.','Green highway shields with a crown are Ontario, a fleur-de-lis shield is Quebec, dead-flat prairie with grain elevators is Saskatchewan or Manitoba, and the Rockies mean Alberta or British Columbia.'],
+ 'Mexico':['ALTO on the stop signs and warnings for topes (speed bumps) are nationwide, as are yellow centre lines.','Speed signs read MÁXIMA, town signs are white with a black or red border, and OXXO shops and painted concrete houses are in every town.','Dry scrub and long straight roads are the north (Chihuahua, Sonora, Coahuila); tropical green and pastel colonial towns are the south (Oaxaca, Chiapas, Yucatán).'],
+ 'Guatemala':['Chicken buses, old US school buses painted in bright colours, run everywhere in the highlands around Guatemala City, Antigua and Lake Atitlán.','Yellow centre lines, green volcanic hills, low concrete houses and tienda corner shops, nationwide.'],
+ 'Costa Rica':['Pura vida on signs and shopfronts nationwide, and blue-and-white square street signs in the towns.','Steep green hills with tin-roofed houses in the Central Valley around San José; flat, dry cattle country in Guanacaste in the north-west; rainforest and the sea on the Caribbean side.'],
+ 'Panama':['Yellow centre lines and Spanish signs; a skyscraper skyline means Panama City, small Caribbean-coloured towns mean anywhere else.','Diablo Rojo buses covered in airbrushed art are a Panama City thing.'],
+ 'Dominican Republic':['Motorbikes carrying whole families and colmado corner shops are nationwide, most of them with a Presidente beer sign.','Yellow centre lines, palms, and brightly painted concrete houses; on an island this size the sea is never far.'],
+ 'Colombia':['Yellow licence plates, front and back, nationwide: the single best Colombia tell.','Yellow centre lines; red-brick towns in the Andes around Bogotá and Medellín; mototaxis (tuk-tuks) in the hot lowlands and on the Caribbean coast.'],
+ 'Ecuador':['Yellow centre lines and Spanish; the Andes fill the horizon in the central highlands (Quito, Cuenca), while the coast is flat with banana and cacao plantations.','White plates, Pilsener beer signs, and buses painted in bold colours, nationwide.'],
+ 'Peru':['Yellow centre lines, white plates, and three-wheeled mototaxis, nationwide.','A dusty grey desert coast along the Pan-American and around Lima; deep green Andes valleys inland around Cusco and Arequipa; political slogans painted on walls everywhere.'],
+ 'Bolivia':['The Altiplano around La Paz, El Alto and Oruro is high, dry and brown; towns of unpainted red brick are the norm nationwide.','Spanish signs, yellow centre lines, and old Japanese minibuses as public transport.'],
+ 'Brazil':['Portuguese on the signs (Rua, Avenida) and squarish concrete utility poles, nationwide.','Yellow centre lines; white Mercosur plates (older ones grey); Ipiranga and Petrobras stations.','Red-clay dust on walls in the interior (Goiás, Minas Gerais, Mato Grosso); flat green pampas in the far south (Rio Grande do Sul); palms and pastel colonial towns in the north-east (Bahia, Pernambuco).'],
+ 'Argentina':['Black-on-white plates with a blue Mercosur strip on top (older cars: black plates with white text), nationwide.','Yellow centre lines across the flat pampas around Buenos Aires; YPF fuel stations; concrete poles.','Dry scrub and wind in Patagonia (Chubut, Santa Cruz); vineyards under the Andes wall in Mendoza; red earth and subtropical green in Misiones in the north-east.'],
+ 'Chile':['White lines only, no yellow centre line, and PARE on the stop signs, nationwide.','The Andes on the eastern horizon almost everywhere; bone-dry desert in the north (Atacama, Antofagasta), rain, forest and fjords in the south (Los Lagos, Aysén).'],
+ 'Uruguay':['ANCAP fuel stations exist only in Uruguay; Spanish signs and yellow centre lines.','Flat green farmland with low houses under terracotta roofs, and Mercosur plates.'],
+ 'United Kingdom':['Drives on the left, speeds in mph, white front plates and yellow rear plates, nationwide.','Direction signs: green on main A-roads, white on local roads, blue on motorways; red pillar postboxes.','Terraced red brick in northern England and the Midlands; honey-coloured stone in the Cotswolds; grey stone and dry-stone walls in Yorkshire and Scotland; Welsh on every sign in Wales.'],
+ 'Ireland':['Yellow dashed edge lines on left-hand-drive roads, nationwide: the Irish tell.','Signs in Irish and English, speeds in km/h, green postboxes.','Grey stone walls and small wet fields in the west (Galway, Clare, Kerry); flatter, greener farmland in the midlands and east.'],
+ 'France':['Town-entry signs are white with a red border and street names sit on blue enamel plaques, nationwide.','Bollards are white with a red band on top; plane trees line the straight D-roads, especially in the south.','Half-timbered houses mean Alsace or Normandy; ochre stone, cypresses and dry hills mean Provence; grey slate roofs mean Brittany and the north.'],
+ 'Spain':['CEDA EL PASO on give-way signs nationwide; blue signs on main roads, white on local ones.','Bollards with a black top; Repsol and Cepsa stations; town names on white with a red border.','Whitewashed villages and olive groves are Andalusia; wet green hills are Galicia and Asturias; the dry ochre plateau is Castile; Catalan on the signs means Catalonia.'],
+ 'Portugal':['Blue direction signs and mosaic-cobbled pavements (calçada) nationwide; patterned tile façades (azulejos) on older houses.','Plates are white with a blue EU strip on the left and, on older cars, a yellow strip on the right.','Eucalyptus and pine in the centre and north; flat cork-oak plains in the Alentejo; whitewash and the sea in the Algarve.'],
+ 'Italy':['Black-on-white town signs, blue parking bays, and scooters everywhere, nationwide.','Green Autostrada signs; Tabacchi shops marked with a big T; white plates with blue strips at both ends.','Cypresses and terracotta hill towns are Tuscany and Umbria; pale limestone and dry hills are Puglia and Sicily; wood and stone under the Alps is the north.'],
+ 'Germany':['Yellow town-entry signs with black text nationwide; leaving town, the name has a line struck through it.','Plates are black on white with a blue EU strip and a round registration seal after the city letters.','Half-timbered houses mean Hesse, Lower Saxony or Franconia; onion-domed churches and Alpine meadows mean Bavaria; flat farmland and brick mean the north.'],
+ 'Netherlands':['Yellow licence plates, front and back, nationwide: the Dutch tell.','Flat land, brick houses with big windows, and red-asphalt cycle paths beside every road.','Bollards white with a red band. Canals and dykes are the west (North and South Holland); heath and forest are the east (the Veluwe).'],
+ 'Belgium':['Red text on white licence plates, nationwide, and nobody else in Europe.','Brick houses, concrete-slab roads, and a roundabout every kilometre.','Dutch on the signs is Flanders (north), French is Wallonia (south), both together is Brussels.'],
+ 'Switzerland':['Blue signs on main roads, green on motorways, and white plates with the canton\'s coat of arms, nationwide.','A yellow-diamond priority sign like Germany\'s; yellow pedestrian crossings.','German in the centre and east, French in the west (Geneva, Lausanne), Italian in Ticino; wooden chalets in the Alps.'],
+ 'Austria':['Blue town-entry signs with white text, nationwide.','White plates with a blue EU strip and the red-white-red flag; Bundesland shields on the cars.','Onion-domed churches and wooden balconies full of flowers in Tyrol and Salzburg; flatter vineyards and plains east of Vienna.'],
+ 'Czech Republic':['Town signs white with black text; náměstí (square) and ulice (street) on names, nationwide.','Diacritics like ř, ě, ů and ž in almost every word; Škodas everywhere.','Soviet-era panel blocks beside baroque squares in most towns; forested hills along the borders.'],
+ 'Slovakia':['Slovak letters ľ, ť, ô and ä, and ulica on street names, nationwide.','Hilly forested countryside with painted concrete houses; the Tatras rise along the northern border.'],
+ 'Hungary':['utca (street) and út (road), with long accents like ő and ű, nationwide.','Flat plains east of the Danube (the Great Alföld); yellow-washed rural houses; white plates with a blue strip.'],
+ 'Poland':['White town-entry signs with black text and green direction signs, nationwide.','Red-brick churches, dense pine forest and flat farmland; Żabka shops in every town.','Bollards white with a red band and a black top; mountains only along the southern border (Tatras, Sudetes).'],
+ 'Denmark':['Danish letters æ, ø and å; vej means road, nationwide.','Red-and-white town signs, cycle lanes everywhere, white plates with a red border.'],
+ 'Norway':['Yellow centre lines nationwide; Sweden and Finland use white.','Red and white wooden houses, fjords and bare rock along the west coast; vei or veg on signs.','White plates with a blue strip; a tunnel every few minutes in the west; flatter forest and farmland around Oslo.'],
+ 'Sweden':['White centre lines with yellow-on-blue direction signs and yellow-backed warning signs, nationwide.','Falu-red wooden houses in pine forest; väg and gatan on names.','Road-edge posts are white with yellow reflectors; the far north (Norrland) is birch, bog and hardly anyone.'],
+ 'Finland':['Finnish, with long words and double letters (kk, tt, aa); tie is road, katu is street, nationwide.','Yellow-backed warning signs like Sweden\'s, but flatter land, lakes everywhere, and birch.','Finnish and Swedish together on signs along the west and south coasts (Vaasa, Turku, Helsinki).'],
+ 'Iceland':['Treeless volcanic moss, black gravel and yellow road-edge posts, nationwide.','Icelandic ð and þ on signs; single-lane bridges on the ring road.'],
+ 'Estonia':['Estonian õ, ä, ö, ü; tee means road, tänav street, nationwide.','Flat, forested, wooden houses and Soviet-era blocks; white plates with a blue strip.'],
+ 'Latvia':['Latvian macrons ā, ē, ī, ū and iela on street names, nationwide.','Wooden houses and pine forest; Art Nouveau façades in Riga.'],
+ 'Lithuania':['gatvė on street names and letters ė, ų, į, nationwide.','Flat farmland, wooden farmhouses, storks\' nests on the poles.'],
+ 'Ukraine':['Cyrillic with ї and є, letters Russian does not use; вулиця means street, nationwide.','Fences, bus stops and kerbs painted blue and yellow; wide flat black-earth fields in the centre and east.'],
+ 'Russia':['Cyrillic; улица (street) and проспект; black-on-white plates ending in a region number, nationwide.','Blue direction signs, grey apartment blocks, birch forest, long straight roads.','Kilometre posts and kerbs painted black and white; the region number on the plates is the fastest way to place a Russian round.'],
+ 'Romania':['Romanian (ă, â, î, ș, ț) is a Latin language among Slavic neighbours; strada on names, nationwide.','Horse carts on the road, yellow taxis, Petrom and Rompetrol stations.','Silver-domed Orthodox churches; ornate metal gates on village houses, especially in Transylvania and Maramureș.'],
+ 'Bulgaria':['Cyrillic with a lot of ъ; ул. for street; white plates with a blue strip, nationwide.','Dry hills, Soviet-era blocks and red-tiled houses; the Balkan range runs east to west across the middle.'],
+ 'Greece':['Greek alphabet with a Latin transliteration under it on most signs, nationwide.','Blue direction signs; dry rocky hills, olive trees and whitewashed houses; white cube houses with blue shutters mean the islands.'],
+ 'Croatia':['Yellow direction signs on main roads; ulica and the letters č, ć, š, ž, nationwide.','Red-tiled roofs, stone houses and the Adriatic on the Dalmatian coast; flatter farmland in Slavonia in the east.'],
+ 'Slovenia':['Slovene č, š, ž; cesta (road) and ulica (street), nationwide.','Alpine and green with a church spire on every hill; white plates with a blue strip.'],
+ 'Serbia':['Cyrillic and Latin side by side; улица and ulica; letters ć and đ, nationwide.','Unrendered brick houses, plum orchards, and plates with a Cyrillic town code.'],
+ 'North Macedonia':['Cyrillic with letters nobody else uses (ѓ, ќ, ѕ, џ); mountains in every direction, nationwide.','Red-tiled roofs, minarets and Orthodox churches in the same town.'],
+ 'Albania':['Albanian ë and ç everywhere; Rruga on street names, nationwide.','Mercedes of every age, concrete bunkers in the fields, mountains meeting the sea.'],
+ 'Bosnia and Herzegovina':['Latin and Cyrillic both appear; mosques and churches in the same town, nationwide.','Steep green valleys, unrendered brick, white plates with a blue strip.'],
+ 'Turkey':['Turkish, with dotless ı, ğ, ş, ç; sokak (street) and caddesi (avenue), nationwide.','Blue direction signs, white plates with a blue strip, red-and-white painted kerbs.','A minaret on every skyline; dry Anatolian plateau in the centre, green and wet along the Black Sea coast, pines and the Mediterranean in the south.'],
+ 'Georgia':['Georgian script, rounded letters unlike anything else, with Latin underneath, nationwide.','Caucasus mountains, vineyards in Kakheti in the east, old Ladas and Mercedes.'],
+ 'Israel':['Hebrew (with Arabic and English) on signs and yellow licence plates, nationwide.','Dry stony hills; white apartment blocks with solar water tanks on the roof; irrigated green farmland in the north.'],
+ 'Jordan':['Arabic and English signs; rocky desert and sand-coloured stone houses, nationwide.','Roundabouts with a flag in the middle; pickups and old Hyundais.'],
+ 'Lebanon':['Arabic and French signs; steep, dense hillside towns with the sea below, nationwide.','Red plates on taxis; concrete apartment blocks stacked with balconies.'],
+ 'United Arab Emirates':['Arabic and English; wide immaculate roads, desert sand and glass towers, nationwide.','White plates with the emirate\'s name; green and blue direction signs.'],
+ 'Oman':['Arabic and English; bare brown mountains and a coast of pale houses, nationwide.','White forts and low white houses, a mosque in every village.'],
+ 'Egypt':['Arabic (English on main roads); dusty streets and unfinished red-brick apartment blocks, nationwide.','Palms, the Nile\'s green strip, and desert right at the edge of town.'],
+ 'Tunisia':['Arabic and French; black plates with white text, nationwide.','Whitewashed houses with blue doors, olive groves and dry hills.'],
+ 'Algeria':['Arabic and French signs; dry hills and unfinished brick buildings, nationwide.','Long desert roads in the south, Mediterranean towns in the north.'],
+ 'Kenya':['Drives on the left; white front plates, yellow rear, nationwide.','Red soil, matatu minibuses, and M-Pesa shops painted green; the Rift Valley and tea estates lie west of Nairobi.'],
+ 'Uganda':['Drives on the left; red soil, banana plants and boda-boda motorbikes, nationwide.','White front and yellow rear plates; MTN-yellow shopfronts.'],
+ 'Rwanda':['Drives on the right, unlike its East African neighbours.','Steep green hills, tidy paved roads, motorbike taxis in matching vests; Kigali is unusually clean.'],
+ 'Tanzania':['Drives on the left; yellow plates; Swahili signs (duka, barabara), nationwide.','Red earth, baobabs, and three-wheeled bajaji.'],
+ 'Ghana':['Drives on the right; English signs; red laterite soil; tro-tro minibuses, nationwide.','Concrete houses painted in Vodafone red or MTN yellow as adverts.'],
+ 'Nigeria':['Drives on the right; English signs; yellow taxis in Lagos, okada motorbikes elsewhere.','Red earth, dense busy towns, hand-painted shop signs, nationwide.'],
+ 'Senegal':['French signs; yellow taxis and colourful car rapide minibuses in Dakar.','Sandy streets, baobabs, flat Sahel scrub and horse-drawn carts, nationwide.'],
+ 'Cameroon':['French and English signs; red soil, dense green, yellow taxis, nationwide.','Roadside markets under corrugated roofs.'],
+ 'Madagascar':['French and Malagasy signs; red-earth roads and rice paddies, nationwide.','Renault 4s and Peugeot 404s still running; steep-roofed brick houses in the central highlands around Antananarivo.'],
+ 'Ethiopia':['Ge\'ez (Amharic) script on signs nationwide; blue-and-white Lada taxis in Addis Ababa.','Highland plateaus, eucalyptus, and round thatched tukul houses.'],
+ 'Democratic Republic of the Congo':['French signs, red earth, dense green; coverage is mostly Kinshasa and the east.','Crowded streets, hand-painted signs, motorbikes everywhere.'],
+ 'South Africa':['Drives on the left; yellow edge lines with white centre lines, nationwide: the southern-African tell.','Plates differ by province (GP is Gauteng, WC the Western Cape, KZN KwaZulu-Natal); a robot is a traffic light; walled houses with electric fencing.','Dry veld and blue-gum trees inland; vineyards and Table Mountain around Cape Town; sugar cane and humidity in KwaZulu-Natal.'],
+ 'Namibia':['Drives on the left; gravel roads through empty desert; yellow edge lines, nationwide.','German street names in Swakopmund and Windhoek; dead-straight roads with the car\'s long shadow.'],
+ 'Botswana':['Drives on the left; flat dry bush with acacia and cattle on the road; yellow edge lines, nationwide.','White plates starting with B; donkey carts.'],
+ 'Zimbabwe':['Drives on the left; yellow edge lines; kopjes (rocky hills) in dry bush, nationwide.','Jacaranda-lined streets in Harare; roadside vendors under msasa trees.'],
+ 'Japan':['Drives on the left; kanji and kana everywhere; narrow, immaculate streets under a web of cables, nationwide.','Red-and-white striped arrows hanging above the road edge are snow poles, marking where the shoulder is under drifts: Hokkaido or the Sea of Japan side (Niigata, Akita, Aomori, Nagano), never the south.','White plates on cars, yellow on tiny kei cars; a vending machine on every corner; blue no-parking circles and 止まれ (stop) painted on the road itself.'],
+ 'South Korea':['Hangul, circles (ㅇ) and straight strokes, on every sign, nationwide.','Yellow centre lines, numbered apartment towers, grey concrete poles.','로 (ro) and 길 (gil) end street names; taxis in silver or orange; green-roofed farm buildings in the countryside.'],
+ 'Taiwan':['Traditional Chinese characters; scooters by the hundred; arcaded pavements under the buildings, nationwide.','White plates; traffic lights with countdowns; dense green on the steep hills inland, flat and built-up on the west coast.'],
+ 'Thailand':['Thai script, loops and curls; drives on the left, nationwide.','Red-and-white striped kerbs, pickup trucks, and a 7-Eleven on every corner.','Blue direction signs with Thai above English; rice paddies on the central plain, hills in the north (Chiang Mai), palms and beaches in the south.'],
+ 'Malaysia':['Drives on the left; Malay in Latin script, Jalan (road) and Lorong, nationwide.','Black plates with white text; palm-oil plantations; Petronas stations; Chinese characters on shop signs in the towns.'],
+ 'Indonesia':['Drives on the left; Indonesian (Jalan, Jl.); black plates with white text, nationwide.','Motorbikes everywhere, red-tiled roofs, Indomaret and Alfamart minimarts.','Rice terraces and volcanoes on Java and Bali; mosques with metal domes; Hindu temples and daily offerings mean Bali.'],
+ 'Philippines':['Drives on the right, unlike most of South-East Asia; Tagalog and English signs, nationwide.','Jeepneys and tricycles, Barangay signs, sari-sari stores.'],
+ 'Vietnam':['Vietnamese, Latin letters buried in diacritics (ư, ơ, ă, ộ), nationwide.','Rivers of motorbikes, tall narrow tube houses, conical hats in the countryside; the Mekong delta is flat and wet, the north hilly.'],
+ 'Cambodia':['Khmer script, tall ornate letters; drives on the right, nationwide.','Angkor beer signs, tuk-tuks, flat rice fields and stilt houses.'],
+ 'Laos':['Lao script, like Thai but rounder; drives on the right, nationwide.','Yellow licence plates; the Mekong; French colonial shophouses and Beerlao signs.'],
+ 'Mongolia':['Cyrillic; endless steppe with no fences; gers (yurts) beside the road, nationwide.','Dirt tracks braided across the grass; Toyota Priuses all over Ulaanbaatar.'],
+ 'Kazakhstan':['Cyrillic (with Latin arriving) plus extra letters ә, ғ, қ, ң, ө, ұ, ү; flat steppe, nationwide.','Soviet blocks next to Astana\'s glass; white plates marked KZ; mountains only in the far south-east around Almaty.'],
+ 'Kyrgyzstan':['Cyrillic; jagged snow-capped mountains on most horizons, nationwide.','Old Audis and Ladas, riders on horseback, red flags with the yurt-crown sun.'],
+ 'Uzbekistan':['Latin and Cyrillic mixed; white Chevrolets make up most of the traffic, nationwide.','Dry, flat, irrigated cotton fields; blue-tiled mosques and madrasas in Samarkand and Bukhara.'],
+ 'India':['Drives on the left; auto-rickshaws; English plus the local script, nationwide.','Yellow plates on commercial vehicles, white on private; trucks painted with Horn OK Please.','The script places you: Devanagari in the north (Hindi), Tamil in the far south, Kannada in Karnataka, Bengali in the east.'],
+ 'Pakistan':['Urdu (Arabic-style script) with English; drives on the left; wildly decorated jingle trucks, nationwide.','Dry plains in Punjab and Sindh, mountains in the north; motorbikes carrying whole families.'],
+ 'Bangladesh':['Bengali script; drives on the left; cycle rickshaws in every street, nationwide.','Flat, wet, green and crowded; bright painted rickshaw art.'],
+ 'Sri Lanka':['Drives on the left; Sinhala (rounded) and Tamil scripts plus English on signs, nationwide.','Tuk-tuks everywhere, coconut palms, red-tiled roofs, Buddhist stupas; tea estates in the hill country around Kandy and Nuwara Eliya.'],
+ 'Nepal':['Devanagari script; drives on the left; steep terraced hills, nationwide.','Red licence plates with white Devanagari; prayer flags and Tata buses.'],
+ 'Bhutan':['Dzongkha script (Tibetan-style); every building in traditional painted style, by law, nationwide.','Drives on the left; red plates with white text; monasteries on cliffs.'],
+ 'Australia':['Drives on the left; white lines; yellow diamond warning signs with kangaroos, nationwide.','Wide flat outback of red earth or eucalyptus bush; GIVE WAY triangles; wide roads with gravel shoulders.','The state is on the plates. Tropical green and sugar cane is Queensland; red dirt and termite mounds is the Northern Territory; gum-lined roads and cool hills are Victoria and Tasmania.'],
+ 'New Zealand':['Drives on the left; white lines with yellow no-passing lines; Give Way signs, nationwide.','Green hills with sheep, tree ferns and cabbage trees; white plates with black text.','Snowy peaks and braided rivers are the South Island; volcanoes and Māori place names everywhere are the North Island.'],
 };
 function clueFor(country){
   if(!country) return null;
@@ -1846,7 +1852,7 @@ async function deportStep(chain,m){
   }
   return await findDeported(chain,m);   // one last go; if this throws the round is genuinely unavailable
 }
-/* One Deported round. Every result is either a neighbour of the last country or an explicit fresh start —
+/* One Deported round. Every result is either a neighbour of the last country or an explicit fresh start , 
    a failed lookup can no longer silently drop you somewhere unrelated. */
 async function findDeported(chain,m){
   const prev=chain[chain.length-1];
@@ -2063,7 +2069,7 @@ function makeMap(id,opts={}){
   allMaps.push(m); applyStyle(m);
   return m;
 }
-/* Every guess is a white pin; what sits in its head says whose it is — a colour, or the player's photo. */
+/* Every guess is a white pin; what sits in its head says whose it is, a colour, or the player's photo. */
 const PIN_BODY='M16 1C7.7 1 1 7.7 1 16c0 10.5 15 27 15 27s15-16.5 15-27C31 7.7 24.3 1 16 1z';
 const PIN_SVG=(inner)=>`<svg viewBox="0 0 32 44" width="32" height="44"><path d="${PIN_BODY}" fill="#fff" stroke="#152219" stroke-width="2"/><circle cx="16" cy="16" r="7.5" fill="${inner}"/></svg>`;
 function pinIcon(inner,av,late){
@@ -2098,7 +2104,7 @@ function dominantColor(url){
       if(v>0.15&&v<0.97){ fr+=r; fg+=g; fb+=b; fn++; }
       if(sat<0.28||v<0.2||v>0.95) continue;
       let h=0; const dl=mx-mn; if(mx===r) h=((g-b)/dl+6)%6; else if(mx===g) h=(b-r)/dl+2; else h=(r-g)/dl+4; const bi=Math.floor(h*4)%24;
-      bins[bi]+=sat; const s0=sum[bi]; s0[0]+=r*sat; s0[1]+=g*sat; s0[2]+=b*sat; s0[3]+=sat; }
+      const w=0.35+sat; bins[bi]+=w; const s0=sum[bi]; s0[0]+=r*w; s0[1]+=g*w; s0[2]+=b*w; s0[3]+=w; }
     let best=-1,bw=0; for(let i=0;i<24;i++) if(bins[i]>bw){ bw=bins[i]; best=i; }
     let r,g,b;
     if(best>=0&&bw>2){ const s0=sum[best]; r=s0[0]/s0[3]; g=s0[1]/s0[3]; b=s0[2]/s0[3]; }
@@ -2117,13 +2123,13 @@ function dominantColor(url){
 }
 function lineColor(p){ const av=p&&p.face?avOf(p.id):null; return (av&&dominantColor(av))||COLORS[(p&&p.color)??0][0]; }
 function myLineColor(){ return (acct.av&&dominantColor(acct.av))||SOLO_COL; }
-/* The real location: bigger, red, unmistakable — a target inside a pin with a pulsing ring at its foot. */
+/* The real location: bigger, red, unmistakable, a target inside a pin with a pulsing ring at its foot. */
 const TRUE_SVG='<svg viewBox="0 0 40 56" width="40" height="56"><path d="M20 1.5C9.6 1.5 1.5 9.6 1.5 20c0 13.2 18.5 34.5 18.5 34.5S38.5 33.2 38.5 20C38.5 9.6 30.4 1.5 20 1.5z" fill="#e63946" stroke="#7a1520" stroke-width="2.2"/><path d="M8.5 15.5A12.5 12.5 0 0 1 17 8.2" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="20" r="10.5" fill="#fff"/><circle cx="20" cy="20" r="7" fill="#e63946"/><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
 const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-true drop late"><span class="ring"></span>'+TRUE_SVG+'</div>',iconSize:[40,56],iconAnchor:[20,54]});
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-204406';
+const BUILD='20260917-210008';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2170,7 +2176,7 @@ function lbFlush(){
   if(lb.queue.length) setTimeout(lbFlush,4000);
 }
 /* Reconcile, not a one-shot migration: on every load, any score this browser has that is missing from the
-   public board — and still good enough to belong on it — gets uploaded. Self-healing, so a score saved while
+   public board, and still good enough to belong on it, gets uploaded. Self-healing, so a score saved while
    offline, or on a load that was cut short, turns up the next time the page opens. */
 let lbSynced=0;
 function lbReconcile(announce){
@@ -2242,10 +2248,10 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
 /* ---------- Version ----------
    major.minor.patch, counted from the project's own history.
    MAJOR  a ground-up rework of the game: 1 was the original, 2 was the rebuild of the layout, system and
-          branding, 3 is the social game — duos, challenges, custom maps, streaks, Learn.
+          branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:1,patch:1};
+const VERSION={major:3,minor:2,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2384,7 +2390,7 @@ function renderBoard(highlightId){
 /* ---------- Accounts ----------
    No server and no sign-up service: an account is one retained message on the same brokers the boards use,
    holding a name and a salted hash of a four-digit code. It keeps a name yours across devices and stops a
-   friend typing it by accident. It is not security — a four-digit code is guessable and the record is public. */
+   friend typing it by accident. It is not security, a four-digit code is guessable and the record is public. */
 /* ---------- Preferences: theme, text size, map, sound ---------- */
 const prefs={theme:'light',size:'0'};
 try{ const p=JSON.parse(localStorage.getItem('pp_prefs')||'{}'); Object.assign(prefs,p); }catch(e){}
@@ -2582,7 +2588,7 @@ $('avClear').addEventListener('click',async ()=>{
   if(mp.role) mpSend({t:'av',av:''});
 });
 $('acctOutBtn').addEventListener('click',()=>{ const who=acct.name; acctClear(); soc.mine=new Set(); soc.theirs={}; soc.loaded=false; socWarming=null; paintAcct(); acctMsg('acctMsg','');
-  toast(`Signed out of ${who}. Your account is still there — sign back in any time.`); show('menu'); });
+  toast(`Signed out of ${who}. Your account is still there, sign back in any time.`); show('menu'); });
 acctLoad();
 
 /* ---------- Friends ----------
@@ -2801,7 +2807,7 @@ $('inviteList').addEventListener('click',async e=>{
 
 /* ---------- Challenges ----------
    A finished game becomes a link. The record holds the exact locations and the sharer's guess for each,
-   so whoever opens it plays the same rounds and sees that pin after every guess — a race against a ghost.
+   so whoever opens it plays the same rounds and sees that pin after every guess, a race against a ghost.
    One retained message per challenge; everyone who finishes it appends themselves to its list of plays. */
 const CH_ROOT='worlddrop/v1/ch';
 const chal={cur:null, focus:null};
@@ -2826,7 +2832,7 @@ let shareRec=null;
 function paintShare(){ const on=!$('final').hidden&&chalShareable(); $('shareBox').hidden=!on; if(!on){ $('shareCard').hidden=true; shareRec=null; } }
 $('shareBtn').addEventListener('click',()=>{
   const card=$('shareCard'); if(!card.hidden){ card.hidden=true; return; }
-  if(!shareRec){ shareRec=chalBuild(); const ok=chalPublish(shareRec); $('shareNote').textContent=ok?'':'Not connected yet — the link will work once you\'re back online and reopen this screen.'; if(!ok) setTimeout(()=>{ if(shareRec&&chalPublish(shareRec)) $('shareNote').textContent=''; },4000); }
+  if(!shareRec){ shareRec=chalBuild(); const ok=chalPublish(shareRec); $('shareNote').textContent=ok?'':'Not connected yet, the link will work once you\'re back online and reopen this screen.'; if(!ok) setTimeout(()=>{ if(shareRec&&chalPublish(shareRec)) $('shareNote').textContent=''; },4000); }
   $('shareLink').value=chalLink(shareRec.id); card.hidden=false; sfx('click');
 });
 $('shareCopy').addEventListener('click',()=>copyText($('shareLink').value,$('shareCopy'),'Copy'));
@@ -2839,7 +2845,7 @@ function rivalColor(){ return (state.chal&&state.chal.av&&dominantColor(state.ch
 function rivalIcon(){ return pinIcon(RIVAL_COL,state.chal&&state.chal.av||null,true); }
 function rivalFace(size){ const c=state.chal; if(!c) return ''; return c.av?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${c.av})"></span>`:`<span class="pav ini" style="width:${size}px;height:${size}px;background:${RIVAL_COL};color:#fff">${esc((c.name||'?')[0].toUpperCase())}</span>`; }
 function rivalDesc(rv,m){
-  if(!rv) return '—';
+  if(!rv) return ', ';
   if(m.trio) return rv.p!=null?`picked ${String.fromCharCode(65+rv.p)}`:'no pick';
   if(m.country) return rv.c?esc(rv.c):'no pick';
   if(m.slider) return rv.s!=null?`${rv.s}°F`:'no answer';
@@ -2909,7 +2915,7 @@ function renderChal(){
   $('chPlaysCard').hidden=false; $('chPlaysSub').textContent=plays.length?`${plays.length} ${plays.length===1?'person has':'people have'} taken it on`:'Nobody yet. You could be first.';
   $('chPlays').innerHTML=plays.map(pl=>{ const res=pl.score>rec.score?['beat','Beat it']:pl.score<rec.score?['short','Short by '+(rec.score-pl.score).toLocaleString()]:['tie','Tied'];
     return `<div class="chplay" data-k="${esc(pl.k||'')}">${pl.k?frFace(pl.k,26):`<span class="pav ini" style="width:26px;height:26px">${esc((pl.name||'?')[0].toUpperCase())}</span>`}<span class="pn">${esc(pl.name)}${pl.k?friendTag({k:pl.k,name:pl.name}):''}</span><span class="res ${res[0]}">${res[1]}</span><span class="sc">${pl.score.toLocaleString()}</span></div>`; }).join('');
-  // round by round: the sharer against whoever this page is about — the notified player, or you
+  // round by round: the sharer against whoever this page is about, the notified player, or you
   let other=null;
   if(chal.focus) other=plays.find(pl=>(pl.k&&pl.k===chal.focus)||pl.name===chal.focus)||null;
   if(!other&&done) other={name:'You',pts:done.pts,score:done.score,me:true};
@@ -3008,7 +3014,7 @@ async function cmapFinish(){
 }
 /* ----- the builder ----- */
 function openMake(){
-  if(!acct.key){ toast('Sign in to build a map — it needs a name on it'); show('acct'); return; }
+  if(!acct.key){ toast('Sign in to build a map, it needs a name on it'); show('acct'); return; }
   show('cmake'); $('cmake').scrollTo(0,0); $('mkMsg').textContent='';
   if(!cm.mk){ cm.mk={map:makeMap('mkMap'),pins:[],layer:null}; cm.mk.layer=L.layerGroup().addTo(cm.mk.map);
     cm.mk.map.on('click',e=>mkAdd(e.latlng.lat,e.latlng.lng)); }
@@ -3047,7 +3053,7 @@ $('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefau
 $('mkSave').addEventListener('click',()=>{
   const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<2||name.length<2) return;
   const rec={id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],pins:mk.pins.map(p=>({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}))};
-  if(!cmapPublish(rec)){ $('mkMsg').textContent='Not connected — try again in a moment.'; return; }
+  if(!cmapPublish(rec)){ $('mkMsg').textContent='Not connected, try again in a moment.'; return; }
   cm.all[rec.id]=rec; mk.pins=[]; $('mkName').value=''; renderMk(); toast('Map published','ok'); cmapOpen(rec.id);
 });
 $('cmakeBack').addEventListener('click',()=>openCmaps(cm.from));
@@ -3209,6 +3215,7 @@ $('boardBack').addEventListener('click',()=>{ if(bp.from==='final'){ show('final
 $('boardMenu').addEventListener('click',()=>{ if(bp.from==='final'&&scoreUnsaved()){ show('final'); nagToSave(finalMenu); return; } if(mp.role) mpLeave(); renderBoard(); show('menu'); });
 $('viewBoardBtn').addEventListener('click',()=>openBoardPage(state.mode,state.savedId,'final'));
 $('allBoards').addEventListener('click',()=>openBoardPage('classic',null,'menu'));
+$('soloBoards').addEventListener('click',()=>openBoardPage('classic',null,'menu'));
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 renderBoard();
 /* Footer: version, build and the small print. */
@@ -3253,7 +3260,7 @@ picker('timeSeg','timeCustom','t',1,180,v=>{ state.userTime=v; });
 picker('roundSeg','roundCustom','r',1,100,v=>{ state.userRounds=v; });
 state.userTime=60; state.userRounds=5;
 $('startBtn').addEventListener('click',()=>startGame());
-/* Leaving the final screen with an unsaved score asks first — it's easy to walk away from a run by accident. */
+/* Leaving the final screen with an unsaved score asks first, it's easy to walk away from a run by accident. */
 let nagAction=null;
 function scoreUnsaved(){ return !$('saveRow').hidden && !state.saved; }
 function needsSave(){ return !$('final').hidden && canSave() && scoreUnsaved(); }
@@ -3530,7 +3537,7 @@ function renderVerdict(r){
   const same=!!(tp&&gp&&tp.country===gp.country);
   let text,cls;
   const hide=false, hid=false;
-  if(r.timedOut){ text="Time's up — no guess placed"; cls='bad'; }
+  if(r.timedOut){ text="Time's up, no guess placed"; cls='bad'; }
   else { [text,cls]=verdictFor(r.km,same&&!hid); if(same&&!hid&&r.km>=200) text=hide?'Right country':`Right country: ${tp.country}`; }
   const v=$('verdict'); v.textContent=text; v.className='verdict '+cls;
   const parts=[];
@@ -3548,7 +3555,8 @@ function paintClues(tp){
   const box=$('clueBox'); const want=state.mode==='learn';
   const c=want&&tp?clueFor(tp.country):null;
   box.hidden=!c; if(!c) return;
-  box.innerHTML=`<div class="ch">The giveaways<b>${esc(c.country)}</b></div><ul>${c.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
+  const where=tp&&tp.region?`${esc(tp.region)}, ${esc(c.country)}`:esc(c.country);
+  box.innerHTML=`<div class="ch">How to spot it next time<b>${where}</b></div><ul>${c.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
 }
 $('nextBtn').addEventListener('click',()=>{ if(mp.role==='host'){ mpHostNext(); return; } if(mp.role) return; if(state.round>=state.totalRounds||(modeOf(state.mode).bet&&state.bank<=0)) showFinal(); else nextRound(); });
 
@@ -3642,7 +3650,7 @@ $('saveBtn').addEventListener('click',()=>{
   const same=boardFor(state.totalRounds,state.timeLimit,state.mode);
   const rank=same.filter(e=>e.score>entry.score).length+1;
   $('saveBtn').hidden=true; $('nameInput').hidden=true; hideNag();
-  $('savedMsg').hidden=false; $('savedMsg').textContent=`Saved · #${rank} of ${same.length} in ${modeLabel()}${lbLive()?' worldwide':' (offline — it will post when you reconnect)'}`;
+  $('savedMsg').hidden=false; $('savedMsg').textContent=`Saved · #${rank} of ${same.length} in ${modeLabel()}${lbLive()?' worldwide':' (offline, it will post when you reconnect)'}`;
   renderBoard(state.mode==='classic'?entry.id:undefined);
 });
 $('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('saveBtn').click(); } });
@@ -3713,7 +3721,7 @@ async function buildCopyImage(pano){
     modeLook(ctx,c,x,y,look);
     await new Promise(r=>setTimeout(r,0));
     ctx.strokeStyle='#d5dcd8'; ctx.lineWidth=2; ctx.strokeRect(x-1,y-1,VIEW_W+2,VIEW_H+2);
-    ctx.font='600 18px Inter, sans-serif'; const t=name+' · '+hd+'°'; const tw=Math.round(ctx.measureText(t).width)+22; const lx=x+Math.round(VIEW_W/2-tw/2);
+    ctx.font='600 18px Outfit, sans-serif'; const t=name+' · '+hd+'°'; const tw=Math.round(ctx.measureText(t).width)+22; const lx=x+Math.round(VIEW_W/2-tw/2);
     ctx.fillStyle='rgba(0,0,0,.6)'; ctx.beginPath(); ctx.roundRect(lx,y+10,tw,28,14); ctx.fill(); ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.fillText(t,x+VIEW_W/2,y+30); ctx.textAlign='left';
   }
   return c;
@@ -3910,7 +3918,7 @@ function trioResultMap(loc,lie){
 }
 function showTrioResult(r){
   trioResultMap(r.loc,r.lie); paintRival();
-  const v=$('verdict'); v.textContent=r.timedOut?"Time's up — no pick":(r.ok?'Correct!':`Nope. The lie was ${String.fromCharCode(65+r.lie)}`); v.className='verdict '+(r.ok?'good':'bad');
+  const v=$('verdict'); v.textContent=r.timedOut?"Time's up, no pick":(r.ok?'Correct!':`Nope. The lie was ${String.fromCharCode(65+r.lie)}`); v.className='verdict '+(r.ok?'good':'bad');
   $('distTxt').innerHTML=r.ok?'You spotted the lie.':(r.pick!=null?`You picked ${String.fromCharCode(65+r.pick)}.`:'');
   $('placeTxt').innerHTML='';
   $('nextBtn').textContent = state.round>=state.totalRounds ? 'See results' : 'Next round';
@@ -3931,7 +3939,7 @@ function showTrioResultMP(rev){
   const overall=rev.results.slice().sort((a,b)=>b.total-a.total); const lead=overall[0]; const myPos=overall.findIndex(r=>r.id===mp.me.id)+1;
   $('leaderLine').hidden=false; $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="${swStyle(lead)}"></span>🏆 ${esc(lead.name)} leads · ${lead.total.toLocaleString()}</span><span>You're <b>${myPos}</b> of ${overall.length}</span>`;
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">picked ${r.pick!=null?String.fromCharCode(65+r.pick):'—'}</span><span class="rp">+${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} total</span></div>`).join('');
+  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">picked ${r.pick!=null?String.fromCharCode(65+r.pick):', '}</span><span class="rp">+${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} total</span></div>`).join('');
   if(mine.ok) setTimeout(confetti,700);
 }
 
@@ -3993,7 +4001,7 @@ function countryResultMap(truthLL,truthName,guesses){
   const fit=()=>{ resultMap.invalidateSize(); resultMap.fitBounds(L.latLngBounds(pts),{padding:[60,60],maxZoom:6,animate:false}); }; fit(); setTimeout(fit,150);
 }
 function countryResultText(ok,picked,truthName,pts,timedOut){
-  const v=$('verdict'); v.textContent=timedOut?"Time's up — no country picked":(ok?`Correct: ${truthName}`:`Nope. It was ${truthName||'somewhere else'}`); v.className='verdict '+(ok?'good':'bad');
+  const v=$('verdict'); v.textContent=timedOut?"Time's up, no country picked":(ok?`Correct: ${truthName}`:`Nope. It was ${truthName||'somewhere else'}`); v.className='verdict '+(ok?'good':'bad');
   $('distTxt').innerHTML=picked?`You picked <b>${esc(picked)}</b>.`:''; $('placeTxt').innerHTML='';
   $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; $('ptsBar').style.width='0%'; countUp($('ptsNum'),0,pts,900); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(pts/50)+'%'; }));
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(ok) pe.classList.add('great'); setTimeout(()=>{ pe.classList.add('pop'); if(ok) confetti(); },900);
@@ -4030,7 +4038,7 @@ function deportTrail(r){
   let line='';
   if(state.round<state.totalRounds){
     line = (next&&!(next instanceof Error)&&next.fresh)
-      ? `Next round: <b>a fresh start</b> — nothing reachable next to ${esc(here)}`
+      ? `Next round: <b>a fresh start</b>, nothing reachable next to ${esc(here)}`
       : `Next round: <b>a country bordering ${esc(here)}</b>`;
   }
   return `<span class="trail">${trail}</span>${line?`<span>${line}</span>`:''}`;
@@ -4046,7 +4054,7 @@ function choiceText(kind,sel,ans,pts,ok,err){
   if(kind==='gov'){
     const okP=!!sel&&sel.p===ans[0], okE=!!sel&&sel.e===ans[1];
     const none=!sel||(sel.p==null&&sel.e==null);
-    v.textContent = none?"Time's up — no answer" : (okP&&okE?'Both right':(okP||okE?'Half right':'Neither one'));
+    v.textContent = none?"Time's up, no answer" : (okP&&okE?'Both right':(okP||okE?'Half right':'Neither one'));
     v.className='verdict '+(okP&&okE?'good':(okP||okE?'mid':'bad'));
     const row=(label,right,picked,o)=>`<div class="polrow"><span class="k">${label}</span><b class="${right?'ok':'no'}">${esc(o.name)}</b><span class="bl">${esc(o.blurb)}</span>${picked!=null&&!right?`<span class="yours">you said ${esc(picked)}</span>`:''}</div>`;
     $('distTxt').innerHTML =
@@ -4059,11 +4067,11 @@ function choiceText(kind,sel,ans,pts,ok,err){
     return;
   }
   if(kind==='slider'){
-    if(sel==null){ v.textContent="Time's up — no guess"; v.className='verdict bad'; }
+    if(sel==null){ v.textContent="Time's up, no guess"; v.className='verdict bad'; }
     else { const t=err<=1?['Bang on','good']:err<=3?['Very close','good']:err<=6?['Close','good']:err<=12?['Not far','mid']:['Way off','bad'];
       v.textContent=t[0]; v.className='verdict '+t[1]; }
     $('distTxt').innerHTML = sel==null ? `The average is <b>${fmtTemp(ans)}</b>.`
-      : `You said <b>${sel}°F</b>. The year-round average is <b>${fmtTemp(ans)}</b> — off by <b>${err.toFixed(1)}°F</b>.`;
+      : `You said <b>${sel}°F</b>. The year-round average is <b>${fmtTemp(ans)}</b>, off by <b>${err.toFixed(1)}°F</b>.`;
   }
   $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; $('ptsBar').style.width='0%'; countUp($('ptsNum'),0,pts,900);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(pts/50)+'%'; }));
@@ -4091,7 +4099,7 @@ function showChoiceResultMP(rev){
   $('placeTxt').innerHTML=rev.place?`<span>📍 Location: <b>${esc(rev.place.region?rev.place.region+', ':'')}${esc(rev.place.country)}</b></span>`:'';
   $('nextBtn').textContent = (rev.round>=state.totalRounds||rev.over) ? 'See results' : 'Next round';
   mpRankRows(rev,r=> r.sel==null?'no answer':(slider?`${r.sel}°F · off by ${r.err.toFixed(1)}°`
-    :`${r.sel.p!=null?esc(POWER[r.sel.p].short):'—'} · ${r.sel.e!=null?esc(ECON[r.sel.e].short):'—'}`));
+    :`${r.sel.p!=null?esc(POWER[r.sel.p].short):', '} · ${r.sel.e!=null?esc(ECON[r.sel.e].short):', '}`));
 }
 /* Leader line + per-round ranking for multiplayer result screens (shared by the newer modes). */
 function mpRankRows(rev,rdFn){
@@ -4159,7 +4167,7 @@ document.addEventListener('keydown',e=>{
 });
 window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resultMap&&resultMap.invalidateSize(); finalMap&&finalMap.invalidateSize(); });
 /* =========================================================
-   MULTIPLAYER — host-authoritative. Game messages travel through public MQTT brokers
+   MULTIPLAYER, host-authoritative. Game messages travel through public MQTT brokers
    (plain WebSockets, so they work on any network); WebRTC is used only for voice.
    ========================================================= */
 const COLORS=[['#e63946','Red'],['#ff6b6b','Coral'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#9acd32','Lime'],['#2bb673','Green'],['#12a5a0','Teal'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#6f42c1','Indigo'],['#b23fd0','Purple'],['#e84393','Pink']];
@@ -4319,7 +4327,7 @@ async function duelPrefetch(){
 }
 function hostPending(){ const add=[]; for(let i=mp.sentUpTo+1;i<state.locs.length;i++){ const l=state.locs[i]; if(l&&!(l instanceof Error)) add.push({i,loc:locPayload(l)}); } if(add.length) mp.sentUpTo=add[add.length-1].i; return add; }
 /* One player has guessed, so the other gets a short clock: no sitting on a guess to run the round out. */
-function hurryLocal(secs){ if(state.locked||$('game').hidden) return; if(!state.timeLimit||state.timeLeft>secs){ stopTimer(); startTimer(secs); const p=$('timerPill'); p.classList.add('low'); toast(`Your opponent has guessed — ${secs} seconds!`); } }
+function hurryLocal(secs){ if(state.locked||$('game').hidden) return; if(!state.timeLimit||state.timeLeft>secs){ stopTimer(); startTimer(secs); const p=$('timerPill'); p.classList.add('low'); toast(`Your opponent has guessed, ${secs} seconds!`); } }
 /* Photos are far too heavy to repeat in every lobby sync, so they travel once and are cached by player. */
 const avCache={};
 function avOf(id){ return avCache[id]||null; }
@@ -4582,7 +4590,7 @@ function applyBlind(){
   g.classList.toggle('blind-eyes',role==='eyes'); g.classList.toggle('blind-map',role==='map');
   const h=$('blindHint'); h.hidden=!role;
   if(role){ const o=playerList().find(p=>p.id!==mp.me.id); const on=o&&o.name?esc(o.name):'your partner';
-    h.innerHTML=role==='eyes'?`<b>You're the eyes.</b> Describe what you see — ${on} has the map.`:`<b>You're the map.</b> Listen to ${on}, then drop the pin.`;
+    h.innerHTML=role==='eyes'?`<b>You're the eyes.</b> Describe what you see, ${on} has the map.`:`<b>You're the map.</b> Listen to ${on}, then drop the pin.`;
     if(role==='map'){ $('mappanel').classList.add('open','pinned'); $('pinBtn').classList.add('on'); state.fitDone=false; setTimeout(()=>{ guessMap.invalidateSize(); guessMap.fitBounds([[-55,-170],[72,180]],{animate:false}); state.fitDone=true; },80); }
     else { $('mappanel').classList.remove('open','pinned'); $('pinBtn').classList.remove('on'); } }
 }
@@ -4592,7 +4600,7 @@ function updateStrip(){
   el.innerHTML=playerList().map(p=>{ const av=p.face?avOf(p.id):null; const done=mp.guesses[p.id]!==undefined&&!p.out;
     const face=p.out?'✕':(done?'✓':(av?'':esc((p.name||'?')[0].toUpperCase())));
     const bg=av&&!p.out&&!done?`background-image:url(${av});background-size:cover;`:'';
-    return `<div class="dotp ${done?'done':''} ${p.out?'out':''} ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}" style="background:${COLORS[p.color??0][0]};${bg}" title="${esc(p.name||'…')}${p.out?' — out':(p.lives!=null?' — '+p.lives+' live'+(p.lives===1?'':'s'):'')}">${face}${!p.out&&p.lives!=null?`<i class="lv">${p.lives}</i>`:''}</div>`; }).join('');
+    return `<div class="dotp ${done?'done':''} ${p.out?'out':''} ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}" style="background:${COLORS[p.color??0][0]};${bg}" title="${esc(p.name||'…')}${p.out?', out':(p.lives!=null?', '+p.lives+' live'+(p.lives===1?'':'s'):'')}">${face}${!p.out&&p.lives!=null?`<i class="lv">${p.lives}</i>`:''}</div>`; }).join('');
 }
 function updateWaitList(n,total){
   const ps=alivePlayers(); const done=n!=null?n:ps.filter(p=>mp.guesses[p.id]!==undefined).length;
@@ -4614,7 +4622,7 @@ function renderLobby(){
   if($('mpRoundsBox')) $('mpRoundsBox').hidden=!!lm.duel;
   renderBlindSetup();
   const pend=Object.keys(mp.pending||{}).filter(id=>!mp.players[id]);
-  $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}">${avTag(p.id,p.name,26)}<span class="sw" style="${p.color===null&&!p.face?'background:#cfd8d2':swStyle(p)}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
+  $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}"><span class="sw big" style="${p.color===null&&!p.face?'background:#cfd8d2':swStyle(p)}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
   const meP=ps.find(p=>p.id===mp.me.id), myAv=avOf(mp.me.id)||acct.av;
   const faceTile=myAv?`<div class="swatch face ${meP&&meP.face?'mine':''}" data-i="av" style="background-image:url(${myAv})" title="Your photo">${meP&&meP.face?'✓':''}</div>`:'';
   $('swatches').innerHTML=faceTile+COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i&&!p.face); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
@@ -4688,7 +4696,7 @@ function duelBanner(rev){
   const d=rev.duel; if(!d) return '';
   paintDuel();
   const mine=d.loser===mp.me.id; const them=playerList().find(p=>p.id!==mp.me.id); const tn=them&&them.name?esc(them.name):'Your opponent';
-  if(!d.loser||!d.dmg) return `<div class="duelrow even">Even round — no damage</div>`;
+  if(!d.loser||!d.dmg) return `<div class="duelrow even">Even round, no damage</div>`;
   const left=d.hp&&d.hp[d.loser]!=null?d.hp[d.loser]:null; const ko=left!=null&&left<=0;
   if(mine){ sfx(ko?'out':'hurt'); return `<div class="duelrow">You take <b>${d.dmg.toLocaleString()}</b> damage · ×${d.mult}${ko?' · knocked out':''}</div>`; }
   sfx('great');
@@ -4742,7 +4750,7 @@ function showFinalMP(fin){
   const fv=$('finalVerdict'); const iWon=winner&&winner.id===mp.me.id;
   const lastStanding=elimMode&&ps.filter(p=>!p.out).length===1;
   const wn=winner?esc(winner.name):'Someone';
-  if(duelMode){ const ko=ps.some(p=>(p.hp??0)<=0); fv.innerHTML = iWon ? (ko?'🏆 Knockout — you win the duel':'🏆 You win the duel') : `${wn} wins the duel${ko?' by knockout':''}`; }
+  if(duelMode){ const ko=ps.some(p=>(p.hp??0)<=0); fv.innerHTML = iWon ? (ko?'🏆 Knockout, you win the duel':'🏆 You win the duel') : `${wn} wins the duel${ko?' by knockout':''}`; }
   else if(blindMode){ const pct=state.score/max; fv.textContent = pct>=.9?'Perfect teamwork':pct>=.7?'Great teamwork':pct>=.5?'Not bad, you two':'Talk more next time'; }
   else fv.textContent = lastStanding ? (iWon?'🏆 Last one standing!':`${winner?winner.name:'Someone'} is the last one standing`) : (iWon ? '🏆 You win!' : `${winner?winner.name:'Someone'} wins`);
   fv.className='verdict '+(duelMode?(iWon?'good':'bad'):blindMode?(state.score/max>=.6?'good':'mid'):(iWon?'good':'mid'));
@@ -4757,7 +4765,7 @@ function showFinalMP(fin){
 }
 
 /* =========================================================
-   VOICE CHAT — one audio call per pair of players (mesh).
+   VOICE CHAT, one audio call per pair of players (mesh).
    Everyone always has a track (silent until the mic is on),
    so turning the mic on just swaps the track, no renegotiation dance.
    ========================================================= */
@@ -5027,12 +5035,13 @@ async function loadHero(){
 }
 loadHero();
 setTimeout(showPage,9000);   // never hold the page hostage if Street View is slow or blocked
+/* One reveal per visit: the background changes when the page does. */
 $('liveChip').addEventListener('click',async()=>{
-  if(!heroLoc) return;
-  if(heroRevealed){ heroRevealed=false; $('liveTxt').textContent='Loading a new spot…'; await loadHero(); $('liveTxt').textContent='Live: a real spot somewhere on Earth. Know where? Click to reveal.'; return; }
+  if(!heroLoc||heroRevealed) return;
+  heroRevealed=true; $('liveTxt').textContent='Looking it up…';
   const p=heroLoc.place||await placeOf(heroLoc.lat,heroLoc.lng);
-  heroRevealed=true;
-  $('liveTxt').textContent=p?`📍 ${p.region?p.region+', ':''}${p.country}. Click for another spot.`:'📍 Somewhere remote. Click for another spot.';
+  $('liveTxt').textContent=p?`📍 ${p.city||p.locality?(p.city||p.locality)+', ':''}${p.region?p.region+', ':''}${p.country}`:'📍 Somewhere remote, far from any town';
+  $('liveChip').disabled=true;
 });
 
 function confetti(){
