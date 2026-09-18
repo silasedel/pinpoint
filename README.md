@@ -64,7 +64,7 @@ Multiplayer has no server of its own. The host's browser runs the game; messages
 1. The host opens https://silasedel.github.io/pinpoint/ and clicks **Create game**.
 2. The host clicks **Copy invite link** and sends it to friends. The invite link opens the game and joins the lobby automatically. Or send the 4-letter code and they click **Join game** on the same site.
 3. Everyone picks a name and a colour (no two players can share a colour). If you have a profile photo, a thirteenth tile at the front of the tray is your photo, already selected — it becomes your token in the player list, the strip, the standings and the head of your pin. The host picks time, rounds and a mode, and presses Start. The game begins immediately.
-4. **Voice chat** is built in. The mic button in the bottom-left corner (or the M key) turns your microphone on; click again to mute. It's off until you turn it on, and everyone hears everyone who's live. A green ring shows who's talking.
+4. **Voice chat** is built in. The mic button in the bottom-left corner (or the M key) turns your microphone on; click again to mute. It's off until you turn it on, and everyone hears everyone who's live. A green ring shows who's talking. Next to it is a **room chat**: a typed feed, Twitch-style, open with the speech-bubble button or the C key. Guests send to the host, the host stamps and relays, so everyone sees the same order; joins and leaves show up in it, unread messages count on the button, and the latest one peeks out beside it for a few seconds.
 5. Every round shows the same panorama to everyone. When all guesses are in, or time runs out, the map shows every pin in its player's colour with distances, points, and running totals. The host advances rounds. 2 to 10 players. The final map shows every round's real spot and every player's guess for it, each line in that player's colour — for a photo token, the colour that stands out most in the photo.
 
 Running from the launcher instead? It prints a temporary public link (via `cloudflared`) and a same-Wi-Fi address, either of which works the same way.
@@ -75,7 +75,7 @@ Leaving the name box empty is fine: A browser that never types a name gets its o
 
 ## Version
 
-The footer on the home page shows the version as `v<major>.<minor>.<patch>`.
+The footer on the home page shows the version as `v<major>.<minor>.<patch>`. The look since 3.1.1: a pastel-green ground with a soft radial highlight, white cards with a bottom edge, and buttons, bars and tiles that lift on hover and press in on click. The home page runs 1,320px wide on a desktop so Solo, Duo and Multiplayer sit three across at full size; under 1,100px they go two-up with Solo full width, under 640px one column.
 
 - **major** — a ground-up rework. 1 was the original build; 2 was the rebuild of the layout, system and branding; 3 is the social game: duos, challenges, custom maps, streaks and Learn.
 - **minor** — a release that adds a capability: a batch of modes, the global leaderboards, the daily drop.

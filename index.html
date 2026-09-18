@@ -11,17 +11,19 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root{
-    --bg:#f3f6f4; --card:#ffffff; --line:#e1e7e3; --text:#152219; --muted:#66756c;
-    --sunk:#eef2ef; --hover:#f6f8f7; --raise:#ffffff; --hair:#eef2ef;
-    --green:#1f9d55; --green-dark:#187f44; --green-soft:#e7f4ec; --red:#d64545; --red-soft:#fbeaea; --amber:#c98a12;
+    --bg:#e3f0e7; --card:#ffffff; --line:#cfe2d6; --text:#132419; --muted:#5e7267;
+    --sunk:#eaf4ee; --hover:#f1f8f3; --raise:#ffffff; --hair:#e3efe8;
+    --green:#18a356; --green-dark:#0f7f42; --green-soft:#dcf1e4; --red:#d64545; --red-soft:#fbeaea; --amber:#c98a12;
+    --edge:#c4dccd; --edge-primary:#0d6a38;
     --font:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    --radius:12px; --shadow:0 1px 2px rgba(20,34,25,.06),0 8px 24px rgba(20,34,25,.08);
+    --radius:12px; --shadow:0 3px 0 rgba(15,64,36,.05),0 12px 28px rgba(15,64,36,.10);
   }
   html[data-theme="dark"]{
     --bg:#0f1714; --card:#182220; --line:#2a3733; --text:#e8efea; --muted:#95a79d;
     --sunk:#121b18; --hover:#1f2b27; --raise:#202c28; --hair:#233029;
     --green:#2bb367; --green-dark:#6fd79b; --green-soft:#17301f; --red:#e06a6a; --red-soft:#3a1f1f; --amber:#d9a441;
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.45);
+    --edge:#0a1410; --edge-primary:#0a4a28;
+    --shadow:0 3px 0 rgba(0,0,0,.35),0 12px 28px rgba(0,0,0,.45);
     color-scheme:dark;
   }
   html[data-theme="dark"] .hero-shade{background:linear-gradient(90deg,rgba(6,12,9,.92),rgba(6,12,9,.55) 60%,rgba(6,12,9,.25))}
@@ -53,7 +55,7 @@
   .hero-shade{z-index:2}
   .hero-content{z-index:3}
   .hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,20,12,.55) 0%,rgba(8,20,12,.25) 45%,rgba(8,20,12,.85) 100%)}
-  .hero-content{position:relative;max-width:960px;margin:0 auto;padding:32px 20px 100px;height:100%;display:flex;flex-direction:column;justify-content:space-between;color:#fff}
+  .hero-content{position:relative;max-width:1320px;margin:0 auto;padding:32px 24px 100px;height:100%;display:flex;flex-direction:column;justify-content:space-between;color:#fff}
   .lockup{display:flex;align-items:center;gap:12px}
   .lockup svg{width:48px;height:48px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
   .lockup b{font-size:28px;font-weight:800;letter-spacing:-.6px;text-shadow:0 2px 12px rgba(0,0,0,.4)}
@@ -63,7 +65,7 @@
   .live:hover{background:rgba(0,0,0,.6)}
   .live .dot{width:8px;height:8px;border-radius:50%;background:#ff4b4b;box-shadow:0 0 0 0 rgba(255,75,75,.7);animation:pulse 1.6s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,75,75,.7)}70%{box-shadow:0 0 0 8px rgba(255,75,75,0)}100%{box-shadow:0 0 0 0 rgba(255,75,75,0)}}
-  .menu-wrap{max-width:960px;margin:-64px auto 0;padding:0 20px 60px;position:relative;z-index:5}
+  .menu-wrap{max-width:1320px;margin:-64px auto 0;padding:0 24px 60px;position:relative;z-index:5}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
   .card.wide{margin-top:20px}
   .card.big{padding:0 26px 26px;overflow:hidden}
@@ -74,15 +76,16 @@
   .cardart.solo{background-image:url(images/mode-classic.jpg)}
   .cardart.mp{background-image:url(images/mode-peek.jpg)}
   .cardart.duo{background-image:url(images/mode-duel.jpg)}
-  .grid.three{grid-template-columns:1fr 1fr 1fr}
-  .grid.three .card.big h2{font-size:23px}
+  .grid.three{grid-template-columns:1fr 1fr 1fr;gap:22px}
+  .grid.three .card.big h2{font-size:25px}
   .grid.three .card.big p{min-height:42px}
-  .duo-card .btn,.mp-card .btn{padding:14px;font-size:15px}
-  .solo-card .btn{padding:16px;font-size:17px}
-  @media (max-width:980px){ .grid.three{grid-template-columns:1fr 1fr} .grid.three .solo-card{grid-column:1 / -1} }
+  .grid.three .cardart{height:150px}
+  .duo-card .btn,.mp-card .btn{padding:15px;font-size:15.5px}
+  .solo-card .btn{padding:18px;font-size:18px}
+  @media (max-width:1100px){ .grid.three{grid-template-columns:1fr 1fr} .grid.three .solo-card{grid-column:1 / -1} .grid.three .cardart{height:120px} }
   @media (max-width:640px){ .grid.three{grid-template-columns:1fr} .grid.three .solo-card{grid-column:auto} }
   .learnbar{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:1.5px solid var(--line);
-    border-radius:16px;padding:13px 18px;margin:-6px 0 20px;background:var(--card);box-shadow:var(--shadow);color:var(--text);transition:transform .15s,border-color .15s}
+    border-radius:16px;padding:14px 20px;margin:20px 0 0;background:var(--card);box-shadow:var(--shadow);color:var(--text);transition:transform .15s,border-color .15s}
   .learnbar:hover{transform:translateY(-1px);border-color:var(--green)}
   .learnbar .lmark{flex:none;width:42px;height:42px;border-radius:12px;background:var(--green-soft);color:var(--green-dark);display:grid;place-items:center}
   .learnbar .lmark svg{width:22px;height:22px}
@@ -797,6 +800,49 @@
   .toast.ok{background:var(--green);padding:10px 22px;font-weight:700}
   @keyframes toastin{from{opacity:0;transform:translate(-50%,-14px)}to{opacity:1;transform:translate(-50%,0)}}
 
+  /* ---------- v3.1.1 look: a pastel ground, white cards and buttons with a bottom edge that presses in ---------- */
+  body{background-image:radial-gradient(1400px 700px at 50% -8%,#f3faf5 0%,var(--bg) 62%)}
+  html[data-theme="dark"] body{background-image:radial-gradient(1400px 700px at 50% -8%,#15211c 0%,var(--bg) 62%)}
+  .btn{border-radius:12px;box-shadow:0 3px 0 var(--edge);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,background .15s}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--edge)}
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge)}
+  .btn-primary{box-shadow:0 3px 0 var(--edge-primary)} .btn-primary:hover{box-shadow:0 4px 0 var(--edge-primary)} .btn-primary:active{box-shadow:0 1px 0 var(--edge-primary)}
+  .btn-primary:disabled,.btn-primary:disabled:hover{box-shadow:none;transform:none}
+  .btn-secondary{border:1.5px solid var(--line)}
+  .card{border:1.5px solid var(--line);border-radius:18px;box-shadow:0 4px 0 rgba(15,64,36,.05),0 14px 34px rgba(15,64,36,.10)}
+  html[data-theme="dark"] .card{box-shadow:0 4px 0 rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.45)}
+  .acctchip{background:rgba(255,255,255,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.75);box-shadow:0 3px 0 rgba(15,64,36,.14),0 10px 24px rgba(0,0,0,.22);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,border-color .15s}
+  .acctchip:hover{transform:translateY(-1px);border-color:#fff}
+  .acctchip:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(15,64,36,.14)}
+  html[data-theme="dark"] .acctchip{background:rgba(24,34,32,.86);border-color:rgba(255,255,255,.12)}
+  html[data-theme="dark"] .acctchip:hover{border-color:rgba(255,255,255,.3)}
+  .dailybtn{box-shadow:0 5px 0 #0b4a27,0 16px 34px rgba(20,60,38,.35)}
+  .dailybtn:hover{transform:translateY(-2px);box-shadow:0 7px 0 #0b4a27,0 20px 40px rgba(20,60,38,.4)}
+  .dailybtn:active{transform:translateY(3px);box-shadow:0 2px 0 #0b4a27,0 8px 20px rgba(20,60,38,.3)}
+  .learnbar,.wbar{box-shadow:0 3px 0 var(--edge);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,border-color .15s}
+  .learnbar:hover,.wbar:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--edge)}
+  .learnbar:active,.wbar:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge)}
+  .seg{border:1.5px solid var(--line)}
+  .seg button.on{box-shadow:0 2px 0 var(--edge),0 1px 3px rgba(0,0,0,.06)}
+  .tile{transition:transform .18s cubic-bezier(.2,1.5,.4,1),box-shadow .18s;box-shadow:0 3px 0 rgba(15,64,36,.14),0 4px 12px rgba(20,34,25,.14)}
+  .tile:hover{transform:translateY(-4px) rotate(-.7deg);box-shadow:0 6px 0 rgba(15,64,36,.14),0 14px 28px rgba(20,34,25,.22)}
+  .tile:active{transform:translateY(0) scale(.98) rotate(-.7deg)}
+  .tile.on{transform:translateY(-2px)}
+  .rgrid button,.bpmode,.cmcard{box-shadow:0 2px 0 var(--edge);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,border-color .15s,background .15s}
+  .rgrid button:hover,.bpmode:hover,.cmcard:hover{transform:translateY(-1px)}
+  .rgrid button:active,.bpmode:active,.cmcard:active{transform:translateY(1px);box-shadow:none}
+  .guess{border-radius:10px;box-shadow:0 3px 0 var(--edge-primary);transition:transform .12s,box-shadow .12s,background .15s}
+  .guess:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge-primary)}
+  .guess:disabled{box-shadow:none;transform:none}
+  .mic,.chatbtn,.icon-btn{box-shadow:0 3px 0 var(--edge),0 8px 20px rgba(15,64,36,.12);transition:transform .12s,box-shadow .12s,background .15s}
+  .mic:active,.chatbtn:active,.icon-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge)}
+  .hud{box-shadow:0 2px 0 var(--edge),0 6px 18px rgba(15,64,36,.08)}
+  .rrow,.prow,.frrow,.chplay,.mkrow{box-shadow:0 2px 0 var(--edge)}
+  .code-box{border:1.5px solid #bfe3cd;box-shadow:0 3px 0 #bfe3cd}
+  html[data-theme="dark"] .code-box{border-color:#1f4a31;box-shadow:0 3px 0 #0f2a1b}
+  .pill{box-shadow:0 2px 0 rgba(15,64,36,.08)}
+  .notepanel,.invitelist,.copymenu,.sharecard,.chatpanel{border:1.5px solid var(--line);box-shadow:0 4px 0 var(--edge),0 16px 36px rgba(15,64,36,.16)}
+  .update{box-shadow:0 4px 0 rgba(0,0,0,.35),0 12px 28px rgba(0,0,0,.35)}
   @media (max-width:820px){
     .grid{grid-template-columns:1fr}
     .hero{height:auto;min-height:0}
@@ -907,11 +953,6 @@
       </span>
       <span class="dr" id="dailyRight">Open</span>
     </button>
-    <button class="learnbar" id="learnBtn">
-      <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
-      <span class="ll"><b>Learn</b><span>Play like normal — after every round, the one or two things that gave the country away.</span></span>
-      <span class="lr">Open</span>
-    </button>
     <div class="grid three">
       <div class="card solo-card big">
         <div class="cardart solo"></div>
@@ -929,11 +970,16 @@
       <div class="card mp-card big">
         <div class="cardart mp"></div>
         <h2>Multiplayer</h2>
-        <p>Up to ten players, one room code, voice chat built in.</p>
+        <p>Up to ten players, one room code, everyone on the same spot.</p>
         <button class="btn btn-primary btn-block" id="hostBtn">Create game</button>
         <div class="mp-row"><input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn">Join</button></div>
       </div>
     </div>
+    <button class="learnbar" id="learnBtn">
+      <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+      <span class="ll"><b>Learn</b><span>Play like normal — after every round, the one or two things that gave the country away.</span></span>
+      <span class="lr">Open</span>
+    </button>
     <div class="card wide">
       <h2>Today's leaderboard<span class="board-tag" id="menuDailyTag">Daily</span></h2>
       <div class="rsub" id="menuDailySub">Everyone who has played today's drop</div>
@@ -2077,7 +2123,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-204221';
+const BUILD='20260917-204406';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2199,7 +2245,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game — duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:1,patch:0};
+const VERSION={major:3,minor:1,patch:1};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4786,7 +4832,7 @@ function chatAdd(m){
   chat.items.push({id:m.id,name:String(m.name||'').slice(0,16),text:m.text.slice(0,200),ts:m.ts||Date.now(),sys:!!m.sys});
   if(chat.items.length>80) chat.items.shift();
   const mine=m.id===mp.me.id;
-  if(!chat.open&&!mine){ chat.unread++; chatPeek(m); sfx('click'); }
+  if(!chat.open&&!mine){ chatPeek(m); if(!m.sys){ chat.unread++; sfx('click'); } }
   renderChat();
 }
 function chatPeek(m){
