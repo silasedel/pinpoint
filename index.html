@@ -169,7 +169,7 @@
   html[data-theme="dark"] .pav.sil{background:#3a4a40}
   .board .fchip.adm{background:var(--green-dark);color:#fff} .board .fchip.ai{background:#e8e2ff;color:#5a3fc0}
   .fchip.adm{background:var(--green-dark);color:#fff} .fchip.ai{background:#e8e2ff;color:#5a3fc0}
-  .aitog{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none} .aitog input{accent-color:var(--green);width:16px;height:16px}
+  .aitog{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);user-select:none;flex:none}
   .dlgwrap{position:fixed;inset:0;z-index:150;background:rgba(8,26,16,.5);display:grid;place-items:center;padding:16px}
   .dlgwrap[hidden]{display:none}
   .dlg{width:min(440px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px 22px;animation:nagIn .18s ease-out}
@@ -1627,8 +1627,8 @@
     <div class="rank" id="standings" hidden></div>
     <div class="save-row" id="saveRow">
       <input id="nameInput" maxlength="20" placeholder="Your name">
-      <label class="aitog" id="aiRow"><input type="checkbox" id="aiUsed"> AI was used in this game</label>
       <button class="btn btn-secondary" id="saveBtn">Save to global leaderboard</button>
+      <span class="aitog" id="aiRow"><span>AI used</span><label class="switch" id="aiSw" title="AI was used in this game"><input type="checkbox" id="aiUsed"><i></i></label></span>
       <span class="saved" id="savedMsg" hidden></span>
     </div>
     <div class="signup" id="signUp" hidden>
@@ -2366,7 +2366,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-093525';
+const BUILD='20260918-094505';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2517,7 +2517,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:14};
+const VERSION={major:3,minor:4,patch:15};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4087,6 +4087,7 @@ $('bpModes').addEventListener('click',e=>{ const b=e.target.closest('.bpmode'); 
   bp.mode=b.dataset.mode; bp.rounds='all'; bp.time='all'; bp.highlight=null; renderBoardPage(); $('board').scrollTo(0,0); });
 $('boardBack').addEventListener('click',()=>{ if(bp.from==='final'){ show('final'); } else { renderBoard(); show('menu'); } });
 $('boardMenu').addEventListener('click',()=>{ if(bp.from==='final'&&scoreUnsaved()){ show('final'); nagToSave(finalMenu); return; } if(mp.role) mpLeave(); renderBoard(); show('menu'); });
+$('aiUsed').addEventListener('change',e=>{ $('aiSw').classList.toggle('on',e.target.checked); sfx('click'); });
 $('viewBoardBtn').addEventListener('click',()=>{ if(state.custom){ cm.from='setup'; cmapOpen(state.custom.id); return; } openBoardPage(state.mode,state.savedId,'final'); });
 $('allBoards').addEventListener('click',()=>openBoardPage('classic',null,'menu'));
 $('soloBoards').addEventListener('click',()=>openBoardPage('classic',null,'menu'));
@@ -4302,7 +4303,7 @@ async function nextRound(){
     swapFrames();
   }
   if(canvasRound){ const w=Math.min(1280,Math.round(innerWidth*0.85)), h=Math.round(w*Math.min(0.62,innerHeight/innerWidth));
-    await startPixel(loc,{w,h,fov:85,zoom:4,smooth:true,fixed:state.lock,full:true}); }
+    await startPixel(loc,{w,h,fov:110,zoom:4,smooth:true,fixed:state.lock,full:true}); }
   else if(state.mode==='pixel') startPixel(loc,{move:!state.nomove&&!state.lock});
   else if(modeOf(state.mode).trio){ startTrio(loc); }
   else if(state.mode==='blink'){
@@ -4513,7 +4514,7 @@ function showFinal(){
 
   chalFinish(); $('againBtn').textContent=state.chal?'New game':'Play again';
   // Leaderboard save
-  state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false; $('aiUsed').checked=false; $('aiRow').hidden=false; hideNag();
+  state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false; $('aiUsed').checked=false; $('aiSw').classList.remove('on'); $('aiRow').hidden=false; hideNag();
   const signedIn=!!acct.name; $('signUp').hidden=signedIn; $('saveRow').hidden=!signedIn;
   $('nameInput').value=''; $('nameInput').placeholder=acct.name||'';
   const rank=boardFor(state.totalRounds,state.timeLimit,state.mode).filter(e=>e.score>state.score).length+1;
@@ -4676,11 +4677,11 @@ function runBlink(){
   })(t0);
 }
 /* Pixelated: a tiny canvas panorama viewer rendered from the imagery tiles, upscaled with hard pixel edges. */
-const pix={band:null,meta:null,heading:0,pitch:0,fov:85,drag:null,active:false,round:0,fixed:false,full:null,pano:null,canMove:false,moving:false};
+const pix={band:null,meta:null,heading:0,pitch:0,fov:110,drag:null,active:false,round:0,fixed:false,full:null,pano:null,canMove:false,moving:false};
 function stopPixel(){ pix.active=false; $('pix').hidden=true; }
 /* opts: {w,h,fov,fixed,zoom}. Pixelated uses a 160×90 canvas; Blink uses a full-res 120° still with no interaction. */
 async function startPixel(loc,opts={}){
-  const round=state.round; pix.active=true; pix.round=round; pix.heading=loc.heading; pix.pitch=0; pix.fov=opts.fov||85; pix.fixed=!!opts.fixed; pix.pano=loc.pano; pix.canMove=!!opts.move; pix.moving=false; $('pixLinks').innerHTML='';
+  const round=state.round; pix.active=true; pix.round=round; pix.heading=loc.heading; pix.pitch=0; pix.fov=opts.fov||110; pix.fixed=!!opts.fixed; pix.pano=loc.pano; pix.canMove=!!opts.move; pix.moving=false; $('pixLinks').innerHTML='';
   const el=$('pix'); el.hidden=false; el.classList.toggle('smooth',!!opts.smooth); el.classList.toggle('fixed',!!opts.fixed);
   $('pixDev').hidden=false; $('pixDev').textContent='Loading…';
   pix.full=opts.full?{w:opts.w,h:opts.h}:null;
@@ -4742,7 +4743,7 @@ function drawPixel(){
   el.addEventListener('pointermove',e=>{ if(!pix.drag) return; const k=pix.fov/el.clientWidth; pix.heading=pix.drag.h-(e.clientX-pix.drag.x)*k; pix.pitch=Math.max(-0.9,Math.min(0.9,pix.drag.p+(e.clientY-pix.drag.y)*k*Math.PI/180)); drawPixel(); });
   const release=()=>{ if(!pix.drag) return; pix.drag=null; if(pix.full) drawPixel(); };
   el.addEventListener('pointerup',release); el.addEventListener('pointercancel',release);
-  el.addEventListener('wheel',e=>{ e.preventDefault(); if(pix.fixed) return; pix.fov=Math.max(35,Math.min(110,pix.fov+e.deltaY*0.05)); drawPixel(); },{passive:false});
+  el.addEventListener('wheel',e=>{ e.preventDefault(); if(pix.fixed) return; pix.fov=Math.max(35,Math.min(120,pix.fov+e.deltaY*0.05)); drawPixel(); },{passive:false});
 })();
 
 /* ---------- All In: betting tray ---------- */
@@ -5084,7 +5085,7 @@ $('coordIn').addEventListener('input',()=>$('coordIn').classList.remove('bad'));
 $('guessBtn').addEventListener('click',()=>submitGuess(false));
 $('pinBtn').addEventListener('click',()=>{ const p=$('mappanel'); $('pinBtn').classList.toggle('on'); p.classList.toggle('pinned'); p.classList.add('open'); guessMap.invalidateSize(); });
 $('sfxBtn').addEventListener('click',sfxToggle); paintSfx();
-$('resetBtn').addEventListener('click',()=>{ if(!state.current) return; if(state.mode==='blink'||state.lock) return; if(pix.active){ pix.heading=state.current.heading; pix.pitch=0; pix.fov=85; if(pix.pano!==state.current.pano){ pixMove(state.current.pano); } else drawPixel(); return; } panos[front].src=embedUrl(state.current); });
+$('resetBtn').addEventListener('click',()=>{ if(!state.current) return; if(state.mode==='blink'||state.lock) return; if(pix.active){ pix.heading=state.current.heading; pix.pitch=0; pix.fov=110; if(pix.pano!==state.current.pano){ pixMove(state.current.pano); } else drawPixel(); return; } panos[front].src=embedUrl(state.current); });
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT') return;
   if(e.code==='Space'||e.code==='Enter'){
