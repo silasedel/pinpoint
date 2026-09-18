@@ -206,7 +206,10 @@
   .trash{width:30px;height:30px;border-radius:8px;background:var(--red-soft);color:var(--red);display:inline-grid;place-items:center;padding:0;vertical-align:middle;border:1px solid transparent}
   .trash:hover{background:var(--red);color:#fff}
   .trash svg{width:15px;height:15px}
-  .board td.adm{width:36px;text-align:right}
+  .board td.adm{width:72px;text-align:right;white-space:nowrap}
+  .pencil{width:30px;height:30px;border-radius:8px;background:var(--green-soft);color:var(--green-dark);display:inline-grid;place-items:center;padding:0;vertical-align:middle;border:1px solid transparent;margin-right:4px}
+  .pencil:hover{background:var(--green);color:#fff}
+  .pencil svg{width:15px;height:15px}
   .delbox{margin-top:12px;padding:14px 16px;border-radius:12px;background:var(--red-soft);border:1.5px solid var(--red);animation:nagIn .2s ease-out}
   .delbox b{display:block;font-size:16px;color:var(--red)}
   .delbox p{margin:4px 0 8px;font-size:13.5px;color:var(--text)}
@@ -623,6 +626,17 @@
   .mkrow button:hover{background:var(--red-soft);color:var(--red)}
   .mkrow.busy{opacity:.6}
   .marker-dot{width:14px;height:14px;border-radius:50%;background:#1f9d55;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+  .mkrow img{cursor:pointer}
+  .mkrow .look{background:var(--green-soft);color:var(--green-dark)} .mkrow .look:hover{background:var(--green);color:#fff}
+  .mkrow.dead{border-color:var(--red);background:var(--red-soft)} .mkrow.dead .mkt small{color:var(--red);font-weight:700}
+  #cmEdit{margin-top:-10px}
+  .cmcard{position:relative} .cmcard .trash{position:absolute;top:8px;right:8px}
+  .peek{position:fixed;inset:0;z-index:120;background:#0b1a12;display:flex;flex-direction:column}
+  .peek[hidden]{display:none}
+  .peekbar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .peekbar b{font-size:15px;white-space:nowrap}
+  .peekbar .peekpos{flex:1;min-width:120px;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .peek iframe{flex:1;width:100%;border:0;background:#000}
   .cmap-empty{color:var(--muted);font-size:14px;padding:18px 0;text-align:center}
 
   /* ---------- LOBBY / MULTIPLAYER ---------- */
@@ -1074,8 +1088,8 @@
       <h2 style="margin:0 0 14px">Create an account or sign in</h2>
       <div class="label" style="margin-top:0">Username</div>
       <input class="tin" id="acctName" maxlength="16" placeholder="silas" autocomplete="username" spellcheck="false">
-      <div class="label">Passcode <span class="dim">(4-digit code)</span></div>
-      <input class="tin code" id="acctPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off">
+      <div class="label">Passcode <span class="dim">(4 to 12 digits)</span></div>
+      <input class="tin code" id="acctPin" inputmode="numeric" maxlength="12" placeholder="0000" autocomplete="off">
       <div class="acctmsg" id="acctMsg"></div>
       <button class="btn btn-primary btn-block" id="acctGo">Continue</button>
     </div>
@@ -1102,7 +1116,7 @@
         </div>
       </div>
       <div id="nameBox" hidden><div class="prow2"><input class="tin" id="nameNew" maxlength="16" placeholder="New display name" spellcheck="false"><button class="btn btn-primary" id="nameSave">Save</button></div></div>
-      <div id="pinBox" hidden><div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off"><button class="btn btn-primary" id="acctChange">Save</button></div></div>
+      <div id="pinBox" hidden><div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="12" placeholder="0000" autocomplete="off"><button class="btn btn-primary" id="acctChange">Save</button></div></div>
       <div class="acctmsg" id="acctMsg2"></div>
       <button class="btn btn-secondary btn-block" id="friendsBtn">Friends <span id="frCount" class="dim"></span></button>
       <div class="twobtn"><button class="btn btn-secondary sm" id="pinToggle">Change passcode</button><button class="btn btn-secondary sm" id="acctOutBtn">Sign out</button><button class="btn btn-secondary sm danger" id="acctDelBtn">Delete account</button></div>
@@ -1124,18 +1138,26 @@
       <div class="label">Sound</div>
       <div class="seg" id="soundSeg"><button data-snd="1">On</button><button data-snd="0">Off</button></div>
     </div>
-    <div class="card wide" id="adminCard">
-      <h2 style="margin:0 0 4px">Admin mode</h2>
+    <div class="card wide" id="adminCard" hidden>
+      <h2 style="margin:0 0 4px">Admin</h2>
       <div id="adminOff">
-        <div class="prow2" style="margin-top:12px"><input class="tin code" id="adminPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" style="max-width:180px"><button class="btn btn-secondary" id="adminGo">Enter admin mode</button></div>
+        <div class="rsub" style="margin-top:8px">Enter the admin phrase once on this device.</div>
+        <div class="prow2" style="margin-top:10px"><input class="tin" id="adminPhrase" placeholder="admin phrase" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="adminGo">Unlock</button></div>
         <div class="acctmsg" id="adminMsg"></div>
       </div>
+      <div id="adminHid" hidden>
+        <div class="rsub" style="margin-top:8px">Admin controls are hidden for this visit.</div>
+        <button class="btn btn-secondary btn-block" id="adminShow" style="margin-top:10px">Show admin controls</button>
+      </div>
       <div id="adminOn" hidden>
-        <div class="rsub" style="margin-top:8px">Admin mode is on for this visit. Every leaderboard row and every custom map now has a red trash button. Removed scores go on a block list that every player's browser honors, so they stay gone.</div>
-        <div class="label">Remove an account by handle</div>
-        <div class="prow2"><input class="tin" id="adminAcct" placeholder="handle" autocomplete="off" spellcheck="false"><button class="btn btn-secondary danger" id="adminAcctGo">Remove</button></div>
+        <div class="rsub" style="margin-top:8px">Admin is on whenever @silas is signed in on this device. Leaderboard rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.</div>
+        <div class="label">Rename an account</div>
+        <div class="prow2"><input class="tin" id="adminRnKey" placeholder="handle" autocomplete="off" spellcheck="false"><input class="tin" id="adminRnName" maxlength="16" placeholder="new name" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="adminRnGo">Rename</button></div>
+        <div class="label">Remove or ban an account</div>
+        <div class="prow2"><input class="tin" id="adminAcct" placeholder="handle" autocomplete="off" spellcheck="false"><button class="btn btn-secondary danger" id="adminAcctGo">Remove</button><button class="btn btn-secondary danger" id="adminBanGo">Ban</button></div>
+        <div class="rsub" style="margin-top:8px">Remove deletes the account. Ban also wipes its scores and maps and stops the handle being claimed again.</div>
         <div class="acctmsg" id="adminMsg2"></div>
-        <button class="btn btn-secondary btn-block" id="adminExit" style="margin-top:6px">Exit admin mode</button>
+        <div class="twobtn"><button class="btn btn-secondary sm" id="adminHide">Hide controls this visit</button><button class="btn btn-secondary sm" id="adminForget">Forget the phrase on this device</button></div>
       </div>
     </div>
   </div>
@@ -1238,6 +1260,7 @@
         <div class="seg" id="cmRoundSeg"></div>
       </div>
       <button class="btn btn-primary btn-block big" id="cmPlay">Play</button>
+      <button class="btn btn-secondary btn-block big" id="cmEdit" hidden>Edit map</button>
       <div class="ddone" id="cmOwner" hidden></div>
     </div>
     <div class="card wide"><h2 style="margin-bottom:4px">Best on this map</h2><div class="rsub" id="cmBoardSub"></div><div id="cmBoard"></div></div>
@@ -1245,9 +1268,13 @@
   </div>
 </div>
 
+<div id="peek" class="peek" hidden>
+  <div class="peekbar"><b id="peekTitle">Spot</b><span class="peekpos" id="peekSub"></span><button class="btn btn-secondary sm" id="peekPrev">Previous</button><button class="btn btn-secondary sm" id="peekNext">Next</button><button class="btn btn-secondary sm danger" id="peekDel">Remove this spot</button><button class="btn btn-primary sm" id="peekClose">Done</button></div>
+  <iframe id="peekFrame" allowfullscreen referrerpolicy="no-referrer-when-downgrade" title="Street View preview"></iframe>
+</div>
 <div id="cmake" class="screen" hidden>
   <div class="setup-wrap">
-    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Create a map</b></div><button class="btn btn-secondary" id="cmakeBack" style="margin-left:auto">Back</button></div>
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px" id="mkTitle">Create a map</b></div><button class="btn btn-secondary" id="cmakeBack" style="margin-left:auto">Back</button></div>
     <div class="card">
       <div class="label" style="margin-top:0">Name</div>
       <input class="tin" id="mkName" maxlength="32" placeholder="Name your map" autocomplete="off">
@@ -1257,6 +1284,7 @@
       <div class="label">Spots <span class="dim" id="mkCount">0 of 10</span></div>
       <div class="mkprog"><i id="mkProg"></i></div>
       <div class="rsub" id="mkNeed" style="margin:6px 0 10px">Ten spots minimum. Add as many as you like after that.</div>
+      <div class="twobtn" id="mkTools" style="margin:0 0 10px" hidden><button class="btn btn-secondary sm" id="mkReview">Review spots</button><button class="btn btn-secondary sm" id="mkCheck">Check for missing Street View</button><button class="btn btn-secondary sm danger" id="mkDropDead" hidden>Remove missing spots</button></div>
       <div class="mklist" id="mkList"><div class="frempty">Nothing yet. Click the map.</div></div>
       <div class="acctmsg" id="mkMsg"></div>
       <button class="btn btn-primary btn-block big" id="mkSave" disabled>Publish map</button>
@@ -2201,7 +2229,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-230853';
+const BUILD='20260917-233615';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2228,15 +2256,23 @@ function lbClean(e){
 /* Scores an admin removed. One retained list of entry ids; every client drops them on merge and on reconcile,
    so a removed score can't creep back from the browser that saved it. */
 const BAN_ROOT='worlddrop/v1/ban';
-lb.ban=new Set();
+lb.ban=new Set(); lb.banK=new Set();
+/* Admin belongs to one account. The phrase's hash lives here; the phrase itself never does. */
+const ADMIN_KEY='silas', ADMIN_HASH='cf3409ff012df9e16b8af95ff83e0f4bb5e3c1e39d66f8da0453f5530526b74f';
+const admin={on:false,unlocked:false,hidden:false,ready:false};
+try{ admin.unlocked=localStorage.getItem('pp_adm')===ADMIN_HASH; }catch(e){}
 function banMerge(list){ if(Array.isArray(list)) for(const id of list.slice(-800)) if(typeof id==='string') lb.ban.add(id); }
+function banKMerge(list){ if(Array.isArray(list)) for(const k of list.slice(-800)) if(typeof k==='string'&&k!==ADMIN_KEY) lb.banK.add(k); }
 function banPublish(){ const payload=JSON.stringify([...lb.ban].slice(-800)); for(const l of lb.links) if(l.ready){ try{ l.client.publish(BAN_ROOT+'/ids',payload,{qos:1,retain:true}); }catch(e){} } }
-function banApply(){ for(const id of Object.keys(lb.boards)) lb.boards[id]=lb.boards[id].filter(e=>!lb.ban.has(e.id)); lb.daily=(lb.daily||[]).filter(e=>!lb.ban.has(e.id)); }
+function banKPublish(){ const payload=JSON.stringify([...lb.banK].slice(-800)); for(const l of lb.links) if(l.ready){ try{ l.client.publish(BAN_ROOT+'/handles',payload,{qos:1,retain:true}); }catch(e){} } }
+/* A score is gone if its id was removed or its account was banned. */
+function banned(e){ return !e||lb.ban.has(e.id)||(!!e.k&&lb.banK.has(e.k)); }
+function banApply(){ for(const id of Object.keys(lb.boards)) lb.boards[id]=lb.boards[id].filter(e=>!banned(e)); lb.daily=(lb.daily||[]).filter(e=>!banned(e)); }
 function lbMerge(modeId,list){
   if(!MODES[modeId]) return [];
   const byId=new Map((lb.boards[modeId]||[]).map(e=>[e.id,e]));
-  if(Array.isArray(list)) for(const raw of list.slice(0,200)){ const e=lbClean(raw); if(e&&!byId.has(e.id)&&!lb.ban.has(e.id)) byId.set(e.id,e); }
-  lb.boards[modeId]=[...byId.values()].filter(e=>!lb.ban.has(e.id)).sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,LB_MAX);
+  if(Array.isArray(list)) for(const raw of list.slice(0,200)){ const e=lbClean(raw); if(e&&!byId.has(e.id)&&!banned(e)) byId.set(e.id,e); }
+  lb.boards[modeId]=[...byId.values()].filter(e=>!banned(e)).sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,LB_MAX);
   return lb.boards[modeId];
 }
 /* Don't publish until this mode's retained board has arrived, or nothing would be left of it. */
@@ -2267,7 +2303,7 @@ function lbReconcile(announce){
     if(!lb.seen[id]&&!lbReadyFor(id)){ pending++; continue; }          // wait for this mode's board to arrive
     const have=new Set(board.map(e=>e.id));
     const cut=board.length>=LB_MAX ? board[LB_MAX-1].score : -1;        // no point re-posting one the cap would drop
-    const missing=byMode[id].filter(e=>!have.has(e.id)&&e.score>cut&&!lb.ban.has(e.id));
+    const missing=byMode[id].filter(e=>!have.has(e.id)&&e.score>cut&&!banned(e));
     if(!missing.length) continue;
     lbMerge(id,missing);
     if(lbPublish(id)) uploaded+=missing.length; else pending++;
@@ -2291,8 +2327,8 @@ function lbPaint(){
 /* Today's board is its own retained message, keyed by date, so it resets itself every day. */
 function dlMerge(list){
   const byId=new Map(lb.daily.map(e=>[e.id,e]));
-  if(Array.isArray(list)) for(const raw of list.slice(0,300)){ const e=lbClean(raw); if(e&&!byId.has(e.id)&&!lb.ban.has(e.id)) byId.set(e.id,e); }
-  lb.daily=[...byId.values()].filter(e=>!lb.ban.has(e.id)).sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,100);
+  if(Array.isArray(list)) for(const raw of list.slice(0,300)){ const e=lbClean(raw); if(e&&!byId.has(e.id)&&!banned(e)) byId.set(e.id,e); }
+  lb.daily=[...byId.values()].filter(e=>!banned(e)).sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,100);
 }
 function dlPublish(){
   const payload=JSON.stringify(lb.daily); let sent=false;
@@ -2312,11 +2348,11 @@ function lbConnect(){
     let c; try{ c=mqtt.connect(url,{connectTimeout:8000,reconnectPeriod:20000,keepalive:30,clean:true,clientId:'wdlb_'+Math.random().toString(36).slice(2,10)}); }catch(e){ continue; }
     const link={url,client:c,ready:false}; lb.links.push(link);
     c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); lb.dailyDate=dailyDate();
-      c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+',DL_ROOT+'/'+lb.dailyDate,BAN_ROOT+'/ids'],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint(); });
+      c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+',DL_ROOT+'/'+lb.dailyDate,BAN_ROOT+'/+'],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint(); });
     c.on('message',(t,payload)=>{ const parts=t.split('/'); const id=parts.pop(); let data=null; try{ data=JSON.parse(payload.toString()); }catch(e){ return; }
       if(parts[parts.length-1]==='st'){ if(data&&MODES[id]) stats.got[id]={r:stClean(data.r),g:stClean(data.g)}; return; }
       if(parts[parts.length-1]==='dl'){ if(id===dailyDate()){ lb.dailySeen=true; lb.dailyDate=id; dlMerge(data); lbPaint(); } return; }
-      if(parts[parts.length-1]==='ban'){ banMerge(data); banApply(); lbPaint(); return; }
+      if(parts[parts.length-1]==='ban'){ if(id==='handles'){ banKMerge(data); if(acct.key&&lb.banK.has(acct.key)){ acctClear(); paintAcct(); toast('This account was removed by an admin.'); } } else banMerge(data); banApply(); lbPaint(); return; }
       lb.seen[id]=true; lbMerge(id,data); lbPaint(); });
     c.on('error',()=>{}); c.on('close',()=>{ link.ready=false; }); c.on('offline',()=>{ link.ready=false; lbPaint(); });
   }
@@ -2331,7 +2367,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:6,patch:0};
+const VERSION={major:3,minor:7,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2527,7 +2563,11 @@ function personStreak(k){ if(!k) return 0; if(k===acct.key) return streakNow(acc
 const FLAME='<svg aria-hidden="true"><use href="#flame"/></svg>';
 /* Five days and up shows on the boards, next to the name. */
 function streakTag(e){ const n=e&&e.k?personStreak(e.k):0; return n>=5?` <span class="stk" title="${n}-day streak">${n}${FLAME}</span>`:''; }
-function acctKey(name){ return String(name||'').toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,20); }
+/* Handles fold lookalikes first, so "Sіlas" with a Cyrillic i or a fullwidth s can't sit next to silas. */
+const HOMO={'\u0430':'a','\u0435':'e','\u043e':'o','\u0440':'p','\u0441':'c','\u0445':'x','\u0443':'y','\u0456':'i','\u0455':'s','\u0458':'j','\u0501':'d','\u0261':'g','\u04bb':'h','\u0578':'n','\u0561':'w','\u04cf':'l','\u0131':'i','\u03bf':'o','\u03bd':'v','\u03b1':'a','\u03b5':'e','\u03b9':'i','\u03ba':'k','\u03c4':'t','\u03c5':'u','\u03c1':'p','\u03c7':'x','\u03f2':'c','\u0461':'w','\u051b':'q','\u051d':'w','\u2c9f':'o','\u0138':'k','\u1d00':'a','\u0432':'b','\u043c':'m','\u043d':'h','\u0442':'t','\u043a':'k'};
+function foldName(s){ return String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^\x00-\x7f]/g,ch=>HOMO[ch]||ch); }
+function acctKey(name){ return foldName(name).replace(/[^a-z0-9_-]/g,'').slice(0,20); }
+function cleanName(s){ return String(s||'').replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF\u0000-\u001f\u007f]/g,'').replace(/\s+/g,' ').trim(); }
 async function acctHash(pin,salt,key){
   const data=new TextEncoder().encode(salt+':'+pin+':'+key);
   const buf=await crypto.subtle.digest('SHA-256',data);
@@ -2561,6 +2601,7 @@ function paintAcct(){
   if($('acctWho')) $('acctWho').textContent=acct.name||'';
   if($('acctStreak')){ const n=streakNow(acct.streak); $('acctStreak').hidden=n<2; $('acctStreak').innerHTML=`${FLAME}${n}-day streak`; }
   if($('acctHandle')) $('acctHandle').textContent=acct.key?'@'+acct.key:'';
+  if(admin.ready){ const was=admin.on; adminSync(); if(was!==admin.on) lbPaint(); }
   avPaint(); paintPrefs();
   if(acct.key&&!soc.loaded) socWarm().then(()=>{ const c=$('frCount'); if(c&&soc.mine.size) c.textContent=''; });
   const inN=!!acct.name;
@@ -2574,7 +2615,8 @@ async function acctContinue(){
   const key=acctKey(raw);
   const bad=el=>{ const n=$(el); n.classList.remove('bad'); void n.offsetWidth; n.classList.add('bad'); n.focus(); };
   if(key.length<2){ acctMsg('acctMsg','Pick a name of at least two letters or numbers.','bad'); bad('acctName'); return; }
-  if(!/^\d{4}$/.test(pin)){ acctMsg('acctMsg','The code is four digits.','bad'); bad('acctPin'); return; }
+  if(!/^\d{4,12}$/.test(pin)){ acctMsg('acctMsg','The code is 4 to 12 digits.','bad'); bad('acctPin'); return; }
+  if(lb.banK.has(key)){ acctMsg('acctMsg','That name isn\'t available.','bad'); bad('acctName'); return; }
   $('acctGo').disabled=true; acctMsg('acctMsg','Checking…');
   const got=await acctFetch(key);
   if(got.error==='offline'){ $('acctGo').disabled=false; acctMsg('acctMsg','Not connected yet. Give it a second and try again.','bad'); return; }
@@ -2586,9 +2628,10 @@ async function acctContinue(){
       acctPublish({...got.record,seen:Date.now()});   // republish so the record stays alive on every broker
       acctMsg('acctMsg','Signed in.','ok');
     } else {
+      if(key===ADMIN_KEY&&!admin.unlocked){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is reserved.','bad'); bad('acctName'); return; }
       const salt=Math.random().toString(36).slice(2,10);
       const hash=await acctHash(pin,salt,key);
-      const rec={key,name:raw.slice(0,16),salt,hash,made:Date.now()};
+      const rec={key,name:cleanName(raw).slice(0,16)||key,salt,hash,made:Date.now()};
       if(!acctPublish(rec)){ $('acctGo').disabled=false; acctMsg('acctMsg','Could not reach the server. Try again in a moment.','bad'); return; }
       acct.key=key; acct.name=rec.name; acctSave();
       acctMsg('acctMsg','Name claimed.','ok');
@@ -2601,7 +2644,7 @@ async function acctContinue(){
 }
 async function acctChangePin(){
   const pin=$('acctNewPin').value.trim();
-  if(!/^\d{4}$/.test(pin)){ acctMsg('acctMsg2','Four digits.','bad'); return; }
+  if(!/^\d{4,12}$/.test(pin)){ acctMsg('acctMsg2','4 to 12 digits.','bad'); return; }
   acctMsg('acctMsg2','Saving…');
   const got=await acctFetch(acct.key);
   const salt=Math.random().toString(36).slice(2,10);
@@ -2616,15 +2659,17 @@ $('acctBack').addEventListener('click',()=>show('menu'));
 $('acctGo').addEventListener('click',acctContinue);
 $('acctPin').addEventListener('keydown',e=>{ if(e.key==='Enter') acctContinue(); });
 $('acctName').addEventListener('keydown',e=>{ if(e.key==='Enter') $('acctPin').focus(); });
-for(const id of ['acctPin','acctNewPin']) $(id).addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').slice(0,4); e.target.classList.remove('bad'); });
+for(const id of ['acctPin','acctNewPin']) $(id).addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').slice(0,12); e.target.classList.remove('bad'); });
 $('acctChange').addEventListener('click',acctChangePin);
 $('pinToggle').addEventListener('click',()=>{ const b=$('pinBox'); b.hidden=!b.hidden; $('nameBox').hidden=true; acctMsg('acctMsg2',''); if(!b.hidden) $('acctNewPin').focus(); });
 $('nameEdit').addEventListener('click',()=>{ const b=$('nameBox'); b.hidden=!b.hidden; $('pinBox').hidden=true; acctMsg('acctMsg2',''); if(!b.hidden){ $('nameNew').value=acct.name||''; $('nameNew').focus(); } });
 /* The display name is free to change; the @handle you sign in with stays put, so friends and sign-ins keep working. */
 async function saveDisplayName(){
-  const v=$('nameNew').value.trim().slice(0,16);
+  const v=cleanName($('nameNew').value).slice(0,16);
   if(v.length<2){ acctMsg('acctMsg2','A name needs at least two characters.','bad'); return; }
   acctMsg('acctMsg2','Saving…');
+  const k2=acctKey(v);   // a display name that reads as someone else's handle is theirs, not yours
+  if(k2&&k2!==acct.key){ const other=await acctFetch(k2); if(other.record||k2===ADMIN_KEY){ acctMsg('acctMsg2',`That name belongs to @${k2}. Pick another.`,'bad'); return; } }
   const got=await acctFetch(acct.key);
   if(!got.record){ acctMsg('acctMsg2','Could not reach your account. Try again.','bad'); return; }
   const rec={...got.record,name:v};
@@ -3130,10 +3175,12 @@ function renderCmaps(){
   if(q) list=list.filter(r=>r.name.toLowerCase().includes(q)||String(r.byName||'').toLowerCase().includes(q)||String(r.by||'').toLowerCase().includes(q));
   list.sort((a,b)=>(b.plays||0)-(a.plays||0)||(b.made||0)-(a.made||0));
   $('cmSub').textContent=Object.keys(cm.all).length?`${Object.keys(cm.all).length} map${Object.keys(cm.all).length===1?'':'s'}${q?` · ${list.length} match`:''}`:(lbLive()?'No custom maps yet. Make the first one.':'Connecting…');
-  $('cmList').innerHTML=list.map(r=>`<button class="cmcard" data-id="${esc(r.id)}"><b>${esc(r.name)}</b><span class="by">${r.by?frFace(r.by,18):''}${esc(r.byName||r.by||'someone')}</span><span class="meta"><span><b>${r.pins.length}</b> spots</span><span><b>${(r.plays||0).toLocaleString()}</b> plays</span></span></button>`).join('');
+  $('cmList').innerHTML=list.map(r=>`<button class="cmcard" data-id="${esc(r.id)}">${admin.on?`<span class="trash" role="button" data-cmdel="${esc(r.id)}" title="Delete this map for everyone">${TRASH}</span>`:''}<b>${esc(r.name)}</b><span class="by">${r.by?frFace(r.by,18):''}${esc(r.byName||r.by||'someone')}</span><span class="meta"><span><b>${r.pins.length}</b> spots</span><span><b>${(r.plays||0).toLocaleString()}</b> plays</span></span></button>`).join('');
 }
 $('cmSearch').addEventListener('input',renderCmaps);
-$('cmList').addEventListener('click',e=>{ const b=e.target.closest('.cmcard'); if(b) cmapOpen(b.dataset.id); });
+$('cmList').addEventListener('click',e=>{
+  const d=e.target.closest('[data-cmdel]'); if(d){ e.stopPropagation(); if(!admin.on) return; const r=cm.all[d.dataset.cmdel]; if(r&&confirm(`Delete "${r.name}" by ${r.byName||r.by} for everyone?`)){ cmapDelete(r.id); renderCmaps(); toast('Map deleted','ok'); } return; }
+  const b=e.target.closest('.cmcard'); if(b) cmapOpen(b.dataset.id); });
 $('cmapsBack').addEventListener('click',()=>{ show(cm.from==='lobby'?'lobby':'setup'); });
 async function cmapOpen(id){
   show('cmap'); $('cmap').scrollTo(0,0);
@@ -3152,19 +3199,22 @@ function renderCmap(){
   $('cmRoundSeg').innerHTML=opts.map(n=>`<button data-r="${n}" class="${n===cm.rounds?'on':''}">${n===rec.pins.length&&n!==5&&n!==10?'All '+n:n}</button>`).join('');
   [...$('cmTimeSeg').children].forEach(b=>b.classList.toggle('on',+b.dataset.t===cm.time));
   $('cmPlay').hidden=false; $('cmPlay').textContent=lobby?`Use this map for the room`:`Play ${rec.name}`;
-  const mine=acct.key&&rec.by===acct.key; $('cmOwner').hidden=!(mine||admin.on);
+  const mine=acct.key&&rec.by===acct.key; $('cmOwner').hidden=!(mine||admin.on); $('cmEdit').hidden=!(mine||admin.on);
+  $('cmEdit').textContent=mine?'Edit map':'Edit map (admin)';
   if(!$('cmOwner').hidden) $('cmOwner').innerHTML=(mine?'This is your map. ':'Admin: ')+'<button class="link" id="cmDelete">Delete it'+(mine?'':' for everyone')+'</button>';
-  const top=(rec.top||[]).slice().sort((a,b)=>b.score-a.score||a.ts-b.ts);
-  $('cmBoardSub').textContent=top.length?`${top.length} score${top.length===1?'':'s'} · ${cm.rounds} rounds scores separately from other lengths`:'Nobody has played it yet.';
-  $('cmBoard').innerHTML=top.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th style="text-align:right">Score</th></tr>`+top.slice(0,15).map((e,i)=>`<tr><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${e.k?friendTag({k:e.k,name:e.name}):''}${e.k?streakTag({k:e.k}):''}</td><td class="mode">${e.rounds} rounds · ${e.time?e.time+'s':'no limit'}</td><td class="score">${(+e.score).toLocaleString()}</td></tr>`).join('')+'</table>':'<div class="cmap-empty">Be the first.</div>';
+  rec.top=(rec.top||[]).filter(e=>e&&!(e.k&&lb.banK.has(e.k))).sort((a,b)=>b.score-a.score||a.ts-b.ts); const top=rec.top;
+  $('cmBoardSub').textContent=top.length?`${top.length} player${top.length===1?'':'s'} · best score per account`:'Nobody has played it yet.';
+  $('cmBoard').innerHTML=top.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th style="text-align:right">Score</th></tr>`+top.slice(0,15).map((e,i)=>`<tr class="${e.k&&e.k===acct.key?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${e.k?friendTag({k:e.k,name:e.name}):''}${e.k?streakTag({k:e.k}):''}</td><td class="mode">${e.rounds} rounds · ${e.time?e.time+'s':'no limit'}</td><td class="score">${(+e.score).toLocaleString()}</td>${trashCell(String(i),'cmap')}</tr>`).join('')+'</table>':'<div class="cmap-empty">Be the first.</div>';
   $('cmLink').textContent=cmapLink(rec.id);
 }
 $('cmTimeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cm.time=+b.dataset.t; renderCmap(); sfx('click'); });
 $('cmRoundSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cm.rounds=+b.dataset.r; renderCmap(); sfx('click'); });
 $('cmCopy').addEventListener('click',()=>copyText(cmapLink(cm.cur.id),$('cmCopy'),'Copy link'));
 $('cmapBack').addEventListener('click',()=>{ if(cm.from==='menu'){ show('menu'); return; } openCmaps(cm.from); });
+function cmapDelete(id){ for(const l of lb.links) if(l.ready){ try{ l.client.publish(CM_ROOT+'/'+id,'',{qos:1,retain:true}); }catch(e){} } delete cm.all[id]; }
 $('cmOwner').addEventListener('click',async e=>{ if(!e.target.closest('#cmDelete')||!cm.cur) return; if(!confirm(`Delete "${cm.cur.name}" for everyone?`)) return;
-  for(const l of lb.links) if(l.ready){ try{ l.client.publish(CM_ROOT+'/'+cm.cur.id,'',{qos:1,retain:true}); }catch(e){} } delete cm.all[cm.cur.id]; toast('Map deleted','ok'); openCmaps(cm.from); });
+  cmapDelete(cm.cur.id); toast('Map deleted','ok'); openCmaps(cm.from); });
+$('cmEdit').addEventListener('click',()=>{ if(cm.cur) openMake(cm.cur); });
 $('cmPlay').addEventListener('click',()=>{
   const rec=cm.cur; if(!rec) return;
   if(mp.role==='host'){ mp.customPins=rec.pins; mp.settings.custom={id:rec.id,name:rec.name,n:rec.pins.length}; mp.settings.mode='custom'; mp.settings.rounds=cm.rounds; mp.settings.time=cm.time; mp.locPromise=null; hostSync(); show('lobby'); toast(`Room set to ${rec.name}`,'ok'); return; }
@@ -3172,21 +3222,48 @@ $('cmPlay').addEventListener('click',()=>{
   rec.plays=(rec.plays||0)+1; cmapPublish(rec);
   startGame();
 });
-/* A finished game on a custom map lands on that map's own board. */
+/* A finished game on a custom map lands on that map's own board: one row per account, your best score. */
 async function cmapFinish(){
-  const map=state.custom; if(!map||!acct.key||state.chal) return;
-  try{ const fresh=await cmapFetch(map.id); const rec=fresh||map; if(!rec.pins) return;
-    const top=(rec.top||[]).filter(e=>e&&e.k!==acct.key); top.push({k:acct.key,name:acct.name,score:state.score,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()});
-    rec.top=top.sort((a,b)=>b.score-a.score).slice(0,30); cm.all[rec.id]=rec; cmapPublish(rec); }catch(e){}
+  const map=state.custom; if(!map||!acct.key||state.chal) return null;
+  try{ const fresh=await cmapFetch(map.id); const rec=fresh||map; if(!rec.pins) return null;
+    const mine=(rec.top||[]).find(e=>e&&e.k===acct.key); const kept=!!(mine&&mine.score>state.score);
+    const top=(rec.top||[]).filter(e=>e&&e.k!==acct.key);
+    top.push(kept?{...mine,name:acct.name}:{k:acct.key,name:acct.name,score:state.score,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()});
+    top.sort((a,b)=>b.score-a.score||a.ts-b.ts); const my=kept?mine.score:state.score;
+    rec.top=top.slice(0,30); cm.all[rec.id]=rec; if(!cmapPublish(rec)) return null;
+    return {rank:top.filter(e=>e.score>my).length+1,total:top.length,kept}; }catch(e){ return null; }
+}
+/* The final screen says where the game went. */
+async function paintCustomSave(){
+  const map=state.custom; $('saveBtn').hidden=true; $('nameInput').hidden=true; $('saveRow').hidden=!acct.key; $('signUp').hidden=!!acct.key;
+  $('viewBoardBtn').hidden=false; $('viewBoardBtn').textContent='View map board';
+  if(!acct.key){ $('signUp').querySelector('b').textContent=`Get on the ${map.name} board`; return; }
+  $('savedMsg').hidden=false; $('savedMsg').textContent=`Saving to the ${map.name} board…`;
+  const r=await cmapFinish(); state.saved=true;
+  $('savedMsg').textContent=r?(r.kept?`Saved · your best on ${map.name} is still #${r.rank} of ${r.total}`:`Saved · #${r.rank} of ${r.total} on ${map.name}`):`Couldn't reach the server, so this one isn't on the board.`;
 }
 /* ----- the builder ----- */
-function openMake(){
+function openMake(rec){
   if(!acct.key){ toast('To make a map you need an account'); acctMsg('acctMsg','Create an account or sign in to make a map.'); show('acct'); $('acct').scrollTo(0,0); return; }
   show('cmake'); $('cmake').scrollTo(0,0); $('mkMsg').textContent='';
-  if(!cm.mk){ cm.mk={map:makeMap('mkMap'),pins:[],layer:null}; cm.mk.layer=L.layerGroup().addTo(cm.mk.map);
+  if(!cm.mk){ cm.mk={map:makeMap('mkMap'),pins:[],layer:null,edit:null}; cm.mk.layer=L.layerGroup().addTo(cm.mk.map);
     cm.mk.map.on('click',e=>mkAdd(e.latlng.lat,e.latlng.lng)); }
-  setTimeout(()=>{ cm.mk.map.invalidateSize(); if(!cm.mk.pins.length) cm.mk.map.fitBounds([[-55,-170],[72,180]],{animate:false}); },60);
+  const mk=cm.mk;
+  if(rec&&Array.isArray(rec.pins)){   // editing a published map: its spots come in, and Save puts them back under the same id
+    mk.edit=rec; $('mkName').value=rec.name; mk.pins=rec.pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:0,label:p.label||''})); mkLabels();
+  } else if(mk.edit){ mk.edit=null; mk.pins=[]; $('mkName').value=''; }
+  $('mkTitle').textContent=mk.edit?'Edit map':'Create a map';
+  setTimeout(()=>{ mk.map.invalidateSize(); if(!mk.pins.length) mk.map.fitBounds([[-55,-170],[72,180]],{animate:false}); else mk.map.fitBounds(L.latLngBounds(mk.pins.map(p=>[p.lat,p.lng])).pad(0.2),{animate:false,maxZoom:12}); },60);
   renderMk();
+}
+/* Older maps were published without place names; fill them in quietly while the builder is open. */
+async function mkLabels(){
+  const mk=cm.mk, ed=mk.edit; let n=0;
+  for(const p of mk.pins){ if(mk.edit!==ed||$('cmake').hidden) return; if(p.label) continue;
+    try{ const q=await placeOf(p.lat,p.lng); if(q) p.label=[q.city||q.locality||q.region,q.country].filter(Boolean).join(', ').slice(0,60); }catch(e){}
+    await new Promise(r=>setTimeout(r,350));   // the geocoder rate-limits a burst
+    if(++n%4===0) renderMk(); }
+  if(mk.edit===ed&&!$('cmake').hidden) renderMk();
 }
 const dotIcon=L.divIcon({className:'',html:'<div class="marker-dot"></div>',iconSize:[14,14],iconAnchor:[7,7]});
 async function mkAdd(lat,lng){
@@ -3211,12 +3288,44 @@ function renderMk(){
   $('mkCount').textContent=n<MIN?`${n} of ${MIN}`:`${n}`;
   $('mkProg').style.width=Math.min(100,n/MIN*100)+'%'; $('mkProg').classList.toggle('done',n>=MIN);
   $('mkNeed').textContent=n<MIN?`${MIN-n} more to go. Ten spots minimum, add as many as you like after that.`:`${n} spots. Add more or publish.`;
-  $('mkList').innerHTML=mk.pins.length?mk.pins.map((p,i)=>`<div class="mkrow"><img src="${SV_TILE(p.pano,0,0,0)}" alt=""><span class="mkt">${esc(p.label||'Spot '+(i+1))}<small>${p.lat}, ${p.lng}</small></span><button data-del="${i}">Remove</button></div>`).join(''):'<div class="frempty">Nothing yet. Click the map.</div>';
-  $('mkSave').disabled=n<MIN||$('mkName').value.trim().length<2;
-  $('mkSave').textContent=n<MIN?`Publish map (${n}/${MIN})`:$('mkName').value.trim().length<2?'Name it to publish':`Publish ${$('mkName').value.trim()}`;
+  $('mkList').innerHTML=mk.pins.length?mk.pins.map((p,i)=>`<div class="mkrow${p.dead?' dead':''}"><img src="${SV_TILE(p.pano,0,0,0)}" alt="" data-look="${i}" title="Look at this spot"><span class="mkt">${esc(p.label||'Spot '+(i+1))}<small>${p.dead?'Gone from Street View · ':''}${p.lat}, ${p.lng}</small></span><button class="look" data-look="${i}">Look</button><button data-del="${i}">Remove</button></div>`).join(''):'<div class="frempty">Nothing yet. Click the map.</div>';
+  $('mkTools').hidden=!n; $('mkDropDead').hidden=!mk.pins.some(p=>p.dead);
+  const verb=mk.edit?'Save':'Publish', nm=$('mkName').value.trim();
+  $('mkSave').disabled=n<MIN||nm.length<2;
+  $('mkSave').textContent=n<MIN?`${verb} map (${n}/${MIN})`:nm.length<2?`Name it to ${verb.toLowerCase()}`:mk.edit?`Save changes to ${nm}`:`Publish ${nm}`;
 }
 $('mkName').addEventListener('input',renderMk);
-$('mkList').addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(!b) return; cm.mk.pins.splice(+b.dataset.del,1); renderMk(); });
+$('mkList').addEventListener('click',e=>{
+  const l=e.target.closest('[data-look]'); if(l){ peekOpen(+l.dataset.look); return; }
+  const b=e.target.closest('[data-del]'); if(!b) return; cm.mk.pins.splice(+b.dataset.del,1); renderMk(); sfx('click'); });
+/* ----- looking at a spot: the real Street View, full screen, with Previous / Next / Remove ----- */
+const peek={i:0};
+function peekOpen(i){
+  const mk=cm.mk; if(!mk||!mk.pins.length) return; const n=mk.pins.length; peek.i=((i%n)+n)%n; const p=mk.pins[peek.i];
+  $('peekTitle').textContent=`Spot ${peek.i+1} of ${n}`;
+  $('peekSub').textContent=[p.label||'',p.dead?'gone from Street View':'',`${p.lat}, ${p.lng}`].filter(Boolean).join(' · ');
+  $('peekFrame').src=embedUrl({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading||0});
+  $('peek').hidden=false;
+}
+function peekClose(){ $('peek').hidden=true; $('peekFrame').src='about:blank'; }
+$('peekPrev').addEventListener('click',()=>{ peekOpen(peek.i-1); sfx('click'); });
+$('peekNext').addEventListener('click',()=>{ peekOpen(peek.i+1); sfx('click'); });
+$('peekClose').addEventListener('click',()=>{ peekClose(); sfx('click'); });
+$('peekDel').addEventListener('click',()=>{ const mk=cm.mk; if(!mk||!mk.pins.length) return; mk.pins.splice(peek.i,1); renderMk(); sfx('click'); if(!mk.pins.length) peekClose(); else peekOpen(peek.i); });
+document.addEventListener('keydown',e=>{ if($('peek').hidden) return; if(e.key==='Escape') peekClose(); else if(e.key==='ArrowRight') peekOpen(peek.i+1); else if(e.key==='ArrowLeft') peekOpen(peek.i-1); });
+$('mkReview').addEventListener('click',()=>{ peekOpen(0); sfx('click'); });
+/* Ask Google about every spot; the ones it no longer has get flagged so they can be dropped in one go. */
+async function mkCheck(){
+  const mk=cm.mk; if(!mk||mk.checking||!mk.pins.length) return; mk.checking=true; const btn=$('mkCheck'); btn.disabled=true;
+  try{ await gmapsReady; svService=svService||new google.maps.StreetViewService(); }catch(e){ mk.checking=false; btn.disabled=false; toast('Street View isn\'t reachable right now'); return; }
+  let done=0, dead=0; const q=mk.pins.slice();
+  const one=async p=>{ try{ await svService.getPanorama({pano:p.pano}); p.dead=false; }catch(e){ p.dead=true; dead++; } done++; btn.textContent=`Checking ${done} of ${q.length}…`; };
+  const pool=q.slice(); await Promise.all([0,1,2].map(async()=>{ while(pool.length) await one(pool.shift()); }));
+  mk.checking=false; btn.disabled=false; btn.textContent='Check for missing Street View'; renderMk();
+  toast(dead?`${dead} spot${dead===1?'':'s'} no longer on Street View`:'Every spot is still on Street View','ok');
+}
+$('mkCheck').addEventListener('click',mkCheck);
+$('mkDropDead').addEventListener('click',()=>{ const mk=cm.mk; const n=mk.pins.filter(p=>p.dead).length; mk.pins=mk.pins.filter(p=>!p.dead); renderMk(); toast(`${n} removed`,'ok'); sfx('click'); });
 /* The builder box takes coordinates, a full Google Maps link, or plain text (an address or a place name), which is geocoded. */
 function mkQueryOf(text){
   let t=String(text||'').trim(); if(!t) return '';
@@ -3249,11 +3358,15 @@ $('mkCoordGo').addEventListener('click',mkCoordAdd);
 $('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); mkCoordAdd(); } });
 $('mkSave').addEventListener('click',()=>{
   const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<10||name.length<2) return;
-  const rec={id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],pins:mk.pins.map(p=>({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}))};
+  const pins=mk.pins.map(p=>({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading,label:(p.label||'').slice(0,40)}));
+  const rec=mk.edit?{...mk.edit,name,pins,edited:Date.now()}
+    :{id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],pins};
   if(!cmapPublish(rec)){ $('mkMsg').textContent='Not connected, try again in a moment.'; return; }
-  cm.all[rec.id]=rec; mk.pins=[]; $('mkName').value=''; renderMk(); toast('Map published','ok'); cmapOpen(rec.id);
+  const was=!!mk.edit; cm.all[rec.id]=rec; mk.edit=null; mk.pins=[]; $('mkName').value=''; renderMk(); toast(was?'Map updated':'Map published','ok'); cmapOpen(rec.id);
 });
-$('cmakeBack').addEventListener('click',()=>{ if(cm.from==='menu'){ show('menu'); return; } openCmaps(cm.from); });
+$('cmakeBack').addEventListener('click',()=>{
+  const mk=cm.mk; if(mk&&mk.edit){ const id=mk.edit.id; mk.edit=null; mk.pins=[]; $('mkName').value=''; cmapOpen(id); return; }
+  if(cm.from==='menu'){ show('menu'); return; } openCmaps(cm.from); });
 $('customBtn').addEventListener('click',()=>openCmaps('setup'));
 $('createBtn').addEventListener('click',()=>{ cm.from='setup'; openMake(); });
 $('makeBar').addEventListener('click',()=>{ cm.from='menu'; openMake(); });
@@ -3261,42 +3374,101 @@ $('cmCreate2').addEventListener('click',openMake);
 $('lobbyCustomBtn').addEventListener('click',()=>openCmaps('lobby'));
 
 /* ---------- Admin mode ----------
-   A code in Settings turns it on for this visit only. It adds a trash button to every board row and every
-   custom map, and a way to remove an account by handle. Everything it removes goes to the brokers, so it's
-   gone for everyone, not just here. */
-const ADMIN_CODE='6996';
-const admin={on:false};
-function paintAdmin(){ $('adminOff').hidden=admin.on; $('adminOn').hidden=!admin.on; }
-$('adminGo').addEventListener('click',()=>{
-  const v=$('adminPin').value.trim(); $('adminPin').value='';
-  if(v!==ADMIN_CODE){ acctMsg('adminMsg','Wrong code.','bad'); $('adminPin').classList.remove('bad'); void $('adminPin').offsetWidth; $('adminPin').classList.add('bad'); return; }
-  admin.on=true; acctMsg('adminMsg',''); paintAdmin(); lbPaint(); toast('Admin mode on','ok'); sfx('lock');
+   Admin belongs to one account, @silas. It takes two things: that account signed in, and the admin phrase
+   entered once on this device (only its hash is kept). Nobody else can turn it on, the handle can't be
+   claimed fresh, and rewriting the account record on a broker gets you nothing without the phrase.
+   Everything admin removes, renames or bans goes to the brokers, so it changes for everyone. */
+async function sha256hex(str){ const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str)); return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+function adminSync(){ admin.on=admin.unlocked&&acct.key===ADMIN_KEY&&!admin.hidden; paintAdmin(); }
+function paintAdmin(){
+  const me=acct.key===ADMIN_KEY;
+  $('adminCard').hidden=!me;
+  $('adminOff').hidden=admin.unlocked; $('adminOn').hidden=!(admin.unlocked&&!admin.hidden); $('adminHid').hidden=!(admin.unlocked&&admin.hidden);
+}
+$('adminGo').addEventListener('click',async()=>{
+  const h=await sha256hex('pinpoint-admin:'+$('adminPhrase').value.trim().toLowerCase()); $('adminPhrase').value='';
+  if(h!==ADMIN_HASH){ acctMsg('adminMsg','Wrong phrase.','bad'); $('adminPhrase').classList.remove('bad'); void $('adminPhrase').offsetWidth; $('adminPhrase').classList.add('bad'); return; }
+  admin.unlocked=true; try{ localStorage.setItem('pp_adm',h); }catch(e){}
+  acctMsg('adminMsg',''); adminSync(); lbPaint(); toast('Admin on','ok'); sfx('lock');
 });
-$('adminPin').addEventListener('keydown',e=>{ if(e.key==='Enter') $('adminGo').click(); });
-$('adminPin').addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').slice(0,4); e.target.classList.remove('bad'); });
-$('adminExit').addEventListener('click',()=>{ admin.on=false; paintAdmin(); lbPaint(); toast('Admin mode off','ok'); });
+$('adminPhrase').addEventListener('keydown',e=>{ if(e.key==='Enter') $('adminGo').click(); });
+$('adminPhrase').addEventListener('input',e=>e.target.classList.remove('bad'));
+$('adminHide').addEventListener('click',()=>{ admin.hidden=true; adminSync(); lbPaint(); toast('Admin controls hidden until you reload','ok'); });
+$('adminShow').addEventListener('click',()=>{ admin.hidden=false; adminSync(); lbPaint(); });
+$('adminForget').addEventListener('click',()=>{ if(!confirm('Forget the admin phrase on this device? You can enter it again any time.')) return; admin.unlocked=false; try{ localStorage.removeItem('pp_adm'); }catch(e){} adminSync(); lbPaint(); });
 const TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>';
-function trashCell(id,board){ return admin.on?`<td class="adm"><button class="trash" data-trash="${esc(id)}" data-board="${esc(board)}" title="Remove this score for everyone">${TRASH}</button></td>`:''; }
-/* Remove a score: ban its id, drop it here, republish the board it sat on. */
+const PENCIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+function trashCell(id,board){ return admin.on?`<td class="adm"><button class="pencil" data-edit="${esc(id)}" data-board="${esc(board)}" title="Change the name on this row for everyone">${PENCIL}</button><button class="trash" data-trash="${esc(id)}" data-board="${esc(board)}" title="Remove this score for everyone">${TRASH}</button></td>`:''; }
+/* Remove a score: ban its id, drop it here, republish the board it sat on. Custom map rows go by position. */
 function adminRemove(id,board){
   if(!admin.on||!id) return;
+  if(board==='cmap'){ const rec=cm.cur; if(!rec) return; rec.top.splice(+id,1); cmapPublish(rec); renderCmap(); toast('Score removed for everyone','ok'); sfx('click'); return; }
   lb.ban.add(id); banPublish();
   if(board==='daily'){ lb.daily=lb.daily.filter(e=>e.id!==id); dlPublish(); }
   else if(lb.boards[board]){ lb.boards[board]=lb.boards[board].filter(e=>e.id!==id); lbPublish(board); }
   try{ saveBoard(loadBoard().filter(e=>e.id!==id)); }catch(e){}
   lbPaint(); toast('Score removed for everyone','ok'); sfx('click');
 }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-trash]'); if(!b||!admin.on) return; e.preventDefault(); e.stopPropagation();
+/* Rename one row. */
+function adminRename(id,board,name){
+  if(!admin.on||!id||!name) return;
+  if(board==='cmap'){ const rec=cm.cur; if(!rec||!rec.top[+id]) return; rec.top[+id].name=name; cmapPublish(rec); renderCmap(); toast('Name changed for everyone','ok'); return; }
+  if(board==='daily'){ const e=lb.daily.find(e=>e.id===id); if(e) e.name=name; dlPublish(); }
+  else if(lb.boards[board]){ const e=lb.boards[board].find(e=>e.id===id); if(e) e.name=name; lbPublish(board); }
+  try{ saveBoard(loadBoard().map(e=>e.id===id?{...e,name}:e)); }catch(e){}
+  lbPaint(); toast('Name changed for everyone','ok'); sfx('click');
+}
+document.addEventListener('click',e=>{
+  const p=e.target.closest('[data-edit]');
+  if(p&&admin.on){ e.preventDefault(); e.stopPropagation(); const row=p.closest('tr'); const cur=row?row.querySelector('td.name').firstChild.textContent.trim():'';
+    const v=prompt('New name for this row, shown to everyone:',cur); const name=cleanName(v||'').slice(0,20); if(name.length>=2&&name!==cur) adminRename(p.dataset.edit,p.dataset.board,name); return; }
+  const b=e.target.closest('[data-trash]'); if(!b||!admin.on) return; e.preventDefault(); e.stopPropagation();
   const row=b.closest('tr'); const who=row?row.querySelector('td.name').textContent.trim():'this score';
   if(confirm(`Remove ${who} from the leaderboard for everyone? This can't be undone.`)) adminRemove(b.dataset.trash,b.dataset.board); },true);
+/* Rename an account: its record, and every board row that carries its handle. */
+async function adminRenameAcct(key,name){
+  const got=await acctFetch(key); if(!got.record){ acctMsg('adminMsg2',`No account @${key}.`,'bad'); return; }
+  acctPublish({...got.record,name}); if(soc.dir[key]) soc.dir[key].name=name; if(acct.key===key){ acct.name=name; acctSave(); paintAcct(); }
+  let n=0;
+  for(const id of Object.keys(lb.boards)){ let hit=false; for(const e of lb.boards[id]) if(e.k===key&&e.name!==name){ e.name=name; hit=true; n++; } if(hit) lbPublish(id); }
+  let hd=false; for(const e of lb.daily||[]) if(e.k===key&&e.name!==name){ e.name=name; hd=true; n++; } if(hd) dlPublish();
+  lbPaint(); acctMsg('adminMsg2',`@${key} is now "${name}". ${n} score${n===1?'':'s'} updated.`,'ok');
+}
+$('adminRnGo').addEventListener('click',()=>{
+  if(!admin.on) return; const key=acctKey($('adminRnKey').value), name=cleanName($('adminRnName').value).slice(0,16);
+  if(key.length<2){ acctMsg('adminMsg2','Type a handle.','bad'); return; } if(name.length<2){ acctMsg('adminMsg2','Type a name of at least two characters.','bad'); return; }
+  const k2=acctKey(name); if(k2&&k2!==key&&k2===ADMIN_KEY){ acctMsg('adminMsg2','Not that one.','bad'); return; }
+  acctMsg('adminMsg2','Renaming…'); adminRenameAcct(key,name); $('adminRnKey').value=''; $('adminRnName').value='';
+});
+function adminDropAcct(key){
+  let sent=0; for(const l of lb.links) if(l.ready){ for(const t of [ACCT_ROOT+'/'+key,SOC_ROOT+'/'+key,INBOX_ROOT+'/'+key]){ try{ l.client.publish(t,'',{qos:1,retain:true}); sent++; }catch(e){} } }
+  if(sent){ delete soc.dir[key]; if(acct.key===key){ acctClear(); paintAcct(); } }
+  return sent>0;
+}
 $('adminAcctGo').addEventListener('click',()=>{
   if(!admin.on) return; const key=acctKey($('adminAcct').value); if(key.length<2){ acctMsg('adminMsg2','Type a handle.','bad'); return; }
+  if(key===ADMIN_KEY){ acctMsg('adminMsg2','Not that one.','bad'); return; }
   if(!confirm(`Remove the account @${key} for everyone? Their name, photo, passcode and friends list are deleted. This can't be undone.`)) return;
-  let sent=0; for(const l of lb.links) if(l.ready){ for(const t of [ACCT_ROOT+'/'+key,SOC_ROOT+'/'+key,INBOX_ROOT+'/'+key]){ try{ l.client.publish(t,'',{qos:1,retain:true}); sent++; }catch(e){} } }
-  if(!sent){ acctMsg('adminMsg2','Not connected.','bad'); return; }
-  delete soc.dir[key]; if(acct.key===key){ acctClear(); paintAcct(); }
+  if(!adminDropAcct(key)){ acctMsg('adminMsg2','Not connected.','bad'); return; }
   $('adminAcct').value=''; acctMsg('adminMsg2',`@${key} removed.`,'ok'); lbPaint();
 });
+/* Ban: the handle can't be claimed again, every score under it goes, every map it made goes, the account goes. */
+async function adminBan(key){
+  lb.banK.add(key); banKPublish();
+  for(const id of Object.keys(lb.boards)){ const before=lb.boards[id].length; lb.boards[id]=lb.boards[id].filter(e=>e.k!==key); if(lb.boards[id].length!==before) lbPublish(id); }
+  const bd=(lb.daily||[]).length; lb.daily=(lb.daily||[]).filter(e=>e.k!==key); if(lb.daily.length!==bd) dlPublish();
+  adminDropAcct(key); lbPaint();
+  await cmapList(); let maps=0; for(const r of Object.values(cm.all)) if(r.by===key){ cmapDelete(r.id); maps++; }
+  return maps;
+}
+$('adminBanGo').addEventListener('click',async()=>{
+  if(!admin.on) return; const key=acctKey($('adminAcct').value); if(key.length<2){ acctMsg('adminMsg2','Type a handle.','bad'); return; }
+  if(key===ADMIN_KEY){ acctMsg('adminMsg2','Not that one.','bad'); return; }
+  if(!confirm(`Ban @${key}? The account, every score under it and every map it made are removed for everyone, and the handle can't be claimed again. This can't be undone.`)) return;
+  acctMsg('adminMsg2','Banning…'); const maps=await adminBan(key);
+  $('adminAcct').value=''; acctMsg('adminMsg2',`@${key} banned. ${maps} map${maps===1?'':'s'} removed.`,'ok');
+});
+admin.ready=true; adminSync();
 
 /* ---------- Where in the world: pick a continent, then narrow to a country ---------- */
 let regionCont=null;
@@ -3458,7 +3630,7 @@ $('bpModes').addEventListener('click',e=>{ const b=e.target.closest('.bpmode'); 
   bp.mode=b.dataset.mode; bp.rounds='all'; bp.time='all'; bp.highlight=null; renderBoardPage(); $('board').scrollTo(0,0); });
 $('boardBack').addEventListener('click',()=>{ if(bp.from==='final'){ show('final'); } else { renderBoard(); show('menu'); } });
 $('boardMenu').addEventListener('click',()=>{ if(bp.from==='final'&&scoreUnsaved()){ show('final'); nagToSave(finalMenu); return; } if(mp.role) mpLeave(); renderBoard(); show('menu'); });
-$('viewBoardBtn').addEventListener('click',()=>openBoardPage(state.mode,state.savedId,'final'));
+$('viewBoardBtn').addEventListener('click',()=>{ if(state.custom){ cm.from='setup'; cmapOpen(state.custom.id); return; } openBoardPage(state.mode,state.savedId,'final'); });
 $('allBoards').addEventListener('click',()=>openBoardPage('classic',null,'menu'));
 $('soloBoards').addEventListener('click',()=>openBoardPage('classic',null,'menu'));
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -3866,7 +4038,8 @@ function showFinal(){
   $('nameInput').value=''; $('nameInput').placeholder=acct.name||'';
   const rank=boardFor(state.totalRounds,state.timeLimit,state.mode).filter(e=>e.score>state.score).length+1;
   $('saveBtn').textContent = rank<=10 ? `Save to leaderboard · #${rank} in ${modeLabel()}` : 'Save to leaderboard';
-  if(state.custom) { $('saveRow').hidden=true; $('signUp').hidden=true; $('viewBoardBtn').hidden=true; cmapFinish(); }
+  $('signUp').querySelector('b').textContent='Save this score'; $('viewBoardBtn').textContent='View leaderboard';
+  if(state.custom) paintCustomSave();
   paintShare();
 }
 /* Every finished game lands on the board the same way, solo or with friends. */
@@ -5038,7 +5211,8 @@ function showFinalMP(fin){
   $('signUp').hidden=canSave()||duelMode; $('saveRow').hidden=true;
   if(canSave()&&!state.saved&&!duelMode&&!state.custom){ const e=recordScore(acct.name); state.saved=true; state.savedId=e.id; }
   if(duelMode||state.custom) $('viewBoardBtn').hidden=true;
-  if(state.custom){ $('signUp').hidden=true; cmapFinish(); }
+  $('signUp').querySelector('b').textContent='Save this score'; $('viewBoardBtn').textContent='View leaderboard';
+  if(state.custom) paintCustomSave();
   paintShare();
   $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(p)}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd" title="${p.out?'knocked out in round '+p.outRound:'still standing'}">${modeOf(state.mode).lives?heartRow(p.lives??0,modeOf(state.mode).lives,!!p.out,17):heartRow(p.out?0:1,1,!!p.out,17)}</span>`:''}${duelMode?`<span class="rd">${Math.max(0,p.hp??0).toLocaleString()} HP<span class="hpmini"><i class="${hpClass(Math.max(0,p.hp??0)/DUEL_HP*100)}" style="width:${Math.max(0,p.hp??0)/DUEL_HP*100}%"></i></span></span>`:''}<span class="rp">${duelMode?p.score.toLocaleString()+' pts':p.score.toLocaleString()}</span></div>`).join('');
 }
