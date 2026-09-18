@@ -499,6 +499,13 @@
     background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:opacity .18s,width .18s ease-out,height .18s ease-out}
   .mappanel.open,.mappanel.pinned{opacity:1}
   .mappanel.open{width:min(1000px,100vw);height:min(720px,calc(100vh - 90px))}
+  /* On a desktop the panel leaves a strip down the right edge, so Google's own compass and zoom stay visible and turn with you. */
+  @media (min-width:821px){ .mappanel{right:64px;border-radius:var(--radius) var(--radius) 0 0} #game.blind-map .mappanel{right:0;border-radius:0} }
+  .compass{position:absolute;right:20px;bottom:150px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.4);z-index:6;pointer-events:none}
+  .compass .rose{position:absolute;inset:0;transition:transform .08s linear}
+  .compass .rose i{position:absolute;left:50%;top:50%;width:5px;height:32px;margin:-16px 0 0 -2.5px;border-radius:3px;background:linear-gradient(#e63946 0 50%,#2b2b2b 50% 100%)}
+  .compass .rose b{position:absolute;top:1px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:#e63946;line-height:1}
+  @media (max-width:820px){ .compass{right:12px;bottom:calc(34vh + 12px)} }
   #guessmap{flex:1;background:#bfd9e8}
   .mappanel.cty .coordbar{display:none}
   .leaflet-container.plain .style-ctl{display:none}
@@ -1535,7 +1542,7 @@
   <div class="round-intro" id="roundIntro" hidden></div>
   <div class="blindhint" id="blindHint" hidden></div>
   <div id="blink" hidden><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="lid" fill="#000" fill-rule="evenodd" d=""/></svg></div>
-  <div id="pix" hidden><canvas id="pixCanvas" width="128" height="72"></canvas><div id="pixLinks"></div><div class="dev" id="pixDev">Loading…</div></div>
+  <div id="pix" hidden><canvas id="pixCanvas" width="128" height="72"></canvas><div id="pixLinks"></div><div class="compass" id="pixCompass"><div class="rose"><i></i><b>N</b></div></div><div class="dev" id="pixDev">Loading…</div></div>
   <div id="trio" hidden></div>
   <div id="tmap" hidden><div class="handle"><span id="tmapTitle">Map</span><span class="hint" id="tmapHint">Hover to open</span><button class="btn btn-primary" id="trioLock" disabled>Pick one first</button></div><div id="triomap"></div></div>
   <div id="bettray" hidden>
@@ -2368,7 +2375,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-150227';
+const BUILD='20260918-151651';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2519,7 +2526,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:24};
+const VERSION={major:3,minor:4,patch:25};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4773,7 +4780,8 @@ document.addEventListener('keydown',e=>{ if(!pix.active||!pix.canMove||$('game')
   if(e.code==='ArrowUp'||e.code==='KeyW'){ e.preventDefault(); pixStep(); }
   else if(e.code==='ArrowLeft'||e.code==='KeyA'){ e.preventDefault(); pix.heading-=20; drawPixel(); }
   else if(e.code==='ArrowRight'||e.code==='KeyD'){ e.preventDefault(); pix.heading+=20; drawPixel(); } });
-function drawPixel(){
+function paintCompass(){ const r=document.querySelector('#pixCompass .rose'); if(r) r.style.transform=`rotate(${(-pix.heading).toFixed(1)}deg)`; }
+function drawPixel(){ paintCompass();
   if(!pix.band||!pix.active) return;
   const c=$('pixCanvas');
   if(pix.full){   // full-size viewer: drop to a smaller render while the pointer is down, then sharpen

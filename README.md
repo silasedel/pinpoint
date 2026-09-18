@@ -119,6 +119,10 @@ Delete account sits beside Sign out: it explains what goes (name, photo, passcod
 
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
+## Compass
+
+Every round has a compass at the right edge, just above the map panel, that turns as you look around. In the Street View rounds it is Google's own (the page cannot read the embed's heading, so on desktop the map panel now leaves a 64 px strip down the right edge where Google's compass, pegman toggle and zoom buttons stay visible). In the rounds the app draws itself (Pixelated and the other canvas modes) it is Pinpoint's, a red-north needle with an N that rotates with the view.
+
 ## Field of view
 
 Every Street View embed (the game, the home-page background, the Google view in the builder) asks for Google's widest view. The embed URL's `5f` value is a zoom level, larger meaning closer; 0.78 is Google's default and anything at 0.6 or below is already its maximum zoom-out, so the app passes 0.4. Pinpoint's own tile viewers (Pixelated, the canvas rounds, the spot preview and the thumbnail picker) open at 110° to match and zoom between 35° and 120°.
