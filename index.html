@@ -1251,9 +1251,9 @@
     <div class="card">
       <div class="label" style="margin-top:0">Name</div>
       <input class="tin" id="mkName" maxlength="32" placeholder="Name your map" autocomplete="off">
-      <div class="rsub" style="margin-top:8px">Click the map to add a spot. Each click snaps to the nearest Street View within a couple of miles. Paste coordinates or a Google Maps link to add one exactly.</div>
+      <div class="rsub" style="margin-top:8px">Click the map to add a spot. Each click snaps to the nearest Street View within a couple of miles. Or type an address, a place name, coordinates or a Google Maps link.</div>
       <div id="mkMap" class="mkmap"></div>
-      <div class="coordbar" style="border:0;padding:8px 0 0"><input id="mkCoord" placeholder="Paste coordinates: 48.8584, 2.2945 (or a Google Maps link)" autocomplete="off" spellcheck="false"><button id="mkCoordGo">Add</button></div>
+      <div class="coordbar" style="border:0;padding:8px 0 0"><input id="mkCoord" placeholder="Address, place, coordinates or a Google Maps link" autocomplete="off" spellcheck="false"><button id="mkCoordGo">Add</button></div>
       <div class="label">Spots <span class="dim" id="mkCount">0 of 10</span></div>
       <div class="mkprog"><i id="mkProg"></i></div>
       <div class="rsub" id="mkNeed" style="margin:6px 0 10px">Ten spots minimum. Add as many as you like after that.</div>
@@ -2201,7 +2201,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-225903';
+const BUILD='20260917-230853';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2331,7 +2331,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:5,patch:0};
+const VERSION={major:3,minor:6,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3217,7 +3217,34 @@ function renderMk(){
 }
 $('mkName').addEventListener('input',renderMk);
 $('mkList').addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(!b) return; cm.mk.pins.splice(+b.dataset.del,1); renderMk(); });
-function mkCoordAdd(){ const c=parseCoords($('mkCoord').value); if(!c||!isFinite(c.lat)||!isFinite(c.lng)||Math.abs(c.lat)>90||Math.abs(c.lng)>180){ toast('Couldn\'t read those coordinates'); return; } $('mkCoord').value=''; cm.mk.map.setView([c.lat,c.lng],Math.max(cm.mk.map.getZoom(),8)); mkAdd(c.lat,c.lng); }
+/* The builder box takes coordinates, a full Google Maps link, or plain text (an address or a place name), which is geocoded. */
+function mkQueryOf(text){
+  let t=String(text||'').trim(); if(!t) return '';
+  if(/^https?:\/\//i.test(t)){
+    let u; try{ u=new URL(t); }catch(e){ return ''; }
+    const pl=/\/maps\/(?:place|search|dir)\/([^/@?]+)/.exec(u.pathname); if(pl){ try{ return decodeURIComponent(pl[1].replace(/\+/g,' ')).trim(); }catch(e){ return pl[1].replace(/\+/g,' '); } }
+    const q=u.searchParams.get('q')||u.searchParams.get('query')||u.searchParams.get('destination'); if(q) return q.trim();
+    return '';
+  }
+  return t;
+}
+async function geocode(q){
+  try{ const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=en&q=${encodeURIComponent(q)}`); const j=await r.json(); if(j&&j[0]) return {lat:+j[0].lat,lng:+j[0].lon,name:j[0].display_name}; }catch(e){}
+  try{ const r=await fetch(`https://photon.komoot.io/api/?limit=1&lang=en&q=${encodeURIComponent(q)}`); const j=await r.json(); const f=j&&j.features&&j.features[0]; if(f){ const pr=f.properties||{}; return {lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0],name:[pr.name,pr.city,pr.country].filter(Boolean).join(', ')}; } }catch(e){}
+  return null;
+}
+async function mkCoordAdd(){
+  const inp=$('mkCoord'); const raw=inp.value.trim(); if(!raw||!cm.mk||cm.mk.busy) return;
+  const bad=m=>{ inp.classList.remove('bad'); void inp.offsetWidth; inp.classList.add('bad'); toast(m); };
+  let c=parseCoords(raw);
+  if(c&&isFinite(c.lat)&&isFinite(c.lng)&&Math.abs(c.lat)<=90&&Math.abs(c.lng)<=180){ inp.value=''; cm.mk.map.setView([c.lat,c.lng],Math.max(cm.mk.map.getZoom(),8)); mkAdd(c.lat,c.lng); return; }
+  if(/^https?:\/\/(?:maps\.app\.goo\.gl|goo\.gl|g\.co)\//i.test(raw)){ bad('Short links can\'t be opened from here. Open it in Google Maps and paste the full link from the address bar, or type the address.'); return; }
+  const q=mkQueryOf(raw); if(!q){ bad('Couldn\'t read that. Try an address, a place name, coordinates or a Google Maps link.'); return; }
+  cm.mk.busy=true; $('mkMsg').className='acctmsg'; $('mkMsg').textContent=`Looking up ${q}…`; $('mkCoordGo').disabled=true;
+  const g=await geocode(q); cm.mk.busy=false; $('mkCoordGo').disabled=false;
+  if(!g){ $('mkMsg').textContent=''; bad(`Couldn't find "${q}". Try adding the city or country.`); return; }
+  inp.value=''; toast(`Found ${g.name.split(',').slice(0,3).join(',')}`); cm.mk.map.setView([g.lat,g.lng],Math.max(cm.mk.map.getZoom(),12)); mkAdd(g.lat,g.lng);
+}
 $('mkCoordGo').addEventListener('click',mkCoordAdd);
 $('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); mkCoordAdd(); } });
 $('mkSave').addEventListener('click',()=>{
