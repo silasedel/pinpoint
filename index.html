@@ -404,12 +404,12 @@
   .hud-brand svg{width:30px;height:30px}
 
   .ctl{position:absolute;left:16px;bottom:16px;z-index:6;display:flex;gap:8px}
-  .ctl.shift{left:206px}
+  .ctl.shift{left:252px}
   .ctl .icon-btn.wide{width:auto;padding:0 14px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
   .ctl .icon-btn.wide svg{width:16px;height:16px}
   .ctl .icon-btn.busy{opacity:.6;cursor:wait}
   .copymenu{position:absolute;left:16px;bottom:70px;z-index:9;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;min-width:250px}
-  .copymenu.shift{left:206px}
+  .copymenu.shift{left:252px}
   .copymenu button{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:8px;background:none;font-size:13px;font-weight:600}
   .copymenu button:hover{background:var(--green-soft);color:var(--green-dark)}
   .copymenu button small{display:block;font-weight:500;color:var(--muted);font-size:11px}
@@ -473,7 +473,7 @@
 
   .marker-pin{position:relative;width:32px;height:44px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
   .marker-pin svg{position:relative;display:block}
-  .marker-pin .facepin{position:absolute;left:8.5px;top:8.5px;width:15px;height:15px;border-radius:50%;background-size:cover;background-position:center;z-index:2}
+  .marker-pin .facepin{position:absolute;left:8.5px;top:8.5px;width:15px;height:15px;border-radius:50%;background-size:cover;background-position:center;z-index:300}   /* Leaflet gives marker SVGs z-index 200; the face must sit above */
   .marker-pin.big{width:40px;height:56px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45))}
   .marker-true .ring{position:absolute;left:50%;top:54px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:3px solid #e63946;animation:ring 1.6s ease-out infinite}
   @keyframes ring{0%{transform:scale(.4);opacity:.9}100%{transform:scale(3.2);opacity:0}}
@@ -2207,7 +2207,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-221806';
+const BUILD='20260917-222038';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2337,7 +2337,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:3,patch:4};
+const VERSION={major:3,minor:3,patch:5};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
