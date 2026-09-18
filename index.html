@@ -527,6 +527,15 @@
   .strip .dotp{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800;opacity:.45;transition:opacity .2s,transform .2s}
   .strip .dotp.done{opacity:1;transform:scale(1.1)}
   .strip .dotp{position:relative}
+  .pill .hp{width:19px;height:19px;margin-right:1px;fill:var(--line);vertical-align:-4px;transition:fill .25s}
+  .pill .hp.on{fill:#e63946}
+  .hearts{display:inline-flex;align-items:center;gap:1px;vertical-align:-3px}
+  .hearts .hp{fill:var(--line)}
+  .hearts .hp.on{fill:#e63946}
+  .hearts .hp.broke{fill:#a3202c}
+  .hearts .hp.broke .crack{stroke:var(--card)}
+  .rrow.out{opacity:.72}
+  .pill.lives b{letter-spacing:0}
   .pav{display:inline-block;border-radius:50%;background:var(--sunk) center/cover no-repeat;flex:none;vertical-align:middle}
   .pav.ini{display:grid;place-items:center;font-weight:800;color:var(--muted);font-size:12px}
   .prow .pav{margin-right:2px}
@@ -1561,7 +1570,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-184755';
+const BUILD='20260917-190004';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1680,7 +1689,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding were rebuilt from scratch.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:2,minor:17,patch:1};
+const VERSION={major:2,minor:17,patch:3};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2381,7 +2390,7 @@ async function waitForLoc(i){
 async function nextRound(){
   state.round++; state.guess=null; state.locked=false; state.fitDone=false; state.pick=null; state.choice=null; state.bet=0; resetGuessBar(); if(modeOf(state.mode).bet) renderBet();
   show('game');
-  $('roundLbl').textContent = (mp.role&&modeOf(state.mode).elim) ? `${state.round} · ${alivePlayers().length} left` : `${state.round} / ${state.totalRounds}`;
+  if(!paintLives()) $('roundLbl').textContent = (mp.role&&modeOf(state.mode).elim) ? `${state.round} · ${alivePlayers().length} left` : `${state.round} / ${state.totalRounds}`;
   const last=state.results[state.results.length-1];
   if(last){ countUp($('scoreLbl'),state.score-last.pts,state.score,900); $('scorePill').classList.remove('pop'); void $('scorePill').offsetWidth; $('scorePill').classList.add('pop');
     if(last.pts>0){ const f=document.createElement('span'); f.className='floater'; f.textContent='+'+last.pts.toLocaleString(); $('scorePill').appendChild(f); setTimeout(()=>f.remove(),1400); } }
@@ -3488,8 +3497,30 @@ function mpSubmitGuess(){
   mpSend({t:'guess',guess:g,left:state.timeLeft,bet:state.bet,pick:state.pick,choice:state.choice});
   $('waitOverlay').hidden=false; $('waitTxt').textContent=g?'Waiting for the others to guess…':"Time's up. Waiting for the others…"; updateWaitList();
 }
+const HEART_D='M12 21s-7.6-4.9-9.5-9.1A5.4 5.4 0 0 1 12 6.5a5.4 5.4 0 0 1 9.5 5.4C19.6 16.1 12 21 12 21z';
+/* A row of hearts: filled for what's left, hollow for what's gone, and a cracked one when you're knocked out. */
+function heartRow(left,total,out,size){
+  const sz=size||16;
+  if(out) return `<span class="hearts"><svg class="hp broke" width="${sz+3}" height="${sz+3}" viewBox="0 0 24 24" aria-hidden="true">`+
+    `<path d="${HEART_D}"/><path class="crack" d="M12 6.9l-2 3.5 2.7 1.7-2.2 3.2 1.6 2.6" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  return `<span class="hearts">`+Array.from({length:total},(_,i)=>
+    `<svg class="hp ${i<left?'on':''}" width="${sz}" height="${sz}" viewBox="0 0 24 24" aria-hidden="true"><path d="${HEART_D}"/></svg>`).join('')+`</span>`;
+}
+/* Lives mode swaps the round counter for hearts, so you can read your own health at a glance. */
+function paintLives(){
+  const m=modeOf(state.mode), lbl=$('roundLbl'), pill=lbl.parentElement;
+  const me=mp.players[mp.me.id];
+  if(!(mp.role&&m.lives&&me)){ pill.classList.remove('lives'); pill.querySelector('small').textContent='ROUND'; return false; }
+  const total=m.lives, left=me.out?0:(me.lives==null?total:Math.max(0,me.lives));
+  pill.classList.add('lives'); pill.querySelector('small').textContent='LIVES';
+  lbl.innerHTML=Array.from({length:total},(_,i)=>
+    `<svg class="hp ${i<left?'on':''}" viewBox="0 0 24 24" aria-hidden="true"><path d="${HEART_D}"/></svg>`).join('');
+  lbl.setAttribute('title',`${left} of ${total} lives left`);
+  return true;
+}
 function updateStrip(){
   const el=$('strip'); if(!mp.role) return;
+  paintLives();
   el.innerHTML=playerList().map(p=>{ const av=avOf(p.id); const done=mp.guesses[p.id]!==undefined&&!p.out;
     const face=p.out?'✕':(done?'✓':(av?'':esc((p.name||'?')[0].toUpperCase())));
     const bg=av&&!p.out&&!done?`background-image:url(${av});background-size:cover;`:'';
@@ -3521,7 +3552,7 @@ function mpToLobby(){ setTimeout(sendAvatar,400);
 /* ----- multiplayer result screens ----- */
 function showResultMP(rev){
   show('result'); $('nextBtn').hidden=mp.role!=='host'; $('nextWait').hidden=mp.role==='host'; $('roundRank').hidden=false;
-  if(rev.players){ for(const p of rev.players){ if(mp.players[p.id]) Object.assign(mp.players[p.id],p); } updateStrip(); }
+  if(rev.players){ for(const p of rev.players){ if(mp.players[p.id]) Object.assign(mp.players[p.id],p); } updateStrip(); paintLives(); }
   if(rev.lie!=null&&rev.extra){ showTrioResultMP(rev); return; }
   if(rev.truthCountry!==undefined){ showCountryResultMP(rev); return; }
   if(rev.ans){ showChoiceResultMP(rev); return; }
@@ -3559,7 +3590,7 @@ function showResultMP(rev){
   $('leaderLine').hidden=false;
   $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="background:${COLORS[lead.color??0][0]}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=elimBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out?' · out':(r.lives!=null?` · ${r.lives} live${r.lives===1?'':'s'}`:'')}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
+  $('roundRank').innerHTML=elimBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out||r.lives!=null?' '+heartRow(r.lives??0,modeOf(state.mode).lives||3,!!r.out,14):''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
 }
 /* One line on the result screen naming whoever just lost a life or got knocked out. */
 function elimBanner(rev){
@@ -3597,7 +3628,7 @@ function showFinalMP(fin){
   if(iWon) setTimeout(confetti,900);
   $('signUp').hidden=canSave(); $('saveRow').hidden=true;
   if(canSave()&&!state.saved){ const e=recordScore(acct.name); state.saved=true; state.savedId=e.id; }
-  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd">${p.out?'out in round '+p.outRound:(p.lives!=null?p.lives+' life'+(p.lives===1?'':'s')+' left':'survived')}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
+  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd" title="${p.out?'knocked out in round '+p.outRound:'still standing'}">${modeOf(state.mode).lives?heartRow(p.lives??0,modeOf(state.mode).lives,!!p.out,17):heartRow(p.out?0:1,1,!!p.out,17)}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
 }
 
 /* =========================================================
