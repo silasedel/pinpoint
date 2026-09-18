@@ -183,6 +183,15 @@
   .ptag{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--sunk);color:var(--muted);margin-left:6px;vertical-align:middle}
   .ptag.adm{background:var(--green-dark);color:#fff} .ptag.fr{background:var(--green-soft);color:var(--green-dark)} .ptag.ban{background:var(--red-soft);color:var(--red)}
   .profbio{font-size:14.5px;margin:2px 0 6px;line-height:1.35}
+  .av-col{display:flex;flex-direction:column;align-items:center;gap:10px;flex:none}
+  .av-wrap{position:relative;flex:none}
+  .stkbar{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);white-space:nowrap}
+  .stkbar span{display:inline-flex;align-items:center;gap:3px;padding:2px 8px 2px 6px;border-radius:99px;background:#fff1e3;color:#c2410c;font-size:11px;font-weight:800;border:1px solid #fbd7bd;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .stkbar svg{width:12px;height:12px}
+  html[data-theme="dark"] .stkbar span{background:#3a2114;color:#ffb38a;border-color:#5a3520}
+  .profbtns+.profbtns{margin-top:8px}
+  .adminlog{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:12.5px;color:var(--muted);max-height:180px;overflow:auto}
+  .adminlog div{padding:3px 0} .adminlog b{color:var(--text)}
   .cmc .who.lnk{cursor:pointer} .cmc .who.lnk:hover{text-decoration:underline}
   .cmcard .by.lnk:hover{text-decoration:underline}
   .thumbbox{position:relative;flex:none;width:min(100%,320px);aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#1a2a20}
@@ -191,7 +200,7 @@
   .mkthumb.cv{cursor:grab;touch-action:none} .mkthumb.cv:active{cursor:grabbing}
   .thumbzoom{display:flex;gap:6px;align-items:center;margin-top:8px} .thumbzoom .btn{min-width:38px;padding:6px 10px}
   .board th:first-child{width:36px}
-  .board td.rank{color:var(--muted);width:36px}
+  .board td.rank{color:var(--muted);width:36px;display:table-cell}
   .board td.name{font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:260px;width:99%}
   .board td.score{font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
   .board td.mode{color:var(--muted);font-size:12px}
@@ -633,7 +642,7 @@
   .chrep td{padding:8px;border-bottom:1px solid var(--hair)}
   .chrep td.w{font-weight:800;color:var(--green-dark)}
   .chrep td small{display:block;color:var(--muted);font-weight:500;font-size:12px}
-  #chal,#cmaps,#cmap,#cmake{overflow:auto;padding:30px 20px 60px}
+  #chal,#cmaps,#cmap,#cmake,#cmstats,#profile{overflow:auto;padding:30px 20px 60px}
   #chal .ddone{margin:14px 22px 22px}
   .cmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
   .cmcard{display:flex;flex-direction:column;gap:4px;padding:0 0 12px;border:1.5px solid var(--line);border-radius:14px;background:var(--raise);cursor:pointer;text-align:left;font-family:inherit;color:var(--text);overflow:hidden}
@@ -688,7 +697,7 @@
   .toprow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer;width:100%;background:none;text-align:left;font-family:inherit;color:var(--text)}
   .toprow img{width:96px;height:54px;object-fit:cover;border-radius:8px;flex:none;background:#1a2a20}
   .toprow .tn{flex:1;min-width:0} .toprow .tn b{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .toprow .tn small{color:var(--muted)}
-  .toprow .tv{text-align:right;font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted);min-width:64px} .toprow .tv b{display:block;font-size:15px;color:var(--text)}
+  .toprow .tv{text-align:right;font-variant-numeric:tabular-nums;font-size:11px;color:var(--muted);min-width:56px;line-height:1.2} .toprow .tv b{display:block;font-size:15px;color:var(--text)}
   .cmap-empty{color:var(--muted);font-size:14px;padding:18px 0;text-align:center}
 
   /* ---------- LOBBY / MULTIPLAYER ---------- */
@@ -1147,18 +1156,21 @@
     </div>
     <div class="card" id="acctIn" hidden>
       <h2 style="margin:0 0 16px">Account</h2>
-      <div class="prof">
-        <div class="av-big" id="avPreview"></div>
+      <div class="prof" style="align-items:flex-start">
+        <div class="av-col"><div class="av-wrap"><div class="av-big" id="avPreview"></div><div class="stkbar" id="acctStreak" hidden></div></div>
+          <button class="btn btn-secondary sm" id="colorEdit" hidden><span class="cdot" id="colorDot"></span>Line color</button></div>
         <div class="profside">
-          <div class="namerow"><b id="acctWho"></b><span class="stkbig" id="acctStreak" hidden></span></div>
+          <div class="namerow"><b id="acctWho"></b></div>
           <span class="handle" id="acctHandle"></span>
           <div class="profbio" id="acctBio"></div>
           <div class="profbtns">
             <button class="btn btn-secondary sm" id="avPick">Choose photo</button>
             <button class="btn btn-secondary sm" id="avClear">Remove</button>
+          </div>
+          <div class="profbtns">
             <button class="btn btn-secondary sm" id="nameEdit">Edit name</button>
             <button class="btn btn-secondary sm" id="bioEdit">Edit bio</button>
-            <button class="btn btn-secondary sm" id="colorEdit" hidden><span class="cdot" id="colorDot"></span>Line color</button>
+            <button class="btn btn-secondary sm" id="acctView">View profile</button>
           </div>
         </div>
       </div>
@@ -1196,6 +1208,7 @@
     </div>
     <div class="card wide" id="adminCard" hidden style="padding:14px 22px">
       <div class="adminrow"><span><b>Admin mode</b><span class="rsub" id="adminSub" style="display:inline;margin-left:10px"></span></span><label class="switch" id="adminSw"><input type="checkbox" id="adminTog"><i></i></label></div>
+      <div class="adminlog" id="adminLog" hidden></div>
     </div>
   </div>
 </div>
@@ -1316,7 +1329,7 @@
   <div class="setup-wrap narrow">
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Profile</b></div><button class="btn btn-secondary" id="profBack" style="margin-left:auto">Back</button></div>
     <div class="card">
-      <div class="prof"><div class="av-big" id="profAv"></div><div class="profside">
+      <div class="prof" style="align-items:flex-start"><div class="av-wrap"><div class="av-big" id="profAv"></div><div class="stkbar" id="profStk" hidden></div></div><div class="profside">
         <div class="namerow"><b id="profName">…</b><span id="profTags"></span></div>
         <span class="handle" id="profHandle"></span>
         <div class="profbio" id="profBio"></div>
@@ -2339,7 +2352,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-002735';
+const BUILD='20260918-004146';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2440,9 +2453,11 @@ function lbSubmit(entry){
   lbPaint();
 }
 function lbPaint(){
-  if(!$('menu').hidden){ renderBoard(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintDailyButton(); }
+  renderBoard(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintDailyButton();   // the home boards are cheap, keep them current even off screen
   if(!$('board').hidden) renderBoardPage();
   if(!$('daily').hidden) renderDailyBoard('dBoardWrap','dBoardSub');
+  if(cm.cur&&!$('cmap').hidden) renderCmap();
+  if(!$('cmaps').hidden) renderCmaps();
 }
 /* Today's board is its own retained message, keyed by date, so it resets itself every day. */
 function dlMerge(list){
@@ -2488,7 +2503,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:4};
+const VERSION={major:3,minor:4,patch:5};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2720,7 +2735,9 @@ function acctPublish(rec){
 }
 function paintAcct(){
   if($('acctWho')) $('acctWho').textContent=acct.name||'';
-  if($('acctStreak')){ const n=streakNow(acct.streak); $('acctStreak').hidden=n<2; $('acctStreak').innerHTML=`${FLAME}${n}-day streak`; }
+  if($('acctStreak')){ const n=streakNow(acct.streak); $('acctStreak').hidden=n<2; $('acctStreak').innerHTML=`<span>${FLAME}${n}-day streak</span>`; }
+  if($('bioEdit')) $('bioEdit').textContent=acct.bio?'Edit bio':'Add bio';
+  if($('statsBtn')) $('statsBtn').hidden=!(acct.key&&Object.values(cm.all).some(r=>r.by===acct.key));
   if($('acctHandle')) $('acctHandle').textContent=acct.key?'@'+acct.key:'';
   if($('acctBio')){ $('acctBio').textContent=acct.bio||''; $('acctBio').hidden=!acct.bio; }
   if(admin.ready){ const was=admin.on; adminSync(); if(was!==admin.on) lbPaint(); }
@@ -2776,7 +2793,8 @@ async function acctChangePin(){
   acctMsg('acctMsg2',ok?'Passcode changed.':'Could not reach the server.',ok?'ok':'bad');
   $('acctNewPin').value=''; if(ok) $('pinBox').hidden=true;
 }
-$('acctChip').addEventListener('click',()=>{ acctMsg('acctMsg',''); acctMsg('acctMsg2',''); paintAcct(); show('acct'); $('acct').scrollTo(0,0); if(!acct.name) $('acctName').focus(); });
+$('acctChip').addEventListener('click',()=>{ acctMsg('acctMsg',''); acctMsg('acctMsg2',''); paintAcct(); show('acct'); $('acct').scrollTo(0,0); if(!acct.name) $('acctName').focus(); if(acct.key&&!cm.loaded) cmapList().then(()=>paintAcct()); });
+$('acctView').addEventListener('click',()=>{ if(acct.key) openProfile(acct.key); });
 $('acctBack').addEventListener('click',()=>show('menu'));
 $('acctGo').addEventListener('click',acctContinue);
 $('acctPin').addEventListener('keydown',e=>{ if(e.key==='Enter') acctContinue(); });
@@ -3293,7 +3311,7 @@ $('chPlays').addEventListener('click',e=>{ const row=e.target.closest('.chplay')
    wildcard read of all of them. Playing one is Classic scoring over that map's spots; each map keeps its own
    small board of best scores. */
 const CM_ROOT='worlddrop/v1/cmap';
-const cm={cur:null, all:{}, time:60, rounds:5, mk:null};
+const cm={cur:null, all:{}, time:60, rounds:5, mk:null, loaded:false, from:'menu'};
 function cmapLink(id){ return location.origin+location.pathname+'?m='+id; }
 function cmapPublish(rec){ let sent=false; for(const l of lb.links) if(l.ready){ try{ l.client.publish(CM_ROOT+'/'+rec.id,JSON.stringify(rec),{qos:1,retain:true}); sent=true; }catch(e){} } return sent; }
 async function cmapFetch(id){ const t0=Date.now(); while(!lbLive()&&Date.now()-t0<9000) await new Promise(r=>setTimeout(r,250)); const got=await fetchMany(CM_ROOT,[id],3600); const r=got[id]; return r&&r.id===id&&Array.isArray(r.pins)?r:null; }
@@ -3316,7 +3334,7 @@ function cmapList(ms){
     const finish=()=>{ if(done) return; done=true; clearTimeout(timer); for(const l of links){ try{ l.client.removeListener('message',onMsg); l.client.unsubscribe(wild); }catch(e){} } resolve(cm.all); };
     const onMsg=(t,payload)=>{ if(!t.startsWith(CM_ROOT+'/')) return; let rec=null; try{ rec=cmapClean(JSON.parse(payload.toString())); }catch(e){} if(rec) cm.all[rec.id]=rec; };
     for(const l of links){ try{ l.client.on('message',onMsg); l.client.subscribe(wild,{qos:0}); }catch(e){} }
-    const timer=setTimeout(finish,ms||2600); });
+    const timer=setTimeout(finish,ms||2600); }).then(v=>{ cm.loaded=true; return v; });
 }
 /* The rounds of a game on this map: a shuffle of its spots, as location objects the game understands. */
 async function customLocs(map,n){ const pins=shuffle(map.pins.slice()).slice(0,Math.max(1,Math.min(n,map.pins.length))); return pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:Math.floor(Math.random()*360),place:null,continent:null,region:map.name})); }
@@ -3330,7 +3348,7 @@ function renderCmaps(){
   let list=Object.values(cm.all);
   if(q) list=list.filter(r=>r.name.toLowerCase().includes(q)||String(r.byName||'').toLowerCase().includes(q)||String(r.by||'').toLowerCase().includes(q));
   list.sort((a,b)=>(b.plays||0)-(a.plays||0)||(b.made||0)-(a.made||0));
-  $('cmSub').textContent=Object.keys(cm.all).length?`${Object.keys(cm.all).length} map${Object.keys(cm.all).length===1?'':'s'}${q?` · ${list.length} match`:''}`:(lbLive()?'No custom maps yet. Make the first one.':'Connecting…');
+  $('cmSub').textContent=Object.keys(cm.all).length?`${Object.keys(cm.all).length} map${Object.keys(cm.all).length===1?'':'s'}${q?` · ${list.length} match`:''}`:(cm.loaded&&lbLive()?'No custom maps yet. Make the first one.':'Loading…');
   $('cmList').innerHTML=list.map(r=>`<button class="cmcard" data-id="${esc(r.id)}"><img class="thumb" src="${thumbOf(r)}" alt="" loading="lazy">${admin.on?`<span class="trash" role="button" data-cmdel="${esc(r.id)}" title="Delete this map for everyone">${TRASH}</span>`:''}<b>${esc(r.name)}</b><span class="by${r.by?' lnk':''}"${r.by?` data-prof="${esc(r.by)}"`:''}>${r.by?faceOf(r.by,18):''}${esc(r.byName||r.by||'someone')}</span><span class="meta"><span><b>${r.pins.length}</b> spots</span><span><b>${(r.plays||0).toLocaleString()}</b> plays</span><span class="lk">♥ <b>${(r.likes||[]).length}</b></span></span></button>`).join('');
 }
 $('cmSearch').addEventListener('input',renderCmaps);
@@ -3344,13 +3362,14 @@ async function cmapOpen(id){
   $('cmTitle').textContent='Loading…'; $('cmFacts').innerHTML=''; $('cmBoard').innerHTML=''; $('cmOwner').hidden=true; $('cmcList').innerHTML=''; $('cmcCount').textContent='';
   const rec=cm.all[id]||await cmapFetch(id);
   if(!rec){ $('cmTitle').textContent='Map not found'; $('cmOwner').hidden=false; $('cmOwner').textContent='That link doesn\'t point at a map any more.'; $('cmPlay').hidden=true; return; }
-  cm.all[rec.id]=rec; cm.cur=rec; cm.rounds=5; renderCmap(); cmcLoad(rec.id);
+  cm.all[rec.id]=rec; cm.cur=rec; cm.rounds=5; renderCmap(); cmcLoad(rec.id); saveScreen();
 }
 /* ----- likes ----- */
 $('cmLike').addEventListener('click',async()=>{
   if(!acct.key){ toast('Sign in to like maps'); return; } const rec=cm.cur; if(!rec||cm.liking) return; cm.liking=true;
   try{ const fresh=await cmapFetch(rec.id); const r=fresh||rec; const likes=new Set(Array.isArray(r.likes)?r.likes:[]);
-    if(likes.has(acct.key)) likes.delete(acct.key); else likes.add(acct.key);
+    const had=likes.has(acct.key); if(had) likes.delete(acct.key); else likes.add(acct.key);
+    const day=dailyDate(); const st=r.stats&&typeof r.stats==='object'?r.stats:{}; const cur=Array.isArray(st[day])?st[day]:[0,0,0]; st[day]=[+cur[0]||0,+cur[1]||0,Math.max(0,(+cur[2]||0)+(had?-1:1))]; r.stats=st;
     r.likes=[...likes].slice(-2000); cm.all[r.id]=r; cm.cur=r; cmapPublish(r); renderCmap(); sfx('click'); }catch(e){}
   cm.liking=false;
 });
@@ -3668,10 +3687,13 @@ const prof={key:null,from:'menu',rec:null};
 async function openProfile(k){
   k=acctKey(k); if(!k) return;
   const was=currentScreen(); if(was!=='profile') prof.from=was;
-  prof.key=k; prof.rec=null; show('profile'); $('profile').scrollTo(0,0); $('profMsg').textContent=''; $('profAdminMsg').textContent='';
+  prof.key=k; prof.rec=null; show('profile'); saveScreen(); $('profile').scrollTo(0,0); $('profMsg').textContent=''; $('profAdminMsg').textContent='';
   const d=soc.dir[k]||{}; paintProfile({name:d.name||k,av:d.av||null,streak:d.streak||null,bio:d.bio||'',made:d.made||0},true);
   $('profMaps').innerHTML=''; $('profMapsSub').textContent='Loading…';
+  { const t0=Date.now(); while(!lbLive()&&Date.now()-t0<9000) await new Promise(r=>setTimeout(r,250)); }   // right after a reload the brokers are still connecting
+  if(prof.key!==k) return;
   const got=await acctFetch(k); if(prof.key!==k) return;
+  if(got.error==='offline'){ $('profMeta').textContent='Could not reach the server. Try again in a moment.'; $('profMapsSub').textContent=''; return; }
   if(got.record){ const r=got.record; prof.rec=r; soc.dir[k]={name:r.name,av:r.av||null,streak:r.streak||null,bio:cleanName(r.bio||'').slice(0,90),made:+r.made||0}; paintProfile(soc.dir[k],false); }
   else if(!d.name){ $('profName').textContent='No such account'; $('profHandle').textContent='@'+k; $('profBtns').innerHTML=''; $('profAdmin').hidden=true; }
   await cmapList(); if(prof.key!==k) return;
@@ -3687,7 +3709,8 @@ function paintProfile(d,loading){
   const tags=[k===ADMIN_KEY?'<span class="ptag adm">Admin</span>':'',fr?'<span class="ptag fr">Friend</span>':'',me?'<span class="ptag">You</span>':'',u?`<span class="ptag ban">${u===Infinity?'Banned':'Banned until '+new Date(u).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span>`:''].join('');
   $('profTags').innerHTML=tags;
   $('profBio').textContent=d.bio||''; $('profBio').hidden=!d.bio;
-  const st=streakNow(d.streak); $('profMeta').innerHTML=[st>=2?`${FLAME}${st}-day streak`:'',d.made?`Joined ${new Date(d.made).toLocaleDateString(undefined,{month:'short',year:'numeric'})}`:''].filter(Boolean).join(' · ')||(loading?'Loading…':'');
+  const st=streakNow(d.streak); $('profStk').hidden=st<2; $('profStk').innerHTML=`<span>${FLAME}${st}-day streak</span>`;
+  $('profMeta').textContent=d.made?`Joined ${new Date(d.made).toLocaleDateString(undefined,{month:'short',year:'numeric'})}`:(loading?'Loading…':'');
   let btns='';
   if(me) btns=`<button class="btn btn-secondary sm" id="profEdit">Edit in Settings</button>`;
   else if(acct.key){ const f=iFollow(k); btns=`<button class="btn ${f?'btn-secondary':'btn-primary'} sm" id="profFollow">${f?(fr?'Remove friend':'Cancel request'):(followsMe(k)?'Accept friend':'Add friend')}</button><button class="btn btn-secondary sm" id="profReport">Report</button>`; }
@@ -3703,22 +3726,22 @@ $('profBtns').addEventListener('click',async e=>{
   if(b.id==='profSignIn'){ acctMsg('acctMsg',''); paintAcct(); show('acct'); return; }
   if(b.id==='profFollow'){ await frToggle(k,!iFollow(k)); paintProfile(soc.dir[k]||{name:k},false); return; }
   if(b.id==='profReport'){ const why=await ask({title:`Report @${k}`,body:'Tell the admin what is wrong. Cheating, a bad name, or something in a comment or map.',input:true,placeholder:'What happened',max:200,ok:'Send report'}); if(!why||!cleanName(why)) return;
-    try{ await inboxPush(ADMIN_KEY,{id:'rep-'+k+'-'+Date.now(),kind:'report',from:acct.key,fromName:acct.name,about:k,text:cleanName(why).slice(0,200),ts:Date.now()}); acctMsg('profMsg','Report sent.','ok'); }catch(err){ acctMsg('profMsg','Could not send it. Try again.','bad'); } }
+    try{ await inboxPush(ADMIN_KEY,{id:'rep-'+k+'-'+Date.now(),kind:'report',from:acct.key,fromName:acct.name,about:k,text:cleanName(why).slice(0,200),ts:Date.now()}); acctMsg('profMsg','Report sent.','ok'); if(acct.key===ADMIN_KEY) admLog('Reported',k,cleanName(why).slice(0,120)); }catch(err){ acctMsg('profMsg','Could not send it. Try again.','bad'); } }
 });
 $('profMaps').addEventListener('click',e=>{ const b=e.target.closest('[data-pmap]'); if(b){ cm.from='profile'; cmapOpen(b.dataset.pmap); } });
 /* admin tools on a profile */
 $('profWarnGo').addEventListener('click',async()=>{ if(!admin.on) return; const k=prof.key; const text=cleanName($('profWarn').value).slice(0,200); if(text.length<3){ acctMsg('profAdminMsg','Write what they need to fix.','bad'); return; }
-  try{ await inboxPush(k,{id:'warn-'+Date.now(),kind:'warn',from:acct.key||ADMIN_KEY,fromName:acct.name||'Admin',text,ts:Date.now()}); $('profWarn').value=''; acctMsg('profAdminMsg',`Warning sent to @${k}.`,'ok'); }catch(e){ acctMsg('profAdminMsg','Could not send it.','bad'); } });
+  try{ await inboxPush(k,{id:'warn-'+Date.now(),kind:'warn',from:acct.key||ADMIN_KEY,fromName:acct.name||'Admin',text,ts:Date.now()}); $('profWarn').value=''; acctMsg('profAdminMsg',`Warning sent to @${k}.`,'ok'); admLog('Warned',k,text); }catch(e){ acctMsg('profAdminMsg','Could not send it.','bad'); } });
 $('profRnGo').addEventListener('click',async()=>{ if(!admin.on) return; const k=prof.key; const name=cleanName($('profRn').value).slice(0,16); if(name.length<2){ acctMsg('profAdminMsg','A name needs at least two characters.','bad'); return; }
   const k2=acctKey(name); if(k2&&k2!==k&&k2===ADMIN_KEY){ acctMsg('profAdminMsg','Not that one.','bad'); return; }
-  acctMsg('profAdminMsg','Renaming…'); await adminRenameAcct(k,name); $('profRn').value=''; openProfile(k); });
+  acctMsg('profAdminMsg','Renaming…'); await adminRenameAcct(k,name); admLog('Renamed',k,'to '+name); $('profRn').value=''; openProfile(k); });
 $('profAdmin').addEventListener('click',async e=>{ const b=e.target.closest('[data-ban]'); if(!b||!admin.on) return; const k=prof.key; const days=+b.dataset.ban;
   const ok=await ask({title:days?`Ban @${k} for ${days} days?`:`Ban @${k} permanently?`,body:days?'They are signed out everywhere, cannot sign in, and their scores are hidden until it ends.':'The account, every score under it and every map it made are removed for everyone, and the handle can never be claimed again. This cannot be undone.',ok:days?`Ban ${days} days`:'Ban forever',danger:true}); if(!ok) return;
   acctMsg('profAdminMsg','Banning…');
-  if(days){ lb.banExp[k]=Date.now()+days*86400000; lb.banK.add(k); banKPublish(); banApply(); lbPaint(); acctMsg('profAdminMsg',`@${k} is banned for ${days} days.`,'ok'); }
-  else { const maps=await adminBan(k); acctMsg('profAdminMsg',`@${k} banned for good. ${maps} map${maps===1?'':'s'} removed.`,'ok'); }
+  if(days){ lb.banExp[k]=Date.now()+days*86400000; lb.banK.add(k); banKPublish(); banApply(); lbPaint(); acctMsg('profAdminMsg',`@${k} is banned for ${days} days.`,'ok'); admLog('Banned',k,days+' days'); }
+  else { const maps=await adminBan(k); acctMsg('profAdminMsg',`@${k} banned for good. ${maps} map${maps===1?'':'s'} removed.`,'ok'); admLog('Banned',k,'permanently'); }
   paintProfile(soc.dir[k]||{name:k},false); });
-$('profUnban').addEventListener('click',()=>{ if(!admin.on) return; const k=prof.key; banLift(k); banKPublish(); acctMsg('profAdminMsg',`Ban lifted for @${k}.`,'ok'); paintProfile(soc.dir[k]||{name:k},false); });
+$('profUnban').addEventListener('click',()=>{ if(!admin.on) return; const k=prof.key; banLift(k); banKPublish(); acctMsg('profAdminMsg',`Ban lifted for @${k}.`,'ok'); admLog('Ban lifted',k,''); paintProfile(soc.dir[k]||{name:k},false); });
 /* any name with a handle behind it opens the profile */
 document.addEventListener('click',e=>{ const p=e.target.closest('[data-prof]'); if(!p) return; if(e.target.closest('[data-trash],[data-edit],[data-cdel],[data-cmdel]')) return; e.preventDefault(); e.stopPropagation(); openProfile(p.dataset.prof); },true);
 
@@ -3728,13 +3751,13 @@ document.addEventListener('click',e=>{ const p=e.target.closest('[data-prof]'); 
    and the maps ranked for the period. */
 const stv={range:28,metric:'p'};
 function dayKeys(n,end){ const out=[]; for(let i=n-1;i>=0;i--) out.push(dailyDate(new Date((end||Date.now())-i*86400000))); return out; }
-function statSum(maps,keys){ let p=0,s=0; const per=keys.map(k=>{ let dp=0,ds=0; for(const m of maps){ const v=m.stats&&m.stats[k]; if(Array.isArray(v)){ dp+=+v[0]||0; ds+=+v[1]||0; } } p+=dp; s+=ds; return {k,p,s:ds}; }); return {per,p,s}; }
+function statSum(maps,keys){ let p=0,s=0,l=0; const per=keys.map(k=>{ let dp=0,ds=0,dl=0; for(const m of maps){ const v=m.stats&&m.stats[k]; if(Array.isArray(v)){ dp+=+v[0]||0; ds+=+v[1]||0; dl+=+v[2]||0; } } p+=dp; s+=ds; l+=dl; return {k,p,s:ds,l:dl}; }); return {per,p,s,l}; }
 function niceMax(v){ if(!(v>0)) return 1; const pw=Math.pow(10,Math.floor(Math.log10(v))); const m=v/pw; return (m<=1?1:m<=2?2:m<=3?3:m<=5?5:10)*pw; }
 function niceDay(k){ const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }
 function fmtStat(v,metric){ if(metric==='h') return v>=10?Math.round(v)+'h':(Math.round(v*10)/10)+'h'; if(metric==='a') return fmtDur(v); return v>=1000?(Math.round(v/100)/10)+'K':String(Math.round(v)); }
 function statChart(per,metric){
   const W=720,H=230,L=8,R=64,T=14,B=34; const iw=W-L-R, ih=H-T-B;
-  const vals=per.map(d=>metric==='h'?d.s/3600:metric==='a'?(d.p?d.s/d.p:0):d.p); let nice=niceMax(Math.max(...vals,0)); if(metric==='p'&&nice<3) nice=3;   // whole plays on the gridlines
+  const vals=per.map(d=>metric==='h'?d.s/3600:metric==='l'?d.l:d.p); let nice=niceMax(Math.max(...vals,0)); if(metric!=='h'&&nice<3) nice=3;   // whole plays on the gridlines
   const x=i=>L+(per.length<2?iw/2:i*iw/(per.length-1)), y=v=>T+ih-(v/nice)*ih;
   const pts=vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`);
   const grid=[0,1/3,2/3,1].map(f=>`<line x1="${L}" x2="${L+iw}" y1="${y(nice*f).toFixed(1)}" y2="${y(nice*f).toFixed(1)}" stroke="var(--line)"/><text x="${W-R+10}" y="${(y(nice*f)+4).toFixed(1)}" font-size="11" fill="var(--muted)" font-family="inherit">${fmtStat(nice*f,metric)}</text>`).join('');
@@ -3757,15 +3780,14 @@ function renderStats(){
   const likes=mine.reduce((a,m)=>a+((m.likes||[]).length),0);
   $('statsTitle').textContent=mine.length?`Your maps got ${cur.p.toLocaleString()} play${cur.p===1?'':'s'} ${n?'in '+label:'all time'}`:'You have no maps yet';
   const delta=(a,b)=>{ if(!prev||!(b>0)) return prev?`<i>nothing in the previous ${n} days</i>`:'<i>all time</i>'; const pct=Math.round((a-b)/b*100); return `<i class="${pct>0?'up':pct<0?'down':''}">${Math.abs(pct)}% ${pct>=0?'more':'less'} than the previous ${n} days</i>`; };
-  const avg=cur.p?cur.s/cur.p:0, pavg=prev&&prev.p?prev.s/prev.p:0;
+  if(stv.metric==='a') stv.metric='p';
   $('statsTiles').innerHTML=`<button class="stattile ${stv.metric==='p'?'on':''}" data-m="p"><small>Plays</small><b>${cur.p.toLocaleString()}</b>${delta(cur.p,prev?prev.p:0)}</button>
     <button class="stattile ${stv.metric==='h'?'on':''}" data-m="h"><small>Play time (hours)</small><b>${(Math.round(cur.s/360)/10).toLocaleString()}</b>${delta(cur.s,prev?prev.s:0)}</button>
-    <button class="stattile ${stv.metric==='a'?'on':''}" data-m="a"><small>Average play duration</small><b>${fmtDur(avg)}</b>${delta(avg,pavg)}</button>
-    <div class="stattile" style="cursor:default"><small>Likes on your maps</small><b>${likes.toLocaleString()}</b><i>${mine.length} map${mine.length===1?'':'s'}</i></div>`;
+    <button class="stattile ${stv.metric==='l'?'on':''}" data-m="l"><small>Likes${n?' this period':''}</small><b>${(n?cur.l:likes).toLocaleString()}</b>${n?delta(cur.l,prev?prev.l:0):`<i>${likes.toLocaleString()} on ${mine.length} map${mine.length===1?'':'s'} all time</i>`}</button>`;
   $('statsChart').innerHTML=statChart(cur.per,stv.metric);
   const rows=mine.map(m=>{ const t=statSum([m],keys); return {m,p:t.p,s:t.s}; }).sort((a,b)=>b.p-a.p||(b.m.plays||0)-(a.m.plays||0));
-  $('statsTopSub').textContent=mine.length?`Plays and average play duration ${n?'in '+label:'all time'}`:'Make a map and its numbers show up here.';
-  $('statsTop').innerHTML=rows.map((r,i)=>`<button class="toprow" data-id="${esc(r.m.id)}"><span class="dim" style="width:18px">${i+1}</span><img src="${thumbOf(r.m)}" alt="" loading="lazy"><span class="tn"><b>${esc(r.m.name)}</b><small>${r.m.made?new Date(r.m.made).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):''} · ${r.m.pins.length} spots · ${(r.m.plays||0).toLocaleString()} plays all time</small></span><span class="tv">Avg play<b>${r.p?fmtDur(r.s/r.p):'–'}</b></span><span class="tv">Plays<b>${r.p.toLocaleString()}</b></span></button>`).join('');
+  $('statsTopSub').textContent=mine.length?`Plays, average play duration and likes ${n?'in '+label:'all time'}`:'Make a map and its numbers show up here.';
+  $('statsTop').innerHTML=rows.map((r,i)=>`<button class="toprow" data-id="${esc(r.m.id)}"><span class="dim" style="width:18px">${i+1}</span><img src="${thumbOf(r.m)}" alt="" loading="lazy"><span class="tn"><b>${esc(r.m.name)}</b><small>${r.m.made?new Date(r.m.made).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):''} · ${r.m.pins.length} spots · ${(r.m.plays||0).toLocaleString()} plays all time</small></span><span class="tv">Average play duration<b>${r.p?fmtDur(r.s/r.p):'–'}</b></span><span class="tv">Likes<b>${(r.m.likes||[]).length.toLocaleString()}</b></span><span class="tv">Plays<b>${r.p.toLocaleString()}</b></span></button>`).join('');
 }
 $('statsRange').addEventListener('change',()=>{ stv.range=+$('statsRange').value; renderStats(); sfx('click'); });
 $('statsTiles').addEventListener('click',e=>{ const b=e.target.closest('[data-m]'); if(!b) return; stv.metric=b.dataset.m; renderStats(); sfx('click'); });
@@ -3778,10 +3800,14 @@ $('statsBack').addEventListener('click',()=>{ show('acct'); });
    every map gets Edit and Delete, and profiles get warn, rename and ban. Off, the game looks like anyone else's.
    Everything admin does goes to the brokers, so it changes for everyone. */
 function adminSync(){ admin.on=acct.key===ADMIN_KEY&&admin.pref; paintAdmin(); }
+function admLogRead(){ try{ return JSON.parse(localStorage.getItem('pp_admlog')||'[]'); }catch(e){ return []; } }
+function admLog(kind,who,text){ const list=admLogRead(); list.unshift({ts:Date.now(),kind,who,text:String(text||'').slice(0,120)}); try{ localStorage.setItem('pp_admlog',JSON.stringify(list.slice(0,60))); }catch(e){} paintAdmin(); }
 function paintAdmin(){
   const me=acct.key===ADMIN_KEY; $('adminCard').hidden=!me; if(!me) return;
   $('adminTog').checked=admin.pref; $('adminSw').classList.toggle('on',admin.pref);
   $('adminSub').textContent=admin.pref?'On. Edit or remove anything from any leaderboard, map or profile.':'Off. Normal game.';
+  const log=admLogRead(); $('adminLog').hidden=!(admin.pref&&log.length);
+  $('adminLog').innerHTML=log.map(e=>`<div>${agoTxt(e.ts)} · <b>${esc(e.kind)}</b> <span class="lnk" data-prof="${esc(e.who)}" style="cursor:pointer;text-decoration:underline">@${esc(e.who)}</span>${e.text?` · ${esc(e.text)}`:''}</div>`).join('');
 }
 $('adminTog').addEventListener('change',e=>{ admin.pref=e.target.checked; try{ localStorage.setItem('pp_admin_on',admin.pref?'1':'0'); }catch(err){} adminSync(); lbPaint(); toast(admin.pref?'Admin mode on':'Admin mode off','ok'); sfx('click'); });
 const TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>';
@@ -4072,7 +4098,25 @@ $('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(fin
 
 const SCREENS=['menu','setup','acct','friends','region','daily','board','lobby','game','result','final','chal','cmaps','cmake','cmap','cmstats','profile'];
 function currentScreen(){ return SCREENS.find(s=>!$(s).hidden)||'menu'; }
-function show(id){ for(const s of SCREENS) $(s).hidden = s!==id;
+const KEEP_SCREENS=['menu','setup','acct','friends','daily','board','cmaps','cmap','cmstats','profile'];
+let bootScreen=null; try{ bootScreen=JSON.parse(localStorage.getItem('pp_screen')||'null'); }catch(e){}   // read before boot shows the menu
+function saveScreen(){ try{ const id=currentScreen(); if(!KEEP_SCREENS.includes(id)) return; localStorage.setItem('pp_screen',JSON.stringify({s:id,id:id==='cmap'&&cm.cur?cm.cur.id:id==='profile'?prof.key:id==='board'?bp.mode:null})); }catch(e){} }
+function restoreScreen(){
+  const sv=bootScreen; bootScreen=null;
+  if(!sv||!sv.s||sv.s==='menu'||/[?&](c|m)=/.test(location.search)) return;   // a shared link wins over the remembered screen
+  try{ switch(sv.s){
+    case 'setup': show('setup'); break;
+    case 'acct': $('acctChip').click(); break;
+    case 'friends': if(acct.key) openFriends(); break;
+    case 'daily': renderDaily(); show('daily'); break;
+    case 'board': openBoardPage(sv.id||'classic',null,'menu'); break;
+    case 'cmaps': openCmaps('menu'); break;
+    case 'cmap': if(sv.id){ cm.from='menu'; cmapOpen(sv.id); } break;
+    case 'cmstats': if(acct.key) openStats(); break;
+    case 'profile': if(sv.id){ prof.from='menu'; openProfile(sv.id); } break;
+  } }catch(e){}
+}
+function show(id){ for(const s of SCREENS) $(s).hidden = s!==id; if(KEEP_SCREENS.includes(id)) setTimeout(saveScreen,0);
   if(id==='result'){ $('game').hidden=false; const m=modeOf(state.mode); $('rTitle').textContent=`Round ${state.round}`+(mp.role&&m.duel?` · damage ×${duelMult(state.round)}`:(state.totalRounds<99?` of ${state.totalRounds}`:'')); }   // the street stays behind the wash
   document.body.classList.toggle('in-game',id==='game'); if(id!=='final'){ $('shareBox').hidden=true; $('shareCard').hidden=true; } }
 
@@ -5890,6 +5934,7 @@ if(location.protocol==='https:'){ setTimeout(checkUpdate,3000); setInterval(chec
 function toast(msg,kind){ const t=document.createElement('div'); t.className='toast'+(kind?' '+kind:''); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),kind==='ok'?1800:3500); }
 /* First paint of the pieces defined further down the file. */
 paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion(); paintAcct();
+setTimeout(restoreScreen,50);   // a reload lands you back where you were
 paintBell(); setTimeout(paintBell,0);   // the daily's state settles a tick after the rest of the boot
 setTimeout(()=>{ paintBell(); if(acct.key){ socWarming=null; socWarm(); loadInbox(); } else fetchDirectory().then(lbPaint); },4000);   // the brokers are up by now
 setInterval(()=>{ fetchDirectory().then(lbPaint); },6*60*1000);   // streaks on the boards stay current
