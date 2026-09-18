@@ -382,10 +382,13 @@
   .dside .dn{font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
   .dside .dhp{font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
   .dside .dbar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;margin-top:3px;border:1px solid var(--line)}
-  .dside .dbar i{display:block;height:100%;background:linear-gradient(90deg,#2bb673,#1f9d55);border-radius:99px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
-  .dside.them .dbar i{background:linear-gradient(90deg,#e63946,#ff6b6b);margin-left:auto}
+  .dside .dbar i{display:block;height:100%;background:linear-gradient(90deg,#2bb673,#1f9d55);border-radius:99px;transition:width .9s cubic-bezier(.2,.8,.2,1),background .5s}
+  .dside.them .dbar i{margin-left:auto}
   .dside.them .dbar{direction:rtl}
-  .dside .dbar i.low{background:linear-gradient(90deg,#f4772a,#e63946)}
+  .dside .dbar i.mid{background:linear-gradient(90deg,#f2c11b,#f4772a)}
+  .dside .dbar i.low{background:linear-gradient(90deg,#e63946,#ff6b6b);animation:pulse-t 1s ease-in-out infinite}
+  .dside .dhp.mid{color:#c46a12} .dside .dhp.low{color:var(--red)}
+  .rrow .hpmini i.mid{background:#f4772a} .rrow .hpmini i.low{background:#e63946}
   .dmult{flex:none;padding:5px 10px;border-radius:99px;background:#fff4d6;color:#7a5200;font-weight:800;font-size:13px;letter-spacing:.02em}
   .dmult.hot{background:#e63946;color:#fff;animation:pop .5s}
   @media (max-width:720px){ .dside{min-width:0} .dside .dn{max-width:70px} }
@@ -2207,7 +2210,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-222038';
+const BUILD='20260917-222215';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2337,7 +2340,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:3,patch:5};
+const VERSION={major:3,minor:3,patch:6};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4767,12 +4770,14 @@ function paintLives(){
   livesShown=left;
   return true;
 }
+/* Health colour: green while comfortable, orange once it's getting low, red when a round could end it. */
+function hpClass(pct){ return pct<=25?'low':pct<=50?'mid':''; }
 /* Duel HUD: two health bars where the round and score pills usually sit. */
 function paintDuel(){
   const on=!!(mp.role&&modeOf(state.mode).duel); $('duelHud').hidden=!on; $('roundPill').hidden=on; $('scorePill').hidden=on; if(!on) return;
   const me=mp.players[mp.me.id], them=playerList().find(p=>p.id!==mp.me.id);
-  const side=(el,p,mine)=>{ if(!p){ el.innerHTML=''; return; } const hp=Math.max(0,p.hp??DUEL_HP); const pct=hp/DUEL_HP*100;
-    el.innerHTML=`${avTag(p.id,p.name,28)}<span class="dt"><b class="dn">${mine?'You':esc(p.name||'Opponent')}</b><span class="dhp">${hp.toLocaleString()} HP</span><span class="dbar"><i class="${pct<=25?'low':''}" style="width:${pct}%"></i></span></span>`; };
+  const side=(el,p,mine)=>{ if(!p){ el.innerHTML=''; return; } const hp=Math.max(0,p.hp??DUEL_HP); const pct=hp/DUEL_HP*100; const cls=hpClass(pct);
+    el.innerHTML=`${avTag(p.id,p.name,28)}<span class="dt"><b class="dn">${mine?'You':esc(p.name||'Opponent')}</b><span class="dhp ${cls}">${hp.toLocaleString()} HP</span><span class="dbar"><i class="${cls}" style="width:${pct}%"></i></span></span>`; };
   side($('duelMe'),me,true); side($('duelThem'),them,false);
   const mult=duelMult(state.round||1); const dm=$('duelMult'); dm.textContent='×'+mult; dm.classList.toggle('hot',mult>=2);
 }
@@ -4959,7 +4964,7 @@ function showFinalMP(fin){
   if(duelMode||state.custom) $('viewBoardBtn').hidden=true;
   if(state.custom){ $('signUp').hidden=true; cmapFinish(); }
   paintShare();
-  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(p)}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd" title="${p.out?'knocked out in round '+p.outRound:'still standing'}">${modeOf(state.mode).lives?heartRow(p.lives??0,modeOf(state.mode).lives,!!p.out,17):heartRow(p.out?0:1,1,!!p.out,17)}</span>`:''}${duelMode?`<span class="rd">${Math.max(0,p.hp??0).toLocaleString()} HP<span class="hpmini"><i style="width:${Math.max(0,p.hp??0)/DUEL_HP*100}%"></i></span></span>`:''}<span class="rp">${duelMode?p.score.toLocaleString()+' pts':p.score.toLocaleString()}</span></div>`).join('');
+  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(p)}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd" title="${p.out?'knocked out in round '+p.outRound:'still standing'}">${modeOf(state.mode).lives?heartRow(p.lives??0,modeOf(state.mode).lives,!!p.out,17):heartRow(p.out?0:1,1,!!p.out,17)}</span>`:''}${duelMode?`<span class="rd">${Math.max(0,p.hp??0).toLocaleString()} HP<span class="hpmini"><i class="${hpClass(Math.max(0,p.hp??0)/DUEL_HP*100)}" style="width:${Math.max(0,p.hp??0)/DUEL_HP*100}%"></i></span></span>`:''}<span class="rp">${duelMode?p.score.toLocaleString()+' pts':p.score.toLocaleString()}</span></div>`).join('');
 }
 
 /* =========================================================
