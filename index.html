@@ -195,6 +195,10 @@
   .twobtn .btn{flex:1;min-width:130px}
   .btn.danger{color:var(--red)} .btn.danger:hover{border-color:var(--red);background:var(--red-soft)}
   .btn.dangerfill{background:var(--red);box-shadow:0 3px 0 #8a2b2b} .btn.dangerfill:hover{background:#b83a3a;box-shadow:0 4px 0 #8a2b2b} .btn.dangerfill:disabled{background:#d9a1a1;box-shadow:none}
+  .trash{width:30px;height:30px;border-radius:8px;background:var(--red-soft);color:var(--red);display:inline-grid;place-items:center;padding:0;vertical-align:middle;border:1px solid transparent}
+  .trash:hover{background:var(--red);color:#fff}
+  .trash svg{width:15px;height:15px}
+  .board td.adm{width:36px;text-align:right}
   .delbox{margin-top:12px;padding:14px 16px;border-radius:12px;background:var(--red-soft);border:1.5px solid var(--red);animation:nagIn .2s ease-out}
   .delbox b{display:block;font-size:16px;color:var(--red)}
   .delbox p{margin:4px 0 8px;font-size:13.5px;color:var(--text)}
@@ -861,11 +865,12 @@
   .btn-secondary{border:1.5px solid var(--line)}
   .card{border:1.5px solid var(--line);border-radius:18px;box-shadow:0 4px 0 rgba(15,64,36,.05),0 14px 34px rgba(15,64,36,.10)}
   html[data-theme="dark"] .card{box-shadow:0 4px 0 rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.45)}
-  .acctchip{background:rgba(255,255,255,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.75);box-shadow:0 3px 0 rgba(15,64,36,.14),0 10px 24px rgba(0,0,0,.22);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,border-color .15s}
-  .acctchip:hover{transform:translateY(-1px);border-color:#fff}
-  .acctchip:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(15,64,36,.14)}
-  html[data-theme="dark"] .acctchip{background:rgba(24,34,32,.86);border-color:rgba(255,255,255,.12)}
-  html[data-theme="dark"] .acctchip:hover{border-color:rgba(255,255,255,.3)}
+  .acctchip{background:var(--green);color:#fff;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.35);box-shadow:0 3px 0 var(--edge-primary),0 10px 24px rgba(0,0,0,.28);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,background .15s}
+  .acctchip:hover{transform:translateY(-1px);background:var(--green-dark);border-color:rgba(255,255,255,.55);box-shadow:0 4px 0 var(--edge-primary),0 12px 26px rgba(0,0,0,.3)}
+  .acctchip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge-primary)}
+  .acctchip .gear{opacity:1}
+  .bellcount{border:2px solid #fff}
+  html[data-theme="dark"] .acctchip{background:#1f9d55;border-color:rgba(255,255,255,.25)} html[data-theme="dark"] .acctchip:hover{background:#26b364}
   .dailybtn{box-shadow:0 5px 0 #0b4a27,0 16px 34px rgba(20,60,38,.35)}
   .dailybtn:hover{transform:translateY(-2px);box-shadow:0 7px 0 #0b4a27,0 20px 40px rgba(20,60,38,.4)}
   .dailybtn:active{transform:translateY(3px);box-shadow:0 2px 0 #0b4a27,0 8px 20px rgba(20,60,38,.3)}
@@ -1097,6 +1102,20 @@
       <div class="seg" id="sizeSeg"><button data-size="0">Normal</button><button data-size="1">Large</button><button data-size="2">Larger</button></div>
       <div class="label">Sound</div>
       <div class="seg" id="soundSeg"><button data-snd="1">On</button><button data-snd="0">Off</button></div>
+    </div>
+    <div class="card wide" id="adminCard">
+      <h2 style="margin:0 0 4px">Admin mode</h2>
+      <div id="adminOff">
+        <div class="prow2" style="margin-top:12px"><input class="tin code" id="adminPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" style="max-width:180px"><button class="btn btn-secondary" id="adminGo">Enter admin mode</button></div>
+        <div class="acctmsg" id="adminMsg"></div>
+      </div>
+      <div id="adminOn" hidden>
+        <div class="rsub" style="margin-top:8px">Admin mode is on for this visit. Every leaderboard row and every custom map now has a red trash button. Removed scores go on a block list that every player's browser honours, so they stay gone.</div>
+        <div class="label">Remove an account by handle</div>
+        <div class="prow2"><input class="tin" id="adminAcct" placeholder="handle" autocomplete="off" spellcheck="false"><button class="btn btn-secondary danger" id="adminAcctGo">Remove</button></div>
+        <div class="acctmsg" id="adminMsg2"></div>
+        <button class="btn btn-secondary btn-block" id="adminExit" style="margin-top:6px">Exit admin mode</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2186,7 +2205,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-214819';
+const BUILD='20260917-220036';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2210,11 +2229,18 @@ function lbClean(e){
   if(k) out.k=k;   // whose account saved it, so friends can be marked on the board
   return out;
 }
+/* Scores an admin removed. One retained list of entry ids; every client drops them on merge and on reconcile,
+   so a removed score can't creep back from the browser that saved it. */
+const BAN_ROOT='worlddrop/v1/ban';
+lb.ban=new Set();
+function banMerge(list){ if(Array.isArray(list)) for(const id of list.slice(-800)) if(typeof id==='string') lb.ban.add(id); }
+function banPublish(){ const payload=JSON.stringify([...lb.ban].slice(-800)); for(const l of lb.links) if(l.ready){ try{ l.client.publish(BAN_ROOT+'/ids',payload,{qos:1,retain:true}); }catch(e){} } }
+function banApply(){ for(const id of Object.keys(lb.boards)) lb.boards[id]=lb.boards[id].filter(e=>!lb.ban.has(e.id)); lb.daily=(lb.daily||[]).filter(e=>!lb.ban.has(e.id)); }
 function lbMerge(modeId,list){
   if(!MODES[modeId]) return [];
   const byId=new Map((lb.boards[modeId]||[]).map(e=>[e.id,e]));
-  if(Array.isArray(list)) for(const raw of list.slice(0,200)){ const e=lbClean(raw); if(e&&!byId.has(e.id)) byId.set(e.id,e); }
-  lb.boards[modeId]=[...byId.values()].sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,LB_MAX);
+  if(Array.isArray(list)) for(const raw of list.slice(0,200)){ const e=lbClean(raw); if(e&&!byId.has(e.id)&&!lb.ban.has(e.id)) byId.set(e.id,e); }
+  lb.boards[modeId]=[...byId.values()].filter(e=>!lb.ban.has(e.id)).sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,LB_MAX);
   return lb.boards[modeId];
 }
 /* Don't publish until this mode's retained board has arrived, or nothing would be left of it. */
@@ -2245,7 +2271,7 @@ function lbReconcile(announce){
     if(!lb.seen[id]&&!lbReadyFor(id)){ pending++; continue; }          // wait for this mode's board to arrive
     const have=new Set(board.map(e=>e.id));
     const cut=board.length>=LB_MAX ? board[LB_MAX-1].score : -1;        // no point re-posting one the cap would drop
-    const missing=byMode[id].filter(e=>!have.has(e.id)&&e.score>cut);
+    const missing=byMode[id].filter(e=>!have.has(e.id)&&e.score>cut&&!lb.ban.has(e.id));
     if(!missing.length) continue;
     lbMerge(id,missing);
     if(lbPublish(id)) uploaded+=missing.length; else pending++;
@@ -2269,8 +2295,8 @@ function lbPaint(){
 /* Today's board is its own retained message, keyed by date, so it resets itself every day. */
 function dlMerge(list){
   const byId=new Map(lb.daily.map(e=>[e.id,e]));
-  if(Array.isArray(list)) for(const raw of list.slice(0,300)){ const e=lbClean(raw); if(e&&!byId.has(e.id)) byId.set(e.id,e); }
-  lb.daily=[...byId.values()].sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,100);
+  if(Array.isArray(list)) for(const raw of list.slice(0,300)){ const e=lbClean(raw); if(e&&!byId.has(e.id)&&!lb.ban.has(e.id)) byId.set(e.id,e); }
+  lb.daily=[...byId.values()].filter(e=>!lb.ban.has(e.id)).sort((a,b)=>b.score-a.score||a.ts-b.ts).slice(0,100);
 }
 function dlPublish(){
   const payload=JSON.stringify(lb.daily); let sent=false;
@@ -2290,10 +2316,11 @@ function lbConnect(){
     let c; try{ c=mqtt.connect(url,{connectTimeout:8000,reconnectPeriod:20000,keepalive:30,clean:true,clientId:'wdlb_'+Math.random().toString(36).slice(2,10)}); }catch(e){ continue; }
     const link={url,client:c,ready:false}; lb.links.push(link);
     c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); lb.dailyDate=dailyDate();
-      c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+',DL_ROOT+'/'+lb.dailyDate],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint(); });
+      c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+',DL_ROOT+'/'+lb.dailyDate,BAN_ROOT+'/ids'],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint(); });
     c.on('message',(t,payload)=>{ const parts=t.split('/'); const id=parts.pop(); let data=null; try{ data=JSON.parse(payload.toString()); }catch(e){ return; }
       if(parts[parts.length-1]==='st'){ if(data&&MODES[id]) stats.got[id]={r:stClean(data.r),g:stClean(data.g)}; return; }
       if(parts[parts.length-1]==='dl'){ if(id===dailyDate()){ lb.dailySeen=true; lb.dailyDate=id; dlMerge(data); lbPaint(); } return; }
+      if(parts[parts.length-1]==='ban'){ banMerge(data); banApply(); lbPaint(); return; }
       lb.seen[id]=true; lbMerge(id,data); lbPaint(); });
     c.on('error',()=>{}); c.on('close',()=>{ link.ready=false; }); c.on('offline',()=>{ link.ready=false; lbPaint(); });
   }
@@ -2308,7 +2335,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:3,patch:2};
+const VERSION={major:3,minor:3,patch:3};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2456,7 +2483,7 @@ function renderBoard(highlightId){
   wrap.innerHTML=`<table class="board"><tr><th>#</th><th>Name</th>${showMode?'<th>Setup</th>':'<th>Date</th>'}<th style="text-align:right">Score</th></tr>`+
     b.slice(0,10).map((e,i)=>{ const em=entryMode(e);
       const setup=`${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}`;
-      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`;
+      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td>${trashCell(e.id,'classic')}</tr>`; }).join('')+`</table>`;
   $('boardCount').textContent=foot;
 }
 /* ---------- Accounts ----------
@@ -3080,7 +3107,8 @@ function renderCmap(){
   $('cmRoundSeg').innerHTML=opts.map(n=>`<button data-r="${n}" class="${n===cm.rounds?'on':''}">${n===rec.pins.length&&n!==5&&n!==10?'All '+n:n}</button>`).join('');
   [...$('cmTimeSeg').children].forEach(b=>b.classList.toggle('on',+b.dataset.t===cm.time));
   $('cmPlay').hidden=false; $('cmPlay').textContent=lobby?`Use this map for the room`:`Play ${rec.name}`;
-  $('cmOwner').hidden=!(acct.key&&rec.by===acct.key); if(!$('cmOwner').hidden) $('cmOwner').innerHTML='This is your map. <button class="link" id="cmDelete">Delete it</button>';
+  const mine=acct.key&&rec.by===acct.key; $('cmOwner').hidden=!(mine||admin.on);
+  if(!$('cmOwner').hidden) $('cmOwner').innerHTML=(mine?'This is your map. ':'Admin: ')+'<button class="link" id="cmDelete">Delete it'+(mine?'':' for everyone')+'</button>';
   const top=(rec.top||[]).slice().sort((a,b)=>b.score-a.score||a.ts-b.ts);
   $('cmBoardSub').textContent=top.length?`${top.length} score${top.length===1?'':'s'} · ${cm.rounds} rounds scores separately from other lengths`:'Nobody has played it yet.';
   $('cmBoard').innerHTML=top.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th style="text-align:right">Score</th></tr>`+top.slice(0,15).map((e,i)=>`<tr><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${e.k?friendTag({k:e.k,name:e.name}):''}${e.k?streakTag({k:e.k}):''}</td><td class="mode">${e.rounds} rounds · ${e.time?e.time+'s':'no limit'}</td><td class="score">${(+e.score).toLocaleString()}</td></tr>`).join('')+'</table>':'<div class="cmap-empty">Be the first.</div>';
@@ -3159,6 +3187,44 @@ $('createBtn').addEventListener('click',()=>{ cm.from='setup'; openMake(); });
 $('makeBar').addEventListener('click',()=>{ cm.from='menu'; openMake(); });
 $('cmCreate2').addEventListener('click',openMake);
 $('lobbyCustomBtn').addEventListener('click',()=>openCmaps('lobby'));
+
+/* ---------- Admin mode ----------
+   A code in Settings turns it on for this visit only. It adds a trash button to every board row and every
+   custom map, and a way to remove an account by handle. Everything it removes goes to the brokers, so it's
+   gone for everyone, not just here. */
+const ADMIN_CODE='6996';
+const admin={on:false};
+function paintAdmin(){ $('adminOff').hidden=admin.on; $('adminOn').hidden=!admin.on; }
+$('adminGo').addEventListener('click',()=>{
+  const v=$('adminPin').value.trim(); $('adminPin').value='';
+  if(v!==ADMIN_CODE){ acctMsg('adminMsg','Wrong code.','bad'); $('adminPin').classList.remove('bad'); void $('adminPin').offsetWidth; $('adminPin').classList.add('bad'); return; }
+  admin.on=true; acctMsg('adminMsg',''); paintAdmin(); lbPaint(); toast('Admin mode on','ok'); sfx('lock');
+});
+$('adminPin').addEventListener('keydown',e=>{ if(e.key==='Enter') $('adminGo').click(); });
+$('adminPin').addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').slice(0,4); e.target.classList.remove('bad'); });
+$('adminExit').addEventListener('click',()=>{ admin.on=false; paintAdmin(); lbPaint(); toast('Admin mode off','ok'); });
+const TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>';
+function trashCell(id,board){ return admin.on?`<td class="adm"><button class="trash" data-trash="${esc(id)}" data-board="${esc(board)}" title="Remove this score for everyone">${TRASH}</button></td>`:''; }
+/* Remove a score: ban its id, drop it here, republish the board it sat on. */
+function adminRemove(id,board){
+  if(!admin.on||!id) return;
+  lb.ban.add(id); banPublish();
+  if(board==='daily'){ lb.daily=lb.daily.filter(e=>e.id!==id); dlPublish(); }
+  else if(lb.boards[board]){ lb.boards[board]=lb.boards[board].filter(e=>e.id!==id); lbPublish(board); }
+  try{ saveBoard(loadBoard().filter(e=>e.id!==id)); }catch(e){}
+  lbPaint(); toast('Score removed for everyone','ok'); sfx('click');
+}
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-trash]'); if(!b||!admin.on) return; e.preventDefault(); e.stopPropagation();
+  const row=b.closest('tr'); const who=row?row.querySelector('td.name').textContent.trim():'this score';
+  if(confirm(`Remove ${who} from the leaderboard for everyone? This can't be undone.`)) adminRemove(b.dataset.trash,b.dataset.board); },true);
+$('adminAcctGo').addEventListener('click',()=>{
+  if(!admin.on) return; const key=acctKey($('adminAcct').value); if(key.length<2){ acctMsg('adminMsg2','Type a handle.','bad'); return; }
+  if(!confirm(`Remove the account @${key} for everyone? Their name, photo, passcode and friends list are deleted. This can't be undone.`)) return;
+  let sent=0; for(const l of lb.links) if(l.ready){ for(const t of [ACCT_ROOT+'/'+key,SOC_ROOT+'/'+key,INBOX_ROOT+'/'+key]){ try{ l.client.publish(t,'',{qos:1,retain:true}); sent++; }catch(e){} } }
+  if(!sent){ acctMsg('adminMsg2','Not connected.','bad'); return; }
+  delete soc.dir[key]; if(acct.key===key){ acctClear(); paintAcct(); }
+  $('adminAcct').value=''; acctMsg('adminMsg2',`@${key} removed.`,'ok'); lbPaint();
+});
 
 /* ---------- Where in the world: pick a continent, then narrow to a country ---------- */
 let regionCont=null;
@@ -3262,8 +3328,8 @@ function renderDailyBoard(wrapId,subId){
   const me=dailyDone(); const mineId=me&&me.date===dailyDate()?me.id:null;
   const wrap=$(wrapId); if(!wrap) return;
   wrap.innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th style="text-align:right">Score</th></tr>`+
-    rows.slice(0,10).map((e,i)=>`<tr class="${e.id===mineId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="score">${e.score.toLocaleString()}</td></tr>`).join('')+`</table>`
-    :`<div class="empty">${lbLive()?'Nobody has played today yet. Go first.':'Connecting…'}</div>`;
+    rows.slice(0,10).map((e,i)=>`<tr class="${e.id===mineId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="score">${e.score.toLocaleString()}</td>${trashCell(e.id,'daily')}</tr>`).join('')+`</table>`
+    :`<div class=\"empty\">${lbLive()?'Nobody has played today yet. Go first.':'Connecting…'}</div>`;
   if($(subId)) $(subId).textContent=rows.length?`${rows.length} player${rows.length===1?'':'s'} today`:'Everyone plays the same five locations';
   if($('menuDailyCount')) $('menuDailyCount').textContent=rows.length?`${rows.length} played today`:'';
 }
@@ -3296,8 +3362,8 @@ function renderBoardPage(){
 
   $('bpWrap').innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th>Date</th><th style="text-align:right">Score</th></tr>`+
     rows.slice(0,25).map((e,i)=>{ const em=entryMode(e);
-      return `<tr class="${e.id===bp.highlight?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="mode">${new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`
-    :`<div class="empty">${all.length?'No scores with these settings.':'Finish a game in this mode and save your score.'}</div>`;
+      return `<tr class="${e.id===bp.highlight?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="mode">${new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td>${trashCell(e.id,bp.mode)}</tr>`; }).join('')+`</table>`
+    :`<div class=\"empty\">${all.length?'No scores with these settings.':'Finish a game in this mode and save your score.'}</div>`;
   $('bpCount').textContent=rows.length?`${rows.length} game${rows.length===1?'':'s'} shown`:'';
   $('bpModes').innerHTML=Object.entries(MODES).filter(([id,mm])=>!mm.mp&&!mm.custom).map(([id,mm])=>{
     const n=boardFor('all','all',id).length;

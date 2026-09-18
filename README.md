@@ -97,6 +97,10 @@ Delete account sits beside Sign out: it explains what goes (name, photo, passcod
 
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
+## Admin mode
+
+At the bottom of Settings. A four-digit code turns it on for the current visit only (it's in the page source, so it keeps honest people honest, nothing more). While it's on, every leaderboard row and every custom map has a red trash button, and an account can be removed by handle. A removed score's id goes on a retained block list (`worlddrop/v1/ban/ids`) that every client applies when merging boards and when reconciling its local mirror, so the score can't come back from the browser that saved it. Exit admin mode puts everything back; the code is asked for again next time.
+
 ## Notifications
 
 A bell in the top left of the home page. Four kinds land there: a new daily mission (worked out locally from the date and whether you've played), someone following you (read straight from the follow graph), a game invite, and someone completing your challenge. Invites are the only thing anyone writes into your inbox — one retained message per account (`worlddrop/v1/inbox/<name>`), capped and expiring after a couple of hours. Each row acts: add a friend back, join a room, or play the daily. In a lobby, **Invite friends** lists your friends with their photos and sends one straight to their bell.
