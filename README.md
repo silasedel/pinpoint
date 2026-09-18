@@ -68,7 +68,7 @@ It's bumped with every change, the build stamp lives in the tooltip, and the sam
 
 ## Settings
 
-A gear in the top right of the home page opens Settings: your account, a light/dark theme, the map style, text size and sound. The theme is light by default, and every choice is remembered on the device.
+A gear button in the top right of the home page, always reading Settings, opens Settings: your account, a light/dark theme, the map style, text size and sound. The theme is light by default, and every choice is remembered on the device.
 
 ## Accounts
 
