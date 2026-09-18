@@ -542,7 +542,7 @@
   @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
   .pts.pop{animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
   .pts.great{color:var(--green-dark)}
-  #confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:140}
 
   /* ---------- RESULT / FINAL ---------- */
   #result,#final{background:var(--bg);display:flex;flex-direction:column;z-index:10}
@@ -2368,7 +2368,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-120416';
+const BUILD='20260918-121738';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2519,7 +2519,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:21};
+const VERSION={major:3,minor:4,patch:22};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4222,7 +4222,7 @@ function restoreScreen(){
     case 'profile': if(sv.id){ prof.from='menu'; openProfile(sv.id); } break;
   } }catch(e){}
 }
-function show(id){ for(const s of SCREENS) $(s).hidden = s!==id; if(KEEP_SCREENS.includes(id)) setTimeout(saveScreen,0);
+function show(id){ for(const s of SCREENS) $(s).hidden = s!==id; if(KEEP_SCREENS.includes(id)) setTimeout(saveScreen,0); if(id==='game'||id==='menu') confettiStop();
   if(id==='result'){ $('game').hidden=false; const m=modeOf(state.mode); $('rTitle').textContent=`Round ${state.round}`+(mp.role&&m.duel?` · damage ×${duelMult(state.round)}`:(state.totalRounds<99?` of ${state.totalRounds}`:'')); }   // the street stays behind the wash
   document.body.classList.toggle('in-game',id==='game'); if(id!=='final'){ $('shareBox').hidden=true; $('shareCard').hidden=true; } }
 
@@ -4457,7 +4457,7 @@ function showResult(r){
   fit(); setTimeout(fit,150); sfx('reveal'); paintRival();
   if(line) setTimeout(()=>{ for(const pl of [casing,line]){ const el=pl.getElement(); if(!el) continue; const len=el.getTotalLength(); el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.classList.add('draw-line'); void el.getBoundingClientRect(); el.style.strokeDashoffset=0; } },350);
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(r.pts>=4000) pe.classList.add('great');
-  setTimeout(()=>{ pe.classList.add('pop'); if(r.pts>=4500){ confetti(); flash(); sfx(r.pts>=4900?'perfect':'great'); } },1000);
+  setTimeout(()=>{ if($('result').hidden) return; pe.classList.add('pop'); if(r.pts>=4500){ confetti(); flash(); sfx(r.pts>=4900?'perfect':'great'); } },600);
   stRound(state.mode,r.pts);
 
   $('distTxt').innerHTML = r.guess ? `Your guess was <b>${fmtDist(r.km)}</b> from the correct location.` : (hid?`You didn't place a pin.`:`You didn't place a pin. The location is marked with a flag.`);
@@ -5651,7 +5651,7 @@ function showResultMP(rev){
   if(mine.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${mine.bet.stake.toLocaleString()} × ${mine.bet.mult.toFixed(2)} = ${mine.bet.payout.toLocaleString()} back · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,mine.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.bet.mult/5*100)+'%'; })); }
   else { $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; countUp($('ptsNum'),0,mine.pts,1000); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.pts/50)+'%'; })); }
   const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(mine.pts>=4000) pe.classList.add('great');
-  setTimeout(()=>{ pe.classList.add('pop'); if(mine.pts>=4500){ confetti(); flash(); sfx(mine.pts>=4900?'perfect':'great'); } },1000);
+  setTimeout(()=>{ if($('result').hidden) return; pe.classList.add('pop'); if(mine.pts>=4500){ confetti(); flash(); sfx(mine.pts>=4900?'perfect':'great'); } },600);
   stRound(state.mode,mine.pts);
   renderVerdict(me);
   (async()=>{ const [tp,gp]=await Promise.all([ me.loc.place||placeOf(rev.truth.lat,rev.truth.lng), mine.guess?placeOf(mine.guess.lat,mine.guess.lng):null ]); me.loc.place=tp; me.guessPlace=gp; if(!$('result').hidden) renderVerdict(me); })();
@@ -6021,14 +6021,18 @@ $('liveChip').addEventListener('click',async()=>{
   $('liveChip').disabled=true;
 });
 
+let confettiRun=0;
+function confettiStop(){ confettiRun++; const c=$('confetti'); if(!c.hidden){ c.getContext('2d').clearRect(0,0,c.width,c.height); c.hidden=true; } }
 function confetti(){
+  const run=++confettiRun;
   const c=$('confetti'); c.hidden=false; c.width=innerWidth; c.height=innerHeight; const ctx=c.getContext('2d');
   const cols=['#1f9d55','#27b364','#ffd166','#ef476f','#118ab2','#ffffff'];
   const ps=Array.from({length:140},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.4,vx:(Math.random()-.5)*2.5,vy:2.5+Math.random()*3.5,s:6+Math.random()*6,r:Math.random()*Math.PI,vr:(Math.random()-.5)*.25,col:cols[Math.random()*cols.length|0]}));
   const t0=performance.now();
   (function frame(t){
-    ctx.clearRect(0,0,c.width,c.height);
+    ctx.clearRect(0,0,c.width,c.height); if(run!==confettiRun) return;
     for(const p of ps){ p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.col; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); ctx.restore(); }
+    if(run!==confettiRun) return;   // the screen it was for is gone
     if(t-t0<2600) requestAnimationFrame(frame); else { ctx.clearRect(0,0,c.width,c.height); c.hidden=true; }
   })(t0);
 }
