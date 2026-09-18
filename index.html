@@ -2363,7 +2363,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-014358';
+const BUILD='20260918-015504';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2514,7 +2514,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:9};
+const VERSION={major:3,minor:4,patch:10};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3435,8 +3435,8 @@ function renderCmap(){
   $('cmEdit').textContent=mine?'Edit map':'Edit map (admin)';
   if(!$('cmOwner').hidden) $('cmOwner').innerHTML=(mine?'This is your map. ':'Admin: ')+'<button class="link" id="cmDelete">Delete it'+(mine?'':' for everyone')+'</button>';
   rec.top=(rec.top||[]).filter(e=>e&&!(e.k&&lb.banK.has(e.k))).sort((a,b)=>b.score-a.score||a.ts-b.ts); const top=rec.top;
-  $('cmBoardSub').textContent=top.length?`${top.length} player${top.length===1?'':'s'} · best score per account`:'Nobody has played it yet.';
-  $('cmBoard').innerHTML=top.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th style="text-align:right">Score</th></tr>`+top.slice(0,15).map((e,i)=>`<tr class="${e.k&&e.k===acct.key?'me':''}"><td class="rank">${i+1}</td>${nameCell(e)}<td class="mode">${e.rounds} rounds · ${e.time?e.time+'s':'no limit'}</td><td class="score">${(+e.score).toLocaleString()}</td>${trashCell(String(i),'cmap')}</tr>`).join('')+'</table>':'<div class="cmap-empty">Be the first.</div>';
+  $('cmBoardSub').textContent=top.length?`${top.length} game${top.length===1?'':'s'} · every finished game counts`:'Nobody has played it yet.';
+  $('cmBoard').innerHTML=top.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th style="text-align:right">Score</th></tr>`+top.slice(0,25).map((e,i)=>`<tr class="${e.k&&e.k===acct.key?'me':''}"><td class="rank">${i+1}</td>${nameCell(e)}<td class="mode">${e.rounds} rounds · ${e.time?e.time+'s':'no limit'}</td><td class="score">${(+e.score).toLocaleString()}</td>${trashCell(String(i),'cmap')}</tr>`).join('')+'</table>':'<div class="cmap-empty">Be the first.</div>';
   $('cmLink').textContent=cmapLink(rec.id);
 }
 $('cmTimeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cm.time=+b.dataset.t; renderCmap(); sfx('click'); });
@@ -3453,7 +3453,7 @@ $('cmPlay').addEventListener('click',()=>{
   state.mode='custom'; state.custom=rec; state.region={type:'all',value:null}; state.userTime=cm.time; state.userRounds=cm.rounds; state.timeLimit=cm.time; state.totalRounds=cm.rounds;
   startGame();   // the play is counted when it finishes, on a fresh copy of the record
 });
-/* A finished game on a custom map lands on that map's own board: one row per account, your best score. */
+/* A finished game on a custom map lands on that map's own board, every game, best fifty kept. */
 async function cmapFinish(){
   const map=state.custom; if(!map||state.chal||state.cmCounted) return null; state.cmCounted=true;
   try{ const fresh=await cmapFetch(map.id); const rec=fresh||map; if(!rec.pins) return null;
@@ -3463,12 +3463,11 @@ async function cmapFinish(){
     st[day]=[(+cur[0]||0)+1,(+cur[1]||0)+secs]; const keys=Object.keys(st).sort(); while(keys.length>400) delete st[keys.shift()]; rec.stats=st;
     rec.plays=(+rec.plays||0)+1;
     let out={board:false};
-    if(acct.key){
-      const mine=(rec.top||[]).find(e=>e&&e.k===acct.key); const kept=!!(mine&&mine.score>state.score);
-      const top=(rec.top||[]).filter(e=>e&&e.k!==acct.key);
-      top.push(kept?{...mine,name:acct.name}:{k:acct.key,name:acct.name,score:state.score,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()});
-      top.sort((a,b)=>b.score-a.score||a.ts-b.ts); const my=kept?mine.score:state.score;
-      rec.top=top.slice(0,30); out={board:true,rank:top.filter(e=>e.score>my).length+1,total:top.length,kept};
+    if(acct.key){   // every finished game goes on the map's board, good or bad
+      const top=(rec.top||[]).filter(e=>e&&e.k!==undefined);
+      const mine={k:acct.key,name:acct.name,score:state.score,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()}; top.push(mine);
+      top.sort((a,b)=>b.score-a.score||a.ts-b.ts);
+      rec.top=top.slice(0,50); out={board:true,rank:top.indexOf(mine)+1,total:top.length,kept:false};
     }
     cm.all[rec.id]=rec; if(!cmapPublish(rec)) return null; return out; }catch(e){ return null; }
 }
@@ -3479,7 +3478,7 @@ async function paintCustomSave(){
   if(!acct.key){ $('signUp').querySelector('b').textContent=`Get on the ${map.name} board`; cmapFinish(); return; }
   $('savedMsg').hidden=false; $('savedMsg').textContent=`Saving to the ${map.name} board…`;
   const r=await cmapFinish(); state.saved=true;
-  $('savedMsg').textContent=r?(r.kept?`Saved · your best on ${map.name} is still #${r.rank} of ${r.total}`:`Saved · #${r.rank} of ${r.total} on ${map.name}`):`Couldn't reach the server, so this one isn't on the board.`;
+  $('savedMsg').textContent=r?`Saved · #${r.rank} of ${r.total} on ${map.name}`:`Couldn't reach the server, so this one isn't on the board.`;
 }
 /* ----- the builder ----- */
 function openMake(rec){
