@@ -152,6 +152,17 @@
   .av-big{width:84px;height:84px;border-radius:50%;flex:none;background:var(--sunk) center/cover no-repeat;border:2px solid var(--line);
     display:grid;place-items:center;font-size:30px;font-weight:800;color:var(--muted)}
   .av-act{flex:1;min-width:0}
+  #friends{overflow:auto;padding:30px 20px 60px}
+  .frsec{margin-top:18px}
+  .frsec h3{margin:0 0 8px;font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+  .frrow{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--raise);margin-bottom:8px}
+  .frrow .who{flex:1;min-width:0}
+  .frrow .who b{display:block;font-size:15px;letter-spacing:-.2px}
+  .frrow .who span{display:block;font-size:12px;color:var(--muted)}
+  .frrow .btn{padding:8px 14px;font-size:13px;flex:none}
+  .frrow.pend{opacity:.85}
+  .frempty{color:var(--muted);font-size:13.5px;padding:2px 2px 6px}
+  .frtag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--green-dark);background:var(--green-soft);border-radius:99px;padding:3px 9px}
   .prow2{display:flex;gap:8px;align-items:center}
   .prow2 .tin{width:auto;flex:1;min-width:0;margin-bottom:0}
   .prow2 .btn{flex:none;padding:12px 18px}
@@ -732,7 +743,8 @@
       <div class="label">Change your passcode</div>
       <div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="4" placeholder="New code" autocomplete="off"><button class="btn btn-secondary" id="acctChange">Change</button></div>
       <div class="acctmsg" id="acctMsg2"></div>
-      <button class="btn btn-secondary btn-block" id="acctOutBtn" style="margin-top:16px">Sign out</button>
+      <button class="btn btn-secondary btn-block" id="friendsBtn" style="margin-top:16px">Friends <span id="frCount" class="dim"></span></button>
+      <button class="btn btn-secondary btn-block" id="acctOutBtn" style="margin-top:10px">Sign out</button>
       <div class="fineprint">There's no way to reset a forgotten passcode, so keep it somewhere. Signing out leaves this browser as a numbered player again.</div>
     </div>
     <div class="card wide">
@@ -745,6 +757,22 @@
       <div class="seg" id="sizeSeg"><button data-size="0">Normal</button><button data-size="1">Large</button><button data-size="2">Larger</button></div>
       <div class="label">Sound</div>
       <div class="seg" id="soundSeg"><button data-snd="1">On</button><button data-snd="0">Off</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= FRIENDS ================= -->
+<div id="friends" class="screen" hidden>
+  <div class="setup-wrap narrow">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Friends</b></div><button class="btn btn-secondary" id="frBack" style="margin-left:auto">Back</button></div>
+    <div class="card">
+      <input class="tin" id="frSearch" placeholder="Find someone by username" autocomplete="off" spellcheck="false">
+      <div id="frFind"></div>
+    </div>
+    <div class="card wide" id="frCard">
+      <h2 style="margin:0 0 4px">Your people</h2>
+      <div class="rsub" id="frSub">Follow someone back and you're friends.</div>
+      <div id="frLists"></div>
     </div>
   </div>
 </div>
@@ -1532,7 +1560,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-183823';
+const BUILD='20260917-184222';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1651,7 +1679,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding were rebuilt from scratch.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:2,minor:16,patch:1};
+const VERSION={major:2,minor:17,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -1835,6 +1863,7 @@ function paintAcct(){
   $('acctLbl').textContent=acct.name||'Sign in';
   if($('acctWho')) $('acctWho').textContent=acct.name||'';
   avPaint(); paintPrefs();
+  if(acct.key&&!soc.loaded){ soc.loaded=true; socLoadMine().then(()=>{ const c=$('frCount'); if(c&&soc.mine.size) c.textContent=''; }); }
   const inN=!!acct.name;
   if($('acctIn')) $('acctIn').hidden=!inN;
   if($('acctOut')) $('acctOut').hidden=inN;
@@ -1940,6 +1969,123 @@ $('avClear').addEventListener('click',async ()=>{
 });
 $('acctOutBtn').addEventListener('click',()=>{ acctClear(); paintAcct(); acctMsg('acctMsg',''); toast('Signed out'); show('menu'); });
 acctLoad();
+
+/* ---------- Friends ----------
+   Nobody writes to anyone else's record: each account publishes only the list of people it follows.
+   Following someone is a request; when they follow back you're mutual, which is what the app calls friends. */
+const SOC_ROOT='worlddrop/v1/soc';
+const soc={mine:new Set(), theirs:{}, dir:{}, dirAt:0};
+function socTopic(k){ return SOC_ROOT+'/'+k; }
+/* Read several retained records at once: subscribe to them all, take what arrives, unsubscribe. */
+function fetchMany(root,keys,ms){
+  const links=lb.links.filter(l=>l.ready);
+  const topics=keys.map(k=>root+'/'+k);
+  if(!links.length||!topics.length) return Promise.resolve({});
+  return new Promise(resolve=>{
+    const out={}; let done=false;
+    const finish=()=>{ if(done) return; done=true; clearTimeout(timer);
+      for(const l of links){ try{ l.client.removeListener('message',onMsg); l.client.unsubscribe(topics); }catch(e){} }
+      resolve(out); };
+    const onMsg=(t,payload)=>{ if(!topics.includes(t)) return; const k=t.split('/').pop();
+      try{ out[k]=JSON.parse(payload.toString()); }catch(e){}
+      if(Object.keys(out).length>=keys.length) finish(); };
+    for(const l of links){ try{ l.client.on('message',onMsg); l.client.subscribe(topics,{qos:0}); }catch(e){} }
+    const timer=setTimeout(finish,ms||2600);
+  });
+}
+/* Every account record on the brokers, which doubles as the people directory. */
+function fetchDirectory(ms){
+  const links=lb.links.filter(l=>l.ready);
+  if(!links.length) return Promise.resolve({});
+  const wild=ACCT_ROOT+'/+';
+  return new Promise(resolve=>{
+    let done=false;
+    const finish=()=>{ if(done) return; done=true; clearTimeout(timer);
+      for(const l of links){ try{ l.client.removeListener('message',onMsg); l.client.unsubscribe(wild); }catch(e){} }
+      resolve(soc.dir); };
+    const onMsg=(t,payload)=>{ if(!t.startsWith(ACCT_ROOT+'/')) return; const k=t.split('/').pop();
+      let rec=null; try{ rec=JSON.parse(payload.toString()); }catch(e){}
+      if(rec&&rec.name) soc.dir[k]={name:rec.name,av:rec.av||null};
+    };
+    for(const l of links){ try{ l.client.on('message',onMsg); l.client.subscribe(wild,{qos:0}); }catch(e){} }
+    const timer=setTimeout(finish,ms||2200);
+  });
+}
+function socPublish(){
+  const rec={key:acct.key,f:[...soc.mine],ts:Date.now()};
+  for(const l of lb.links) if(l.ready){ try{ l.client.publish(socTopic(acct.key),JSON.stringify(rec),{qos:1,retain:true}); }catch(e){} }
+}
+async function socLoadMine(){
+  if(!acct.key) return;
+  const got=await fetchMany(SOC_ROOT,[acct.key],2200);
+  const rec=got[acct.key];
+  soc.mine=new Set(rec&&Array.isArray(rec.f)?rec.f.filter(k=>typeof k==='string').slice(0,300):[]);
+}
+/* Who follows me: read the records of everyone in the directory. */
+async function socLoadTheirs(keys){
+  const want=keys.filter(k=>k&&k!==acct.key);
+  if(!want.length) return;
+  const got=await fetchMany(SOC_ROOT,want,2600);
+  for(const k of want) soc.theirs[k]=new Set(got[k]&&Array.isArray(got[k].f)?got[k].f:[]);
+}
+function followsMe(k){ return !!(soc.theirs[k]&&soc.theirs[k].has(acct.key)); }
+function iFollow(k){ return soc.mine.has(k); }
+function friendKeys(){ return [...soc.mine].filter(followsMe); }
+function personName(k){ return (soc.dir[k]&&soc.dir[k].name)||k; }
+function personAv(k){ return soc.dir[k]&&soc.dir[k].av; }
+function frFace(k,size){
+  const url=personAv(k);
+  return url?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`
+            :`<span class="pav ini" style="width:${size}px;height:${size}px">${esc(personName(k)[0].toUpperCase())}</span>`;
+}
+function frRow(k,action,tag){
+  return `<div class="frrow"><span>${frFace(k,38)}</span><span class="who"><b>${esc(personName(k))}</b><span>@${esc(k)}</span></span>${tag?`<span class="frtag">${tag}</span>`:''}${action}</div>`;
+}
+function renderFriends(){
+  if(!acct.key){ $('frLists').innerHTML='<div class="frempty">Sign in to keep a friends list.</div>'; return; }
+  const mine=[...soc.mine];
+  const friends=mine.filter(followsMe);
+  const pending=mine.filter(k=>!followsMe(k));
+  const incoming=Object.keys(soc.theirs).filter(k=>followsMe(k)&&!iFollow(k));
+  const sec=(title,keys,make,empty)=>`<div class="frsec"><h3>${title}</h3>${keys.length?keys.map(make).join(''):`<div class="frempty">${empty}</div>`}</div>`;
+  $('frLists').innerHTML=
+    sec('Wants to be friends',incoming,k=>frRow(k,`<button class="btn btn-primary" data-add="${esc(k)}">Add back</button>`),'Nobody new right now.')+
+    sec('Friends',friends,k=>frRow(k,`<button class="btn btn-secondary" data-del="${esc(k)}">Remove</button>`),'No friends yet. Find someone above.')+
+    sec('Waiting on them',pending,k=>frRow(k,`<button class="btn btn-secondary" data-del="${esc(k)}">Cancel</button>`,'Sent'),'Nothing pending.');
+  $('frSub').textContent=`${friends.length} friend${friends.length===1?'':'s'}`+(incoming.length?` · ${incoming.length} waiting for you`:'');
+  const c=$('frCount'); if(c) c.textContent=friends.length?`(${friends.length})`:'';
+}
+function renderFind(){
+  const q=$('frSearch').value.trim().toLowerCase();
+  const keys=Object.keys(soc.dir).filter(k=>k!==acct.key).filter(k=>!q||k.includes(q)||personName(k).toLowerCase().includes(q));
+  keys.sort((a,b)=>personName(a).localeCompare(personName(b)));
+  if(!q){ $('frFind').innerHTML=keys.length?`<div class="frempty">${keys.length} ${keys.length===1?'person':'people'} play Pinpoint. Type to find one.</div>`:'<div class="frempty">Looking…</div>'; return; }
+  $('frFind').innerHTML=keys.length?keys.slice(0,12).map(k=>frRow(k,
+    iFollow(k)?`<button class="btn btn-secondary" data-del="${esc(k)}">${followsMe(k)?'Remove':'Cancel'}</button>`
+              :`<button class="btn btn-primary" data-add="${esc(k)}">${followsMe(k)?'Add back':'Add friend'}</button>`)).join('')
+    :`<div class="frempty">Nobody by that name.</div>`;
+}
+async function openFriends(){
+  show('friends'); $('friends').scrollTo(0,0); $('frSearch').value='';
+  $('frLists').innerHTML='<div class="frempty">Loading…</div>'; $('frFind').innerHTML='';
+  if(!acct.key){ renderFriends(); return; }
+  await socLoadMine();
+  await fetchDirectory();
+  await socLoadTheirs(Object.keys(soc.dir));
+  renderFriends(); renderFind();
+}
+async function frToggle(key,add){
+  if(!acct.key) return;
+  if(add) soc.mine.add(key); else soc.mine.delete(key);
+  socPublish(); renderFriends(); renderFind(); sfx('click');
+}
+$('friendsBtn').addEventListener('click',openFriends);
+$('frBack').addEventListener('click',()=>show('acct'));
+$('frSearch').addEventListener('input',renderFind);
+for(const id of ['frFind','frLists']) $(id).addEventListener('click',e=>{
+  const a=e.target.closest('[data-add]'), d=e.target.closest('[data-del]');
+  if(a) frToggle(a.dataset.add,true); else if(d) frToggle(d.dataset.del,false);
+});
 
 /* ---------- Where in the world: pick a continent, then narrow to a country ---------- */
 let regionCont=null;
@@ -2163,7 +2309,7 @@ function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); renderDailyBoard('me
 $('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
 $('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
 
-function show(id){ for(const s of ['menu','setup','acct','region','daily','board','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
+function show(id){ for(const s of ['menu','setup','acct','friends','region','daily','board','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
 
 /* ---------- Game flow ---------- */
 function ensureGuessMap(){
