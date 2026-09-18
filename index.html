@@ -149,6 +149,14 @@
   .acctchip{padding:9px 18px 9px 14px}
   .acctchip .gear{width:19px;height:19px;opacity:.8}
   .dim{color:var(--muted);font-weight:600}
+  .prof{display:flex;gap:18px;align-items:center;margin-bottom:14px}
+  .profside{min-width:0;flex:1}
+  .profside b{display:block;font-size:22px;letter-spacing:-.4px;line-height:1.15}
+  .profside .handle{display:block;font-size:13px;color:var(--muted);margin-bottom:10px}
+  .profbtns{display:flex;gap:8px;flex-wrap:wrap}
+  .btn.sm{padding:9px 14px;font-size:13.5px;font-weight:700}
+  .twobtn{display:flex;gap:8px;margin-top:10px}
+  .twobtn .btn{flex:1}
   .avrow{display:flex;gap:16px;align-items:center;margin-bottom:6px}
   .av-big{width:84px;height:84px;border-radius:50%;flex:none;background:var(--sunk) center/cover no-repeat;border:2px solid var(--line);
     display:grid;place-items:center;font-size:30px;font-weight:800;color:var(--muted)}
@@ -171,6 +179,24 @@
   html[data-size="1"]{font-size:17.5px} html[data-size="2"]{font-size:19px}
   .acctchip.out .av{background:var(--line);color:var(--muted)}
   .hero-top{position:absolute;top:18px;right:20px;z-index:3}
+  .hero-left{position:absolute;top:18px;left:20px;z-index:4}
+  .acctchip.bell{padding:9px 14px;position:relative}
+  .acctchip.bell svg{width:20px;height:20px}
+  .bellcount{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:99px;background:var(--red);color:#fff;
+    font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .notepanel{position:absolute;top:52px;left:0;width:min(340px,86vw);max-height:60vh;overflow:auto;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px}
+  .noterow{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:10px}
+  .noterow+.noterow{border-top:1px solid var(--hair)}
+  .noterow .nt{flex:1;min-width:0}
+  .noterow .nt b{display:block;font-size:14px;letter-spacing:-.2px}
+  .noterow .nt span{display:block;font-size:12px;color:var(--muted)}
+  .noterow .btn{padding:7px 12px;font-size:12.5px;flex:none}
+  .noterow.unseen{background:var(--green-soft)}
+  .noteempty{padding:14px 10px;font-size:13px;color:var(--muted);text-align:center}
+  .invitebox{position:relative}
+  .invitelist{position:absolute;top:46px;right:0;width:min(300px,84vw);max-height:50vh;overflow:auto;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px;z-index:9}
   .rsub{color:var(--muted);font-size:13px;margin:0 0 14px}
   .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .rgrid.small{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
@@ -698,6 +724,13 @@
     <iframe id="hero0" class="hero-pano" title="Live Street View" tabindex="-1"></iframe>
     <iframe id="hero1" class="hero-pano" title="Live Street View" tabindex="-1"></iframe>
     <div class="hero-shade"></div>
+    <div class="hero-left">
+      <button class="acctchip bell" id="bellBtn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span id="bellCount" class="bellcount" hidden>0</span>
+      </button>
+      <div class="notepanel" id="notePanel" hidden><div id="noteList"></div></div>
+    </div>
     <div class="hero-top"><button class="acctchip" id="acctChip" title="Settings"><svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.35.4.65.73.84H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></button></div>
     <div class="hero-content">
       <div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#logo"/></svg><b>Pinpoint</b></div>
@@ -760,23 +793,25 @@
       <div class="fineprint">A new name is yours the moment you claim it. If the name already exists, the code signs you into it. The code keeps a friend from typing your name by accident, nothing more, so don't reuse a real password.</div>
     </div>
     <div class="card" id="acctIn" hidden>
-      <h2 style="margin:0 0 4px">Signed in as <span id="acctWho"></span></h2>
-      <div class="rsub" id="acctSince">Scores you save use this name.</div>
-      <div class="avrow">
+      <h2 style="margin:0 0 16px">Account</h2>
+      <div class="prof">
         <div class="av-big" id="avPreview"></div>
-        <div class="av-act">
-          <div class="label" style="margin-top:0">Profile photo</div>
-          <div class="prow2"><button class="btn btn-secondary" id="avPick">Choose photo</button><button class="btn btn-secondary" id="avClear">Remove</button></div>
-          <div class="fineprint" style="margin-top:6px">Cropped square and shrunk to 96 pixels, so it travels with your account.</div>
+        <div class="profside">
+          <b id="acctWho"></b>
+          <span class="handle" id="acctHandle"></span>
+          <div class="profbtns">
+            <button class="btn btn-secondary sm" id="avPick">Choose photo</button>
+            <button class="btn btn-secondary sm" id="avClear">Remove</button>
+            <button class="btn btn-secondary sm" id="nameEdit">Edit name</button>
+          </div>
         </div>
       </div>
       <input type="file" id="avFile" accept="image/*" hidden>
-      <div class="label">Change your passcode</div>
-      <div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="4" placeholder="New code" autocomplete="off"><button class="btn btn-secondary" id="acctChange">Change</button></div>
+      <div id="nameBox" hidden><div class="prow2"><input class="tin" id="nameNew" maxlength="16" placeholder="New display name" spellcheck="false"><button class="btn btn-primary" id="nameSave">Save</button></div></div>
+      <div id="pinBox" hidden><div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off"><button class="btn btn-primary" id="acctChange">Save</button></div></div>
       <div class="acctmsg" id="acctMsg2"></div>
-      <button class="btn btn-secondary btn-block" id="friendsBtn" style="margin-top:16px">Friends <span id="frCount" class="dim"></span></button>
-      <button class="btn btn-secondary btn-block" id="acctOutBtn" style="margin-top:10px">Sign out</button>
-      <div class="fineprint">There's no way to reset a forgotten passcode, so keep it somewhere. Signing out leaves this browser as a numbered player again.</div>
+      <button class="btn btn-secondary btn-block" id="friendsBtn">Friends <span id="frCount" class="dim"></span></button>
+      <div class="twobtn"><button class="btn btn-secondary sm" id="pinToggle">Change passcode</button><button class="btn btn-secondary sm" id="acctOutBtn">Sign out</button></div>
     </div>
     <div class="card wide">
       <h2 style="margin:0 0 14px">Appearance</h2>
@@ -906,7 +941,7 @@
 <div id="lobby" class="screen" hidden>
   <div class="lobby-wrap">
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="leaveBtn" style="margin-left:auto">Leave</button></div>
-    <div class="code-box"><div class="cb-code"><small>Code</small><b id="roomCode">····</b></div><div class="cb-actions"><button class="btn btn-secondary" id="copyLink">Copy invite link</button><button class="btn btn-secondary" id="copyCode">Copy code</button></div><div class="conn" id="connBox" hidden style="flex-basis:100%;margin:0"></div><div id="roomUrl" hidden></div></div>
+    <div class="code-box"><div class="cb-code"><small>Code</small><b id="roomCode">····</b></div><div class="cb-actions"><button class="btn btn-secondary" id="copyLink">Copy invite link</button><button class="btn btn-secondary" id="copyCode">Copy code</button><span class="invitebox"><button class="btn btn-secondary" id="inviteBtn">Invite friends</button><div class="invitelist" id="inviteList" hidden></div></span></div><div class="conn" id="connBox" hidden style="flex-basis:100%;margin:0"></div><div id="roomUrl" hidden></div></div>
     <div class="lobby-grid">
       <div class="card">
         <h2>You</h2>
@@ -1591,7 +1626,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-190313';
+const BUILD='20260917-191947';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1710,7 +1745,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding were rebuilt from scratch.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:2,minor:17,patch:4};
+const VERSION={major:2,minor:18,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -1890,6 +1925,7 @@ function acctPublish(rec){
 }
 function paintAcct(){
   if($('acctWho')) $('acctWho').textContent=acct.name||'';
+  if($('acctHandle')) $('acctHandle').textContent=acct.key?'@'+acct.key:'';
   avPaint(); paintPrefs();
   if(acct.key&&!soc.loaded){ soc.loaded=true; socLoadMine().then(()=>{ const c=$('frCount'); if(c&&soc.mine.size) c.textContent=''; }); }
   const inN=!!acct.name;
@@ -1926,7 +1962,7 @@ async function acctContinue(){
   $('acctGo').disabled=false; $('acctPin').value='';
   mp.me.name=acct.name; if($('mpName')) $('mpName').value=acct.name;
   paintAcct(); lbPaint();
-  acctMsg('acctMsg2',acct.av?'':'Add a profile photo while you\'re here.');   // stay put: there's more to set up
+  acctMsg('acctMsg2','');
 }
 async function acctChangePin(){
   const pin=$('acctNewPin').value.trim();
@@ -1937,8 +1973,8 @@ async function acctChangePin(){
   const hash=await acctHash(pin,salt,acct.key);
   const rec={...(got.record||{}),key:acct.key,name:acct.name,salt,hash,made:(got.record&&got.record.made)||Date.now()};
   const ok=acctPublish(rec);
-  acctMsg('acctMsg2',ok?'Code changed.':'Could not reach the server.',ok?'ok':'bad');
-  $('acctNewPin').value='';
+  acctMsg('acctMsg2',ok?'Passcode changed.':'Could not reach the server.',ok?'ok':'bad');
+  $('acctNewPin').value=''; if(ok) $('pinBox').hidden=true;
 }
 $('acctChip').addEventListener('click',()=>{ acctMsg('acctMsg',''); acctMsg('acctMsg2',''); paintAcct(); show('acct'); $('acct').scrollTo(0,0); if(!acct.name) $('acctName').focus(); });
 $('acctBack').addEventListener('click',()=>show('menu'));
@@ -1947,6 +1983,23 @@ $('acctPin').addEventListener('keydown',e=>{ if(e.key==='Enter') acctContinue();
 $('acctName').addEventListener('keydown',e=>{ if(e.key==='Enter') $('acctPin').focus(); });
 for(const id of ['acctPin','acctNewPin']) $(id).addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').slice(0,4); e.target.classList.remove('bad'); });
 $('acctChange').addEventListener('click',acctChangePin);
+$('pinToggle').addEventListener('click',()=>{ const b=$('pinBox'); b.hidden=!b.hidden; $('nameBox').hidden=true; acctMsg('acctMsg2',''); if(!b.hidden) $('acctNewPin').focus(); });
+$('nameEdit').addEventListener('click',()=>{ const b=$('nameBox'); b.hidden=!b.hidden; $('pinBox').hidden=true; acctMsg('acctMsg2',''); if(!b.hidden){ $('nameNew').value=acct.name||''; $('nameNew').focus(); } });
+/* The display name is free to change; the @handle you sign in with stays put, so friends and sign-ins keep working. */
+async function saveDisplayName(){
+  const v=$('nameNew').value.trim().slice(0,16);
+  if(v.length<2){ acctMsg('acctMsg2','A name needs at least two characters.','bad'); return; }
+  acctMsg('acctMsg2','Saving…');
+  const got=await acctFetch(acct.key);
+  if(!got.record){ acctMsg('acctMsg2','Could not reach your account. Try again.','bad'); return; }
+  const rec={...got.record,name:v};
+  acct.name=v; acctSave(); paintAcct();
+  const ok=acctPublish(rec);
+  acctMsg('acctMsg2',ok?'Name changed.':'Could not reach the server.',ok?'ok':'bad');
+  $('nameBox').hidden=true; mp.me.name=v; if($('mpName')) $('mpName').value=v;
+}
+$('nameSave').addEventListener('click',saveDisplayName);
+$('nameNew').addEventListener('keydown',e=>{ if(e.key==='Enter') saveDisplayName(); });
 $('themeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; prefs.theme=b.dataset.theme; savePrefs(); applyPrefs(); sfx('click'); });
 $('sizeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; prefs.size=b.dataset.size; savePrefs(); applyPrefs(); sfx('click'); });
 $('mapSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; setStyle(b.dataset.mstyle); paintPrefs(); sfx('click'); });
@@ -1994,7 +2047,8 @@ $('avClear').addEventListener('click',async ()=>{
   acctMsg('acctMsg2','Photo removed.','ok');
   if(mp.role) mpSend({t:'av',av:''});
 });
-$('acctOutBtn').addEventListener('click',()=>{ acctClear(); paintAcct(); acctMsg('acctMsg',''); toast('Signed out'); show('menu'); });
+$('acctOutBtn').addEventListener('click',()=>{ const who=acct.name; acctClear(); soc.mine=new Set(); soc.loaded=false; paintAcct(); acctMsg('acctMsg','');
+  toast(`Signed out of ${who}. Your account is still there — sign back in any time.`); show('menu'); });
 acctLoad();
 
 /* ---------- Friends ----------
@@ -2112,6 +2166,88 @@ $('frSearch').addEventListener('input',renderFind);
 for(const id of ['frFind','frLists']) $(id).addEventListener('click',e=>{
   const a=e.target.closest('[data-add]'), d=e.target.closest('[data-del]');
   if(a) frToggle(a.dataset.add,true); else if(d) frToggle(d.dataset.del,false);
+});
+
+/* ---------- Notifications ----------
+   Three kinds: a new daily mission (worked out locally), someone following you (read from the follow graph),
+   and a game invite (the only thing anyone writes into your inbox, one retained message per account). */
+const INBOX_ROOT='worlddrop/v1/inbox';
+const notes={items:[], seen:new Set(), open:false};
+try{ notes.seen=new Set(JSON.parse(localStorage.getItem('pp_seen')||'[]')); }catch(e){}
+function markSeen(ids){ ids.forEach(i=>notes.seen.add(i)); try{ localStorage.setItem('pp_seen',JSON.stringify([...notes.seen].slice(-200))); }catch(e){} }
+function inboxFetch(key){ return fetchMany(INBOX_ROOT,[key],2400).then(m=>Array.isArray(m[key])?m[key]:[]); }
+async function inboxPush(key,item){
+  const cur=await inboxFetch(key);
+  const fresh=[item,...cur.filter(x=>x&&x.id!==item.id)].slice(0,25);
+  for(const l of lb.links) if(l.ready){ try{ l.client.publish(INBOX_ROOT+'/'+key,JSON.stringify(fresh),{qos:1,retain:true}); }catch(e){} }
+}
+function noteDaily(){
+  const d=dailyDate(), done=dailyDone();
+  if(done&&done.date===d) return [];
+  return [{id:'daily-'+d,kind:'daily',title:"Today's mission is up",body:'Five rounds, same for everyone.',ts:Date.now()}];
+}
+function noteFriends(){
+  if(!acct.key) return [];
+  return Object.keys(soc.theirs).filter(k=>followsMe(k)&&!iFollow(k))
+    .map(k=>({id:'fr-'+k,kind:'friend',who:k,title:personName(k)+' wants to be friends',body:'@'+k,ts:Date.now()}));
+}
+function allNotes(){
+  const inv=notes.items.filter(n=>n&&n.kind==='invite'&&Date.now()-(n.ts||0)<2*3600*1000);
+  return [...inv,...noteFriends(),...noteDaily()];
+}
+function paintBell(){
+  const list=allNotes(); const unseen=list.filter(n=>!notes.seen.has(n.id)).length;
+  const c=$('bellCount'); if(!c) return;
+  c.hidden=!unseen; c.textContent=unseen>9?'9+':String(unseen);
+}
+function renderNotes(){
+  const list=allNotes();
+  $('noteList').innerHTML=list.length?list.map(n=>{
+    const face=n.kind==='friend'?frFace(n.who,32):(n.kind==='invite'?frFace(n.from,32):`<span class="pav ini" style="width:32px;height:32px">★</span>`);
+    const act=n.kind==='friend'?`<button class="btn btn-primary" data-nadd="${esc(n.who)}">Add</button>`
+      :n.kind==='invite'?`<button class="btn btn-primary" data-njoin="${esc(n.code||'')}">Join</button>`
+      :`<button class="btn btn-primary" data-ndaily="1">Play</button>`;
+    return `<div class="noterow ${notes.seen.has(n.id)?'':'unseen'}">${face}<span class="nt"><b>${esc(n.title)}</b><span>${esc(n.body||'')}</span></span>${act}</div>`;
+  }).join(''):'<div class="noteempty">Nothing new.</div>';
+  markSeen(list.map(n=>n.id)); paintBell();
+}
+async function loadInbox(){
+  if(!acct.key) return;
+  notes.items=await inboxFetch(acct.key);
+  paintBell(); if(notes.open) renderNotes();
+}
+$('bellBtn').addEventListener('click',async()=>{
+  notes.open=!notes.open; $('notePanel').hidden=!notes.open;
+  if(notes.open){ renderNotes(); if(acct.key&&!soc.loaded){ soc.loaded=true; await socLoadMine(); await fetchDirectory(); await socLoadTheirs(Object.keys(soc.dir)); }
+    await loadInbox(); renderNotes(); }
+});
+document.addEventListener('click',e=>{ if(notes.open&&!e.target.closest('.hero-left')){ notes.open=false; $('notePanel').hidden=true; } },true);
+$('noteList').addEventListener('click',e=>{
+  const add=e.target.closest('[data-nadd]'), join=e.target.closest('[data-njoin]'), day=e.target.closest('[data-ndaily]');
+  if(add){ frToggle(add.dataset.nadd,true); renderNotes(); toast('Friends with '+personName(add.dataset.nadd)); }
+  else if(join){ notes.open=false; $('notePanel').hidden=true; mpJoin(join.dataset.njoin); }
+  else if(day){ notes.open=false; $('notePanel').hidden=true; renderDaily(); show('daily'); }
+});
+
+/* ---------- Invite a friend into the room you're hosting ---------- */
+async function openInvite(){
+  const box=$('inviteList');
+  if(!box.hidden){ box.hidden=true; return; }
+  box.hidden=false; box.innerHTML='<div class="noteempty">Loading…</div>';
+  if(!acct.key){ box.innerHTML='<div class="noteempty">Sign in to invite friends.</div>'; return; }
+  if(!soc.mine.size||!Object.keys(soc.dir).length){ await socLoadMine(); await fetchDirectory(); await socLoadTheirs(Object.keys(soc.dir)); }
+  const friends=friendKeys();
+  box.innerHTML=friends.length?friends.map(k=>
+    `<div class="noterow">${frFace(k,32)}<span class="nt"><b>${esc(personName(k))}</b><span>@${esc(k)}</span></span><button class="btn btn-primary" data-inv="${esc(k)}">Invite</button></div>`).join('')
+    :'<div class="noteempty">No friends yet. Add some in Settings.</div>';
+}
+$('inviteBtn').addEventListener('click',openInvite);
+$('inviteList').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-inv]'); if(!b) return;
+  const k=b.dataset.inv; b.disabled=true; b.textContent='Sent';
+  await inboxPush(k,{id:'inv-'+mp.code+'-'+acct.key,kind:'invite',from:acct.key,code:mp.code,
+    title:(acct.name||acct.key)+' invited you to a game',body:'Room '+mp.code,ts:Date.now()});
+  sfx('click');
 });
 
 /* ---------- Where in the world: pick a continent, then narrow to a country ---------- */
@@ -3896,10 +4032,14 @@ async function checkUpdate(){
 }
 if(location.protocol==='https:'){ setTimeout(checkUpdate,3000); setInterval(checkUpdate,90000); }
 function toast(msg,kind){ const t=document.createElement('div'); t.className='toast'+(kind?' '+kind:''); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),kind==='ok'?1800:3500); }
-</script>
-<script async src="https://maps.googleapis.com/maps/api/js?callback=__gmapsReady&loading=async&v=weekly">
 /* First paint of the pieces defined further down the file. */
 paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion(); paintAcct();
+paintBell(); setTimeout(paintBell,0);   // the daily's state settles a tick after the rest of the boot
+setTimeout(()=>{ paintBell(); if(acct.key) loadInbox(); },4000);
+setInterval(()=>{ paintBell(); if(acct.key&&!notes.open) loadInbox(); },90000);
+
+</script>
+<script async src="https://maps.googleapis.com/maps/api/js?callback=__gmapsReady&loading=async&v=weekly">
 </script>
 </body>
 </html>
