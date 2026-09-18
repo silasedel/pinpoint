@@ -1370,7 +1370,7 @@
   </div>
 </div>
 <div id="peek" class="peek" hidden>
-  <div class="peekbar"><b id="peekTitle">Spot</b><span class="peekpos" id="peekSub"></span><button class="btn btn-secondary sm" id="peekPrev">Previous</button><button class="btn btn-secondary sm danger" id="peekDel">Remove</button><button class="btn btn-primary sm" id="peekNext">Next ✓</button><button class="peekx" id="peekX" aria-label="Close">×</button></div>
+  <div class="peekbar"><b id="peekTitle">Spot</b><span class="peekpos" id="peekSub"></span><button class="btn btn-secondary sm" id="peekPrev">Previous</button><button class="btn btn-secondary sm danger" id="peekDel">Remove spot</button><button class="btn btn-primary sm" id="peekNext" title="Keeps this position and angle as the spot's start, then moves to the next spot">Lock in &amp; next</button><button class="peekx" id="peekX" aria-label="Close">×</button></div>
   <div class="peekstage"><canvas id="peekCv" class="peekcv" width="1280" height="720"></canvas><div id="peekLinks"></div></div>
 </div>
 <div id="cmake" class="screen" hidden>
@@ -2368,7 +2368,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-102435';
+const BUILD='20260918-104511';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2519,7 +2519,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:17};
+const VERSION={major:3,minor:4,patch:18};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3611,7 +3611,7 @@ async function peekOpen(i){
 /* Next: keep what is on screen as this spot's start view, count it as checked, move on */
 function peekCheck(){ const mk=cm.mk; const p=mk&&mk.pins[peek.i]; if(!p) return; if(fview.band){ p.heading=Math.round(fview.heading)%360; p.pitch=Math.max(-40,Math.min(40,Math.round(fview.pitch))); p.faced=true; mk.dirty=true; } }
 function peekNext(){ const mk=cm.mk; if(!mk||!mk.pins.length) return; peekCheck(); const done=peek.i+1; reviewSave(Math.max(done,reviewPos())); renderMk();
-  if(done>=mk.pins.length){ toast('That was the last spot. All checked.','ok'); peekClose(); return; } peekOpen(done); }
+  if(done>=mk.pins.length){ toast('That was the last spot. All locked in.','ok'); peekClose(); return; } peekOpen(done); }
 function peekClose(){ $('peek').hidden=true; renderMk(); }
 $('peekPrev').addEventListener('click',()=>{ if(peek.i>0) peekOpen(peek.i-1); sfx('click'); });
 $('peekNext').addEventListener('click',()=>{ peekNext(); sfx('lock'); });
