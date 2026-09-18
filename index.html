@@ -677,7 +677,7 @@
   .peekbar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--card);border-bottom:1px solid var(--line);flex-wrap:wrap}
   .peekbar b{font-size:15px;white-space:nowrap}
   .peekbar .peekpos{flex:1;min-width:120px;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .peek iframe{flex:1;width:100%;border:0;background:#000}
+  .peek iframe{flex:1;width:100%;border:0;background:#000} .peek iframe[hidden]{display:none}
   .peekcv{flex:1;width:100%;min-height:0;object-fit:contain;background:#0b1a12;cursor:grab;touch-action:none} .peekcv:active{cursor:grabbing}
   .peekcv[hidden]{display:none}
   .peekx{width:34px;height:34px;border-radius:50%;background:var(--sunk);font-size:22px;line-height:1;padding:0;display:grid;place-items:center;color:var(--text)} .peekx:hover{background:var(--red-soft);color:var(--red)}
@@ -1367,9 +1367,9 @@
   </div>
 </div>
 <div id="peek" class="peek" hidden>
-  <div class="peekbar"><b id="peekTitle">Spot</b><span class="peekpos" id="peekSub"></span><span id="peekNav"><button class="btn btn-secondary sm" id="peekPrev">Previous</button><button class="btn btn-secondary sm" id="peekNext">Next</button><button class="btn btn-secondary sm" id="peekFace">Set facing</button><button class="btn btn-secondary sm danger" id="peekDel">Remove this spot</button><button class="btn btn-primary sm" id="peekClose">Done</button></span><span id="peekFacing" hidden><span class="dim" style="font-size:12.5px;margin-right:6px">Drag to turn, scroll or + − to zoom, then</span><button class="btn btn-secondary sm" id="peekFaceOut">−</button><button class="btn btn-secondary sm" id="peekFaceIn">+</button><button class="btn btn-primary sm" id="peekFaceOk">Face this way</button><button class="btn btn-secondary sm" id="peekFaceX">Cancel</button></span><button class="peekx" id="peekX" aria-label="Close">×</button></div>
-  <iframe id="peekFrame" allowfullscreen referrerpolicy="no-referrer-when-downgrade" title="Street View preview"></iframe>
-  <canvas id="peekCv" class="peekcv" width="960" height="540" hidden></canvas>
+  <div class="peekbar"><b id="peekTitle">Spot</b><span class="peekpos" id="peekSub"></span><button class="btn btn-secondary sm" id="peekPrev">Previous</button><button class="btn btn-secondary sm" id="peekNext">Next</button><button class="btn btn-secondary sm" id="peekOut" title="Zoom out">−</button><button class="btn btn-secondary sm" id="peekIn" title="Zoom in">+</button><button class="btn btn-secondary sm" id="peekFace">Set facing</button><button class="btn btn-secondary sm" id="peekGoogle">Google view</button><button class="btn btn-secondary sm danger" id="peekDel">Remove this spot</button><button class="btn btn-primary sm" id="peekClose">Done</button><button class="peekx" id="peekX" aria-label="Close">×</button></div>
+  <canvas id="peekCv" class="peekcv" width="960" height="540"></canvas>
+  <iframe id="peekFrame" allowfullscreen referrerpolicy="no-referrer-when-downgrade" title="Street View" hidden></iframe>
 </div>
 <div id="cmake" class="screen" hidden>
   <div class="setup-wrap">
@@ -2366,7 +2366,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-080413';
+const BUILD='20260918-083928';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2517,7 +2517,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:12};
+const VERSION={major:3,minor:4,patch:13};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3556,43 +3556,42 @@ $('mkList').addEventListener('click',e=>{
   const l=e.target.closest('[data-look]'); if(l){ peekOpen(+l.dataset.look); return; }
   const b=e.target.closest('[data-del]'); if(!b) return; cm.mk.pins.splice(+b.dataset.del,1); cm.mk.dirty=true; renderMk(); sfx('click'); });
 /* ----- looking at a spot: the real Street View, full screen, with Previous / Next / Remove ----- */
-const peek={i:0};
-function peekOpen(i){
-  const mk=cm.mk; if(!mk||!mk.pins.length) return; const n=mk.pins.length; peek.i=((i%n)+n)%n; const p=mk.pins[peek.i];
-  $('peekTitle').textContent=`Spot ${peek.i+1} of ${n}`;
-  $('peekSub').textContent=[p.label||'',p.dead?'gone from Street View':'',`${p.lat}, ${p.lng}`].filter(Boolean).join(' · ');
-  $('peekFrame').src=embedUrl({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading||0,pitch:p.pitch||0});
-  $('peek').hidden=false;
-}
-function peekClose(){ faceCancel(); $('peek').hidden=true; $('peekFrame').src='about:blank'; }
-/* Set facing: the spot's tiles in the draggable viewer, full screen. Face this way keeps the direction (and tilt) as the spot's start view. */
-const fview={pano:null,heading:0,pitch:0,fov:90,band:null,meta:null,raf:0,on:false};
+/* ----- looking at a spot: our own viewer of its tiles, full screen. Drag to turn, zoom, Previous / Next / Remove.
+   Set facing keeps whatever is on screen as the spot's start view. Google view swaps in Google's embed for walking. ----- */
+const peek={i:0,google:false};
+const fview={pano:null,heading:0,pitch:0,fov:90,band:null,meta:null,raf:0};
 function fviewDraw(){ if(!fview.band) return; cancelAnimationFrame(fview.raf); fview.raf=requestAnimationFrame(()=>renderPersp($('peekCv'),fview.band,fview.meta,fview.heading,fview.fov,fview.pitch)); }
-async function faceOpen(){
-  const mk=cm.mk; const p=mk&&mk.pins[peek.i]; if(!p) return;
-  fview.on=true; $('peekNav').hidden=true; $('peekFacing').hidden=false; $('peekFrame').hidden=true; const cv=$('peekCv'); cv.hidden=false;
+function peekSub(p){ $('peekSub').textContent=[p.label||'',p.dead?'gone from Street View':'',`${p.lat}, ${p.lng}`,p.faced||p.pitch?`faces ${Math.round(p.heading)}°`:''].filter(Boolean).join(' · '); }
+async function peekOpen(i){
+  const mk=cm.mk; if(!mk||!mk.pins.length) return; const n=mk.pins.length; peek.i=((i%n)+n)%n; const p=mk.pins[peek.i];
+  $('peekTitle').textContent=`Spot ${peek.i+1} of ${n}`; peekSub(p); $('peek').hidden=false;
+  $('peekFace').disabled=peek.google; $('peekGoogle').textContent=peek.google?'Our viewer':'Google view';
+  $('peekFrame').hidden=!peek.google; $('peekCv').hidden=peek.google;
+  if(peek.google){ $('peekFrame').src=embedUrl({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading||0,pitch:p.pitch||0}); return; }
   fview.heading=+p.heading||0; fview.pitch=+p.pitch||0; fview.fov=90;
-  const ctx=cv.getContext('2d'); ctx.fillStyle='#0b1a12'; ctx.fillRect(0,0,cv.width,cv.height);
-  if(fview.pano!==p.pano||!fview.band){ fview.pano=p.pano; fview.band=null; $('peekSub').textContent='Loading the picture…';
-    try{ const {band,meta}=await bandFor(p.pano); if(fview.pano!==p.pano||!fview.on) return; fview.band=band; fview.meta=meta; }
-    catch(e){ if(fview.on){ toast('This spot has no picture to render'); faceCancel(); } return; } }
-  $('peekSub').textContent=`Spot ${peek.i+1}: drag until you are looking the way players should start`; fviewDraw();
+  if(fview.pano!==p.pano||!fview.band){
+    fview.pano=p.pano; fview.band=null; const cv=$('peekCv'); const ctx=cv.getContext('2d'); ctx.fillStyle='#0b1a12'; ctx.fillRect(0,0,cv.width,cv.height);
+    $('peekSub').textContent='Loading the picture…';
+    try{ const {band,meta}=await bandFor(p.pano); if(fview.pano!==p.pano) return; fview.band=band; fview.meta=meta; peekSub(p); }
+    catch(e){ if(fview.pano===p.pano) $('peekSub').textContent='This spot has no picture to render. Try Google view.'; return; }
+  }
+  fviewDraw();
+  const nx=mk.pins[(peek.i+1)%n]; if(nx&&nx.pano!==p.pano) bandFor(nx.pano).catch(()=>{});   // the next one is usually wanted next
 }
-function faceCancel(){ if(!fview.on) return; fview.on=false; $('peekNav').hidden=false; $('peekFacing').hidden=true; $('peekFrame').hidden=false; $('peekCv').hidden=true; const p=cm.mk&&cm.mk.pins[peek.i]; if(p) $('peekSub').textContent=[p.label||'',p.dead?'gone from Street View':'',`${p.lat}, ${p.lng}`].filter(Boolean).join(' · '); }
-$('peekFace').addEventListener('click',()=>{ faceOpen(); sfx('click'); });
-$('peekFaceX').addEventListener('click',()=>{ faceCancel(); sfx('click'); });
-$('peekFaceOk').addEventListener('click',()=>{ const mk=cm.mk; const p=mk&&mk.pins[peek.i]; if(!p||!fview.band) return;
-  p.heading=Math.round(fview.heading)%360; p.pitch=Math.max(-40,Math.min(40,Math.round(fview.pitch))); p.faced=true; mk.dirty=true; renderMk(); faceCancel(); peekOpen(peek.i); toast('Players will start facing this way','ok'); sfx('lock'); });
-$('peekFaceIn').addEventListener('click',()=>{ fview.fov=Math.max(35,fview.fov-10); fviewDraw(); });
-$('peekFaceOut').addEventListener('click',()=>{ fview.fov=Math.min(110,fview.fov+10); fviewDraw(); });
-attachLook($('peekCv'),fview,fviewDraw);
-$('peekPrev').addEventListener('click',()=>{ faceCancel(); peekOpen(peek.i-1); sfx('click'); });
-$('peekNext').addEventListener('click',()=>{ faceCancel(); peekOpen(peek.i+1); sfx('click'); });
+function peekClose(){ $('peek').hidden=true; $('peekFrame').src='about:blank'; }
+$('peekPrev').addEventListener('click',()=>{ peekOpen(peek.i-1); sfx('click'); });
+$('peekNext').addEventListener('click',()=>{ peekOpen(peek.i+1); sfx('click'); });
 $('peekClose').addEventListener('click',()=>{ peekClose(); sfx('click'); });
 $('peekX').addEventListener('click',()=>{ peekClose(); sfx('click'); });
 $('peekDel').addEventListener('click',()=>{ const mk=cm.mk; if(!mk||!mk.pins.length) return; mk.pins.splice(peek.i,1); mk.dirty=true; renderMk(); sfx('click'); if(!mk.pins.length) peekClose(); else peekOpen(peek.i); });
-document.addEventListener('keydown',e=>{ if($('peek').hidden) return; if(e.key==='Escape'){ if(fview.on) faceCancel(); else peekClose(); } else if(fview.on) return; else if(e.key==='ArrowRight') peekOpen(peek.i+1); else if(e.key==='ArrowLeft') peekOpen(peek.i-1); });
+$('peekIn').addEventListener('click',()=>{ fview.fov=Math.max(35,fview.fov-10); fviewDraw(); });
+$('peekOut').addEventListener('click',()=>{ fview.fov=Math.min(110,fview.fov+10); fviewDraw(); });
+$('peekGoogle').addEventListener('click',()=>{ peek.google=!peek.google; peekOpen(peek.i); sfx('click'); });
+$('peekFace').addEventListener('click',()=>{ const mk=cm.mk; const p=mk&&mk.pins[peek.i]; if(!p||!fview.band||peek.google) return;
+  p.heading=Math.round(fview.heading)%360; p.pitch=Math.max(-40,Math.min(40,Math.round(fview.pitch))); p.faced=true; mk.dirty=true; renderMk(); peekSub(p); toast(`Spot ${peek.i+1} now starts facing this way`,'ok'); sfx('lock'); });
+document.addEventListener('keydown',e=>{ if($('peek').hidden) return; if(e.key==='Escape') peekClose(); else if(e.key==='ArrowRight') peekOpen(peek.i+1); else if(e.key==='ArrowLeft') peekOpen(peek.i-1); });
 $('mkReview').addEventListener('click',()=>{ peekOpen(0); sfx('click'); });
+attachLook($('peekCv'),fview,fviewDraw);
 /* Ask Google about every spot; the ones it no longer has get flagged so they can be dropped in one go. */
 async function mkCheck(){
   const mk=cm.mk; if(!mk||mk.checking||!mk.pins.length) return; mk.checking=true; const btn=$('mkCheck'); btn.disabled=true;
@@ -3663,7 +3662,7 @@ $('mkThumbSel').addEventListener('change',()=>thumbLook());
 /* The live viewer: the spot's tiles are loaded once, then dragged around and zoomed on a canvas, and Use this view keeps what is on it. */
 const tview={pano:null,heading:0,pitch:0,fov:90,band:null,meta:null,busy:false,raf:0};
 const bandCache=new Map();
-async function bandFor(pano){ if(bandCache.has(pano)) return bandCache.get(pano); const meta=await panoMeta(pano); const band=await loadBand(pano,3,meta,66); const v={band,meta}; if(bandCache.size>6) bandCache.delete(bandCache.keys().next().value); bandCache.set(pano,v); return v; }
+async function bandFor(pano){ if(bandCache.has(pano)) return bandCache.get(pano); const meta=await panoMeta(pano); const band=await loadBand(pano,3,meta,66); const v={band,meta}; if(bandCache.size>12) bandCache.delete(bandCache.keys().next().value); bandCache.set(pano,v); return v; }
 function renderPersp(c,band,meta,heading,hfov,pitch){
   const w=c.width,h=c.height; const ctx=c.getContext('2d'); const o=ctx.createImageData(w,h); const d=o.data; const {img,W,H,yOff}=band; const src=img.data,bw=img.width,bh=img.height;
   const f=(w/2)/Math.tan(hfov/2*Math.PI/180); const cx=w/2, cy=h/2; const lon0=(heading-meta.center)*Math.PI/180; const pr=pitch*Math.PI/180; const sp=Math.sin(pr), cp=Math.cos(pr);
