@@ -394,6 +394,7 @@
 
   .marker-pin{position:relative;width:32px;height:44px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
   .marker-pin svg{position:relative;display:block}
+  .marker-pin .facepin{position:absolute;left:9px;top:9px;width:14px;height:14px;border-radius:50%;background-size:cover;background-position:center;z-index:2}
   .marker-true .ring{position:absolute;left:50%;top:42px;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:3px solid #e63946;animation:ring 1.6s ease-out infinite}
   @keyframes ring{0%{transform:scale(.4);opacity:.9}100%{transform:scale(3.2);opacity:0}}
   .style-ctl{display:flex;background:var(--raise);border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.3);overflow:hidden}
@@ -465,6 +466,7 @@
   .code-box .url{font-size:12px;color:var(--muted);word-break:break-all;margin-top:6px}
   .plist{display:flex;flex-direction:column;gap:6px}
   .prow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--hover);border:1px solid var(--line);font-size:14px}
+  .board .fchip{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--sunk);color:var(--muted);vertical-align:1px}
   .prow .sw{width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);background:#cfd8d2}
   .prow .pn{font-weight:700;flex:1}
   .prow .tag{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
@@ -473,6 +475,9 @@
   .swatch{position:relative;height:46px;border-radius:10px;border:3px solid transparent;cursor:pointer;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
   .swatch.mine{border-color:var(--text);box-shadow:0 0 0 2px #fff inset}
   .swatch.taken{cursor:not-allowed;filter:grayscale(1) opacity(.45)}
+  .swatch.face{background-size:cover;background-position:center;color:#fff}
+  .swatch.face.mine{border-color:var(--text)}
+  .swatch.face::before{content:'You';position:absolute;inset:auto 0 0;font-size:9px;letter-spacing:.06em;text-transform:uppercase;background:rgba(0,0,0,.45);border-radius:0 0 7px 7px;padding:1px 0}
   .swatch.taken::after{content:attr(data-owner);position:absolute;inset:auto 0 -18px;font-size:10px;color:var(--muted);text-shadow:none;text-align:center;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .swatches{margin-bottom:24px}
   .name-row input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;outline:none}
@@ -1621,12 +1626,25 @@ function makeMap(id,opts={}){
 const PIN_SVG=(fill)=>`<svg viewBox="0 0 32 44" width="32" height="44"><path d="M16 1C7.7 1 1 7.7 1 16c0 10.5 15 27 15 27s15-16.5 15-27C31 7.7 24.3 1 16 1z" fill="${fill}" stroke="#fff" stroke-width="2"/><circle cx="16" cy="16" r="6" fill="#fff"/></svg>`;
 const guessIcon=L.divIcon({className:'',html:'<div class="marker-pin drop">'+PIN_SVG('#152219')+'</div>',iconSize:[32,44],iconAnchor:[16,42]});
 const colorIcon=(c,late)=>L.divIcon({className:'',html:'<div class="marker-pin drop'+(late?' late':'')+'">'+PIN_SVG(c)+'</div>',iconSize:[32,44],iconAnchor:[16,42]});
+/* A player who is using their photo as their token gets it inside the head of their pin. */
+function playerIcon(p,late){
+  const col=COLORS[(p&&p.color)??0][0];
+  const av=p&&p.face?avOf(p.id):null;
+  if(!av) return colorIcon(col,late);
+  return L.divIcon({className:'',html:'<div class="marker-pin drop'+(late?' late':'')+'"><span class="facepin" style="background-image:url('+av+')"></span>'+PIN_SVG(col)+'</div>',iconSize:[32,44],iconAnchor:[16,42]});
+}
+/* The little round token beside a name: their photo if they chose it, otherwise their colour. */
+function swStyle(p){
+  const av=p&&p.face?avOf(p.id):null;
+  return av?`background-image:url(${av});background-size:cover;background-position:center`
+           :`background:${COLORS[(p&&p.color)??0][0]}`;
+}
 const TRUE_SVG='<svg viewBox="0 0 32 44" width="32" height="44"><path d="M16 1C7.7 1 1 7.7 1 16c0 10.5 15 27 15 27s15-16.5 15-27C31 7.7 24.3 1 16 1z" fill="#fff" stroke="#152219" stroke-width="2.5"/><circle cx="16" cy="16" r="7" fill="#e63946"/><circle cx="16" cy="16" r="3" fill="#fff"/></svg>';
 const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true drop late"><span class="ring"></span>'+TRUE_SVG+'</div>',iconSize:[32,44],iconAnchor:[16,42]});
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-191947';
+const BUILD='20260917-193558';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1644,8 +1662,11 @@ function lbClean(e){
   const name=String(e.name==null?'':e.name).replace(/[<>]/g,'').trim().slice(0,20);
   const score=Math.round(+e.score), ts=+e.ts, rounds=Math.round(+e.rounds), time=Math.round(+e.time);
   if(!name||!isFinite(score)||score<0||score>2e6||!isFinite(ts)) return null;
-  return {id:String(e.id||'').slice(0,24)||('x'+ts), name, score,
+  const k=String(e.k==null?'':e.k).toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,20);
+  const out={id:String(e.id||'').slice(0,24)||('x'+ts), name, score,
           rounds:isFinite(rounds)&&rounds>0?rounds:0, time:isFinite(time)&&time>=0?time:0, ts};
+  if(k) out.k=k;   // whose account saved it, so friends can be marked on the board
+  return out;
 }
 function lbMerge(modeId,list){
   if(!MODES[modeId]) return [];
@@ -1745,7 +1766,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding were rebuilt from scratch.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:2,minor:18,patch:0};
+const VERSION={major:2,minor:19,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -1858,6 +1879,16 @@ function setFilter(key,val){
   document.querySelectorAll(`[data-${attr}]`).forEach(b=>b.classList.toggle('on',b.dataset[attr]===filter[key]));
 }
 
+/* Boards mark anyone you are friends with. Scores saved since v2.19 carry the account handle;
+   older ones only have a name, so fall back to matching a friend's display name. */
+function friendTag(e){
+  if(!acct.key||!e) return '';
+  const fs=friendKeys(); if(!fs.length) return '';
+  if(e.k) return (e.k!==acct.key&&fs.includes(e.k))?' <span class="fchip">Friend</span>':'';
+  const n=String(e.name||'').trim().toLowerCase();
+  if(!n||n===String(acct.name||'').trim().toLowerCase()) return '';
+  return fs.some(k=>personName(k).trim().toLowerCase()===n)?' <span class="fchip">Friend</span>':'';
+}
 function renderBoard(highlightId){
   const wrap=$('boardWrap'); if(!wrap) return;   // the home page shows the daily board now; this survives for the mode pages
   const b=boardFor(filter.rounds,filter.time,'classic');
@@ -1868,7 +1899,7 @@ function renderBoard(highlightId){
   wrap.innerHTML=`<table class="board"><tr><th>#</th><th>Name</th>${showMode?'<th>Setup</th>':'<th>Date</th>'}<th style="text-align:right">Score</th></tr>`+
     b.slice(0,10).map((e,i)=>{ const em=entryMode(e);
       const setup=`${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}`;
-      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`;
+      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`;
   $('boardCount').textContent=foot;
 }
 /* ---------- Accounts ----------
@@ -1927,7 +1958,7 @@ function paintAcct(){
   if($('acctWho')) $('acctWho').textContent=acct.name||'';
   if($('acctHandle')) $('acctHandle').textContent=acct.key?'@'+acct.key:'';
   avPaint(); paintPrefs();
-  if(acct.key&&!soc.loaded){ soc.loaded=true; socLoadMine().then(()=>{ const c=$('frCount'); if(c&&soc.mine.size) c.textContent=''; }); }
+  if(acct.key&&!soc.loaded) socWarm().then(()=>{ const c=$('frCount'); if(c&&soc.mine.size) c.textContent=''; });
   const inN=!!acct.name;
   if($('acctIn')) $('acctIn').hidden=!inN;
   if($('acctOut')) $('acctOut').hidden=inN;
@@ -2047,7 +2078,7 @@ $('avClear').addEventListener('click',async ()=>{
   acctMsg('acctMsg2','Photo removed.','ok');
   if(mp.role) mpSend({t:'av',av:''});
 });
-$('acctOutBtn').addEventListener('click',()=>{ const who=acct.name; acctClear(); soc.mine=new Set(); soc.loaded=false; paintAcct(); acctMsg('acctMsg','');
+$('acctOutBtn').addEventListener('click',()=>{ const who=acct.name; acctClear(); soc.mine=new Set(); soc.theirs={}; soc.loaded=false; socWarming=null; paintAcct(); acctMsg('acctMsg','');
   toast(`Signed out of ${who}. Your account is still there — sign back in any time.`); show('menu'); });
 acctLoad();
 
@@ -2109,6 +2140,18 @@ async function socLoadTheirs(keys){
   const got=await fetchMany(SOC_ROOT,want,2600);
   for(const k of want) soc.theirs[k]=new Set(got[k]&&Array.isArray(got[k].f)?got[k].f:[]);
 }
+/* Pull the whole follow graph once in the background: the bell, the invite list and the
+   Friend marks on the boards all need it, and none of them should wait on a fetch. */
+let socWarming=null;
+function socWarm(){
+  if(!acct.key) return Promise.resolve();
+  if(socWarming) return socWarming;
+  socWarming=(async()=>{
+    await socLoadMine(); await fetchDirectory(); await socLoadTheirs(Object.keys(soc.dir));
+    soc.loaded=true; lbPaint();
+  })().catch(()=>{ socWarming=null; });
+  return socWarming;
+}
 function followsMe(k){ return !!(soc.theirs[k]&&soc.theirs[k].has(acct.key)); }
 function iFollow(k){ return soc.mine.has(k); }
 function friendKeys(){ return [...soc.mine].filter(followsMe); }
@@ -2153,7 +2196,7 @@ async function openFriends(){
   await socLoadMine();
   await fetchDirectory();
   await socLoadTheirs(Object.keys(soc.dir));
-  renderFriends(); renderFind();
+  soc.loaded=true; renderFriends(); renderFind(); lbPaint();
 }
 async function frToggle(key,add){
   if(!acct.key) return;
@@ -2218,7 +2261,7 @@ async function loadInbox(){
 }
 $('bellBtn').addEventListener('click',async()=>{
   notes.open=!notes.open; $('notePanel').hidden=!notes.open;
-  if(notes.open){ renderNotes(); if(acct.key&&!soc.loaded){ soc.loaded=true; await socLoadMine(); await fetchDirectory(); await socLoadTheirs(Object.keys(soc.dir)); }
+  if(notes.open){ renderNotes(); await socWarm();
     await loadInbox(); renderNotes(); }
 });
 document.addEventListener('click',e=>{ if(notes.open&&!e.target.closest('.hero-left')){ notes.open=false; $('notePanel').hidden=true; } },true);
@@ -2235,7 +2278,7 @@ async function openInvite(){
   if(!box.hidden){ box.hidden=true; return; }
   box.hidden=false; box.innerHTML='<div class="noteempty">Loading…</div>';
   if(!acct.key){ box.innerHTML='<div class="noteempty">Sign in to invite friends.</div>'; return; }
-  if(!soc.mine.size||!Object.keys(soc.dir).length){ await socLoadMine(); await fetchDirectory(); await socLoadTheirs(Object.keys(soc.dir)); }
+  if(!soc.mine.size||!Object.keys(soc.dir).length){ socWarming=null; await socWarm(); }
   const friends=friendKeys();
   box.innerHTML=friends.length?friends.map(k=>
     `<div class="noterow">${frFace(k,32)}<span class="nt"><b>${esc(personName(k))}</b><span>@${esc(k)}</span></span><button class="btn btn-primary" data-inv="${esc(k)}">Invite</button></div>`).join('')
@@ -2352,7 +2395,7 @@ function renderDailyBoard(wrapId,subId){
   const me=dailyDone(); const mineId=me&&me.date===dailyDate()?me.id:null;
   const wrap=$(wrapId); if(!wrap) return;
   wrap.innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th style="text-align:right">Score</th></tr>`+
-    rows.slice(0,10).map((e,i)=>`<tr class="${e.id===mineId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="score">${e.score.toLocaleString()}</td></tr>`).join('')+`</table>`
+    rows.slice(0,10).map((e,i)=>`<tr class="${e.id===mineId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}</td><td class="score">${e.score.toLocaleString()}</td></tr>`).join('')+`</table>`
     :`<div class="empty">${lbLive()?'Nobody has played today yet. Go first.':'Connecting…'}</div>`;
   if($(subId)) $(subId).textContent=rows.length?`${rows.length} player${rows.length===1?'':'s'} today`:'Everyone plays the same five locations';
   if($('menuDailyCount')) $('menuDailyCount').textContent=rows.length?`${rows.length} played today`:'';
@@ -2386,7 +2429,7 @@ function renderBoardPage(){
 
   $('bpWrap').innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th>Date</th><th style="text-align:right">Score</th></tr>`+
     rows.slice(0,25).map((e,i)=>{ const em=entryMode(e);
-      return `<tr class="${e.id===bp.highlight?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="mode">${new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`
+      return `<tr class="${e.id===bp.highlight?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}</td><td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="mode">${new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`
     :`<div class="empty">${all.length?'No scores with these settings.':'Finish a game in this mode and save your score.'}</div>`;
   $('bpCount').textContent=rows.length?`${rows.length} game${rows.length===1?'':'s'} shown`:'';
   $('bpModes').innerHTML=Object.entries(MODES).filter(([id,mm])=>!mm.mp).map(([id,mm])=>{
@@ -2603,7 +2646,7 @@ function setGuess(latlng){
   if(amOut()) return;
   const ll=L.latLng(latlng.lat, ((latlng.lng+180)%360+360)%360-180);
   state.guess=ll;
-  if(guessMarker) guessMarker.setLatLng(ll); else guessMarker=L.marker(ll,{icon:mp.role&&mp.me.color!=null?colorIcon(COLORS[mp.me.color][0]):guessIcon}).addTo(guessMap);
+  if(guessMarker) guessMarker.setLatLng(ll); else guessMarker=L.marker(ll,{icon:mp.role&&mp.players[mp.me.id]?playerIcon(mp.players[mp.me.id]):guessIcon}).addTo(guessMap);
   sfx('pin');
   const gb=$('guessBtn'); if(gb.disabled&&!modeOf(state.mode).bet){ gb.disabled=false; gb.textContent='Guess'; gb.classList.remove('ready'); void gb.offsetWidth; gb.classList.add('ready'); }
   if(modeOf(state.mode).bet) renderBet();
@@ -2791,12 +2834,12 @@ function recordScore(name){
     const done=dailyDone();
     if(done&&done.date===state.daily.date) return {id:done.id||''};
     const e=dlSubmit({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
-      score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now()});
+      score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now(),k:acct.key||''});
     if(e) try{ localStorage.setItem('pp_daily',JSON.stringify({date:state.daily.date,score:state.score,id:e.id})); }catch(err){}
     return e||{id:''};
   }
   const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
-    score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now()};
+    score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now(),k:acct.key||''};
   const b=loadBoard(); b.push(entry); saveBoard(b);
   lbSubmit(entry);
   stGame(state.mode,state.score,state.totalRounds*5000);
@@ -3100,9 +3143,9 @@ function showTrioResultMP(rev){
   $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; $('ptsBar').style.width='0%'; countUp($('ptsNum'),0,mine.pts,900);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.pts/50)+'%'; }));
   const overall=rev.results.slice().sort((a,b)=>b.total-a.total); const lead=overall[0]; const myPos=overall.findIndex(r=>r.id===mp.me.id)+1;
-  $('leaderLine').hidden=false; $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="background:${COLORS[lead.color??0][0]}"></span>🏆 ${esc(lead.name)} leads · ${lead.total.toLocaleString()}</span><span>You're <b>${myPos}</b> of ${overall.length}</span>`;
+  $('leaderLine').hidden=false; $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="${swStyle(lead)}"></span>🏆 ${esc(lead.name)} leads · ${lead.total.toLocaleString()}</span><span>You're <b>${myPos}</b> of ${overall.length}</span>`;
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">picked ${r.pick!=null?String.fromCharCode(65+r.pick):'—'}</span><span class="rp">+${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} total</span></div>`).join('');
+  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">picked ${r.pick!=null?String.fromCharCode(65+r.pick):'—'}</span><span class="rp">+${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} total</span></div>`).join('');
   if(mine.ok) setTimeout(confetti,700);
 }
 
@@ -3159,7 +3202,7 @@ function countryResultMap(truthLL,truthName,guesses){
   if(tf){ L.geoJSON(tf,{style:{color:'#0f7a3f',weight:2.5,fillColor:'#1f9d55',fillOpacity:.45}}).addTo(resultLayer); pts.push(...extent(tf)); }
   const drawn=new Set();
   for(const g of guesses){ if(!g.country) continue; const f=find(g.country); if(!f) continue; if(g.country!==truthName&&!drawn.has(g.country)){ drawn.add(g.country); L.geoJSON(f,{style:{color:'#b3202e',weight:2,fillColor:'#e63946',fillOpacity:.35}}).addTo(resultLayer); }
-    const c=geoCenter(f); pts.push(...extent(f)); if(g.color!=null) L.marker(c,{icon:colorIcon(COLORS[g.color][0])}).addTo(resultLayer).bindTooltip(g.name,{direction:'top',offset:[0,-40]}); }
+    const c=geoCenter(f); pts.push(...extent(f)); if(g.color!=null||g.face) L.marker(c,{icon:playerIcon(g)}).addTo(resultLayer).bindTooltip(g.name,{direction:'top',offset:[0,-40]}); }
   L.marker(truthLL,{icon:trueIcon}).addTo(resultLayer);
   const fit=()=>{ resultMap.invalidateSize(); resultMap.fitBounds(L.latLngBounds(pts),{padding:[60,60],maxZoom:6,animate:false}); }; fit(); setTimeout(fit,150);
 }
@@ -3268,9 +3311,9 @@ function mpRankRows(rev,rdFn){
   const overall=rev.results.slice().sort((a,b)=>b.total-a.total); const lead=overall[0]; const myPos=overall.findIndex(r=>r.id===mp.me.id)+1; const tied=overall.length>1&&overall[1].total===lead.total;
   const ord=n=>n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
   $('leaderLine').hidden=false;
-  $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="background:${COLORS[lead.color??0][0]}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
+  $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="${swStyle(lead)}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${rdFn(r)}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} total</span></div>`).join('');
+  $('roundRank').innerHTML=sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${rdFn(r)}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} total</span></div>`).join('');
 }
 /* Swap in unlabeled satellite imagery for a result map when a mode needs to hide place names. */
 function plainStyle(m,on){
@@ -3283,7 +3326,7 @@ function plainStyle(m,on){
 /* ---------- Peek (multiplayer only): everyone's pins are visible while guessing ---------- */
 const peekMarkers={}; let peekT=0, peekPending=null;
 function peekSend(){ if(!state.guess) return; const now=Date.now(); const send=()=>{ peekT=Date.now(); peekPending=null; if(state.guess) mpSend({t:'pin',lat:+state.guess.lat.toFixed(4),lng:+state.guess.lng.toFixed(4)}); }; if(now-peekT>300) send(); else if(!peekPending) peekPending=setTimeout(send,300-(now-peekT)); }
-function peekShow(id,lat,lng){ const p=mp.players[id]; if(!p||!guessMap||typeof lat!=='number'||typeof lng!=='number') return; const ll=L.latLng(lat,lng); if(peekMarkers[id]) peekMarkers[id].setLatLng(ll); else peekMarkers[id]=L.marker(ll,{icon:colorIcon(COLORS[p.color??0][0]),opacity:.85,zIndexOffset:-100,interactive:false}).addTo(guessMap).bindTooltip(p.name||'?',{permanent:true,direction:'top',offset:[0,-40],className:'peek-tip'}); }
+function peekShow(id,lat,lng){ const p=mp.players[id]; if(!p||!guessMap||typeof lat!=='number'||typeof lng!=='number') return; const ll=L.latLng(lat,lng); if(peekMarkers[id]) peekMarkers[id].setLatLng(ll); else peekMarkers[id]=L.marker(ll,{icon:playerIcon(p),opacity:.85,zIndexOffset:-100,interactive:false}).addTo(guessMap).bindTooltip(p.name||'?',{permanent:true,direction:'top',offset:[0,-40],className:'peek-tip'}); }
 function peekClear(){ for(const k in peekMarkers){ peekMarkers[k].remove(); delete peekMarkers[k]; } }
 
 /* ---------- Coordinate paste box ---------- */
@@ -3391,7 +3434,7 @@ async function mpHost(){
   const code=mkCode();
   mpSetup('host',code);
   mp.me.id='host';
-  mp.players['host']={id:'host',name:mp.me.name,color:null,score:0,host:true,vpeer:null};
+  mp.players['host']={id:'host',name:mp.me.name,color:null,face:!!acct.av,score:0,host:true,vpeer:null};
   if(acct.av) avCache['host']=acct.av; else delete avCache['host'];
   renderLobby(); voiceShow();
   // Connect to every broker so guests can reach us through whichever one works for them.
@@ -3471,7 +3514,7 @@ function connFailed(why){
 }
 
 /* ----- host side ----- */
-function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null})); }
+function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null})); }
 /* Photos are far too heavy to repeat in every lobby sync, so they travel once and are cached by player. */
 const avCache={};
 function avOf(id){ return avCache[id]||null; }
@@ -3492,7 +3535,7 @@ function hostOnMessage(from,m,link){
     if(mp.players[from]){ mp.players[from].link=link||mp.players[from].link; mp.seen[from]=Date.now(); mpSendTo(from,{t:'welcome'}); hostSync(); return; }
     if(mp.phase!=='lobby'){ mpSendTo(from,{t:'reject',why:'That game is already in progress.'}); return; }
     if(playerList().length>=10){ mpSendTo(from,{t:'reject',why:'That game is full (10 players).'}); return; }
-    mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,score:0,host:false,vpeer:m.vpeer||null,link};
+    mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link};
     mp.seen[from]=Date.now(); dlog('joined '+from); mpSendTo(from,{t:'welcome'}); hostSync();
     setTimeout(()=>mpSendTo(from,{t:'avall',map:avCache}),300);   // hand the newcomer everyone's photo, including the host's
     return;
@@ -3502,11 +3545,18 @@ function hostOnMessage(from,m,link){
   if(m.t==='hb') return;
   if(m.t==='leave'){ hostDrop(from); return; }
   if(m.t==='vpeer'){ pl.vpeer=m.vpeer; hostSync(); return; }
-  if(m.t==='av'){ avCache[from]=m.av||null; mpBroadcast({t:'av',id:from,av:m.av||''}); renderLobby(); updateStrip(); return; }
+  if(m.t==='av'){ avCache[from]=m.av||null;
+    if(m.av&&!pl.chose&&!pl.face){ pl.face=true; pl.color=null; }   // your photo is your token by default
+    mpBroadcast({t:'av',id:from,av:m.av||''});
+    if(mp.phase==='lobby') hostSync(); else { mpBroadcast({t:'players',players:pubPlayers()}); renderLobby(); updateStrip(); }
+    return; }
   if(m.t==='name'){ pl.name=String(m.name||'').slice(0,16); if(mp.phase==='lobby') hostSync(); else mpBroadcast({t:'players',players:pubPlayers()}); }
   else if(m.t==='color'){
+    pl.chose=true;
+    if(m.color==='av'){ if(avOf(from)){ pl.face=true; pl.color=null; } hostSync(); return; }
     const c=m.color; const free=c===null||!playerList().some(p=>p.id!==from&&p.color===c);
-    if(free) pl.color=c; hostSync();
+    if(free){ pl.color=c; pl.face=false; }
+    hostSync();
   }
   else if(m.t==='pin'){ if(mp.phase!=='round'||!modeOf(mp.settings.mode).peek) return; mpBroadcast({t:'pin',id:from,lat:m.lat,lng:m.lng}); if(from!==mp.me.id) peekShow(from,m.lat,m.lng); }
   else if(m.t==='guess'){
@@ -3530,16 +3580,16 @@ function hostReveal(){
   const mm=modeOf(mp.settings.mode); const cd=mm.countdown;
   const tf=mm.country?countryAt(truth.lat,truth.lng):null; const tn=tf?tf.properties.name:null;
   const results=alivePlayers().map(p=>{ const g=mp.guesses[p.id]||null;
-    if(mm.country){ const ok=!!(g&&g.country&&tn&&g.country===tn); const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:g&&g.country?{lat:g.lat,lng:g.lng}:null,country:g?g.country||null:null,ok,km:null,pts,total:p.score}; }
+    if(mm.country){ const ok=!!(g&&g.country&&tn&&g.country===tn); const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:g&&g.country?{lat:g.lat,lng:g.lng}:null,country:g?g.country||null:null,ok,km:null,pts,total:p.score}; }
     if(mm.slider){ const sel=g&&g.choice!=null?g.choice:null; const err=sel==null?null:Math.abs(sel-loc.tempF); const pts=err==null?0:tempScore(err); p.score+=pts;
-      return {id:p.id,name:p.name,color:p.color,guess:null,sel,err,km:null,pts,total:p.score}; }
+      return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:null,sel,err,km:null,pts,total:p.score}; }
     if(mm.choice){ const sel=(g&&g.choice&&typeof g.choice==='object')?g.choice:null;
       const okP=!!sel&&sel.p===loc.pol[0], okE=!!sel&&sel.e===loc.pol[1]; const pts=(okP?2500:0)+(okE?2500:0); p.score+=pts;
-      return {id:p.id,name:p.name,color:p.color,guess:null,sel,okP,okE,ok:okP&&okE,km:null,pts,total:p.score}; }
-    if(mm.trio){ const ok=!!g&&g.pick===loc.lie; const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:null,pick:g?g.pick:null,ok,km:null,pts,total:p.score}; }
+      return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:null,sel,okP,okE,ok:okP&&okE,km:null,pts,total:p.score}; }
+    if(mm.trio){ const ok=!!g&&g.pick===loc.lie; const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:null,pick:g?g.pick:null,ok,km:null,pts,total:p.score}; }
     const has=!!(g&&g.lat!=null); const km=has?haversine(g,truth):null; let pts=has?Math.round(scoreFor(km)*(cd?countdownMult(g.left||0,state.timeLimit):1)):0; let bet=null;
     if(mm.bet){ const stake=Math.max(1,Math.min(p.score,(g&&g.bet)||1)); const mult=betMult(pts); const payout=Math.round(stake*mult); bet={stake,mult,payout,base:pts}; pts=payout-stake; }
-    p.score+=pts; return {id:p.id,name:p.name,color:p.color,guess:has?{lat:g.lat,lng:g.lng}:null,km,pts,bet,total:p.score}; });
+    p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:has?{lat:g.lat,lng:g.lng}:null,km,pts,bet,total:p.score}; });
   let elim=null;
   if(mm.elim){
     const alive=alivePlayers();
@@ -3585,6 +3635,7 @@ async function hostStartGame(){
   $('mpStartBtn').disabled=true; $('mpStartBtn').textContent='Finding locations…';
   mpBroadcast({t:'countdown',secs:0,msg:'Starting…'});
   // Auto-assign colors and names
+  for(const p of playerList()) if(p.face) p.color=null;   // photo players get a fresh line colour each game
   const taken=new Set(playerList().map(p=>p.color).filter(c=>c!==null));
   let n=1; for(const p of playerList()){ if(!p.name) p.name='Player '+(n++); if(p.color===null){ const c=COLORS.findIndex((_,i)=>!taken.has(i)); p.color=c<0?0:c; taken.add(p.color); } p.score=0; p.out=false; p.outRound=null; p.lives=null; }
   const em=modeOf(mp.settings.mode);
@@ -3683,22 +3734,24 @@ function paintLives(){
 function updateStrip(){
   const el=$('strip'); if(!mp.role) return;
   paintLives();
-  el.innerHTML=playerList().map(p=>{ const av=avOf(p.id); const done=mp.guesses[p.id]!==undefined&&!p.out;
+  el.innerHTML=playerList().map(p=>{ const av=p.face?avOf(p.id):null; const done=mp.guesses[p.id]!==undefined&&!p.out;
     const face=p.out?'✕':(done?'✓':(av?'':esc((p.name||'?')[0].toUpperCase())));
     const bg=av&&!p.out&&!done?`background-image:url(${av});background-size:cover;`:'';
     return `<div class="dotp ${done?'done':''} ${p.out?'out':''} ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}" style="background:${COLORS[p.color??0][0]};${bg}" title="${esc(p.name||'…')}${p.out?' — out':(p.lives!=null?' — '+p.lives+' live'+(p.lives===1?'':'s'):'')}">${face}${!p.out&&p.lives!=null?`<i class="lv">${p.lives}</i>`:''}</div>`; }).join('');
 }
 function updateWaitList(n,total){
   const ps=alivePlayers(); const done=n!=null?n:ps.filter(p=>mp.guesses[p.id]!==undefined).length;
-  $('waitList').innerHTML=ps.map(p=>`<div class="prow" style="padding:6px 10px"><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name||'…')}</span><span class="${mp.guesses[p.id]!==undefined?'ok':'tag'}">${mp.guesses[p.id]!==undefined?'✓ guessed':'thinking'}</span></div>`).join('');
+  $('waitList').innerHTML=ps.map(p=>`<div class="prow" style="padding:6px 10px"><span class="sw" style="${swStyle(p)}"></span><span class="pn">${esc(p.name||'…')}</span><span class="${mp.guesses[p.id]!==undefined?'ok':'tag'}">${mp.guesses[p.id]!==undefined?'✓ guessed':'thinking'}</span></div>`).join('');
   const w=$('waitTxt'); if(w.textContent.indexOf('Waiting')>=0) w.textContent=`Waiting for the others… ${done}/${total||ps.length} in`;
 }
 function renderLobby(){
   const ps=playerList();
   $('pcount').textContent=ps.length?`(${ps.length}/10)`:'';
   const pend=Object.keys(mp.pending||{}).filter(id=>!mp.players[id]);
-  $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}">${avTag(p.id,p.name,26)}<span class="sw" style="background:${p.color===null?'#cfd8d2':COLORS[p.color][0]}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
-  $('swatches').innerHTML=COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
+  $('plist').innerHTML=(ps.length?ps.map(p=>`<div class="prow ${voice.speaking[p.id]?'speaking':''}" data-id="${p.id}">${avTag(p.id,p.name,26)}<span class="sw" style="${p.color===null&&!p.face?'background:#cfd8d2':swStyle(p)}"></span><span class="pn" style="${p.name?'':'color:var(--muted);font-weight:500'}">${esc(p.name||'Joined, picking a name and color…')}</span>${p.host?'<span class="tag">Host</span>':''}${p.id===mp.me.id?'<span class="tag">You</span>':''}</div>`).join(''):'<div class="waiting">Connecting…</div>')+pend.map(()=>`<div class="prow"><span class="sw"></span><span class="pn" style="color:var(--muted);font-weight:500">Someone is connecting…</span></div>`).join('');
+  const meP=ps.find(p=>p.id===mp.me.id), myAv=avOf(mp.me.id)||acct.av;
+  const faceTile=myAv?`<div class="swatch face ${meP&&meP.face?'mine':''}" data-i="av" style="background-image:url(${myAv})" title="Your photo">${meP&&meP.face?'✓':''}</div>`:'';
+  $('swatches').innerHTML=faceTile+COLORS.map(([c,n],i)=>{ const owner=ps.find(p=>p.color===i&&!p.face); const mine=owner&&owner.id===mp.me.id; const taken=owner&&!mine;
     return `<div class="swatch ${mine?'mine':''} ${taken?'taken':''}" data-i="${i}" style="background:${c}" ${taken?`data-owner="${esc(owner.name||'taken')}"`:''} title="${n}">${mine?'✓':''}</div>`; }).join('');
   paintRules($('mpRules'),mp.settings); paintRegion();
   if(mp.role==='host'){ mpTimePick.mark(mp.settings.time); mpRoundPick.mark(mp.settings.rounds); const cur=mp.settings.mode||'classic'; markTiles($('lobbyModeGrid'),cur); $('mpStartBtn').textContent=`Start ${modeOf(cur).name} game`; }
@@ -3727,7 +3780,7 @@ function showResultMP(rev){
   for(const r of rev.results){ if(!r.guess) continue; pts.push(r.guess);
     if(!hid){ L.polyline([r.guess,rev.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
     lines.push(L.polyline([r.guess,rev.truth],{color:COLORS[r.color??0][0],weight:3,opacity:1}).addTo(resultLayer)); }
-    L.marker(r.guess,{icon:colorIcon(COLORS[r.color??0][0])}).addTo(resultLayer).bindTooltip(r.name,{direction:'top',offset:[0,-40]});
+    L.marker(r.guess,{icon:playerIcon(r)}).addTo(resultLayer).bindTooltip(r.name,{direction:'top',offset:[0,-40]});
   }
   if(!hid) L.marker(rev.truth,{icon:trueIcon}).addTo(resultLayer);
   const fit=()=>{ resultMap.invalidateSize(); if(pts.length>1) resultMap.fitBounds(L.latLngBounds(pts),{padding:[70,70],maxZoom:hid?5:12,animate:false}); else if(pts.length===1) resultMap.setView(pts[0],hid?4:5,{animate:false}); else resultMap.setView([20,0],2,{animate:false}); };
@@ -3750,9 +3803,9 @@ function showResultMP(rev){
   const lead=overall[0]; const myPos=overall.findIndex(r=>r.id===mp.me.id)+1; const tied=overall.length>1&&overall[1].total===lead.total;
   const ord=n=>n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
   $('leaderLine').hidden=false;
-  $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="background:${COLORS[lead.color??0][0]}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
+  $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="${swStyle(lead)}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=elimBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[r.color??0][0]}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out||r.lives!=null?' '+heartRow(r.lives??0,modeOf(state.mode).lives||3,!!r.out,14):''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
+  $('roundRank').innerHTML=elimBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out||r.lives!=null?' '+heartRow(r.lives??0,modeOf(state.mode).lives||3,!!r.out,14):''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
 }
 /* One line on the result screen naming whoever just lost a life or got knocked out. */
 function elimBanner(rev){
@@ -3798,7 +3851,7 @@ function showFinalMP(fin){
   if(iWon) setTimeout(confetti,900);
   $('signUp').hidden=canSave(); $('saveRow').hidden=true;
   if(canSave()&&!state.saved){ const e=recordScore(acct.name); state.saved=true; state.savedId=e.id; }
-  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd" title="${p.out?'knocked out in round '+p.outRound:'still standing'}">${modeOf(state.mode).lives?heartRow(p.lives??0,modeOf(state.mode).lives,!!p.out,17):heartRow(p.out?0:1,1,!!p.out,17)}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
+  $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(p)}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd" title="${p.out?'knocked out in round '+p.outRound:'still standing'}">${modeOf(state.mode).lives?heartRow(p.lives??0,modeOf(state.mode).lives,!!p.out,17):heartRow(p.out?0:1,1,!!p.out,17)}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
 }
 
 /* =========================================================
@@ -3973,7 +4026,12 @@ window.addEventListener('pagehide',()=>{ if(mp.role) mpLeave(); });
 $('mpName').addEventListener('input',()=>{ mp.me.name=$('mpName').value.trim().slice(0,16); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
 /* Share your photo once the room knows who you are. */
 function sendAvatar(){ if(mp.role&&acct.av){ avCache[mp.me.id]=acct.av; mpSend({t:'av',av:acct.av}); } }
-$('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return; const i=+sw.dataset.i; mpSend({t:'color',color:mp.me.color===i?null:i}); if(mp.role==='guest'){ mp.me.color=mp.me.color===i?null:i; } });
+$('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return;
+  const me=mp.players[mp.me.id];
+  if(sw.dataset.i==='av'){ if(me&&me.face) return; mpSend({t:'color',color:'av'}); if(mp.role==='guest'&&me){ me.face=true; me.color=null; renderLobby(); } return; }
+  const i=+sw.dataset.i; const drop=me&&!me.face&&me.color===i;
+  mpSend({t:'color',color:drop?null:i});
+  if(mp.role==='guest'){ mp.me.color=drop?null:i; if(me){ me.color=drop?null:i; me.face=false; renderLobby(); } } });
 function modeTiles(withMp){ return Object.entries(MODES).filter(([id,m])=>withMp||!m.mp).map(([id,m])=>`<button class="tile" data-mode="${id}" style="background-image:url(images/mode-${id}.jpg)" title="${m.name}"><span class="ribbon">${m.name}</span><span class="cap">${m.desc}</span></button>`).join(''); }
 function markTiles(grid,id){ [...grid.children].forEach(t=>t.classList.toggle('on',t.dataset.mode===id)); }
 $('modeGrid').innerHTML=modeTiles(false);
@@ -4035,7 +4093,7 @@ function toast(msg,kind){ const t=document.createElement('div'); t.className='to
 /* First paint of the pieces defined further down the file. */
 paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion(); paintAcct();
 paintBell(); setTimeout(paintBell,0);   // the daily's state settles a tick after the rest of the boot
-setTimeout(()=>{ paintBell(); if(acct.key) loadInbox(); },4000);
+setTimeout(()=>{ paintBell(); if(acct.key){ socWarming=null; socWarm(); loadInbox(); } },4000);   // the brokers are up by now
 setInterval(()=>{ paintBell(); if(acct.key&&!notes.open) loadInbox(); },90000);
 
 </script>
