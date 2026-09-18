@@ -59,8 +59,9 @@
   .hero-brand{display:flex;align-items:center;gap:18px}
   .hero-brand svg{width:104px;height:104px;filter:drop-shadow(0 10px 22px rgba(0,0,0,.45))}
   .hero-brand b{font-size:clamp(52px,7.5vw,92px);font-weight:800;letter-spacing:-.045em;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,.5)}
-  .hero-sub{margin:16px 0 0;font-size:18px;max-width:560px;color:rgba(255,255,255,.92);text-shadow:0 1px 8px rgba(0,0,0,.5);line-height:1.5}
+  .hero-sub{margin:16px 0 0;font-size:18px;max-width:860px;color:rgba(255,255,255,.92);text-shadow:0 1px 8px rgba(0,0,0,.5);line-height:1.5}
   .hero-top,.hero-left{z-index:6}
+  @media (min-width:900px){ .hero-sub{white-space:nowrap} }
   .lockup{display:flex;align-items:center;gap:12px}
   .lockup svg{width:48px;height:48px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
   .lockup b{font-size:28px;font-weight:800;letter-spacing:-.6px;text-shadow:0 2px 12px rgba(0,0,0,.4)}
@@ -72,7 +73,7 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,75,75,.7)}70%{box-shadow:0 0 0 8px rgba(255,75,75,0)}100%{box-shadow:0 0 0 0 rgba(255,75,75,0)}}
   .menu-wrap{max-width:1320px;margin:-64px auto 0;padding:0 24px 60px;position:relative;z-index:5}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
-  .card.wide{margin-top:20px}
+  .card.wide{margin-top:26px}
   .card.big{padding:0 26px 26px;overflow:hidden}
   .card.big h2{margin:16px 0 4px;font-size:26px;letter-spacing:-.5px}
   .card.big p{margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.5}
@@ -92,15 +93,16 @@
   .grid.three .mp-row.one{grid-template-columns:1fr}
   @media (max-width:1100px){ .grid.three{grid-template-columns:1fr 1fr} .grid.three .solo-card{grid-column:1 / -1} .grid.three .cardart{height:120px} }
   @media (max-width:640px){ .grid.three{grid-template-columns:1fr} .grid.three .solo-card{grid-column:auto} }
-  .learnbar{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:1.5px solid var(--line);
-    border-radius:16px;padding:14px 20px;margin:20px 0 0;background:var(--card);box-shadow:var(--shadow);color:var(--text);transition:transform .15s,border-color .15s}
+  .learnbar{display:flex;align-items:center;gap:16px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:1.5px solid var(--line);
+    border-radius:20px;padding:23px 24px;margin:26px 0 0;background:var(--card);box-shadow:var(--shadow);color:var(--text);transition:transform .15s,border-color .15s}
   .learnbar:hover{transform:translateY(-1px);border-color:var(--green)}
-  .learnbar .lmark{flex:none;width:42px;height:42px;border-radius:12px;background:var(--green-soft);color:var(--green-dark);display:grid;place-items:center}
-  .learnbar .lmark svg{width:22px;height:22px}
+  .learnbar .lmark{flex:none;width:58px;height:58px;border-radius:18px;background:var(--green-soft);color:var(--green-dark);display:grid;place-items:center;border:1.5px solid var(--line)}
+  .learnbar .lmark svg{width:28px;height:28px}
   .learnbar .ll{flex:1;min-width:0}
-  .learnbar .ll b{display:block;font-size:16px;letter-spacing:-.2px}
-  .learnbar .ll span{display:block;font-size:12.5px;color:var(--muted);margin-top:1px}
-  .learnbar .lr{flex:none;font-weight:800;font-size:13px;color:var(--green-dark);background:var(--green-soft);border-radius:99px;padding:8px 14px}
+  .learnbar .ll b{display:block;font-size:24px;letter-spacing:-.4px;line-height:1.15}
+  .learnbar .ll span{display:block;font-size:13.5px;color:var(--muted);margin-top:3px}
+  .learnbar .lr{flex:none;font-weight:800;font-size:15px;color:var(--green-dark);background:var(--green-soft);border-radius:99px;padding:10px 20px;border:1.5px solid var(--line)}
+  @media (max-width:560px){ .learnbar{flex-direction:column;align-items:flex-start;gap:12px} .learnbar .lr{align-self:stretch;text-align:center} }
   .wbar{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:1.5px solid var(--line);border-radius:14px;
     padding:14px 18px;margin-top:14px;background:var(--card);color:var(--text);font-weight:800;font-size:15px;transition:border-color .15s,transform .15s}
   .wbar:hover{border-color:var(--green);transform:translateY(-1px)}
@@ -110,7 +112,7 @@
   .wbar .go{flex:none;color:var(--green-dark);font-weight:800;font-size:13px}
   .wbar.on{border-color:var(--green);background:var(--green-soft);box-shadow:0 0 0 3px var(--green-soft)}
   .dailybtn{display:flex;align-items:center;gap:16px;width:100%;text-align:left;cursor:pointer;font-family:inherit;
-    border:0;border-radius:20px;padding:20px 24px;margin:20px 0 0;color:#fff;
+    border:0;border-radius:20px;padding:20px 24px;margin:26px 0 0;color:#fff;
     background:linear-gradient(120deg,#14532d,#1f9d55 55%,#2bb673);box-shadow:0 12px 30px rgba(20,60,38,.35);
     position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
   .dailybtn::after{content:'';position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.09)}
@@ -295,6 +297,10 @@
   #pix canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
   #pix.smooth canvas{image-rendering:auto}
   #pix.fixed{cursor:default;pointer-events:none}
+  #pixLinks{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .plink{position:absolute;pointer-events:auto;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.88);border:2px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.45);display:grid;place-items:center;cursor:pointer;color:#152219;transition:transform .12s,background .12s;padding:0}
+  .plink:hover{background:#fff;transform:translate(-50%,-50%) scale(1.12)!important}
+  .plink svg{width:24px;height:24px}
   #pix .dev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;opacity:.8}
   .modepill{background:#efe7ff}.modepill small{color:#5b3fb8}
   .postcards h3{text-align:center;font-family:var(--font);font-size:30px;font-weight:600;color:var(--green-dark);margin:0 0 6px}
@@ -556,6 +562,9 @@
   .cmcard .meta b{font-size:12px;color:var(--text)}
   .mkmap{height:min(460px,55vh);border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-top:10px;background:#bfd9e8}
   .mklist{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
+  .mkprog{height:10px;border-radius:99px;background:var(--sunk);border:1px solid var(--line);overflow:hidden}
+  .mkprog i{display:block;height:100%;width:0;background:var(--green);border-radius:99px;transition:width .3s}
+  .mkprog i.done{background:var(--green-dark)}
   .mkrow{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--raise);font-size:13px}
   .mkrow img{width:72px;height:36px;object-fit:cover;border-radius:6px;background:#1a2a20;flex:none}
   .mkrow .mkt{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -760,7 +769,7 @@
   .mic{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:99px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);font-weight:700;font-size:14px;color:var(--text)}
   .chatbtn{position:relative}
   .chatbtn .ico{background:var(--green-soft);color:var(--green-dark)}
-  .chatbtn .ico svg{width:17px;height:17px}
+  .chatbtn .ico svg{width:19px;height:19px}
   .chatbtn.open .ico{background:var(--green);color:#fff}
   .chatbtn .badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:99px;background:var(--red);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
   .chatpeek{position:absolute;bottom:60px;right:0;max-width:min(320px,70vw);padding:8px 12px;border-radius:12px;background:var(--text);color:#fff;font-size:13px;line-height:1.35;box-shadow:var(--shadow);animation:nagIn .2s ease-out;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -980,6 +989,11 @@
       <span class="ll"><b>Learn</b><span>Play like normal, and after every round see the two or three things that gave the country away.</span></span>
       <span class="lr">Open</span>
     </button>
+    <button class="learnbar" id="makeBar">
+      <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><path d="M12 8v6M9 11h6"/></svg></span>
+      <span class="ll"><b>Create a custom map</b><span>Pick ten or more spots anywhere on Earth, name it, and anyone can play it.</span></span>
+      <span class="lr">New</span>
+    </button>
     <button class="dailybtn" id="dailyBtn">
       <span class="dmark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#dailymark"/></svg></span>
       <span class="dl">
@@ -1156,11 +1170,13 @@
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Create a map</b></div><button class="btn btn-secondary" id="cmakeBack" style="margin-left:auto">Back</button></div>
     <div class="card">
       <div class="label" style="margin-top:0">Name</div>
-      <input class="tin" id="mkName" maxlength="32" placeholder="Every McDonald's in Ohio" autocomplete="off">
+      <input class="tin" id="mkName" maxlength="32" placeholder="Name your map" autocomplete="off">
       <div class="rsub" style="margin-top:8px">Click the map to add a spot. Each click snaps to the nearest Street View within a couple of miles. Paste coordinates or a Google Maps link to add one exactly.</div>
       <div id="mkMap" class="mkmap"></div>
       <div class="coordbar" style="border:0;padding:8px 0 0"><input id="mkCoord" placeholder="Paste coordinates: 48.8584, 2.2945 (or a Google Maps link)" autocomplete="off" spellcheck="false"><button id="mkCoordGo">Add</button></div>
-      <div class="label">Spots <span class="dim" id="mkCount">(0)</span></div>
+      <div class="label">Spots <span class="dim" id="mkCount">0 of 10</span></div>
+      <div class="mkprog"><i id="mkProg"></i></div>
+      <div class="rsub" id="mkNeed" style="margin:6px 0 10px">Ten spots minimum. Add as many as you like after that.</div>
       <div class="mklist" id="mkList"><div class="frempty">Nothing yet. Click the map.</div></div>
       <div class="acctmsg" id="mkMsg"></div>
       <button class="btn btn-primary btn-block big" id="mkSave" disabled>Publish map</button>
@@ -1296,7 +1312,7 @@
   <div class="round-intro" id="roundIntro" hidden></div>
   <div class="blindhint" id="blindHint" hidden></div>
   <div id="blink" hidden><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="lid" fill="#000" fill-rule="evenodd" d=""/></svg></div>
-  <div id="pix" hidden><canvas id="pixCanvas" width="128" height="72"></canvas><div class="dev" id="pixDev">Loading…</div></div>
+  <div id="pix" hidden><canvas id="pixCanvas" width="128" height="72"></canvas><div id="pixLinks"></div><div class="dev" id="pixDev">Loading…</div></div>
   <div id="trio" hidden></div>
   <div id="tmap" hidden><div class="handle"><span id="tmapTitle">Map</span><span class="hint" id="tmapHint">Hover to open</span><button class="btn btn-primary" id="trioLock" disabled>Pick one first</button></div><div id="triomap"></div></div>
   <div id="bettray" hidden>
@@ -1427,7 +1443,7 @@
 </div>
 <div class="microw" id="micRow">
 <div class="chatpeek" id="chatPeek" hidden></div>
-<button class="mic chatbtn" id="chatBtn" hidden title="Room chat (C)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg></span><span>Chat</span><span class="badge" id="chatBadge" hidden>0</span></button>
+<button class="mic chatbtn" id="chatBtn" hidden title="Room chat (C)"><span class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.9 3 3 6.4 3 10.6c0 2.3 1.2 4.4 3.1 5.8L5 21l4.6-2.2c.8.2 1.6.3 2.4.3 5.1 0 9-3.4 9-7.5S17.1 3 12 3z"/><circle cx="8.5" cy="10.8" r="1.2" fill="#fff"/><circle cx="12" cy="10.8" r="1.2" fill="#fff"/><circle cx="15.5" cy="10.8" r="1.2" fill="#fff"/></svg></span><span>Chat</span><span class="badge" id="chatBadge" hidden>0</span></button>
 <button class="mic" id="micBtn" hidden title="Toggle microphone (M)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/><line class="slash" x1="4" y1="3.5" x2="20" y2="20.5"/></svg></span><span id="micTxt">Mic off</span></button>
 </div>
 <canvas id="confetti" hidden></canvas>
@@ -1757,7 +1773,7 @@ const MODES={
   classic:  {name:'Classic', desc:'The standard game.'},
   gray:     {name:'Grayscale', desc:'No color. Just light and shadow.', gray:true},
   blink:    {name:'Blink', desc:'One quick blink, then guess.', time:15},
-  pixel:    {name:'Pixelated', desc:'Blocky, blurry, barely there.'},
+  pixel:    {name:'Pixelated', desc:'Blocky, blurry, barely there. You can still walk.'},
   stranded: {name:'Stranded', desc:'Only places in the middle of nowhere.', filter:n=>REMOTE.includes(n), radius:25000, remote:true},
   islands:  {name:'Island Hopper', desc:'Only small islands.', places:SMALL_ISLANDS, radius:4000},
   coast:    {name:'Coastline', desc:'Only spots within sight of the sea.', cities:COAST, cityRadius:0.03, snap:2500},
@@ -2129,7 +2145,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-210008';
+const BUILD='20260917-211402';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2251,7 +2267,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:2,patch:0};
+const VERSION={major:3,minor:3,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2775,7 +2791,8 @@ $('bellBtn').addEventListener('click',async()=>{
   if(notes.open){ renderNotes(); await socWarm();
     await loadInbox(); renderNotes(); }
 });
-document.addEventListener('click',e=>{ if(notes.open&&!e.target.closest('.hero-left')){ notes.open=false; $('notePanel').hidden=true; } },true);
+document.addEventListener('click',e=>{ if(notes.open&&!e.target.closest('.hero-left')){ notes.open=false; $('notePanel').hidden=true; }
+  const inv=$('inviteList'); if(inv&&!inv.hidden&&!e.target.closest('.invitebox')) inv.hidden=true; },true);
 $('noteList').addEventListener('click',e=>{
   const add=e.target.closest('[data-nadd]'), join=e.target.closest('[data-njoin]'), day=e.target.closest('[data-ndaily]'), see=e.target.closest('[data-nch]');
   if(see){ notes.open=false; $('notePanel').hidden=true; chalOpen(see.dataset.nch,see.dataset.nfrom); }
@@ -2995,7 +3012,7 @@ function renderCmap(){
 $('cmTimeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cm.time=+b.dataset.t; renderCmap(); sfx('click'); });
 $('cmRoundSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cm.rounds=+b.dataset.r; renderCmap(); sfx('click'); });
 $('cmCopy').addEventListener('click',()=>copyText(cmapLink(cm.cur.id),$('cmCopy'),'Copy link'));
-$('cmapBack').addEventListener('click',()=>openCmaps(cm.from));
+$('cmapBack').addEventListener('click',()=>{ if(cm.from==='menu'){ show('menu'); return; } openCmaps(cm.from); });
 $('cmOwner').addEventListener('click',async e=>{ if(!e.target.closest('#cmDelete')||!cm.cur) return; if(!confirm(`Delete "${cm.cur.name}" for everyone?`)) return;
   for(const l of lb.links) if(l.ready){ try{ l.client.publish(CM_ROOT+'/'+cm.cur.id,'',{qos:1,retain:true}); }catch(e){} } delete cm.all[cm.cur.id]; toast('Map deleted','ok'); openCmaps(cm.from); });
 $('cmPlay').addEventListener('click',()=>{
@@ -3014,7 +3031,7 @@ async function cmapFinish(){
 }
 /* ----- the builder ----- */
 function openMake(){
-  if(!acct.key){ toast('Sign in to build a map, it needs a name on it'); show('acct'); return; }
+  if(!acct.key){ toast('To make a map you need an account'); acctMsg('acctMsg','Create an account or sign in to make a map.'); show('acct'); $('acct').scrollTo(0,0); return; }
   show('cmake'); $('cmake').scrollTo(0,0); $('mkMsg').textContent='';
   if(!cm.mk){ cm.mk={map:makeMap('mkMap'),pins:[],layer:null}; cm.mk.layer=L.layerGroup().addTo(cm.mk.map);
     cm.mk.map.on('click',e=>mkAdd(e.latlng.lat,e.latlng.lng)); }
@@ -3040,10 +3057,13 @@ async function mkAdd(lat,lng){
 function renderMk(){
   const mk=cm.mk; if(!mk) return;
   mk.layer.clearLayers(); mk.pins.forEach(p=>L.marker([p.lat,p.lng],{icon:dotIcon}).addTo(mk.layer).bindTooltip(p.label||`${p.lat}, ${p.lng}`));
-  $('mkCount').textContent=`(${mk.pins.length})`;
+  const n=mk.pins.length, MIN=10;
+  $('mkCount').textContent=n<MIN?`${n} of ${MIN}`:`${n}`;
+  $('mkProg').style.width=Math.min(100,n/MIN*100)+'%'; $('mkProg').classList.toggle('done',n>=MIN);
+  $('mkNeed').textContent=n<MIN?`${MIN-n} more to go. Ten spots minimum, add as many as you like after that.`:`${n} spots. Add more or publish.`;
   $('mkList').innerHTML=mk.pins.length?mk.pins.map((p,i)=>`<div class="mkrow"><img src="${SV_TILE(p.pano,0,0,0)}" alt=""><span class="mkt">${esc(p.label||'Spot '+(i+1))}<small>${p.lat}, ${p.lng}</small></span><button data-del="${i}">Remove</button></div>`).join(''):'<div class="frempty">Nothing yet. Click the map.</div>';
-  $('mkSave').disabled=mk.pins.length<2||$('mkName').value.trim().length<2;
-  $('mkSave').textContent=mk.pins.length<2?`Add ${2-mk.pins.length} more spot${mk.pins.length===1?'':'s'}`:$('mkName').value.trim().length<2?'Give it a name':`Publish ${$('mkName').value.trim()} · ${mk.pins.length} spots`;
+  $('mkSave').disabled=n<MIN||$('mkName').value.trim().length<2;
+  $('mkSave').textContent=n<MIN?`Publish map (${n}/${MIN})`:$('mkName').value.trim().length<2?'Name it to publish':`Publish ${$('mkName').value.trim()}`;
 }
 $('mkName').addEventListener('input',renderMk);
 $('mkList').addEventListener('click',e=>{ const b=e.target.closest('[data-del]'); if(!b) return; cm.mk.pins.splice(+b.dataset.del,1); renderMk(); });
@@ -3051,14 +3071,15 @@ function mkCoordAdd(){ const c=parseCoords($('mkCoord').value); if(!c||!isFinite
 $('mkCoordGo').addEventListener('click',mkCoordAdd);
 $('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); mkCoordAdd(); } });
 $('mkSave').addEventListener('click',()=>{
-  const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<2||name.length<2) return;
+  const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<10||name.length<2) return;
   const rec={id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],pins:mk.pins.map(p=>({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}))};
   if(!cmapPublish(rec)){ $('mkMsg').textContent='Not connected, try again in a moment.'; return; }
   cm.all[rec.id]=rec; mk.pins=[]; $('mkName').value=''; renderMk(); toast('Map published','ok'); cmapOpen(rec.id);
 });
-$('cmakeBack').addEventListener('click',()=>openCmaps(cm.from));
+$('cmakeBack').addEventListener('click',()=>{ if(cm.from==='menu'){ show('menu'); return; } openCmaps(cm.from); });
 $('customBtn').addEventListener('click',()=>openCmaps('setup'));
 $('createBtn').addEventListener('click',()=>{ cm.from='setup'; openMake(); });
+$('makeBar').addEventListener('click',()=>{ cm.from='menu'; openMake(); });
 $('cmCreate2').addEventListener('click',openMake);
 $('lobbyCustomBtn').addEventListener('click',()=>openCmaps('lobby'));
 
@@ -3402,7 +3423,7 @@ async function nextRound(){
   }
   if(canvasRound){ const w=Math.min(1280,Math.round(innerWidth*0.85)), h=Math.round(w*Math.min(0.62,innerHeight/innerWidth));
     await startPixel(loc,{w,h,fov:85,zoom:4,smooth:true,fixed:state.lock,full:true}); }
-  else if(state.mode==='pixel') startPixel(loc);
+  else if(state.mode==='pixel') startPixel(loc,{move:!state.nomove&&!state.lock});
   else if(modeOf(state.mode).trio){ startTrio(loc); }
   else if(state.mode==='blink'){
     $('blink').hidden=false; $('lid').setAttribute('d','M0 0H100V100H0Z');   // eye shut while the still renders
@@ -3665,9 +3686,10 @@ async function fetchBitmap(url,retry=1){
 }
 async function runLimited(jobs,limit){ let i=0; const workers=Array.from({length:limit},async()=>{ while(i<jobs.length){ const j=jobs[i++]; await j(); } }); await Promise.all(workers); }
 async function panoMeta(pano){
-  let w=13312,h=6656,center=0;
-  try{ await gmapsReady; const {data}=await (svService||(svService=new google.maps.StreetViewService())).getPanorama({pano}); const t=data.tiles||{}; if(t.worldSize&&t.worldSize.width){ w=t.worldSize.width; h=t.worldSize.height; } if(typeof t.centerHeading==='number') center=t.centerHeading; }catch(e){}
-  return {w,h,center};
+  let w=13312,h=6656,center=0,links=[];
+  try{ await gmapsReady; const {data}=await (svService||(svService=new google.maps.StreetViewService())).getPanorama({pano}); const t=data.tiles||{}; if(t.worldSize&&t.worldSize.width){ w=t.worldSize.width; h=t.worldSize.height; } if(typeof t.centerHeading==='number') center=t.centerHeading;
+    links=(data.links||[]).filter(l=>l&&l.pano).map(l=>({pano:l.pano,heading:+l.heading||0})); }catch(e){}
+  return {w,h,center,links};
 }
 /* Fetch only the vertical band of the equirect that the views can see (pitch ±~40°). */
 async function loadBand(pano,zoom,meta,latTopOverride){
@@ -3775,11 +3797,11 @@ function runBlink(){
   })(t0);
 }
 /* Pixelated: a tiny canvas panorama viewer rendered from the imagery tiles, upscaled with hard pixel edges. */
-const pix={band:null,meta:null,heading:0,pitch:0,fov:85,drag:null,active:false,round:0,fixed:false,full:null};
+const pix={band:null,meta:null,heading:0,pitch:0,fov:85,drag:null,active:false,round:0,fixed:false,full:null,pano:null,canMove:false,moving:false};
 function stopPixel(){ pix.active=false; $('pix').hidden=true; }
 /* opts: {w,h,fov,fixed,zoom}. Pixelated uses a 160×90 canvas; Blink uses a full-res 120° still with no interaction. */
 async function startPixel(loc,opts={}){
-  const round=state.round; pix.active=true; pix.round=round; pix.heading=loc.heading; pix.pitch=0; pix.fov=opts.fov||85; pix.fixed=!!opts.fixed;
+  const round=state.round; pix.active=true; pix.round=round; pix.heading=loc.heading; pix.pitch=0; pix.fov=opts.fov||85; pix.fixed=!!opts.fixed; pix.pano=loc.pano; pix.canMove=!!opts.move; pix.moving=false; $('pixLinks').innerHTML='';
   const el=$('pix'); el.hidden=false; el.classList.toggle('smooth',!!opts.smooth); el.classList.toggle('fixed',!!opts.fixed);
   $('pixDev').hidden=false; $('pixDev').textContent='Loading…';
   pix.full=opts.full?{w:opts.w,h:opts.h}:null;
@@ -3790,6 +3812,34 @@ async function startPixel(loc,opts={}){
     pix.band=band; pix.meta=meta; $('pixDev').hidden=true; drawPixel(); return true;
   }catch(e){ $('pixDev').textContent='Imagery unavailable'; return false; }
 }
+/* Street View's own arrows, drawn on top of the pixel viewer: click one (or press up) and you walk there,
+   pixels and all. The answer stays where you started. */
+function paintLinks(){
+  const box=$('pixLinks'); if(!box) return;
+  if(!pix.canMove||!pix.meta||!pix.active||pix.moving){ box.innerHTML=''; return; }
+  const el=$('pix'); const W=el.clientWidth||1, H=el.clientHeight||1;
+  const f=(W/2)/Math.tan(pix.fov/2*Math.PI/180);
+  const y=Math.max(0.56,Math.min(0.92,0.5+0.26+pix.pitch*0.55))*H;
+  box.innerHTML=(pix.meta.links||[]).map(l=>{ let rel=((l.heading-pix.heading)%360+540)%360-180; if(Math.abs(rel)>pix.fov/2+8) return '';
+    const x=W/2+f*Math.tan(rel*Math.PI/180);
+    return `<button class="plink" data-pano="${esc(l.pano)}" style="left:${x.toFixed(0)}px;top:${y.toFixed(0)}px;transform:translate(-50%,-50%) rotate(${rel.toFixed(0)}deg)" title="Walk this way"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>`; }).join('');
+}
+async function pixMove(pano){
+  if(!pix.canMove||pix.moving||!pano||pano===pix.pano) return;
+  const round=state.round; pix.moving=true; $('pixLinks').innerHTML=''; $('pixDev').hidden=false; $('pixDev').textContent='Walking…';
+  try{ const meta=await panoMeta(pano); const band=await loadBand(pano,3,meta,70);
+    if(state.round!==round||!pix.active) return;
+    pix.band=band; pix.meta=meta; pix.pano=pano; $('pixDev').hidden=true; sfx('click'); }
+  catch(e){ $('pixDev').hidden=true; toast('Could not load that spot'); }
+  pix.moving=false; drawPixel();
+}
+function pixStep(){ if(!pix.canMove||!pix.meta) return; let best=null,bd=71; for(const l of pix.meta.links||[]){ const rel=Math.abs(((l.heading-pix.heading)%360+540)%360-180); if(rel<bd){ bd=rel; best=l; } } if(best) pixMove(best.pano); }
+$('pixLinks').addEventListener('pointerdown',e=>{ if(e.target.closest('.plink')) e.stopPropagation(); });
+$('pixLinks').addEventListener('click',e=>{ const b=e.target.closest('.plink'); if(b) pixMove(b.dataset.pano); });
+document.addEventListener('keydown',e=>{ if(!pix.active||!pix.canMove||$('game').hidden||e.target.tagName==='INPUT') return;
+  if(e.code==='ArrowUp'||e.code==='KeyW'){ e.preventDefault(); pixStep(); }
+  else if(e.code==='ArrowLeft'||e.code==='KeyA'){ e.preventDefault(); pix.heading-=20; drawPixel(); }
+  else if(e.code==='ArrowRight'||e.code==='KeyD'){ e.preventDefault(); pix.heading+=20; drawPixel(); } });
 function drawPixel(){
   if(!pix.band||!pix.active) return;
   const c=$('pixCanvas');
@@ -3805,6 +3855,7 @@ function drawPixel(){
     let u=lon/(2*Math.PI)+0.5; u-=Math.floor(u); const sx=Math.min(bw-1,Math.floor(u*bw0)); const sy=Math.min(bh-1,Math.max(0,Math.floor((0.5-lat/Math.PI)*bh0-yOff)));
     const i=(sy*bw+sx)*4, k=(py*W+px)*4; d[k]=src[i]; d[k+1]=src[i+1]; d[k+2]=src[i+2]; d[k+3]=255; } }
   ctx.putImageData(o,0,0);
+  paintLinks();
 }
 (function(){
   const el=$('pix');
@@ -4154,7 +4205,7 @@ $('coordIn').addEventListener('input',()=>$('coordIn').classList.remove('bad'));
 $('guessBtn').addEventListener('click',()=>submitGuess(false));
 $('pinBtn').addEventListener('click',()=>{ const p=$('mappanel'); $('pinBtn').classList.toggle('on'); p.classList.toggle('pinned'); p.classList.add('open'); guessMap.invalidateSize(); });
 $('sfxBtn').addEventListener('click',sfxToggle); paintSfx();
-$('resetBtn').addEventListener('click',()=>{ if(!state.current) return; if(state.mode==='blink'||state.lock) return; if(pix.active){ pix.heading=state.current.heading; pix.pitch=0; pix.fov=85; drawPixel(); return; } panos[front].src=embedUrl(state.current); });
+$('resetBtn').addEventListener('click',()=>{ if(!state.current) return; if(state.mode==='blink'||state.lock) return; if(pix.active){ pix.heading=state.current.heading; pix.pitch=0; pix.fov=85; if(pix.pano!==state.current.pano){ pixMove(state.current.pano); } else drawPixel(); return; } panos[front].src=embedUrl(state.current); });
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT') return;
   if(e.code==='Space'||e.code==='Enter'){

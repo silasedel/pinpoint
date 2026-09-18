@@ -14,7 +14,7 @@ Picture tiles on the solo setup screen and in the lobby (multiplayer-only modes 
 
 - **Grayscale**: no color.
 - **Blink**: a fixed 120° still is revealed through an eyelid for about a second. 15 seconds to guess.
-- **Pixelated**: the panorama rendered to a 128-pixel-wide canvas you drag around.
+- **Pixelated**: the panorama rendered to a 128-pixel-wide canvas you drag around, and you can still walk: Street View's own links are drawn as arrows on the pixel viewer, click one (or press up) and you move there, pixels and all. The answer stays where you started, and the reset button walks you back.
 - **Stranded**: remote regions only, never within 60 km of a big city.
 - **Island Hopper**: a curated list of ~85 small islands.
 - **Coastline**: ~80 spots on or beside the sea.
@@ -47,7 +47,7 @@ You never get the same spot twice. Regions rotate (the last sixty are skipped), 
 
 ## Custom maps
 
-Anyone signed in can build a map: give it a name, click spots on a world map (each click snaps to the nearest Street View within a couple of miles and shows a thumbnail), or paste coordinates or a Google Maps link to add one exactly. Two spots minimum, three hundred maximum. Publishing makes it one retained message (`worlddrop/v1/cmap/<id>`) with a shareable link (`?m=<id>`). The **Custom maps** bar under the mode grid — on the solo setup screen and in a lobby — lists every map on the brokers with a search box, sorted by plays. Playing one is Classic scoring over a shuffle of its spots, with your choice of time and length; each map keeps its own small board of best scores rather than touching the mode boards, and the maker can delete it.
+Anyone signed in can build a map: give it a name, click spots on a world map (each click snaps to the nearest Street View within a couple of miles and shows a thumbnail), or paste coordinates or a Google Maps link to add one exactly. Ten spots minimum (a progress bar counts you up to it), three hundred maximum, and you need an account to make one; the Create a custom map bar on the home page takes you straight to the builder. Publishing makes it one retained message (`worlddrop/v1/cmap/<id>`) with a shareable link (`?m=<id>`). The **Custom maps** bar under the mode grid — on the solo setup screen and in a lobby — lists every map on the brokers with a search box, sorted by plays. Playing one is Classic scoring over a shuffle of its spots, with your choice of time and length; each map keeps its own small board of best scores rather than touching the mode boards, and the maker can delete it.
 
 ## Challenges
 
