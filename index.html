@@ -1399,7 +1399,7 @@
       <div class="label">Progress <span class="dim" id="mkCount">0 of 10 minimum</span></div>
       <div class="mkprog"><i id="mkProg"></i></div>
       <div class="rsub" id="mkNeed" style="margin:6px 0 10px">10 spots minimum. After that there is no limit.</div>
-      <div class="twobtn" id="mkTools" style="margin:0 0 10px" hidden><button class="btn btn-secondary sm" id="mkReview">Review spots</button><button class="btn btn-secondary sm" id="mkCheck">Check for missing Street View</button><button class="btn btn-secondary sm danger" id="mkDropDead" hidden>Remove missing spots</button></div>
+      <div class="twobtn" id="mkTools" style="margin:0 0 10px" hidden><button class="btn btn-secondary sm" id="mkReview">Review spots</button><button class="btn btn-secondary sm" id="mkCheck">Check for missing Street View</button><button class="btn btn-secondary sm" id="mkDupes">Remove near-duplicates</button><button class="btn btn-secondary sm danger" id="mkDropDead" hidden>Remove missing spots</button></div>
       <div class="mklist" id="mkList"><div class="frempty">Nothing yet. Click the map.</div></div>
       <div class="acctmsg" id="mkMsg"></div>
       <button class="btn btn-primary btn-block big" id="mkSave" disabled>Publish map</button>
@@ -2368,7 +2368,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-124934';
+const BUILD='20260918-150227';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2519,7 +2519,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:23};
+const VERSION={major:3,minor:4,patch:24};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3627,7 +3627,11 @@ function peekClose(){ $('peek').hidden=true; renderMk(); }
 $('peekPrev').addEventListener('click',()=>{ if(peek.i>0) peekOpen(peek.i-1); sfx('click'); });
 $('peekNext').addEventListener('click',()=>{ peekNext(); sfx('lock'); });
 $('peekX').addEventListener('click',()=>{ peekClose(); sfx('click'); });
-$('peekDel').addEventListener('click',()=>{ const mk=cm.mk; if(!mk||!mk.pins.length) return; mk.pins.splice(peek.i,1); mk.dirty=true; if(reviewPos()>peek.i) reviewSave(reviewPos()-1); renderMk(); sfx('click'); if(!mk.pins.length){ peekClose(); return; } peekOpen(Math.min(peek.i,mk.pins.length-1)); });
+$('peekDel').addEventListener('click',()=>{ const mk=cm.mk; if(!mk||!mk.pins.length) return; const gone=mk.pins[peek.i]; mk.pins.splice(peek.i,1); mk.dirty=true; if(reviewPos()>peek.i) reviewSave(reviewPos()-1); renderMk(); sfx('click');
+  if(!mk.pins.length){ peekClose(); return; }
+  const next=Math.min(peek.i,mk.pins.length-1); const p=mk.pins[next]; fview.band=null; fview.pano=null;   // force a fresh picture, never the removed one
+  const close=p&&gone&&haversine({lat:p.lat,lng:p.lng},{lat:gone.lat,lng:gone.lng})*1000;
+  toast(close<40?`Removed. The next spot is ${Math.round(close)} m from it, a near-duplicate.`:'Removed. Showing the next spot.','ok'); peekOpen(next); });
 document.addEventListener('keydown',e=>{ if($('peek').hidden) return; if(e.key==='Escape') peekClose(); else if(e.key==='ArrowRight'||e.key==='Enter'){ peekNext(); } else if(e.key==='ArrowLeft'){ if(peek.i>0) peekOpen(peek.i-1); } });
 $('mkReview').addEventListener('click',()=>{ const mk=cm.mk; if(!mk||!mk.pins.length) return; let i=reviewPos(); if(i>=mk.pins.length){ reviewReset(); i=0; renderMk(); } peekOpen(i); sfx('click'); });
 window.addEventListener('resize',()=>{ if(!$('peek').hidden){ fitPeekCanvas(); fviewDraw(); } });
@@ -3643,6 +3647,14 @@ async function mkCheck(){
   toast(dead?`${dead} spot${dead===1?'':'s'} no longer on Street View`:'Every spot is still on Street View','ok');
 }
 $('mkCheck').addEventListener('click',mkCheck);
+/* Spots that sit on top of each other (two clicks on one corner, a walk that landed next to another spot): keep the first, drop the rest. */
+$('mkDupes').addEventListener('click',async()=>{
+  const mk=cm.mk; if(!mk||mk.pins.length<2) return; const LIM=25;
+  const keep=[], drop=[]; for(const p of mk.pins){ const near=keep.some(q=>Math.abs(q.lat-p.lat)<0.001&&Math.abs(q.lng-p.lng)<0.002&&haversine(p,q)*1000<LIM); (near?drop:keep).push(p); }
+  if(!drop.length){ toast(`No two spots within ${LIM} m of each other`,'ok'); return; }
+  const ok=await ask({title:`Remove ${drop.length} near-duplicate${drop.length===1?'':'s'}?`,body:`${drop.length} spot${drop.length===1?' sits':'s sit'} within ${LIM} m of an earlier spot. The earlier one stays.`,ok:'Remove them',danger:true}); if(!ok) return;
+  const gone=new Set(drop); let pos=reviewPos(), removedBefore=0; mk.pins.forEach((p,i)=>{ if(gone.has(p)&&i<pos) removedBefore++; }); reviewSave(Math.max(0,pos-removedBefore));
+  mk.pins=keep; mk.dirty=true; renderMk(); toast(`${drop.length} removed`,'ok'); sfx('click'); });
 $('mkDropDead').addEventListener('click',()=>{ const mk=cm.mk; const n=mk.pins.filter(p=>p.dead).length; mk.pins=mk.pins.filter(p=>!p.dead); mk.dirty=true; renderMk(); toast(`${n} removed`,'ok'); sfx('click'); });
 /* The builder box takes coordinates, a full Google Maps link, or plain text (an address or a place name), which is geocoded. */
 function mkQueryOf(text){
