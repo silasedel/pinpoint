@@ -93,6 +93,8 @@ Saving a score needs an account, so the leaderboard is a list of people rather t
 
 **Streaks.** Finish a game on consecutive days (any game — solo, duo, party, daily; days roll at midnight in New York) and the account keeps a day streak. From two days it shows beside your name on the account card with a flame; from five days the number and flame appear next to your name on every leaderboard, for everyone. Miss a day and it's gone. It lives in the account record, so it follows you between devices.
 
+Delete account sits beside Sign out: it explains what goes (name, photo, passcode, friends, streak; leaderboard scores stay under the name), the button arms after a three-second count, and deleting clears the account's retained records so the name is free again.
+
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
 ## Notifications
@@ -125,6 +127,7 @@ The Copy image button renders the spot as four 90° views in one PNG. The export
 ## How it works
 
 - **Street View without an API key.** The keyless Google Maps JS library is used only for `StreetViewService.getPanorama`, which still answers without a key. The panorama is rendered by Google's public embed iframe using the pano ID from that lookup. The embed's place card and controls are covered so they can't leak the answer.
+- **Round result.** The street stays behind a dark green wash, the round title sits at the top, the map is a framed rectangle in the middle, and the numbers read white underneath. The end-of-game screen keeps the light card look.
 - **Pins.** Every guess is a white pin with the player's colour — or photo — in its head. The real location is a bigger red pin with a target in it and a pulsing ring at its foot, so it's never lost among the guesses.
 - **Locations** are random points inside ~65 weighted bounding boxes tagged by continent. Each game shuffles the continents and assigns one per round, so five rounds means five different continents. Points snap to the nearest official Google pano within 15 km.
 - **Maps** are Leaflet with Esri basemaps (National Geographic style, or satellite with labels), which carry English place names worldwide.

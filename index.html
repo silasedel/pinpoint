@@ -191,8 +191,16 @@
   .profside .handle{display:block;font-size:13px;color:var(--muted);margin-bottom:10px}
   .profbtns{display:flex;gap:8px;flex-wrap:wrap}
   .btn.sm{padding:9px 14px;font-size:13.5px;font-weight:700}
-  .twobtn{display:flex;gap:8px;margin-top:10px}
-  .twobtn .btn{flex:1}
+  .twobtn{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .twobtn .btn{flex:1;min-width:130px}
+  .btn.danger{color:var(--red)} .btn.danger:hover{border-color:var(--red);background:var(--red-soft)}
+  .btn.dangerfill{background:var(--red);box-shadow:0 3px 0 #8a2b2b} .btn.dangerfill:hover{background:#b83a3a;box-shadow:0 4px 0 #8a2b2b} .btn.dangerfill:disabled{background:#d9a1a1;box-shadow:none}
+  .delbox{margin-top:12px;padding:14px 16px;border-radius:12px;background:var(--red-soft);border:1.5px solid var(--red);animation:nagIn .2s ease-out}
+  .delbox b{display:block;font-size:16px;color:var(--red)}
+  .delbox p{margin:4px 0 8px;font-size:13.5px;color:var(--text)}
+  .delbox ul{margin:0 0 12px;padding-left:18px;font-size:13px;line-height:1.5;color:var(--text)}
+  .delbox .row{display:flex;gap:8px;flex-wrap:wrap}
+  .delbox .row .btn{flex:1}
   .avrow{display:flex;gap:16px;align-items:center;margin-bottom:6px}
   .av-big{width:84px;height:84px;border-radius:50%;flex:none;background:var(--sunk) center/cover no-repeat;border:2px solid var(--line);
     display:grid;place-items:center;font-size:30px;font-weight:800;color:var(--muted)}
@@ -482,6 +490,32 @@
 
   /* ---------- RESULT / FINAL ---------- */
   #result,#final{background:var(--bg);display:flex;flex-direction:column;z-index:10}
+  /* The round result sits over the round itself: the street stays behind a dark green wash, the map is a framed
+     rectangle in the middle, and the numbers read white. The end-of-game screen keeps the light card look. */
+  #result{background:rgba(8,26,16,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow:auto;align-items:center;padding:18px 20px 40px;color:#fff}
+  #result .rtitle{width:min(1000px,100%);text-align:center;font-size:30px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:6px 0 14px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,.18);text-shadow:0 2px 12px rgba(0,0,0,.5);flex:none}
+  #result .rmap{flex:none;width:min(1000px,100%);height:min(48vh,520px);border-radius:18px;overflow:hidden;border:2px solid rgba(255,255,255,.28);box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 6px rgba(31,157,85,.18)}
+  #result .rpanel{background:transparent;border:0;width:min(1000px,100%);padding:20px 0 0;gap:10px}
+  #result .rpanel>*{animation:rise .5s cubic-bezier(.2,.9,.3,1) both}
+  #result .verdict{color:#9fe0b8;font-size:14px;letter-spacing:.14em} #result .verdict.bad{color:#ff8a8a} #result .verdict.mid{color:#ffd166}
+  #result .pts{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.4)} #result .pts small{color:rgba(255,255,255,.6)} #result .pts.great{color:#9fe0b8}
+  #result .bar{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.12)} #result .bar i{background:linear-gradient(90deg,#2bb673,#7ee0a8)}
+  #result .dist,#result .place,#result .leader{color:rgba(255,255,255,.72)} #result .dist b,#result .place span b,#result .leader b{color:#fff}
+  #result .pct{color:#9fe0b8}
+  #result .place{width:100%;padding:12px 0;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12)}
+  #result .place .trail b{color:rgba(255,255,255,.7)} #result .place .trail b.now{color:#fff;background:rgba(43,182,115,.3)}
+  #result .rrow{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:#fff} #result .rrow.me{background:rgba(43,182,115,.22);border-color:#2bb673}
+  #result .rrow .rd,#result .rrow .rt,#result .rrow .pos{color:rgba(255,255,255,.62)} #result .rrow.first .pos{color:#ffd166}
+  #result .leader .crown{background:rgba(255,209,102,.18);color:#ffd166}
+  #result .cluebox{background:rgba(43,182,115,.14);border-color:rgba(127,224,168,.5);color:#fff} #result .cluebox .ch{color:#9fe0b8} #result .cluebox .ch b{color:#fff} #result .cluebox ul{color:rgba(255,255,255,.9)}
+  #result .rivalline{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.75)} #result .rivalline b{color:#fff} #result .rivalline .ahead{color:#9fe0b8} #result .rivalline .behind{color:#ff8a8a}
+  #result .duelrow{background:rgba(230,57,70,.22);color:#ffb3b3} #result .duelrow.win{background:rgba(43,182,115,.22);color:#9fe0b8} #result .duelrow.even{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7)}
+  #result .elimrow{background:rgba(230,57,70,.22);color:#ffb3b3} #result .elimrow.me{background:#a3202c;color:#fff} #result .elimrow.life{background:rgba(255,209,102,.18);color:#ffd166}
+  #result .polrow .k{color:rgba(255,255,255,.55)} #result .polrow .bl{color:rgba(255,255,255,.7)} #result .polrow b.ok{color:#9fe0b8} #result .polrow b.no{color:#ff8a8a} #result .polrow .yours{background:rgba(230,57,70,.25);color:#ffb3b3}
+  #result .waiting{color:rgba(255,255,255,.65)}
+  #result .hearts .hp{fill:rgba(255,255,255,.25)} #result .hearts .hp.on{fill:#e63946}
+  #result #nextBtn{margin-top:6px;padding:15px 34px;font-size:16px}
+  @media (max-width:820px){ #result{padding:12px 12px 30px} #result .rtitle{font-size:22px;padding-bottom:10px;margin-bottom:10px} #result .rmap{height:40vh;border-radius:14px} }
   .rmap{flex:1;min-height:0;position:relative}
   #resultmap,#finalmap{position:absolute;inset:0;background:#bfd9e8}
   .rpanel{padding:20px 24px 24px;border-top:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -1045,7 +1079,13 @@
       <div id="pinBox" hidden><div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off"><button class="btn btn-primary" id="acctChange">Save</button></div></div>
       <div class="acctmsg" id="acctMsg2"></div>
       <button class="btn btn-secondary btn-block" id="friendsBtn">Friends <span id="frCount" class="dim"></span></button>
-      <div class="twobtn"><button class="btn btn-secondary sm" id="pinToggle">Change passcode</button><button class="btn btn-secondary sm" id="acctOutBtn">Sign out</button></div>
+      <div class="twobtn"><button class="btn btn-secondary sm" id="pinToggle">Change passcode</button><button class="btn btn-secondary sm" id="acctOutBtn">Sign out</button><button class="btn btn-secondary sm danger" id="acctDelBtn">Delete account</button></div>
+      <div class="delbox" id="delBox" hidden>
+        <b>Delete your account?</b>
+        <p id="delText"></p>
+        <ul><li>Your name, photo, passcode, friends list and streak are removed permanently.</li><li>Scores already on the leaderboards stay under the name.</li><li>There is no undo and no way to get the account back. The name becomes free for anyone to claim.</li></ul>
+        <div class="row"><button class="btn btn-secondary sm" id="delKeep">Keep my account</button><button class="btn btn-primary sm dangerfill" id="delGo" disabled>Delete permanently</button></div>
+      </div>
     </div>
     <div class="card wide">
       <h2 style="margin:0 0 14px">Appearance</h2>
@@ -1377,6 +1417,7 @@
 
 <!-- ================= ROUND RESULT ================= -->
 <div id="result" class="screen" hidden>
+  <div class="rtitle" id="rTitle">Round 1</div>
   <div class="rmap"><div id="resultmap"></div></div>
   <div class="rpanel">
     <div class="verdict" id="verdict"></div>
@@ -2145,7 +2186,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-211402';
+const BUILD='20260917-214544';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2267,7 +2308,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:3,patch:0};
+const VERSION={major:3,minor:3,patch:1};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2602,6 +2643,27 @@ $('avClear').addEventListener('click',async ()=>{
   if(rec.hash) acctPublish(rec);
   acctMsg('acctMsg2','Photo removed.','ok');
   if(mp.role) mpSend({t:'av',av:''});
+});
+/* Deleting an account clears its retained records (account, follows, inbox) and forgets it here.
+   The button arms after a moment so it can't be hit by accident. */
+let delTimer=null;
+$('acctDelBtn').addEventListener('click',()=>{
+  const box=$('delBox'); box.hidden=!box.hidden; $('pinBox').hidden=true; $('nameBox').hidden=true;
+  if(box.hidden){ clearTimeout(delTimer); return; }
+  $('delText').textContent=`This deletes @${acct.key} (${acct.name}) for good.`;
+  const go=$('delGo'); go.disabled=true; let n=3; go.textContent=`Delete permanently (${n})`;
+  clearTimeout(delTimer); const tick=()=>{ n--; if(n<=0){ go.disabled=false; go.textContent='Delete permanently'; } else { go.textContent=`Delete permanently (${n})`; delTimer=setTimeout(tick,1000); } }; delTimer=setTimeout(tick,1000);
+  box.scrollIntoView({block:'nearest',behavior:'smooth'});
+});
+$('delKeep').addEventListener('click',()=>{ $('delBox').hidden=true; clearTimeout(delTimer); });
+$('delGo').addEventListener('click',()=>{
+  if(!acct.key||$('delGo').disabled) return;
+  const key=acct.key, who=acct.name; let sent=0;
+  for(const l of lb.links) if(l.ready){ for(const t of [ACCT_ROOT+'/'+key,SOC_ROOT+'/'+key,INBOX_ROOT+'/'+key]){ try{ l.client.publish(t,'',{qos:1,retain:true}); sent++; }catch(e){} } }
+  if(!sent){ toast('Not connected. Try again in a moment.'); return; }
+  delete soc.dir[key]; acctClear(); soc.mine=new Set(); soc.theirs={}; soc.loaded=false; socWarming=null; notes.items=[];
+  $('delBox').hidden=true; paintAcct(); acctMsg('acctMsg',''); paintBell(); lbPaint();
+  toast(`${who} is gone. The account has been deleted.`); show('menu');
 });
 $('acctOutBtn').addEventListener('click',()=>{ const who=acct.name; acctClear(); soc.mine=new Set(); soc.theirs={}; soc.loaded=false; socWarming=null; paintAcct(); acctMsg('acctMsg','');
   toast(`Signed out of ${who}. Your account is still there, sign back in any time.`); show('menu'); });
@@ -3306,7 +3368,9 @@ function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); renderDailyBoard('me
 $('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
 $('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
 
-function show(id){ for(const s of ['menu','setup','acct','friends','region','daily','board','lobby','game','result','final','chal','cmaps','cmake','cmap']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); if(id!=='final'){ $('shareBox').hidden=true; $('shareCard').hidden=true; } }
+function show(id){ for(const s of ['menu','setup','acct','friends','region','daily','board','lobby','game','result','final','chal','cmaps','cmake','cmap']) $(s).hidden = s!==id;
+  if(id==='result'){ $('game').hidden=false; const m=modeOf(state.mode); $('rTitle').textContent=`Round ${state.round}`+(mp.role&&m.duel?` · damage ×${duelMult(state.round)}`:(state.totalRounds<99?` of ${state.totalRounds}`:'')); }   // the street stays behind the wash
+  document.body.classList.toggle('in-game',id==='game'); if(id!=='final'){ $('shareBox').hidden=true; $('shareCard').hidden=true; } }
 
 /* ---------- Game flow ---------- */
 function ensureGuessMap(){
