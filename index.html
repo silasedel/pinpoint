@@ -2363,7 +2363,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-013706';
+const BUILD='20260918-014358';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2514,7 +2514,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:8};
+const VERSION={major:3,minor:4,patch:9};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4133,10 +4133,11 @@ const SCREENS=['menu','setup','acct','friends','region','daily','board','lobby',
 function currentScreen(){ return SCREENS.find(s=>!$(s).hidden)||'menu'; }
 const KEEP_SCREENS=['menu','setup','acct','friends','daily','board','cmaps','cmap','cmstats','profile'];
 let bootScreen=null; try{ bootScreen=JSON.parse(localStorage.getItem('pp_screen')||'null'); }catch(e){}   // read before boot shows the menu
-function saveScreen(){ try{ const id=currentScreen(); if(!KEEP_SCREENS.includes(id)) return; localStorage.setItem('pp_screen',JSON.stringify({s:id,id:id==='cmap'&&cm.cur?cm.cur.id:id==='profile'?prof.key:id==='board'?bp.mode:null})); }catch(e){} }
+function saveScreen(){ try{ const id=currentScreen(); if(!KEEP_SCREENS.includes(id)) return; localStorage.setItem('pp_screen',JSON.stringify({s:id,id:id==='cmap'&&cm.cur?cm.cur.id:id==='profile'?prof.key:id==='board'?bp.mode:null,ts:Date.now()})); }catch(e){} }
 function restoreScreen(){
   const sv=bootScreen; bootScreen=null;
   if(!sv||!sv.s||sv.s==='menu'||/[?&](c|m)=/.test(location.search)) return;   // a shared link wins over the remembered screen
+  if(!(sv.ts>0)||Date.now()-sv.ts>2*60*1000) return;   // only a quick reload comes back to the same place; after a couple of minutes it's home
   try{ switch(sv.s){
     case 'setup': show('setup'); break;
     case 'acct': $('acctChip').click(); break;

@@ -115,7 +115,7 @@ It is deliberately not security: a four-digit code is guessable, the record is p
 
 ## Profiles, tags and admin
 
-**Reload lands you where you were.** The last screen you were on (home, setup, settings, friends, daily, a leaderboard, the map list, a map page, analytics or a profile) is remembered on the device, and a reload reopens it. A shared challenge or map link still wins.
+**Reload lands you where you were.** The last screen you were on (home, setup, settings, friends, daily, a leaderboard, the map list, a map page, analytics or a profile) is remembered on the device, and a reload within two minutes reopens it; after that you start at home. A shared challenge or map link still wins.
 
 Every name that has an account behind it is a link: on the mode boards, the daily, a custom map's board, a comment, a map card or the By fact on a map page. It opens that player's profile: photo (or the plain silhouette if they have none) with the streak as a small flame chip across its bottom edge, name, handle, a one-sentence bio they write in Settings (the button says Add bio until they have one), join month, tags, and their maps. Your own profile is a View profile button away in Settings. Signed in, you can add or remove them as a friend or report them (the report lands in the admin's bell with a Profile button). Board rows carry the face next to the name, then tags: Admin, Friend, AI, and the streak flame from five days. Scores saved before accounts were attached to scores are matched by name: if the row's name is exactly one account's handle or display name, the row gets that account's face, link and tags; two accounts sharing a name means no guess. Profile photos are stored at 240×240 (about 20 KB as JPEG) in the account record.
 
