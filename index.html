@@ -2368,7 +2368,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-111522';
+const BUILD='20260918-120416';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2519,7 +2519,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:20};
+const VERSION={major:3,minor:4,patch:21};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3493,7 +3493,7 @@ function openMake(rec){
     cm.mk.map.on('click',e=>mkAdd(e.latlng.lat,e.latlng.lng,{})); }
   const mk=cm.mk;
   if(rec&&Array.isArray(rec.pins)){   // editing a published map: its spots come in, and Save puts them back under the same id
-    mk.edit=rec; $('mkName').value=rec.name; mk.pins=rec.pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:0,pitch:+p.pitch||0,label:p.label||''})); mkLabels();
+    mk.edit=rec; $('mkName').value=rec.name; mk.pins=rec.pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:0,pitch:+p.pitch||0,faced:!!p.faced,label:p.label||''})); mkLabels();
     mk.thumb=rec.thumb&&rec.thumb.img?{...rec.thumb}:null; mk.thMode=mk.thumb?(mk.thumb.pano?'spot':'upload'):'auto'; mk.start=rec.start&&isFinite(+rec.start.lat)?{lat:+rec.start.lat,lng:+rec.start.lng,z:+rec.start.z||3}:null;
     mk.scale=+rec.scale>0?+rec.scale:null;   // older maps have none, so they get Auto until saved
   } else if(mk.edit){ mk.edit=null; mk.pins=[]; $('mkName').value=''; mk.thumb=null; mk.thMode='auto'; mk.start=null; mk.scale=null; }
@@ -3572,7 +3572,18 @@ $('mkList').addEventListener('click',e=>{
 const peek={i:0};
 const fview={pano:null,heading:0,pitch:0,fov:110,band:null,meta:null,raf:0};
 function reviewKey(){ const mk=cm.mk; return 'pp_rev_'+(mk&&mk.edit?mk.edit.id:'new'); }
-function reviewPos(){ try{ const v=JSON.parse(localStorage.getItem(reviewKey())||'null'); return v&&v.i>=0?+v.i:0; }catch(e){ return 0; } }
+/* Where checking resumes: the saved position on this device, or the marks an older version left (a list of spots),
+   or, on any device, the run of spots at the start of the map that were locked in already. Whichever is furthest. */
+function reviewPos(){
+  const mk=cm.mk; const pins=mk?mk.pins:[]; let pos=0;
+  try{ const v=JSON.parse(localStorage.getItem(reviewKey())||'null');
+    if(Array.isArray(v)){ const set=new Set(v); pos=pins.filter(p=>set.has(p.pano)).length; }
+    else if(v&&v.i>=0) pos=+v.i; }catch(e){}
+  let run=0; while(run<pins.length&&pins[run].faced) run++;
+  if(!run&&!pins.some(p=>p.faced)){   // maps saved before the flag existed: locked spots carry a tilt, so the end of the dense run of tilted spots is as far as the locking got (a lone tilted spot far later was faced on its own)
+    let end=-1, prev=-1; pins.forEach((p,i)=>{ if(!p.pitch) return; if(prev<0||i-prev<=30) end=i; prev=i; }); run=end+1; }
+  return Math.min(pins.length,Math.max(pos,run));
+}
 function reviewSave(i){ try{ localStorage.setItem(reviewKey(),JSON.stringify({i})); }catch(e){} }
 function reviewReset(){ try{ localStorage.removeItem(reviewKey()); }catch(e){} }
 function reviewLeft(){ const mk=cm.mk; if(!mk) return 0; return Math.max(0,mk.pins.length-Math.min(reviewPos(),mk.pins.length)); }
@@ -3666,7 +3677,7 @@ $('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefau
 $('mkSave').addEventListener('click',()=>{
   const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<10||name.length<2) return;
   const big=mk.pins.length>400;   // past 400 spots the place names are dropped so the record stays light on the wire
-  const pins=mk.pins.map(p=>{ const o={pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}; if(p.pitch) o.pitch=p.pitch; if(!big) o.label=(p.label||'').slice(0,40); return o; });
+  const pins=mk.pins.map(p=>{ const o={pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}; if(p.pitch) o.pitch=p.pitch; if(p.faced) o.faced=1; if(!big) o.label=(p.label||'').slice(0,40); return o; });
   const thumb=mk.thumb&&mk.thumb.img?mk.thumb:null, start=mk.start||null, scale=Math.round(mkScaleKm()*100)/100;
   const rec=mk.edit?{...mk.edit,name,pins,thumb,start,scale,edited:Date.now()}
     :{id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],likes:[],stats:{},thumb,start,scale,pins};
