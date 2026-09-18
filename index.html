@@ -736,7 +736,7 @@
   .prow .pn{font-weight:700;flex:1}
   .prow .tag{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
   .prow .ok{color:var(--green-dark);font-weight:800}
-  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
+  .swatches{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:8px}
   .swatch{position:relative;height:46px;border-radius:10px;border:3px solid transparent;cursor:pointer;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
   .swatch.mine{border-color:var(--text);box-shadow:0 0 0 2px #fff inset}
   .swatch.taken{cursor:not-allowed;filter:grayscale(1) opacity(.45)}
@@ -1112,7 +1112,7 @@
       <div class="card mp-card big">
         <div class="cardart mp"></div>
         <h2>Multiplayer</h2>
-        <p>Play with up to ten people</p>
+        <p>Play with up to twenty people</p>
         <button class="btn btn-primary btn-block" id="hostBtn">Create game</button>
         <div class="mp-row"><input id="joinCode" maxlength="4" placeholder="CODE" autocomplete="off"><button class="btn btn-secondary" id="joinBtn">Join</button></div>
       </div>
@@ -2368,7 +2368,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-111101';
+const BUILD='20260918-111522';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2519,7 +2519,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:19};
+const VERSION={major:3,minor:4,patch:20};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -5131,7 +5131,9 @@ window.addEventListener('resize',()=>{ guessMap&&guessMap.invalidateSize(); resu
    MULTIPLAYER, host-authoritative. Game messages travel through public MQTT brokers
    (plain WebSockets, so they work on any network); WebRTC is used only for voice.
    ========================================================= */
-const COLORS=[['#e63946','Red'],['#ff6b6b','Coral'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#9acd32','Lime'],['#2bb673','Green'],['#12a5a0','Teal'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#6f42c1','Indigo'],['#b23fd0','Purple'],['#e84393','Pink']];
+const MAX_PLAYERS=20;
+const COLORS=[['#e63946','Red'],['#ff6b6b','Coral'],['#f4772a','Orange'],['#f2c11b','Yellow'],['#9acd32','Lime'],['#2bb673','Green'],['#12a5a0','Teal'],['#1fa2c9','Sky'],['#3b5bdb','Blue'],['#6f42c1','Indigo'],['#b23fd0','Purple'],['#e84393','Pink'],
+  ['#8d5524','Brown'],['#6b8e23','Olive'],['#1e3a8a','Navy'],['#8b1e3f','Maroon'],['#3ddc97','Mint'],['#c9a227','Gold'],['#5b6b7a','Slate'],['#ff8fab','Rose']];   // twenty, one per seat
 const BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://test.mosquitto.org:8081'];
 const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpeer:null}, code:'', settings:{time:60,rounds:5,mode:'classic',nomove:false,lock:false,region:{type:'all',value:null},kind:'party',blind:{eyes:'host',swap:true},custom:null}, cd:null, cdLeft:0, guesses:{}, deadline:null, phase:'lobby',
            links:[], link:null, seen:{}, hb:null, hostSeen:0, joinTimer:null, brokerIdx:0 };
@@ -5310,8 +5312,8 @@ function hostOnMessage(from,m,link){
   if(m.t==='hello'){
     if(mp.players[from]){ mp.players[from].link=link||mp.players[from].link; mp.seen[from]=Date.now(); mpSendTo(from,{t:'welcome'}); hostSync(); return; }
     if(mp.phase!=='lobby'){ mpSendTo(from,{t:'reject',why:'That game is already in progress.'}); return; }
-    const cap=mp.settings.kind==='duo'?2:10;
-    if(playerList().length>=cap){ mpSendTo(from,{t:'reject',why:cap===2?'That duo already has its two players.':'That game is full (10 players).'}); return; }
+    const cap=mp.settings.kind==='duo'?2:MAX_PLAYERS;
+    if(playerList().length>=cap){ mpSendTo(from,{t:'reject',why:cap===2?'That duo already has its two players.':`That game is full (${MAX_PLAYERS} players).`}); return; }
     mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link};
     mp.seen[from]=Date.now(); dlog('joined '+from); mpSendTo(from,{t:'welcome'}); hostSync();
     const joinNote={t:'chat',id:'sys',sys:true,name:'',text:`${mp.players[from].name||'Someone'} joined`,ts:Date.now()}; mpBroadcast(joinNote); chatAdd(joinNote);
