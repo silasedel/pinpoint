@@ -120,7 +120,21 @@
   .board td.mode{color:var(--muted);font-size:12px}
   .board tr.me td{background:var(--green-soft)}
   .empty{color:var(--muted);font-size:14px;padding:18px 0;text-align:center}
-  #region,#daily{overflow:auto;padding:30px 20px 60px}
+  #region,#daily,#acct{overflow:auto;padding:30px 20px 60px}
+  .setup-wrap.narrow{max-width:560px}
+  .tin{width:100%;padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;font-family:inherit;outline:none;margin-bottom:4px}
+  .tin:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  .tin.code{letter-spacing:.5em;font-variant-numeric:tabular-nums;font-weight:800;text-align:center}
+  .tin.bad{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft);animation:shake .3s}
+  .acctmsg{min-height:20px;margin:8px 0 10px;font-size:13.5px;color:var(--muted)}
+  .acctmsg.bad{color:var(--red)} .acctmsg.ok{color:var(--green-dark)}
+  .fineprint{margin-top:12px;font-size:12px;line-height:1.55;color:var(--muted)}
+  .acctchip{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);background:var(--card);border-radius:99px;
+    padding:7px 16px 7px 8px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;color:var(--text);box-shadow:var(--shadow)}
+  .acctchip:hover{border-color:var(--green)}
+  .acctchip .av{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800}
+  .acctchip.out .av{background:var(--line);color:var(--muted)}
+  .hero-top{position:absolute;top:18px;right:20px;z-index:3}
   .rsub{color:var(--muted);font-size:13px;margin:0 0 14px}
   .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .rgrid.small{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
@@ -612,6 +626,7 @@
     <iframe id="hero0" class="hero-pano" title="Live Street View" tabindex="-1"></iframe>
     <iframe id="hero1" class="hero-pano" title="Live Street View" tabindex="-1"></iframe>
     <div class="hero-shade"></div>
+    <div class="hero-top"><button class="acctchip out" id="acctChip"><span class="av" id="acctAv">?</span><span id="acctLbl">Sign in</span></button></div>
     <div class="hero-content">
       <div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#logo"/></svg><b>Pinpoint</b></div>
       <div>
@@ -654,6 +669,33 @@
       <div class="board-foot"><span id="menuDailyCount"></span><button class="link" id="allBoards">Every mode's leaderboard</button></div>
     </div>
     <footer class="legal" id="legal"></footer>
+  </div>
+</div>
+
+<!-- ================= ACCOUNT ================= -->
+<div id="acct" class="screen" hidden>
+  <div class="setup-wrap narrow">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="acctBack" style="margin-left:auto">Back</button></div>
+    <div class="card" id="acctOut">
+      <h2 style="margin:0 0 4px">Your name, kept</h2>
+      <div class="rsub">Pick a name and a four-digit code. Use them on any device and your scores show up under the same name.</div>
+      <div class="label" style="margin-top:0">Name</div>
+      <input class="tin" id="acctName" maxlength="16" placeholder="Silas" autocomplete="username" spellcheck="false">
+      <div class="label">Four-digit code</div>
+      <input class="tin code" id="acctPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off">
+      <div class="acctmsg" id="acctMsg"></div>
+      <button class="btn btn-primary btn-block" id="acctGo">Continue</button>
+      <div class="fineprint">A new name is yours the moment you claim it. If the name already exists, the code signs you into it. The code keeps a friend from typing your name by accident, nothing more, so don't reuse a real password.</div>
+    </div>
+    <div class="card" id="acctIn" hidden>
+      <h2 style="margin:0 0 4px">Signed in as <span id="acctWho"></span></h2>
+      <div class="rsub" id="acctSince">Scores you save use this name.</div>
+      <div class="label" style="margin-top:0">Change your code</div>
+      <div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="4" placeholder="New code" autocomplete="off"><button class="btn btn-secondary" id="acctChange">Change</button></div>
+      <div class="acctmsg" id="acctMsg2"></div>
+      <button class="btn btn-secondary btn-block" id="acctOutBtn" style="margin-top:16px">Sign out</button>
+      <div class="fineprint">There's no way to reset a forgotten code, so keep it somewhere. Signing out leaves this browser as a numbered player again.</div>
+    </div>
   </div>
 </div>
 
@@ -1435,7 +1477,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin marker-true
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-172217';
+const BUILD='20260917-181712';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); return `${state.mode!=='classic'?m.name+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -1554,7 +1596,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding were rebuilt from scratch.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:2,minor:14,patch:6};
+const VERSION={major:2,minor:15,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -1679,6 +1721,106 @@ function renderBoard(highlightId){
       return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td></tr>`; }).join('')+`</table>`;
   $('boardCount').textContent=foot;
 }
+/* ---------- Accounts ----------
+   No server and no sign-up service: an account is one retained message on the same brokers the boards use,
+   holding a name and a salted hash of a four-digit code. It keeps a name yours across devices and stops a
+   friend typing it by accident. It is not security — a four-digit code is guessable and the record is public. */
+const ACCT_ROOT='worlddrop/v1/acct';
+const acct={key:null,name:null};
+function acctKey(name){ return String(name||'').toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,20); }
+async function acctHash(pin,salt,key){
+  const data=new TextEncoder().encode(salt+':'+pin+':'+key);
+  const buf=await crypto.subtle.digest('SHA-256',data);
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function acctLoad(){ try{ const a=JSON.parse(localStorage.getItem('pp_acct')||'null'); if(a&&a.key&&a.name){ acct.key=a.key; acct.name=a.name; } }catch(e){} }
+function acctSave(){ try{ localStorage.setItem('pp_acct',JSON.stringify({key:acct.key,name:acct.name})); }catch(e){} }
+function acctClear(){ acct.key=null; acct.name=null; try{ localStorage.removeItem('pp_acct'); }catch(e){} }
+/* Read one account's retained record: subscribe, wait briefly for the broker to hand it over, unsubscribe. */
+function acctFetch(key){
+  const topic=ACCT_ROOT+'/'+key;
+  const links=lb.links.filter(l=>l.ready);
+  if(!links.length) return Promise.resolve({error:'offline'});
+  return new Promise(resolve=>{
+    let done=false;
+    const finish=v=>{ if(done) return; done=true; clearTimeout(timer);
+      for(const l of links){ try{ l.client.removeListener('message',onMsg); l.client.unsubscribe(topic); }catch(e){} }
+      resolve(v); };
+    const onMsg=(t,payload)=>{ if(t!==topic) return; let rec=null; try{ rec=JSON.parse(payload.toString()); }catch(e){}
+      finish({record:rec&&rec.hash?rec:null}); };
+    for(const l of links){ try{ l.client.on('message',onMsg); l.client.subscribe(topic,{qos:0}); }catch(e){} }
+    const timer=setTimeout(()=>finish({record:null}),2600);
+  });
+}
+function acctPublish(rec){
+  let sent=false;
+  for(const l of lb.links) if(l.ready){ try{ l.client.publish(ACCT_ROOT+'/'+rec.key,JSON.stringify(rec),{qos:1,retain:true}); sent=true; }catch(e){} }
+  return sent;
+}
+function paintAcct(){
+  const chip=$('acctChip'); if(!chip) return;
+  chip.classList.toggle('out',!acct.name);
+  $('acctAv').textContent=acct.name?acct.name[0].toUpperCase():'?';
+  $('acctLbl').textContent=acct.name||'Sign in';
+  if($('acctWho')) $('acctWho').textContent=acct.name||'';
+  const inN=!!acct.name;
+  if($('acctIn')) $('acctIn').hidden=!inN;
+  if($('acctOut')) $('acctOut').hidden=inN;
+  if($('nameInput')) $('nameInput').placeholder=acct.name||anonName();
+}
+function acctMsg(el,text,cls){ const e=$(el); e.textContent=text||''; e.className='acctmsg'+(cls?' '+cls:''); }
+async function acctContinue(){
+  const raw=$('acctName').value.trim(), pin=$('acctPin').value.trim();
+  const key=acctKey(raw);
+  const bad=el=>{ const n=$(el); n.classList.remove('bad'); void n.offsetWidth; n.classList.add('bad'); n.focus(); };
+  if(key.length<2){ acctMsg('acctMsg','Pick a name of at least two letters or numbers.','bad'); bad('acctName'); return; }
+  if(!/^\d{4}$/.test(pin)){ acctMsg('acctMsg','The code is four digits.','bad'); bad('acctPin'); return; }
+  $('acctGo').disabled=true; acctMsg('acctMsg','Checking…');
+  const got=await acctFetch(key);
+  if(got.error==='offline'){ $('acctGo').disabled=false; acctMsg('acctMsg','Not connected yet. Give it a second and try again.','bad'); return; }
+  try{
+    if(got.record){
+      const h=await acctHash(pin,got.record.salt||'',key);
+      if(h!==got.record.hash){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is taken and the code doesn\'t match it.','bad'); bad('acctPin'); return; }
+      acct.key=key; acct.name=got.record.name||raw.slice(0,16); acctSave();
+      acctPublish({...got.record,seen:Date.now()});   // republish so the record stays alive on every broker
+      acctMsg('acctMsg','Signed in.','ok');
+    } else {
+      const salt=Math.random().toString(36).slice(2,10);
+      const hash=await acctHash(pin,salt,key);
+      const rec={key,name:raw.slice(0,16),salt,hash,made:Date.now()};
+      if(!acctPublish(rec)){ $('acctGo').disabled=false; acctMsg('acctMsg','Could not reach the server. Try again in a moment.','bad'); return; }
+      acct.key=key; acct.name=rec.name; acctSave();
+      acctMsg('acctMsg','Name claimed.','ok');
+    }
+  }catch(e){ $('acctGo').disabled=false; acctMsg('acctMsg','Something went wrong. Try again.','bad'); return; }
+  $('acctGo').disabled=false; $('acctPin').value='';
+  mp.me.name=acct.name; if($('mpName')) $('mpName').value=acct.name;
+  paintAcct(); lbPaint();
+  setTimeout(()=>{ if(!$('acct').hidden) show('menu'); },700);
+}
+async function acctChangePin(){
+  const pin=$('acctNewPin').value.trim();
+  if(!/^\d{4}$/.test(pin)){ acctMsg('acctMsg2','Four digits.','bad'); return; }
+  acctMsg('acctMsg2','Saving…');
+  const got=await acctFetch(acct.key);
+  const salt=Math.random().toString(36).slice(2,10);
+  const hash=await acctHash(pin,salt,acct.key);
+  const rec={...(got.record||{}),key:acct.key,name:acct.name,salt,hash,made:(got.record&&got.record.made)||Date.now()};
+  const ok=acctPublish(rec);
+  acctMsg('acctMsg2',ok?'Code changed.':'Could not reach the server.',ok?'ok':'bad');
+  $('acctNewPin').value='';
+}
+$('acctChip').addEventListener('click',()=>{ acctMsg('acctMsg',''); acctMsg('acctMsg2',''); paintAcct(); show('acct'); $('acct').scrollTo(0,0); if(!acct.name) $('acctName').focus(); });
+$('acctBack').addEventListener('click',()=>show('menu'));
+$('acctGo').addEventListener('click',acctContinue);
+$('acctPin').addEventListener('keydown',e=>{ if(e.key==='Enter') acctContinue(); });
+$('acctName').addEventListener('keydown',e=>{ if(e.key==='Enter') $('acctPin').focus(); });
+for(const id of ['acctPin','acctNewPin']) $(id).addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').slice(0,4); e.target.classList.remove('bad'); });
+$('acctChange').addEventListener('click',acctChangePin);
+$('acctOutBtn').addEventListener('click',()=>{ acctClear(); paintAcct(); acctMsg('acctMsg',''); toast('Signed out'); show('menu'); });
+acctLoad();
+
 /* ---------- Where in the world: pick a continent, then narrow to a country ---------- */
 let regionCont=null;
 let regionFrom='setup';
@@ -1893,7 +2035,7 @@ function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); renderDailyBoard('me
 $('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
 $('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
 
-function show(id){ for(const s of ['menu','setup','region','daily','board','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
+function show(id){ for(const s of ['menu','setup','acct','region','daily','board','lobby','game','result','final']) $(s).hidden = s!==id; document.body.classList.toggle('in-game',id==='game'); }
 
 /* ---------- Game flow ---------- */
 function ensureGuessMap(){
@@ -2166,7 +2308,7 @@ function showFinal(){
   $('againBtn').textContent=state.daily?'Back to menu':'Play again';
   if(state.daily){   // a daily saves itself under the name you already use
     $('saveRow').hidden=true;
-    if(!state.saved){ const e=recordScore(myName()||mp.me.name||anonName()); state.saved=true; state.savedId=e&&e.id; }
+    if(!state.saved){ const e=recordScore(scoreName()); state.saved=true; state.savedId=e&&e.id; }
   }
   const max=state.totalRounds*5000;
   if(!finalMap) finalMap=makeMap('finalmap');
@@ -2199,8 +2341,8 @@ function showFinal(){
 
   // Leaderboard save
   state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false; hideNag();
-  try{ $('nameInput').value=localStorage.getItem('pp_name')||''; }catch(e){}
-  $('nameInput').placeholder=anonName();
+  if(acct.name){ $('nameInput').value=''; $('nameInput').placeholder=acct.name; }
+  else { try{ $('nameInput').value=localStorage.getItem('pp_name')||''; }catch(e){} $('nameInput').placeholder=anonName(); }
   const rank=boardFor(state.totalRounds,state.timeLimit,state.mode).filter(e=>e.score>state.score).length+1;
   $('saveBtn').textContent = rank<=10 ? `Save to leaderboard · #${rank} in ${modeLabel()}` : 'Save to leaderboard';
 }
@@ -2224,7 +2366,7 @@ function recordScore(name){
 }
 $('saveBtn').addEventListener('click',()=>{
   if(state.saved) return;
-  const name=($('nameInput').value.trim()||anonName()).slice(0,20);
+  const name=($('nameInput').value.trim()||scoreName()).slice(0,20);
   const entry=recordScore(name);
   try{ localStorage.setItem('pp_name',name); }catch(e){}
   state.saved=true; state.savedId=entry.id;
@@ -2756,14 +2898,14 @@ const mp={ role:null, peer:null, players:{}, me:{id:null,name:'',color:null,vpee
 const CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ';
 function mkCode(){ let c=''; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.random()*CODE_CHARS.length|0]; return c; }
 function mkId(){ return Math.random().toString(36).slice(2,10); }
-function myName(){ try{ return localStorage.getItem('pp_name')||''; }catch(e){ return ''; } }
+function myName(){ if(acct.name) return acct.name; try{ return localStorage.getItem('pp_name')||''; }catch(e){ return ''; } }
 /* Nobody lands on the board as "Anonymous": a browser that never types a name gets its own player number and keeps it. */
 function anonName(){
   let n=null; try{ n=localStorage.getItem('pp_anon'); }catch(e){}
   if(!n||!/^Player \d{3,4}$/.test(n)){ n='Player '+(100+Math.floor(Math.random()*901)); try{ localStorage.setItem('pp_anon',n); }catch(e){} }
   return n;
 }
-function scoreName(){ return myName()||anonName(); }
+function scoreName(){ return acct.name||myName()||anonName(); }
 function playerList(){ return Object.values(mp.players); }
 function alivePlayers(){ return playerList().filter(p=>!p.out); }
 function amOut(){ const me=mp.players[mp.me.id]; return !!(me&&me.out); }
@@ -3161,7 +3303,7 @@ function showFinalMP(fin){
   fv.className='verdict '+(iWon?'good':'mid');
   plainStyle(finalMap,false);
   if(iWon) setTimeout(confetti,900);
-  if(!state.saved){ const me0=mp.players[mp.me.id]||{}; const e=recordScore(me0.name||mp.me.name||scoreName()); state.saved=true; state.savedId=e.id; }
+  if(!state.saved){ const me0=mp.players[mp.me.id]||{}; const e=recordScore(acct.name||me0.name||mp.me.name||scoreName()); state.saved=true; state.savedId=e.id; }
   $('standings').innerHTML=ps.map((p,i)=>`<div class="rrow ${p.id===mp.me.id?'me':''} ${i===0?'first':''} ${p.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="background:${COLORS[p.color??0][0]}"></span><span class="pn">${esc(p.name)}</span>${elimMode?`<span class="rd">${p.out?'out in round '+p.outRound:(p.lives!=null?p.lives+' life'+(p.lives===1?'':'s')+' left':'survived')}</span>`:''}<span class="rp">${p.score.toLocaleString()}</span></div>`).join('');
 }
 
@@ -3397,7 +3539,7 @@ function toast(msg,kind){ const t=document.createElement('div'); t.className='to
 </script>
 <script async src="https://maps.googleapis.com/maps/api/js?callback=__gmapsReady&loading=async&v=weekly">
 /* First paint of the pieces defined further down the file. */
-paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion();
+paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion(); paintAcct();
 </script>
 </body>
 </html>
