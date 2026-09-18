@@ -175,6 +175,11 @@
   .dlg{width:min(440px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px 22px;animation:nagIn .18s ease-out}
   .dlg h3{margin:0 0 6px;font-size:18px} .dlg p{margin:0 0 12px;color:var(--muted);font-size:14px;line-height:1.4}
   .dlg .tin{width:100%;margin-bottom:12px} .dlg .row{display:flex;gap:8px;justify-content:flex-end} .dlg .row .btn{min-width:100px}
+  .adminrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .switch{position:relative;width:46px;height:26px;background:var(--sunk);border-radius:99px;border:1px solid var(--line);cursor:pointer;transition:background .15s;flex:none}
+  .switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;width:100%;height:100%}
+  .switch i{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s;pointer-events:none}
+  .switch.on{background:var(--green);border-color:var(--green)} .switch.on i{left:22px}
   .ptag{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--sunk);color:var(--muted);margin-left:6px;vertical-align:middle}
   .ptag.adm{background:var(--green-dark);color:#fff} .ptag.fr{background:var(--green-soft);color:var(--green-dark)} .ptag.ban{background:var(--red-soft);color:var(--red)}
   .profbio{font-size:14.5px;margin:2px 0 6px;line-height:1.35}
@@ -1189,20 +1194,8 @@
       <div class="label">Sound</div>
       <div class="seg" id="soundSeg"><button data-snd="1">On</button><button data-snd="0">Off</button></div>
     </div>
-    <div class="card wide" id="adminCard">
-      <h2 style="margin:0 0 4px">Admin</h2>
-      <div id="adminOff">
-        <div class="prow2" style="margin-top:12px"><input class="tin code" id="adminPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" style="max-width:180px"><button class="btn btn-secondary" id="adminGo">Enter admin mode</button></div>
-        <div class="acctmsg" id="adminMsg"></div>
-      </div>
-      <div id="adminHid" hidden>
-        <div class="rsub" style="margin-top:8px">Admin controls are hidden for this visit.</div>
-        <button class="btn btn-secondary btn-block" id="adminShow" style="margin-top:10px">Show admin controls</button>
-      </div>
-      <div id="adminOn" hidden>
-        <div class="rsub" style="margin-top:8px" id="adminWhy"></div>
-        <div class="twobtn"><button class="btn btn-secondary sm" id="adminHide">Hide controls this visit</button><button class="btn btn-secondary sm" id="adminExit" hidden>Exit admin mode</button></div>
-      </div>
+    <div class="card wide" id="adminCard" hidden style="padding:14px 22px">
+      <div class="adminrow"><span><b>Admin mode</b><span class="rsub" id="adminSub" style="display:inline;margin-left:10px"></span></span><label class="switch" id="adminSw"><input type="checkbox" id="adminTog"><i></i></label></div>
     </div>
   </div>
 </div>
@@ -1792,6 +1785,14 @@ const SMALL_ISLANDS=[
  ['Tutuila',-14.4,-14.15,-170.9,-170.5],['Efate',-17.85,-17.45,168.15,168.6],['Santa Cruz, Galápagos',-0.85,-0.4,-90.45,-90.15],['Svalbard',78.15,78.3,15.3,16.1],['Christmas Island',-10.57,-10.4,105.53,105.72],
 ];
 const REMOTE=['Mongolia','Kazakhstan','Kyrgyzstan','Northern Territory','Western Australia','South Australia','Queensland','Botswana','Namibia','Lesotho','Iceland','Faroe Islands','Greenland','Alaska','Canada West','Canada East','Siberia West','Siberia East','Russian Far East','Argentina South','Chile South','Chile North','Bolivia','Peru','Madagascar','Nepal','Bhutan','Norway','Sweden','Finland','Tanzania','Oman','Jordan','Tunisia','Uzbekistan','New Zealand South','Tasmania','USA West','Mexico North','Ethiopia'];
+/* Is there a town here? Probe a ring 350 m out: in a built-up place most probes find another covered road,
+   on a lone road through nothing they miss. Three or more hits means people live here. */
+async function builtUp(lat,lng){
+  const pts=[0,60,120,180,240,300].map(a=>{ const r=a*Math.PI/180, d=0.35/111; return {lat:lat+d*Math.cos(r), lng:lng+d*Math.sin(r)/Math.cos(lat*Math.PI/180)}; });
+  let hits=0;
+  await Promise.all(pts.map(async p=>{ try{ const {data}=await svService.getPanorama({location:p,radius:110,source:google.maps.StreetViewSource.GOOGLE,preference:google.maps.StreetViewPreference.NEAREST}); if(data&&data.location&&data.location.pano) hits++; }catch(e){} }));
+  return hits>=3;
+}
 /* Cities over a million people, with coverage. Picks land within ~3 miles of the center. [name, lat, lng] */
 const MILLION=[['Tokyo',35.68,139.76],['Osaka',34.69,135.5],['Nagoya',35.17,136.9],['Sapporo',43.06,141.35],['Fukuoka',33.59,130.4],['Seoul',37.56,126.98],['Busan',35.18,129.08],['Taipei',25.04,121.56],['Kaohsiung',22.63,120.3],['Hong Kong',22.32,114.17],['Singapore',1.3,103.85],['Bangkok',13.75,100.5],['Kuala Lumpur',3.15,101.7],['Jakarta',-6.2,106.85],['Surabaya',-7.26,112.75],['Manila',14.6,120.98],['Cebu City',10.32,123.9],['Ho Chi Minh City',10.78,106.7],['Hanoi',21.03,105.85],['Phnom Penh',11.56,104.92],['Mumbai',19.08,72.88],['Delhi',28.63,77.22],['Bengaluru',12.97,77.59],['Chennai',13.08,80.27],['Kolkata',22.57,88.36],['Hyderabad',17.39,78.49],['Dhaka',23.73,90.41],['Dubai',25.2,55.27],['Istanbul',41.01,28.97],['Ankara',39.93,32.85],['Izmir',38.42,27.13],['Athens',37.98,23.73],['Rome',41.9,12.5],['Milan',45.46,9.19],['Naples',40.85,14.27],['Madrid',40.42,-3.7],['Barcelona',41.39,2.17],['Paris',48.86,2.35],['London',51.51,-0.13],['Birmingham',52.48,-1.9],['Berlin',52.52,13.4],['Hamburg',53.55,10.0],['Munich',48.14,11.58],['Cologne',50.94,6.96],['Vienna',48.21,16.37],['Prague',50.08,14.43],['Warsaw',52.23,21.01],['Budapest',47.5,19.04],['Bucharest',44.43,26.1],['Belgrade',44.8,20.47],['Kyiv',50.45,30.52],['Moscow',55.75,37.62],['Saint Petersburg',59.93,30.32],['Novosibirsk',55.03,82.92],['Yekaterinburg',56.84,60.6],['Kazan',55.79,49.12],['Almaty',43.24,76.89],['New York',40.75,-73.98],['Chicago',41.88,-87.63],['Los Angeles',34.05,-118.25],['Houston',29.76,-95.37],['Phoenix',33.45,-112.07],['Philadelphia',39.95,-75.16],['San Antonio',29.42,-98.49],['San Diego',32.72,-117.16],['Dallas',32.78,-96.8],['San Jose',37.34,-121.89],['Toronto',43.65,-79.38],['Montreal',45.5,-73.57],['Calgary',51.05,-114.07],['Mexico City',19.43,-99.13],['Guadalajara',20.67,-103.35],['Monterrey',25.67,-100.31],['Puebla',19.04,-98.2],['Tijuana',32.52,-117.03],['Bogotá',4.65,-74.08],['Medellín',6.25,-75.56],['Cali',3.45,-76.53],['Lima',-12.05,-77.04],['Quito',-0.22,-78.51],['Guayaquil',-2.19,-79.89],['Santiago',-33.45,-70.66],['Buenos Aires',-34.6,-58.38],['Córdoba',-31.42,-64.18],['Rosario',-32.95,-60.65],['São Paulo',-23.55,-46.63],['Rio de Janeiro',-22.91,-43.2],['Brasília',-15.79,-47.88],['Salvador',-12.97,-38.51],['Fortaleza',-3.72,-38.54],['Belo Horizonte',-19.92,-43.94],['Curitiba',-25.43,-49.27],['Recife',-8.05,-34.9],['Porto Alegre',-30.03,-51.23],['Montevideo',-34.9,-56.19],['Santa Cruz de la Sierra',-17.78,-63.18],['Johannesburg',-26.2,28.04],['Cape Town',-33.92,18.42],['Durban',-29.86,31.02],['Nairobi',-1.29,36.82],['Lagos',6.52,3.38],['Kano',12.0,8.52],['Accra',5.56,-0.2],['Dakar',14.72,-17.47],['Kampala',0.35,32.58],['Dar es Salaam',-6.8,39.28],['Cairo',30.05,31.24],['Alexandria',31.2,29.92],['Tunis',36.8,10.18],['Sydney',-33.87,151.21],['Melbourne',-37.81,144.96],['Brisbane',-27.47,153.03],['Perth',-31.95,115.86],['Auckland',-36.85,174.76]];
 /* Coastline: spots on or beside the sea. [name, lat, lng] */
@@ -2117,7 +2118,11 @@ async function findLocation(continent,mode,rng){
         if(!rng&&seenPanos().has(loc.pano)&&attempt<12) continue;   // been here before: pick another point (a seeded run must stay identical everywhere)
         const lat=loc.latLng.lat(), lng=loc.latLng.lng();
         let place=null;
-        if(mode.remote && MILLION.some(c=>haversine({lat,lng},{lat:c[1],lng:c[2]})<60)) continue;   // nowhere near a big city
+        if(mode.remote){   // nowhere near a big city or a capital, and no grid of other roads around it
+          if(MILLION.some(c=>haversine({lat,lng},{lat:c[1],lng:c[2]})<60)) continue;
+          if(CAPITALS.some(c=>haversine({lat,lng},{lat:c[1],lng:c[2]})<35)) continue;
+          if((data.links||[]).length>=3) continue;
+          if(await builtUp(lat,lng)) continue; }
         if(mode.alt){ const el=await elevationOf(lat,lng); if(el!=null && el<mode.alt) continue; }
         let pano=loc.pano, heading=Math.floor(R()*360);
         if(mode.old||mode.snow){   // pick a historic capture of this spot that fits the mode
@@ -2334,7 +2339,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-001357';
+const BUILD='20260918-002735';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2363,9 +2368,10 @@ function lbClean(e){
    so a removed score can't creep back from the browser that saved it. */
 const BAN_ROOT='worlddrop/v1/ban';
 lb.ban=new Set(); lb.banK=new Set(); lb.banPerm=new Set(); lb.banExp={};
-/* Admin is the @silas account, automatically. A code also turns it on for one visit. */
-const ADMIN_KEY='silas', ADMIN_CODE='6996';
-const admin={on:false,temp:false,hidden:false,ready:false};
+/* Admin is the @silas account. A toggle in Settings turns the controls on and off; the choice sticks on the device. */
+const ADMIN_KEY='silas';
+const admin={on:false,pref:true,ready:false};
+try{ admin.pref=localStorage.getItem('pp_admin_on')!=='0'; }catch(e){}
 function banMerge(list){ if(Array.isArray(list)) for(const id of list.slice(-800)) if(typeof id==='string') lb.ban.add(id); }
 /* Handles: a plain string is a permanent ban, {k,until} a timed one. Timed bans that have run out are simply dropped. */
 function banKMerge(list){
@@ -2482,7 +2488,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:3};
+const VERSION={major:3,minor:4,patch:4};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2744,7 +2750,7 @@ async function acctContinue(){
       acctPublish({...got.record,seen:Date.now()});   // republish so the record stays alive on every broker
       acctMsg('acctMsg','Signed in.','ok');
     } else {
-      if(key===ADMIN_KEY&&!admin.temp){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is reserved.','bad'); bad('acctName'); return; }
+      if(key===ADMIN_KEY){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is reserved.','bad'); bad('acctName'); return; }
       const salt=Math.random().toString(36).slice(2,10);
       const hash=await acctHash(pin,salt,key);
       const rec={key,name:cleanName(raw).slice(0,16)||key,salt,hash,made:Date.now()};
@@ -3768,26 +3774,16 @@ $('statsBtn').addEventListener('click',openStats);
 $('statsBack').addEventListener('click',()=>{ show('acct'); });
 
 /* ---------- Admin mode ----------
-   Signed in as @silas, admin is simply on. The code turns it on for one visit from any account.
-   The handle can't be claimed fresh. Everything admin removes, renames or bans goes to the brokers,
-   so it changes for everyone. */
-function adminSync(){ admin.on=(acct.key===ADMIN_KEY||admin.temp)&&!admin.hidden; paintAdmin(); }
+   Signed in as @silas, Settings shows one switch. On, every leaderboard row gets a pencil and a trash button,
+   every map gets Edit and Delete, and profiles get warn, rename and ban. Off, the game looks like anyone else's.
+   Everything admin does goes to the brokers, so it changes for everyone. */
+function adminSync(){ admin.on=acct.key===ADMIN_KEY&&admin.pref; paintAdmin(); }
 function paintAdmin(){
-  const me=acct.key===ADMIN_KEY, has=me||admin.temp;
-  $('adminOff').hidden=has; $('adminOn').hidden=!(has&&!admin.hidden); $('adminHid').hidden=!(has&&admin.hidden);
-  $('adminWhy').textContent=(me?'Admin is on because you are @silas. ':'Admin mode is on for this visit. ')+'Open anyone\'s profile from a leaderboard, a comment or a map to warn, rename or ban them. Board rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.';
-  $('adminExit').hidden=me;
+  const me=acct.key===ADMIN_KEY; $('adminCard').hidden=!me; if(!me) return;
+  $('adminTog').checked=admin.pref; $('adminSw').classList.toggle('on',admin.pref);
+  $('adminSub').textContent=admin.pref?'On. Edit or remove anything from any leaderboard, map or profile.':'Off. Normal game.';
 }
-$('adminGo').addEventListener('click',()=>{
-  const v=$('adminPin').value.trim(); $('adminPin').value='';
-  if(v!==ADMIN_CODE){ acctMsg('adminMsg','Wrong code.','bad'); $('adminPin').classList.remove('bad'); void $('adminPin').offsetWidth; $('adminPin').classList.add('bad'); return; }
-  admin.temp=true; acctMsg('adminMsg',''); adminSync(); lbPaint(); toast('Admin mode on','ok'); sfx('lock');
-});
-$('adminPin').addEventListener('keydown',e=>{ if(e.key==='Enter') $('adminGo').click(); });
-$('adminPin').addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,'').slice(0,4); e.target.classList.remove('bad'); });
-$('adminExit').addEventListener('click',()=>{ admin.temp=false; adminSync(); lbPaint(); toast('Admin mode off','ok'); });
-$('adminHide').addEventListener('click',()=>{ admin.hidden=true; adminSync(); lbPaint(); toast('Admin controls hidden until you reload','ok'); });
-$('adminShow').addEventListener('click',()=>{ admin.hidden=false; adminSync(); lbPaint(); });
+$('adminTog').addEventListener('change',e=>{ admin.pref=e.target.checked; try{ localStorage.setItem('pp_admin_on',admin.pref?'1':'0'); }catch(err){} adminSync(); lbPaint(); toast(admin.pref?'Admin mode on':'Admin mode off','ok'); sfx('click'); });
 const TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>';
 const PENCIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 function trashCell(id,board){ return admin.on?`<td class="adm"><button class="pencil" data-edit="${esc(id)}" data-board="${esc(board)}" title="Change the name on this row for everyone">${PENCIL}</button><button class="trash" data-trash="${esc(id)}" data-board="${esc(board)}" title="Remove this score for everyone">${TRASH}</button></td>`:''; }

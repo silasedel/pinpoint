@@ -15,7 +15,7 @@ Picture tiles on the solo setup screen and in the lobby (multiplayer-only modes 
 - **Grayscale**: no color.
 - **Blink**: a fixed 120° still is revealed through an eyelid for about a second. 15 seconds to guess.
 - **Pixelated**: the panorama rendered to a 128-pixel-wide canvas you drag around, and you can still walk: Street View's own links are drawn as arrows on the pixel viewer, click one (or press up) and you move there, pixels and all. The answer stays where you started, and the reset button walks you back.
-- **Stranded**: remote regions only, never within 60 km of a big city.
+- **Stranded**: remote regions only. A spot is thrown out if it is within 60 km of a city over a million, within 35 km of a capital, sits at a junction of three or more Street View roads, or if three of six probes 350 m around it land on other covered roads (a town). A lone road through nothing passes all four.
 - **Island Hopper**: a curated list of ~85 small islands.
 - **Coastline**: ~80 spots on or beside the sea.
 - **'Murica**: the United States only.
@@ -117,7 +117,7 @@ Every name that has an account behind it is a link: on the mode boards, the dail
 
 **AI tag.** The final screen has an "AI was used in this game" checkbox next to Save, off by default. A saved score with it on shows an AI chip on every board, so an AI-assisted run is never mistaken for a human one.
 
-**Admin.** Signed in as @silas, admin is simply on, with no code. From any other account, or signed out, the Admin card at the bottom of Settings takes a four-digit code that turns admin on for the current visit only (it's in the page source, so it keeps honest people honest, nothing more). Admin does everything from a player's profile: send a warning (lands in their bell as "Warning from Silas" with the text), rename them (the record plus every board row carrying their handle), ban for 3, 7 or 30 days (signed out everywhere, can't sign in, scores hidden until it ends, and a Lift the ban button), or ban permanently (account, scores and maps wiped, handle never claimable again). Board rows keep a pencil and a trash button for one-off fixes, and every prompt is an in-app dialog rather than the browser's. The handle silas can't be claimed fresh. Passcodes can be 4 to 12 digits.
+**Admin.** Signed in as @silas, Settings ends with one skinny card: an Admin mode switch. On (the default), the controls appear everywhere; off, the game looks like anyone else's, and the choice sticks on the device. Nobody else sees the card or has a way in. Admin does everything from a player's profile: send a warning (lands in their bell as "Warning from Silas" with the text), rename them (the record plus every board row carrying their handle), ban for 3, 7 or 30 days (signed out everywhere, can't sign in, scores hidden until it ends, and a Lift the ban button), or ban permanently (account, scores and maps wiped, handle never claimable again). Board rows keep a pencil and a trash button for one-off fixes, and every prompt is an in-app dialog rather than the browser's. The handle silas can't be claimed fresh. Passcodes can be 4 to 12 digits.
 
 Bans live on one retained list (`worlddrop/v1/ban/handles`): plain strings are permanent, `{k, until}` entries are timed and drop out on their own. Every client honors it when merging boards, when reconciling its local mirror and at sign-in. Removed score ids keep their own list (`worlddrop/v1/ban/ids`).
 
