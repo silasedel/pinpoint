@@ -2352,7 +2352,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-004146';
+const BUILD='20260918-005153';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2503,7 +2503,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:5};
+const VERSION={major:3,minor:4,patch:6};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2835,7 +2835,7 @@ $('mapSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if
 $('soundSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const want=b.dataset.snd==='1'; if(want!==sfxOn.v) sfxToggle(); paintPrefs(); });
 
 /* ---------- Profile photo: cropped square, shrunk small enough to live in the account record ---------- */
-const AV_SIZE=96;
+const AV_SIZE=240;   // stored in the account record as a JPEG, about 20 KB at this size
 function avPaint(){
   const url=acct.av||'';
   const big=$('avPreview'); if(big){ big.style.backgroundImage=url?`url(${url})`:''; big.textContent=url?'':(acct.name?acct.name[0].toUpperCase():'?'); big.style.setProperty('--avring',myLineColor()); }
@@ -2906,7 +2906,7 @@ $('avFile').addEventListener('change',async e=>{
   acctMsg('acctMsg2','Shrinking…');
   try{
     const url=await avFromFile(f);
-    if(url.length>60000){ acctMsg('acctMsg2','That photo is too heavy even shrunk. Try another.','bad'); return; }
+    if(url.length>120000){ acctMsg('acctMsg2','That photo is too heavy even shrunk. Try another.','bad'); return; }
     const got=await acctFetch(acct.key);
     const rec={...(got.record||{}),key:acct.key,name:acct.name,av:url};
     if(!rec.hash){ acctMsg('acctMsg2','Could not reach your account record. Try again.','bad'); return; }
@@ -3029,7 +3029,17 @@ const SIL='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r=
 function faceOf(k,size){ const url=k&&personAv(k); return url?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`:`<span class="pav sil" style="width:${size}px;height:${size}px">${SIL}</span>`; }
 function adminTag(k){ return k===ADMIN_KEY?' <span class="fchip adm">Admin</span>':''; }
 function aiTag(e){ return e&&e.ai?' <span class="fchip ai" title="The player said an AI helped">AI</span>':''; }
-function nameCell(e){ const k=e.k||''; return `<td class="name"><span class="who${k?' lnk':''}"${k?` data-prof="${esc(k)}"`:''}>${faceOf(k,26)}<span class="nm">${esc(e.name)}</span>${adminTag(k)}${friendTag(e)}${aiTag(e)}${streakTag(e)}</span></td>`; }
+/* Old scores were saved before accounts were attached. If the row's name is exactly one account's handle or
+   display name, the row is theirs: face, link and tags included. Two accounts with the same name means no guess. */
+let dirByName=null, dirByNameN=-1;
+function keyFor(e){
+  if(e.k) return e.k; if(!e.name) return '';
+  const kk=acctKey(e.name); if(soc.dir[kk]) return kk;
+  const n=Object.keys(soc.dir).length;
+  if(!dirByName||dirByNameN!==n){ dirByName={}; for(const k of Object.keys(soc.dir)){ const f=foldName(soc.dir[k].name).replace(/[^a-z0-9]/g,''); if(!f) continue; dirByName[f]=dirByName[f]?'!':k; } dirByNameN=n; }
+  const k=dirByName[foldName(e.name).replace(/[^a-z0-9]/g,'')]; return k&&k!=='!'?k:'';
+}
+function nameCell(e0){ const k=keyFor(e0); const e=k&&!e0.k?{...e0,k}:e0; return `<td class="name"><span class="who${k?' lnk':''}"${k?` data-prof="${esc(k)}"`:''}>${faceOf(k,26)}<span class="nm">${esc(e.name)}</span>${adminTag(k)}${friendTag(e)}${aiTag(e)}${streakTag(e)}</span></td>`; }
 function frFace(k,size){
   const url=personAv(k);
   return url?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`
