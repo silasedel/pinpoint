@@ -594,6 +594,7 @@
   .chrep td.w{font-weight:800;color:var(--green-dark)}
   .chrep td small{display:block;color:var(--muted);font-weight:500;font-size:12px}
   #chal,#cmaps,#cmap,#cmake{overflow:auto;padding:30px 20px 60px}
+  #chal .ddone{margin:14px 22px 22px}
   .cmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:12px}
   .cmcard{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--raise);cursor:pointer;text-align:left;font-family:inherit;color:var(--text)}
   .cmcard:hover{border-color:var(--green);background:var(--green-soft)}
@@ -2210,7 +2211,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-222215';
+const BUILD='20260917-223148';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2340,7 +2341,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:3,patch:6};
+const VERSION={major:3,minor:3,patch:7};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2859,8 +2860,8 @@ async function inboxPush(key,item){
   for(const l of lb.links) if(l.ready){ try{ l.client.publish(INBOX_ROOT+'/'+key,JSON.stringify(fresh),{qos:1,retain:true}); }catch(e){} }
 }
 function noteDaily(){
-  const d=dailyDate(), done=dailyDone();
-  if(done&&done.date===d) return [];
+  const d=dailyDate();
+  if(dailyPlayed()) return [];
   return [{id:'daily-'+d,kind:'daily',title:"Today's mission is up",body:'Five rounds, same for everyone.',ts:Date.now()}];
 }
 function noteFriends(){
@@ -3310,14 +3311,22 @@ function dailyConfig(date){
   return {date, mode, time, rounds:5, region};
 }
 function dailyDone(){ try{ return JSON.parse(localStorage.getItem('pp_daily')||'null'); }catch(e){ return null; } }
-function dailyMark(score){ try{ localStorage.setItem('pp_daily',JSON.stringify({date:dailyDate(),score})); }catch(e){} }
+function dailyMark(rec){ try{ localStorage.setItem('pp_daily',JSON.stringify({...(dailyDone()||{}),...rec,date:dailyDate()})); }catch(e){} }
+/* Has today's drop been used? Locally the moment it was started; and if you're signed in, a score under your
+   handle on today's board counts too, so a second device doesn't get a second go. */
+function dailyPlayed(){
+  const d=dailyDate(), done=dailyDone();
+  if(done&&done.date===d) return done;
+  if(acct.key){ const e=(lb.daily||[]).find(x=>x.k===acct.key); if(e){ const rec={date:d,score:e.score,id:e.id}; dailyMark(rec); return rec; } }
+  return null;
+}
 function dailyFacts(cfg){
   const bits=[['Mode',modeOf(cfg.mode).name],['Rounds',cfg.rounds],['Time per round',cfg.time?cfg.time+'s':'no limit']];
   if(cfg.region.type!=='all') bits.push(['Where',regionLabel(cfg.region)]);
   return bits.map(([k,v])=>`<div class="dfact"><small>${k}</small><b>${esc(String(v))}</b></div>`).join('');
 }
 function renderDaily(){
-  const cfg=dailyConfig(); const done=dailyDone(); const mine=done&&done.date===cfg.date?done:null;
+  const cfg=dailyConfig(); const mine=dailyPlayed();
   $('dHero').style.backgroundImage=`url(images/mode-${cfg.mode}.jpg)`;
   $('dDate').textContent='Daily mission · '+dailyNice(cfg.date);
   $('dTitle').textContent=modeOf(cfg.mode).name+(cfg.region.type!=='all'?' in '+regionLabel(cfg.region):'');
@@ -3325,7 +3334,7 @@ function renderDaily(){
   $('dStart').textContent=mine?'Already played today':'Start today\'s game';
   $('dStart').disabled=!!mine;
   $('dDone').hidden=!mine;
-  if(mine) $('dDone').innerHTML=`You scored <b>${mine.score.toLocaleString()}</b> today. A new drop lands at midnight in New York.`;
+  if(mine) $('dDone').innerHTML=mine.score!=null?`You scored <b>${mine.score.toLocaleString()}</b> today. A new drop lands at midnight in New York.`:`Today's drop is used up. A new one lands at midnight in New York.`;
   renderDailyBoard('dBoardWrap','dBoardSub');
 }
 function renderDailyBoard(wrapId,subId){
@@ -3339,14 +3348,15 @@ function renderDailyBoard(wrapId,subId){
   if($('menuDailyCount')) $('menuDailyCount').textContent=rows.length?`${rows.length} played today`:'';
 }
 function paintDailyButton(){
-  const today=dailyDate(); const done=dailyDone(); const mine=done&&done.date===today?done:null;
+  const today=dailyDate(); const mine=dailyPlayed();
   $('dailyDateLbl').textContent='Daily mission · '+dailyNice(today);
   $('dailyRight').textContent=mine?'Played':'Open';
 }
 $('dailyBtn').addEventListener('click',()=>{ renderDaily(); show('daily'); $('daily').scrollTo(0,0); });
 $('dailyBack').addEventListener('click',()=>{ paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); show('menu'); });
-$('dStart').addEventListener('click',()=>{ const cfg=dailyConfig(); const done=dailyDone();
-  if(done&&done.date===cfg.date){ toast('You have already played today\'s drop'); return; }
+$('dStart').addEventListener('click',()=>{ const cfg=dailyConfig();
+  if(dailyPlayed()){ toast('You have already played today\'s drop'); renderDaily(); return; }
+  dailyMark({date:cfg.date,started:Date.now()});   // used the moment it starts, finished or not
   startGame({daily:cfg}); });
 
 /* ---------- Leaderboard page: one board per mode ---------- */
@@ -3797,7 +3807,7 @@ function showFinal(){
 function recordScore(name){
   if(state.daily){   // the daily has its own board and doesn't touch the all-time ones
     const done=dailyDone();
-    if(done&&done.date===state.daily.date) return {id:done.id||''};
+    if(done&&done.date===state.daily.date&&done.id) return {id:done.id};
     const e=dlSubmit({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
       score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now(),k:acct.key||''});
     if(e) try{ localStorage.setItem('pp_daily',JSON.stringify({date:state.daily.date,score:state.score,id:e.id})); }catch(err){}
