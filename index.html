@@ -2363,7 +2363,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-015504';
+const BUILD='20260918-075043';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2514,7 +2514,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:10};
+const VERSION={major:3,minor:4,patch:11};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3336,7 +3336,7 @@ const cm={cur:null, all:{}, time:60, rounds:5, mk:null, loaded:false, from:'menu
 function cmapLink(id){ return location.origin+location.pathname+'?m='+id; }
 function cmapPublish(rec){ let sent=false; for(const l of lb.links) if(l.ready){ try{ l.client.publish(CM_ROOT+'/'+rec.id,JSON.stringify(rec),{qos:1,retain:true}); sent=true; }catch(e){} } return sent; }
 async function cmapFetch(id){ const t0=Date.now(); while(!lbLive()&&Date.now()-t0<9000) await new Promise(r=>setTimeout(r,250)); const got=await fetchMany(CM_ROOT,[id],3600); const r=got[id]; return r&&r.id===id&&Array.isArray(r.pins)?r:null; }
-function cmapClean(r){ if(!r||!r.id||!r.name||!Array.isArray(r.pins)) return null; const pins=r.pins.filter(p=>p&&isFinite(+p.lat)&&isFinite(+p.lng)&&p.pano).slice(0,300); if(!pins.length) return null; return {...r,pins,name:String(r.name).slice(0,32),plays:+r.plays||0,top:Array.isArray(r.top)?r.top:[],likes:Array.isArray(r.likes)?r.likes.filter(k=>typeof k==='string'):[],stats:r.stats&&typeof r.stats==='object'?r.stats:{},thumb:r.thumb&&typeof r.thumb==='object'?r.thumb:null,start:r.start&&isFinite(+r.start.lat)?r.start:null,scale:+r.scale>0?+r.scale:null}; }
+function cmapClean(r){ if(!r||!r.id||!r.name||!Array.isArray(r.pins)) return null; const pins=r.pins.filter(p=>p&&isFinite(+p.lat)&&isFinite(+p.lng)&&p.pano).slice(0,2000); if(!pins.length) return null; return {...r,pins,name:String(r.name).slice(0,32),plays:+r.plays||0,top:Array.isArray(r.top)?r.top:[],likes:Array.isArray(r.likes)?r.likes.filter(k=>typeof k==='string'):[],stats:r.stats&&typeof r.stats==='object'?r.stats:{},thumb:r.thumb&&typeof r.thumb==='object'?r.thumb:null,start:r.start&&isFinite(+r.start.lat)?r.start:null,scale:+r.scale>0?+r.scale:null}; }
 /* Every map has a picture: the one its maker chose, or a slice of one of its spots. */
 function hashStr(t){ let h=0; for(const c of String(t)) h=(h*31+c.charCodeAt(0))>>>0; return h; }
 function thumbOf(rec){
@@ -3492,7 +3492,7 @@ function openMake(rec){
     mk.thumb=rec.thumb&&rec.thumb.img?{...rec.thumb}:null; mk.thMode=mk.thumb?(mk.thumb.pano?'spot':'upload'):'auto'; mk.start=rec.start&&isFinite(+rec.start.lat)?{lat:+rec.start.lat,lng:+rec.start.lng,z:+rec.start.z||3}:null;
     mk.scale=+rec.scale>0?+rec.scale:null;   // older maps have none, so they get Auto until saved
   } else if(mk.edit){ mk.edit=null; mk.pins=[]; $('mkName').value=''; mk.thumb=null; mk.thMode='auto'; mk.start=null; mk.scale=null; }
-  $('mkTitle').textContent=mk.edit?'Edit map':'Create a map';
+  $('mkTitle').textContent=mk.edit?'Edit map':'Create a map'; mk.dirty=false;
   tview.pano=null; tview.band=null; paintThumb(); paintStart();
   if(mk.thMode==='spot'&&mk.thumb){ paintThumbSel(); const i=mk.pins.findIndex(p=>p.pano===mk.thumb.pano); if(i>=0) $('mkThumbSel').value=String(i); thumbLook(); }
   setTimeout(()=>{ mk.map.invalidateSize(); if(!mk.pins.length) mk.map.fitBounds([[-55,-170],[72,180]],{animate:false}); else mk.map.fitBounds(L.latLngBounds(mk.pins.map(p=>[p.lat,p.lng])).pad(0.2),{animate:false,maxZoom:12}); },60);
@@ -3500,8 +3500,8 @@ function openMake(rec){
 }
 /* Older maps were published without place names; fill them in quietly while the builder is open. */
 async function mkLabels(){
-  const mk=cm.mk, ed=mk.edit; let n=0;
-  for(const p of mk.pins){ if(mk.edit!==ed||$('cmake').hidden) return; if(p.label) continue;
+  const mk=cm.mk, ed=mk.edit; let n=0, looked=0;
+  for(const p of mk.pins){ if(mk.edit!==ed||$('cmake').hidden||looked>=150) return; if(p.label) continue; looked++;
     try{ const q=await placeOf(p.lat,p.lng); if(q) p.label=[q.city||q.locality||q.region,q.country].filter(Boolean).join(', ').slice(0,60); }catch(e){}
     await new Promise(r=>setTimeout(r,350));   // the geocoder rate-limits a burst
     if(++n%4===0) renderMk(); }
@@ -3511,7 +3511,7 @@ const dotIcon=L.divIcon({className:'',html:'<div class="marker-dot"></div>',icon
 /* Add a spot. The search widens in steps (40 m first for a typed address, so it lands on the right street, not
    just the nearest one within a couple of miles), and the view is turned to face the place you asked for. */
 async function mkAdd(lat,lng,opts){
-  opts=opts||{}; const mk=cm.mk; if(!mk||mk.busy) return; if(mk.pins.length>=300){ toast('300 spots is the limit'); return; }
+  opts=opts||{}; const mk=cm.mk; if(!mk||mk.busy) return; if(mk.pins.length>=2000){ toast('2,000 spots is the limit'); return; }
   mk.busy=true; $('mkMsg').textContent='Looking for Street View there…';
   try{ await gmapsReady; svService=svService||new google.maps.StreetViewService();
     let data=null;
@@ -3525,7 +3525,7 @@ async function mkAdd(lat,lng,opts){
     const away=haversine({lat:plat,lng:plng},{lat,lng})*1000;
     const heading=away>4?Math.round(bearingTo(plat,plng,lat,lng)):Math.floor(Math.random()*360);
     const pin={pano:loc.pano,lat:+plat.toFixed(5),lng:+plng.toFixed(5),heading,label:(loc.description||'').slice(0,60)};
-    mk.pins.push(pin); $('mkMsg').textContent=opts.exact&&away>60?`Nearest Street View is ${Math.round(away)} m from that point, facing it.`:'';
+    mk.pins.push(pin); mk.dirty=true; $('mkMsg').textContent=opts.exact&&away>60?`Nearest Street View is ${Math.round(away)} m from that point, facing it.`:'';
     placeOf(plat,plng).then(p=>{ if(p){ pin.label=[p.city||p.locality||p.region,p.country].filter(Boolean).join(', ').slice(0,60); renderMk(); } });
     renderMk(); sfx('pin');
     const list=$('mkList'); const rows=list.querySelectorAll('.mkrow'); const el=rows[rows.length-1]; if(el){ el.classList.add('new'); list.scrollTop=list.scrollHeight; }   // scroll the list only, never the page
@@ -3539,7 +3539,7 @@ function renderMk(){
   const n=mk.pins.length, MIN=10;
   $('mkCount').textContent=n<MIN?`${n} of ${MIN} minimum`:`${n} spots`;
   $('mkProg').style.width=Math.min(100,n/MIN*100)+'%'; $('mkProg').classList.toggle('done',n>=MIN);
-  $('mkNeed').textContent=n<MIN?`${MIN-n} more to reach the ${MIN}-spot minimum. After that there is no limit.`:`${n} spots. No limit, keep adding or ${mk.edit?'save':'publish'}.`;
+  $('mkNeed').textContent=n<MIN?`${MIN-n} more to reach the ${MIN}-spot minimum. After that, up to 2,000.`:`${n} spots. Up to 2,000, keep adding or ${mk.edit?'save':'publish'}.`;
   paintThumbSel();
   $('mkList').innerHTML=mk.pins.length?mk.pins.map((p,i)=>`<div class="mkrow${p.dead?' dead':''}"><img src="${SV_TILE(p.pano,0,0,0)}" alt="" data-look="${i}" title="Look at this spot"><span class="mkt">${esc(p.label||'Spot '+(i+1))}<small>${p.dead?'Gone from Street View · ':''}${p.lat}, ${p.lng}</small></span><button class="look" data-look="${i}">Look</button><button data-del="${i}">Remove</button></div>`).join(''):'<div class="frempty">Nothing yet. Click the map.</div>';
   $('mkTools').hidden=!n; $('mkDropDead').hidden=!mk.pins.some(p=>p.dead);
@@ -3548,10 +3548,10 @@ function renderMk(){
   $('mkSave').disabled=n<MIN||nm.length<2;
   $('mkSave').textContent=n<MIN?`${verb} map (${n}/${MIN})`:nm.length<2?`Name it to ${verb.toLowerCase()}`:mk.edit?`Save changes to ${nm}`:`Publish ${nm}`;
 }
-$('mkName').addEventListener('input',renderMk);
+$('mkName').addEventListener('input',()=>{ if(cm.mk) cm.mk.dirty=true; renderMk(); });
 $('mkList').addEventListener('click',e=>{
   const l=e.target.closest('[data-look]'); if(l){ peekOpen(+l.dataset.look); return; }
-  const b=e.target.closest('[data-del]'); if(!b) return; cm.mk.pins.splice(+b.dataset.del,1); renderMk(); sfx('click'); });
+  const b=e.target.closest('[data-del]'); if(!b) return; cm.mk.pins.splice(+b.dataset.del,1); cm.mk.dirty=true; renderMk(); sfx('click'); });
 /* ----- looking at a spot: the real Street View, full screen, with Previous / Next / Remove ----- */
 const peek={i:0};
 function peekOpen(i){
@@ -3566,7 +3566,7 @@ $('peekPrev').addEventListener('click',()=>{ peekOpen(peek.i-1); sfx('click'); }
 $('peekNext').addEventListener('click',()=>{ peekOpen(peek.i+1); sfx('click'); });
 $('peekClose').addEventListener('click',()=>{ peekClose(); sfx('click'); });
 $('peekX').addEventListener('click',()=>{ peekClose(); sfx('click'); });
-$('peekDel').addEventListener('click',()=>{ const mk=cm.mk; if(!mk||!mk.pins.length) return; mk.pins.splice(peek.i,1); renderMk(); sfx('click'); if(!mk.pins.length) peekClose(); else peekOpen(peek.i); });
+$('peekDel').addEventListener('click',()=>{ const mk=cm.mk; if(!mk||!mk.pins.length) return; mk.pins.splice(peek.i,1); mk.dirty=true; renderMk(); sfx('click'); if(!mk.pins.length) peekClose(); else peekOpen(peek.i); });
 document.addEventListener('keydown',e=>{ if($('peek').hidden) return; if(e.key==='Escape') peekClose(); else if(e.key==='ArrowRight') peekOpen(peek.i+1); else if(e.key==='ArrowLeft') peekOpen(peek.i-1); });
 $('mkReview').addEventListener('click',()=>{ peekOpen(0); sfx('click'); });
 /* Ask Google about every spot; the ones it no longer has get flagged so they can be dropped in one go. */
@@ -3580,7 +3580,7 @@ async function mkCheck(){
   toast(dead?`${dead} spot${dead===1?'':'s'} no longer on Street View`:'Every spot is still on Street View','ok');
 }
 $('mkCheck').addEventListener('click',mkCheck);
-$('mkDropDead').addEventListener('click',()=>{ const mk=cm.mk; const n=mk.pins.filter(p=>p.dead).length; mk.pins=mk.pins.filter(p=>!p.dead); renderMk(); toast(`${n} removed`,'ok'); sfx('click'); });
+$('mkDropDead').addEventListener('click',()=>{ const mk=cm.mk; const n=mk.pins.filter(p=>p.dead).length; mk.pins=mk.pins.filter(p=>!p.dead); mk.dirty=true; renderMk(); toast(`${n} removed`,'ok'); sfx('click'); });
 /* The builder box takes coordinates, a full Google Maps link, or plain text (an address or a place name), which is geocoded. */
 function mkQueryOf(text){
   let t=String(text||'').trim(); if(!t) return '';
@@ -3613,12 +3613,13 @@ $('mkCoordGo').addEventListener('click',mkCoordAdd);
 $('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); mkCoordAdd(); } });
 $('mkSave').addEventListener('click',()=>{
   const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<10||name.length<2) return;
-  const pins=mk.pins.map(p=>({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading,label:(p.label||'').slice(0,40)}));
+  const big=mk.pins.length>400;   // past 400 spots the place names are dropped so the record stays light on the wire
+  const pins=mk.pins.map(p=>big?{pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}:{pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading,label:(p.label||'').slice(0,40)});
   const thumb=mk.thumb&&mk.thumb.img?mk.thumb:null, start=mk.start||null, scale=Math.round(mkScaleKm()*100)/100;
   const rec=mk.edit?{...mk.edit,name,pins,thumb,start,scale,edited:Date.now()}
     :{id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],likes:[],stats:{},thumb,start,scale,pins};
   if(!cmapPublish(rec)){ $('mkMsg').textContent='Not connected, try again in a moment.'; return; }
-  const was=!!mk.edit; cm.all[rec.id]=rec; mk.edit=null; mk.pins=[]; mk.thumb=null; mk.thMode='auto'; mk.start=null; mk.scale=null; $('mkName').value=''; renderMk(); paintThumb(); paintStart(); toast(was?'Map updated':'Map published','ok'); cmapOpen(rec.id);
+  const was=!!mk.edit; cm.all[rec.id]=rec; mk.edit=null; mk.dirty=false; mk.pins=[]; mk.thumb=null; mk.thMode='auto'; mk.start=null; mk.scale=null; $('mkName').value=''; renderMk(); paintThumb(); paintStart(); toast(was?'Map updated':'Map published','ok'); cmapOpen(rec.id);
 });
 /* ----- thumbnail: auto, a spot at a chosen angle (rendered here from the tiles), or an uploaded image ----- */
 function paintThumb(){
@@ -3670,10 +3671,10 @@ async function thumbLook(){
 }
 $('mkThumbRender').addEventListener('click',()=>{ const mk=cm.mk; const p=mk.pins[+$('mkThumbSel').value]; if(!p||!tview.band||tview.pano!==p.pano){ toast('Pick a spot and wait for the picture'); return; }
   renderPersp($('mkThumbCv'),tview.band,tview.meta,tview.heading,tview.fov,tview.pitch);
-  mk.thumb={img:$('mkThumbCv').toDataURL('image/jpeg',0.72),pano:p.pano,heading:Math.round(tview.heading),pitch:Math.round(tview.pitch),fov:Math.round(tview.fov)}; paintThumb(); toast('Thumbnail set','ok'); sfx('click'); });
+  mk.thumb={img:$('mkThumbCv').toDataURL('image/jpeg',0.72),pano:p.pano,heading:Math.round(tview.heading),pitch:Math.round(tview.pitch),fov:Math.round(tview.fov)}; mk.dirty=true; paintThumb(); toast('Thumbnail set','ok'); sfx('click'); });
 $('mkThumbFile').addEventListener('click',()=>$('mkThumbInput').click());
 $('mkThumbInput').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return; const url=URL.createObjectURL(f); const im=new Image();
-  im.onload=()=>{ const c=document.createElement('canvas'); c.width=480; c.height=270; const ctx=c.getContext('2d'); const s=Math.max(480/im.width,270/im.height); const w=im.width*s,h=im.height*s; ctx.drawImage(im,(480-w)/2,(270-h)/2,w,h); cm.mk.thumb={img:c.toDataURL('image/jpeg',0.8)}; URL.revokeObjectURL(url); paintThumb(); sfx('click'); };
+  im.onload=()=>{ const c=document.createElement('canvas'); c.width=480; c.height=270; const ctx=c.getContext('2d'); const s=Math.max(480/im.width,270/im.height); const w=im.width*s,h=im.height*s; ctx.drawImage(im,(480-w)/2,(270-h)/2,w,h); cm.mk.thumb={img:c.toDataURL('image/jpeg',0.8)}; cm.mk.dirty=true; URL.revokeObjectURL(url); paintThumb(); sfx('click'); };
   im.onerror=()=>{ URL.revokeObjectURL(url); toast('That image could not be read'); }; im.src=url; });
 /* ----- scoring scale: how fast points fall off with distance on this map ----- */
 function mkScaleKm(){ const mk=cm.mk; return mk.scale>0?mk.scale:autoScale(mk.pins); }
@@ -3683,16 +3684,22 @@ function paintScale(){
   const pts=d=>Math.round(5000*Math.exp(-d/km)).toLocaleString(); const mi=1.609344;
   $('mkScaleNote').textContent=mk.pins.length<2?'Add spots and this sets itself from how far apart they are.':`A guess 1 mi off scores ${pts(mi)}, 5 mi off ${pts(5*mi)}, 20 mi off ${pts(20*mi)}, 100 mi off ${pts(100*mi)}.${auto?' Auto fits the spread of your spots; drag to change it.':''}`;
 }
-$('mkScale').addEventListener('input',e=>{ cm.mk.scale=sliderToKm(+e.target.value); paintScale(); });
-$('mkScaleAuto').addEventListener('click',()=>{ cm.mk.scale=null; paintScale(); sfx('click'); });
+$('mkScale').addEventListener('input',e=>{ cm.mk.scale=sliderToKm(+e.target.value); cm.mk.dirty=true; paintScale(); });
+$('mkScaleAuto').addEventListener('click',()=>{ cm.mk.scale=null; cm.mk.dirty=true; paintScale(); sfx('click'); });
 /* ----- start view ----- */
 function paintStart(){ const mk=cm.mk; if(!mk) return; $('mkStartClear').hidden=!mk.start;
   $('mkStartNote').textContent=mk.start?`Players start at zoom ${mk.start.z} around ${mk.start.lat.toFixed(2)}, ${mk.start.lng.toFixed(2)}. Move the map and press the button again to change it.`:'Players start zoomed out to the whole world. For a city or state map, zoom the map above into it and press the button.'; }
-$('mkStartSet').addEventListener('click',()=>{ const mk=cm.mk; const c=mk.map.getCenter(); mk.start={lat:+c.lat.toFixed(4),lng:+c.lng.toFixed(4),z:Math.max(1,Math.min(16,Math.round(mk.map.getZoom())))}; paintStart(); toast('Start view set','ok'); sfx('click'); });
-$('mkStartClear').addEventListener('click',()=>{ cm.mk.start=null; paintStart(); sfx('click'); });
-$('cmakeBack').addEventListener('click',()=>{
-  const mk=cm.mk; if(mk&&mk.edit){ const id=mk.edit.id; mk.edit=null; mk.pins=[]; $('mkName').value=''; cmapOpen(id); return; }
+$('mkStartSet').addEventListener('click',()=>{ const mk=cm.mk; const c=mk.map.getCenter(); mk.start={lat:+c.lat.toFixed(4),lng:+c.lng.toFixed(4),z:Math.max(1,Math.min(16,Math.round(mk.map.getZoom())))}; mk.dirty=true; paintStart(); toast('Start view set','ok'); sfx('click'); });
+$('mkStartClear').addEventListener('click',()=>{ cm.mk.start=null; cm.mk.dirty=true; paintStart(); sfx('click'); });
+$('cmakeBack').addEventListener('click',async()=>{
+  const mk=cm.mk;
+  if(mk&&mk.dirty&&(mk.pins.length||$('mkName').value.trim())){   // don't let one tap throw away a map
+    const n=mk.pins.length; const ok=await ask({title:mk.edit?'Leave without saving?':'Leave without publishing?',body:mk.edit?`Your changes to ${mk.edit.name} haven't been saved. Press Save changes to keep them.`:`This map has ${n} spot${n===1?'':'s'} and hasn't been published. Leaving throws it away.`,ok:'Leave anyway',danger:true});
+    if(!ok) return; }
+  if(mk&&mk.edit){ const id=mk.edit.id; mk.edit=null; mk.dirty=false; mk.pins=[]; $('mkName').value=''; cmapOpen(id); return; }
+  if(mk) mk.dirty=false;
   if(cm.from==='menu'){ show('menu'); return; } openCmaps(cm.from); });
+window.addEventListener('beforeunload',e=>{ const mk=cm.mk; if(mk&&mk.dirty&&mk.pins.length&&!$('cmake').hidden){ e.preventDefault(); e.returnValue=''; } });
 $('customBtn').addEventListener('click',()=>openCmaps('setup'));
 $('createBtn').addEventListener('click',()=>{ cm.from='setup'; openMake(); });
 $('makeBar').addEventListener('click',()=>{ cm.from='menu'; openMake(); });
