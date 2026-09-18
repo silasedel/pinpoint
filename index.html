@@ -191,6 +191,14 @@
   .profside .handle{display:block;font-size:13px;color:var(--muted);margin-bottom:10px}
   .profbtns{display:flex;gap:8px;flex-wrap:wrap}
   .btn.sm{padding:9px 14px;font-size:13.5px;font-weight:700}
+  .cdot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);margin-right:7px;vertical-align:-2px}
+  .wheelwrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  #wheel{width:240px;height:240px;border-radius:50%;cursor:crosshair;box-shadow:0 4px 0 var(--edge),0 12px 28px rgba(15,64,36,.15);touch-action:none;flex:none}
+  .wheelside{display:flex;flex-direction:column;gap:8px;align-items:center;flex:1;min-width:150px}
+  .cprev{width:92px;height:92px;border-radius:50%;background:var(--green);display:grid;place-items:center;box-shadow:0 4px 0 rgba(0,0,0,.12);transition:background .1s}
+  .cprev .pav{width:64px;height:64px;border:3px solid #fff}
+  .cval{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+  .av-big{box-shadow:0 0 0 3px var(--card),0 0 0 6px var(--avring,transparent)}
   .twobtn{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
   .twobtn .btn{flex:1;min-width:130px}
   .btn.danger{color:var(--red)} .btn.danger:hover{border-color:var(--red);background:var(--red-soft)}
@@ -476,7 +484,7 @@
 
   .marker-pin{position:relative;width:32px;height:44px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
   .marker-pin svg{position:relative;display:block}
-  .marker-pin .facepin{position:absolute;left:8.5px;top:8.5px;width:15px;height:15px;border-radius:50%;background-size:cover;background-position:center;z-index:300}   /* Leaflet gives marker SVGs z-index 200; the face must sit above */
+  .marker-pin .facepin{position:absolute;left:6.5px;top:6.5px;width:19px;height:19px;border-radius:50%;background-size:cover;background-position:center;z-index:300}   /* Leaflet gives marker SVGs z-index 200; the face must sit above */
   .marker-pin.big{width:40px;height:56px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45))}
   .marker-true .ring{position:absolute;left:50%;top:54px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:3px solid #e63946;animation:ring 1.6s ease-out infinite}
   @keyframes ring{0%{transform:scale(.4);opacity:.9}100%{transform:scale(3.2);opacity:0}}
@@ -1082,10 +1090,17 @@
             <button class="btn btn-secondary sm" id="avPick">Choose photo</button>
             <button class="btn btn-secondary sm" id="avClear">Remove</button>
             <button class="btn btn-secondary sm" id="nameEdit">Edit name</button>
+            <button class="btn btn-secondary sm" id="colorEdit" hidden><span class="cdot" id="colorDot"></span>Line colour</button>
           </div>
         </div>
       </div>
       <input type="file" id="avFile" accept="image/*" hidden>
+      <div id="colorBox" hidden>
+        <div class="rsub" style="margin:4px 0 10px">Your lines on the map, wherever your photo is your token. Tap or drag on the wheel.</div>
+        <div class="wheelwrap"><canvas id="wheel" width="240" height="240"></canvas>
+          <div class="wheelside"><div class="cprev" id="cprev"><span class="pav" id="cprevAv"></span></div><div class="cval" id="cval"></div><button class="btn btn-primary sm" id="colorSave">Use this colour</button><button class="btn btn-secondary sm" id="colorAuto">Pick from photo</button></div>
+        </div>
+      </div>
       <div id="nameBox" hidden><div class="prow2"><input class="tin" id="nameNew" maxlength="16" placeholder="New display name" spellcheck="false"><button class="btn btn-primary" id="nameSave">Save</button></div></div>
       <div id="pinBox" hidden><div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off"><button class="btn btn-primary" id="acctChange">Save</button></div></div>
       <div class="acctmsg" id="acctMsg2"></div>
@@ -2153,7 +2168,7 @@ function makeMap(id,opts={}){
 }
 /* Every guess is a white pin; what sits in its head says whose it is, a colour, or the player's photo. */
 const PIN_BODY='M16 1C7.7 1 1 7.7 1 16c0 10.5 15 27 15 27s15-16.5 15-27C31 7.7 24.3 1 16 1z';
-const PIN_SVG=(inner)=>`<svg viewBox="0 0 32 44" width="32" height="44"><path d="${PIN_BODY}" fill="#fff" stroke="#152219" stroke-width="2"/><circle cx="16" cy="16" r="7.5" fill="${inner}"/></svg>`;
+const PIN_SVG=(inner)=>`<svg viewBox="0 0 32 44" width="32" height="44"><path d="${PIN_BODY}" fill="#fff" stroke="#152219" stroke-width="2"/><circle cx="16" cy="16" r="9.5" fill="${inner}"/></svg>`;
 function pinIcon(inner,av,late){
   const html='<div class="marker-pin drop'+(late?' late':'')+'">'+(av?'<span class="facepin" style="background-image:url('+av+')"></span>':'')+PIN_SVG(av?'#fff':inner)+'</div>';
   return L.divIcon({className:'',html,iconSize:[32,44],iconAnchor:[16,42]});
@@ -2203,15 +2218,16 @@ function dominantColor(url){
   img.src=url;
   return null;
 }
-function lineColor(p){ const av=p&&p.face?avOf(p.id):null; return (av&&dominantColor(av))||COLORS[(p&&p.color)??0][0]; }
-function myLineColor(){ return (acct.av&&dominantColor(acct.av))||SOLO_COL; }
+const colCache={};
+function lineColor(p){ if(!p||!p.face) return COLORS[(p&&p.color)??0][0]; const av=avOf(p.id); return (p.col&&okColor(p.col))||colCache[p.id]||(av&&dominantColor(av))||COLORS[(p&&p.color)??0][0]; }
+function myLineColor(){ return acct.color||(acct.av&&dominantColor(acct.av))||SOLO_COL; }
 /* The real location: bigger, red, unmistakable, a target inside a pin with a pulsing ring at its foot. */
 const TRUE_SVG='<svg viewBox="0 0 40 56" width="40" height="56"><path d="M20 1.5C9.6 1.5 1.5 9.6 1.5 20c0 13.2 18.5 34.5 18.5 34.5S38.5 33.2 38.5 20C38.5 9.6 30.4 1.5 20 1.5z" fill="#e63946" stroke="#7a1520" stroke-width="2.2"/><path d="M8.5 15.5A12.5 12.5 0 0 1 17 8.2" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="20" r="10.5" fill="#fff"/><circle cx="20" cy="20" r="7" fill="#e63946"/><circle cx="20" cy="20" r="2.6" fill="#fff"/></svg>';
 const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-true drop late"><span class="ring"></span>'+TRUE_SVG+'</div>',iconSize:[40,56],iconAnchor:[20,54]});
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-223148';
+const BUILD='20260917-224344';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2341,7 +2357,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:3,patch:7};
+const VERSION={major:3,minor:4,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2513,7 +2529,7 @@ function paintPrefs(){
 applyPrefs();
 
 const ACCT_ROOT='worlddrop/v1/acct';
-const acct={key:null,name:null,av:null,streak:null};
+const acct={key:null,name:null,av:null,streak:null,color:null};
 /* ---------- Day streak ----------
    A day counts if you finish any game in it (days roll over at midnight in New York, like the daily).
    Miss a day and it's gone. The count lives in the account record, so it follows you between devices. */
@@ -2543,9 +2559,9 @@ async function acctHash(pin,salt,key){
   const buf=await crypto.subtle.digest('SHA-256',data);
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function acctLoad(){ try{ const a=JSON.parse(localStorage.getItem('pp_acct')||'null'); if(a&&a.key&&a.name){ acct.key=a.key; acct.name=a.name; acct.av=a.av||null; acct.streak=a.streak||null; } }catch(e){} }
-function acctSave(){ try{ localStorage.setItem('pp_acct',JSON.stringify({key:acct.key,name:acct.name,av:acct.av||null,streak:acct.streak||null})); }catch(e){} }
-function acctClear(){ acct.key=null; acct.name=null; acct.av=null; acct.streak=null; try{ localStorage.removeItem('pp_acct'); }catch(e){} }
+function acctLoad(){ try{ const a=JSON.parse(localStorage.getItem('pp_acct')||'null'); if(a&&a.key&&a.name){ acct.key=a.key; acct.name=a.name; acct.av=a.av||null; acct.streak=a.streak||null; acct.color=a.color||null; } }catch(e){} }
+function acctSave(){ try{ localStorage.setItem('pp_acct',JSON.stringify({key:acct.key,name:acct.name,av:acct.av||null,streak:acct.streak||null,color:acct.color||null})); }catch(e){} }
+function acctClear(){ acct.key=null; acct.name=null; acct.av=null; acct.streak=null; acct.color=null; try{ localStorage.removeItem('pp_acct'); }catch(e){} }
 /* Read one account's retained record: subscribe, wait briefly for the broker to hand it over, unsubscribe. */
 function acctFetch(key){
   const topic=ACCT_ROOT+'/'+key;
@@ -2592,7 +2608,7 @@ async function acctContinue(){
     if(got.record){
       const h=await acctHash(pin,got.record.salt||'',key);
       if(h!==got.record.hash){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is taken and the code doesn\'t match it.','bad'); bad('acctPin'); return; }
-      acct.key=key; acct.name=got.record.name||raw.slice(0,16); acct.av=got.record.av||null; acct.streak=got.record.streak||null; acctSave();
+      acct.key=key; acct.name=got.record.name||raw.slice(0,16); acct.av=got.record.av||null; acct.streak=got.record.streak||null; acct.color=okColor(got.record.color); acctSave();
       acctPublish({...got.record,seen:Date.now()});   // republish so the record stays alive on every broker
       acctMsg('acctMsg','Signed in.','ok');
     } else {
@@ -2654,8 +2670,55 @@ $('soundSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); 
 const AV_SIZE=96;
 function avPaint(){
   const url=acct.av||'';
-  const big=$('avPreview'); if(big){ big.style.backgroundImage=url?`url(${url})`:''; big.textContent=url?'':(acct.name?acct.name[0].toUpperCase():'?'); }
+  const big=$('avPreview'); if(big){ big.style.backgroundImage=url?`url(${url})`:''; big.textContent=url?'':(acct.name?acct.name[0].toUpperCase():'?'); big.style.setProperty('--avring',myLineColor()); }
+  if($('colorEdit')){ $('colorEdit').hidden=!url; $('colorDot').style.background=myLineColor(); if(!url) $('colorBox').hidden=true; }
 }
+/* ---------- Line colour: a hue wheel, white in the middle, drawn once on a canvas ---------- */
+function okColor(v){ return typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v)?v.toLowerCase():null; }
+const wheel={drawn:false,pick:null,R:120};
+function hsvHex(h,sat,v){ const c=v*sat, x=c*(1-Math.abs((h/60)%2-1)), m=v-c; let r,g,b; if(h<60){r=c;g=x;b=0;}else if(h<120){r=x;g=c;b=0;}else if(h<180){r=0;g=c;b=x;}else if(h<240){r=0;g=x;b=c;}else if(h<300){r=x;g=0;b=c;}else{r=c;g=0;b=x;}
+  return '#'+[r,g,b].map(u=>Math.round((u+m)*255).toString(16).padStart(2,'0')).join(''); }
+function hexHsv(hex){ const n=parseInt(hex.slice(1),16); const r=(n>>16&255)/255,g=(n>>8&255)/255,b=(n&255)/255; const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn; let h=0; if(d){ if(mx===r) h=60*(((g-b)/d)%6); else if(mx===g) h=60*((b-r)/d+2); else h=60*((r-g)/d+4); } if(h<0) h+=360; return {h,s:mx?d/mx:0,v:mx}; }
+function drawWheel(){
+  const c=$('wheel'); const R=wheel.R; const x=c.getContext('2d'); const img=x.createImageData(240,240); const d=img.data;
+  for(let py=0;py<240;py++) for(let px=0;px<240;px++){ const dx=px-R, dy=py-R; const r=Math.sqrt(dx*dx+dy*dy); const k=(py*240+px)*4; if(r>R){ d[k+3]=0; continue; }
+    let h=Math.atan2(dy,dx)*180/Math.PI; if(h<0) h+=360; const sat=Math.min(1,r/R); const hex=hsvHex(h,sat,0.96); const n=parseInt(hex.slice(1),16);
+    d[k]=n>>16&255; d[k+1]=n>>8&255; d[k+2]=n&255; d[k+3]=r>R-1.5?Math.round(255*(R-r+0.5)):255; }
+  x.putImageData(img,0,0); wheel.img=img; wheel.drawn=true;
+}
+function wheelMark(hex){
+  if(!wheel.drawn) drawWheel();
+  const c=$('wheel'); const x=c.getContext('2d'); x.putImageData(wheel.img,0,0);   // wipe the old ring
+  const {h,s}=hexHsv(hex); const R=wheel.R; const a=h*Math.PI/180; const px=R+Math.cos(a)*s*R, py=R+Math.sin(a)*s*R;
+  x.beginPath(); x.arc(px,py,9,0,7); x.lineWidth=3; x.strokeStyle='#fff'; x.stroke(); x.beginPath(); x.arc(px,py,9,0,7); x.lineWidth=1; x.strokeStyle='rgba(0,0,0,.45)'; x.stroke();
+  $('cprev').style.background=hex; $('cval').textContent=hex.toUpperCase(); wheel.pick=hex;
+}
+function wheelPickAt(e){
+  const c=$('wheel'); const b=c.getBoundingClientRect(); const R=wheel.R; const sx=240/b.width;
+  let dx=(e.clientX-b.left)*sx-R, dy=(e.clientY-b.top)*sx-R; const r=Math.min(R,Math.sqrt(dx*dx+dy*dy));
+  let h=Math.atan2(dy,dx)*180/Math.PI; if(h<0) h+=360; const sat=Math.max(0.15,r/R);   // never pure white: a line has to show on a map
+  wheelMark(hsvHex(h,sat,0.96));
+}
+function openColor(){
+  const box=$('colorBox'); box.hidden=!box.hidden; $('nameBox').hidden=true; $('pinBox').hidden=true; acctMsg('acctMsg2','');
+  if(box.hidden) return;
+  $('cprevAv').style.backgroundImage=acct.av?`url(${acct.av})`:'';
+  wheelMark(acct.color||(acct.av&&dominantColor(acct.av))||SOLO_COL);
+}
+$('colorEdit').addEventListener('click',openColor);
+$('colorAuto').addEventListener('click',()=>{ const d=acct.av&&dominantColor(acct.av); if(d) wheelMark(d); });
+(function(){ const c=$('wheel'); let down=false;
+  c.addEventListener('pointerdown',e=>{ down=true; c.setPointerCapture(e.pointerId); wheelPickAt(e); });
+  c.addEventListener('pointermove',e=>{ if(down) wheelPickAt(e); });
+  const up=()=>{ down=false; }; c.addEventListener('pointerup',up); c.addEventListener('pointercancel',up); })();
+$('colorSave').addEventListener('click',async()=>{
+  if(!acct.key||!wheel.pick) return;
+  acct.color=wheel.pick; acctSave(); avPaint(); paintAcct();
+  const got=await acctFetch(acct.key);
+  if(got.record) acctPublish({...got.record,color:acct.color});
+  acctMsg('acctMsg2','Colour saved.','ok'); $('colorBox').hidden=true;
+  if(mp.role) sendAvatar();
+});
 function avFromFile(file){
   return new Promise((res,rej)=>{
     const fr=new FileReader();
@@ -2679,15 +2742,16 @@ $('avFile').addEventListener('change',async e=>{
     const got=await acctFetch(acct.key);
     const rec={...(got.record||{}),key:acct.key,name:acct.name,av:url};
     if(!rec.hash){ acctMsg('acctMsg2','Could not reach your account record. Try again.','bad'); return; }
-    acct.av=url; acctSave(); avPaint(); paintAcct();
-    acctMsg('acctMsg2',acctPublish(rec)?'Photo saved.':'Saved here, but the server didn\'t take it.','ok');
-    if(mp.role) mpSend({t:'av',av:url});
+    acct.av=url; acct.color=null; acctSave(); dominantColor(url); avPaint(); paintAcct();
+    acctMsg('acctMsg2',acctPublish(rec)?'Photo saved. Now pick the colour for your lines.':'Saved here, but the server didn\'t take it.','ok');
+    if(mp.role) sendAvatar();
+    setTimeout(()=>{ $('colorBox').hidden=true; openColor(); },350);
   }catch(err){ acctMsg('acctMsg2','That file didn\'t work. Try a jpg or png.','bad'); }
 });
 $('avClear').addEventListener('click',async ()=>{
   if(!acct.key) return;
-  const got=await acctFetch(acct.key); const rec={...(got.record||{}),key:acct.key,name:acct.name}; delete rec.av;
-  acct.av=null; acctSave(); avPaint(); paintAcct();
+  const got=await acctFetch(acct.key); const rec={...(got.record||{}),key:acct.key,name:acct.name}; delete rec.av; delete rec.color;
+  acct.av=null; acct.color=null; acctSave(); avPaint(); paintAcct();
   if(rec.hash) acctPublish(rec);
   acctMsg('acctMsg2','Photo removed.','ok');
   if(mp.role) mpSend({t:'av',av:''});
@@ -2953,6 +3017,7 @@ function chalBuild(){
     custom:state.custom?{id:state.custom.id,name:state.custom.name}:null,locs:state.locs.slice(0,state.totalRounds).filter(l=>l&&!(l instanceof Error)).map(locPayload),
     res:state.results.map(chalRes),score:state.score,made:Date.now(),plays:[]};
   if(acct.av&&acct.av.length<40000) rec.av=acct.av;
+  if(acct.color) rec.col=acct.color;
   return rec;
 }
 let shareRec=null;
@@ -2968,7 +3033,7 @@ document.addEventListener('click',e=>{ if(!$('shareCard').hidden&&!e.target.clos
 /* The ghost: the sharer's result for the round being shown. */
 function rivalRound(i){ const c=state.chal; return c&&c.res?c.res[i]:null; }
 function rivalName(){ return state.chal?(state.chal.name||'Them'):''; }
-function rivalColor(){ return (state.chal&&state.chal.av&&dominantColor(state.chal.av))||RIVAL_COL; }
+function rivalColor(){ const c=state.chal; return (c&&okColor(c.col))||(c&&c.av&&dominantColor(c.av))||RIVAL_COL; }
 function rivalIcon(){ return pinIcon(RIVAL_COL,state.chal&&state.chal.av||null,true); }
 function rivalFace(size){ const c=state.chal; if(!c) return ''; return c.av?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${c.av})"></span>`:`<span class="pav ini" style="width:${size}px;height:${size}px;background:${RIVAL_COL};color:#fff">${esc((c.name||'?')[0].toUpperCase())}</span>`; }
 function rivalDesc(rv,m){
@@ -4440,7 +4505,7 @@ async function mpHost(kind){
   const code=mkCode();
   mpSetup('host',code,kind||'party');
   mp.me.id='host';
-  mp.players['host']={id:'host',name:mp.me.name,color:null,face:!!acct.av,score:0,host:true,vpeer:null};
+  mp.players['host']={id:'host',name:mp.me.name,color:null,face:!!acct.av,col:acct.color||null,score:0,host:true,vpeer:null};
   avSet('host',acct.av);
   renderLobby(); voiceShow();
   // Connect to every broker so guests can reach us through whichever one works for them.
@@ -4524,7 +4589,7 @@ function connFailed(why){
 }
 
 /* ----- host side ----- */
-function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null,hp:p.hp??null})); }
+function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,col:p.col||null,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null,hp:p.hp??null})); }
 /* The wire form of a location: everything a guest needs to load and score it, nothing else. */
 function locPayload(l){ return {pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,pol:l.pol,key:l.key,from:l.from,fresh:l.fresh}; }
 /* A duel has no fixed length, so the host keeps finding spots a few rounds ahead and hands them over as it goes. */
@@ -4565,7 +4630,7 @@ function hostOnMessage(from,m,link){
     mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link};
     mp.seen[from]=Date.now(); dlog('joined '+from); mpSendTo(from,{t:'welcome'}); hostSync();
     const joinNote={t:'chat',id:'sys',sys:true,name:'',text:`${mp.players[from].name||'Someone'} joined`,ts:Date.now()}; mpBroadcast(joinNote); chatAdd(joinNote);
-    setTimeout(()=>mpSendTo(from,{t:'avall',map:avCache}),300);   // hand the newcomer everyone's photo, including the host's
+    setTimeout(()=>mpSendTo(from,{t:'avall',map:avCache,cols:colCache}),300);   // hand the newcomer everyone's photo, including the host's
     return;
   }
   const pl=mp.players[from]; if(!pl) return;
@@ -4573,9 +4638,9 @@ function hostOnMessage(from,m,link){
   if(m.t==='hb') return;
   if(m.t==='leave'){ hostDrop(from); return; }
   if(m.t==='vpeer'){ pl.vpeer=m.vpeer; hostSync(); return; }
-  if(m.t==='av'){ avSet(from,m.av||null);
+  if(m.t==='av'){ avSet(from,m.av||null); pl.col=okColor(m.col); if(pl.col) colCache[from]=pl.col; else delete colCache[from];
     if(m.av&&!pl.chose&&!pl.face){ pl.face=true; pl.color=null; }   // your photo is your token by default
-    mpBroadcast({t:'av',id:from,av:m.av||''});
+    mpBroadcast({t:'av',id:from,av:m.av||'',col:pl.col});
     if(mp.phase==='lobby') hostSync(); else { mpBroadcast({t:'players',players:pubPlayers()}); renderLobby(); updateStrip(); }
     return; }
   if(m.t==='chat'){ const text=String(m.text||'').trim().slice(0,200); if(!text) return; const out={t:'chat',id:from,name:pl.name||('Player'),text,ts:+m.ts||Date.now()}; mpBroadcast(out); chatAdd(out); return; }
@@ -4612,16 +4677,16 @@ function hostReveal(){
   const mm=modeOf(mp.settings.mode); const cd=mm.countdown;
   const tf=mm.country?countryAt(truth.lat,truth.lng):null; const tn=tf?tf.properties.name:null;
   const results=alivePlayers().map(p=>{ const g=mp.guesses[p.id]||null;
-    if(mm.country){ const ok=!!(g&&g.country&&tn&&g.country===tn); const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:g&&g.country?{lat:g.lat,lng:g.lng}:null,country:g?g.country||null:null,ok,km:null,pts,total:p.score}; }
+    if(mm.country){ const ok=!!(g&&g.country&&tn&&g.country===tn); const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:g&&g.country?{lat:g.lat,lng:g.lng}:null,country:g?g.country||null:null,ok,km:null,pts,total:p.score}; }
     if(mm.slider){ const sel=g&&g.choice!=null?g.choice:null; const err=sel==null?null:Math.abs(sel-loc.tempF); const pts=err==null?0:tempScore(err); p.score+=pts;
-      return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:null,sel,err,km:null,pts,total:p.score}; }
+      return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:null,sel,err,km:null,pts,total:p.score}; }
     if(mm.choice){ const sel=(g&&g.choice&&typeof g.choice==='object')?g.choice:null;
       const okP=!!sel&&sel.p===loc.pol[0], okE=!!sel&&sel.e===loc.pol[1]; const pts=(okP?2500:0)+(okE?2500:0); p.score+=pts;
-      return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:null,sel,okP,okE,ok:okP&&okE,km:null,pts,total:p.score}; }
-    if(mm.trio){ const ok=!!g&&g.pick===loc.lie; const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:null,pick:g?g.pick:null,ok,km:null,pts,total:p.score}; }
+      return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:null,sel,okP,okE,ok:okP&&okE,km:null,pts,total:p.score}; }
+    if(mm.trio){ const ok=!!g&&g.pick===loc.lie; const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:null,pick:g?g.pick:null,ok,km:null,pts,total:p.score}; }
     const has=!!(g&&g.lat!=null); const km=has?haversine(g,truth):null; let pts=has?Math.round(scoreFor(km)*(cd?countdownMult(g.left||0,state.timeLimit):1)):0; let bet=null;
     if(mm.bet){ const stake=Math.max(1,Math.min(p.score,(g&&g.bet)||1)); const mult=betMult(pts); const payout=Math.round(stake*mult); bet={stake,mult,payout,base:pts}; pts=payout-stake; }
-    p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,guess:has?{lat:g.lat,lng:g.lng}:null,km,pts,bet,total:p.score}; });
+    p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:has?{lat:g.lat,lng:g.lng}:null,km,pts,bet,total:p.score}; });
   let elim=null;
   if(mm.elim){
     const alive=alivePlayers();
@@ -4719,8 +4784,8 @@ function guestOnMessage(m){
   else if(m.t==='hurry'){ hurryLocal(m.secs||15); }
   else if(m.t==='guessed'){ mp.guesses[m.id]=true; updateStrip(); updateWaitList(m.n,m.total); }
   else if(m.t==='pin'){ if(m.id!==mp.me.id) peekShow(m.id,m.lat,m.lng); }
-  else if(m.t==='av'){ avSet(m.id,m.av||null); renderLobby(); updateStrip(); }
-  else if(m.t==='avall'){ if(m.map&&typeof m.map==='object') for(const k of Object.keys(m.map)){ if(k!==mp.me.id&&typeof m.map[k]==='string') avSet(k,m.map[k]); } renderLobby(); updateStrip(); }
+  else if(m.t==='av'){ avSet(m.id,m.av||null); if(okColor(m.col)) colCache[m.id]=m.col; else delete colCache[m.id]; renderLobby(); updateStrip(); }
+  else if(m.t==='avall'){ if(m.map&&typeof m.map==='object') for(const k of Object.keys(m.map)){ if(k!==mp.me.id&&typeof m.map[k]==='string') avSet(k,m.map[k]); } if(m.cols&&typeof m.cols==='object') for(const k of Object.keys(m.cols)){ if(okColor(m.cols[k])) colCache[k]=m.cols[k]; } renderLobby(); updateStrip(); }
   else if(m.t==='reveal'){ if(m.add) for(const a of m.add) state.locs[a.i]=a.loc; mp.phase='reveal'; showResultMP(m); }
   else if(m.t==='final'){ showFinalMP(m); }
   else if(m.t==='lobby-return'){ mpToLobby(); }
@@ -5197,7 +5262,7 @@ $('leaveBtn').addEventListener('click',()=>{ mpLeave(); show('menu'); });
 window.addEventListener('pagehide',()=>{ if(mp.role) mpLeave(); });
 $('mpName').addEventListener('input',()=>{ mp.me.name=$('mpName').value.trim().slice(0,16); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
 /* Share your photo once the room knows who you are. */
-function sendAvatar(){ if(mp.role&&acct.av){ avSet(mp.me.id,acct.av); mpSend({t:'av',av:acct.av}); } }
+function sendAvatar(){ if(mp.role&&acct.av){ avSet(mp.me.id,acct.av); if(acct.color) colCache[mp.me.id]=acct.color; mpSend({t:'av',av:acct.av,col:acct.color||null}); } }
 $('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return;
   const me=mp.players[mp.me.id];
   if(sw.dataset.i==='av'){ if(me&&me.face) return; mpSend({t:'color',color:'av'}); if(mp.role==='guest'&&me){ me.face=true; me.color=null; renderLobby(); } return; }
