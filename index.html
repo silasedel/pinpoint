@@ -161,7 +161,30 @@
   .chip.on{background:var(--green-soft);border-color:var(--green);color:var(--green-dark)}
   table.board{width:100%;border-collapse:collapse;font-size:14px}
   .board th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
-  .board td{padding:9px 8px;border-bottom:1px solid var(--hair);white-space:nowrap}
+  .board td{padding:7px 8px;border-bottom:1px solid var(--hair);white-space:nowrap;vertical-align:middle}
+  .board .who{display:inline-flex;align-items:center;gap:8px;max-width:100%;vertical-align:middle}
+  .board .who .nm{overflow:hidden;text-overflow:ellipsis}
+  .board .who.lnk{cursor:pointer} .board .who.lnk:hover .nm{text-decoration:underline}
+  .pav.sil{background:#c9d3cc;display:grid;place-items:center} .pav.sil svg{width:68%;height:68%;fill:#fff}
+  html[data-theme="dark"] .pav.sil{background:#3a4a40}
+  .board .fchip.adm{background:var(--green-dark);color:#fff} .board .fchip.ai{background:#e8e2ff;color:#5a3fc0}
+  .fchip.adm{background:var(--green-dark);color:#fff} .fchip.ai{background:#e8e2ff;color:#5a3fc0}
+  .aitog{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none} .aitog input{accent-color:var(--green);width:16px;height:16px}
+  .dlgwrap{position:fixed;inset:0;z-index:150;background:rgba(8,26,16,.5);display:grid;place-items:center;padding:16px}
+  .dlgwrap[hidden]{display:none}
+  .dlg{width:min(440px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px 22px;animation:nagIn .18s ease-out}
+  .dlg h3{margin:0 0 6px;font-size:18px} .dlg p{margin:0 0 12px;color:var(--muted);font-size:14px;line-height:1.4}
+  .dlg .tin{width:100%;margin-bottom:12px} .dlg .row{display:flex;gap:8px;justify-content:flex-end} .dlg .row .btn{min-width:100px}
+  .ptag{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--sunk);color:var(--muted);margin-left:6px;vertical-align:middle}
+  .ptag.adm{background:var(--green-dark);color:#fff} .ptag.fr{background:var(--green-soft);color:var(--green-dark)} .ptag.ban{background:var(--red-soft);color:var(--red)}
+  .profbio{font-size:14.5px;margin:2px 0 6px;line-height:1.35}
+  .cmc .who.lnk{cursor:pointer} .cmc .who.lnk:hover{text-decoration:underline}
+  .cmcard .by.lnk:hover{text-decoration:underline}
+  .thumbbox{position:relative;flex:none;width:min(100%,320px);aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#1a2a20}
+  .thumbbox .mkthumb{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:0}
+  .thumbbox [hidden]{display:none}
+  .mkthumb.cv{cursor:grab;touch-action:none} .mkthumb.cv:active{cursor:grabbing}
+  .thumbzoom{display:flex;gap:6px;align-items:center;margin-top:8px} .thumbzoom .btn{min-width:38px;padding:6px 10px}
   .board th:first-child{width:36px}
   .board td.rank{color:var(--muted);width:36px}
   .board td.name{font-weight:600;overflow:hidden;text-overflow:ellipsis;max-width:260px;width:99%}
@@ -199,15 +222,16 @@
   .cprev .pav{width:64px;height:64px;border:3px solid #fff}
   .cval{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
   .av-big{box-shadow:0 0 0 3px var(--card),0 0 0 6px var(--avring,transparent)}
+  .av-big.silbig{display:grid;place-items:center;background:#c9d3cc} .av-big.silbig svg{width:66%;height:66%;fill:#fff}
   .twobtn{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
   .twobtn .btn{flex:1;min-width:130px}
   .btn.danger{color:var(--red)} .btn.danger:hover{border-color:var(--red);background:var(--red-soft)}
   .btn.dangerfill{background:var(--red);box-shadow:0 3px 0 #8a2b2b} .btn.dangerfill:hover{background:#b83a3a;box-shadow:0 4px 0 #8a2b2b} .btn.dangerfill:disabled{background:#d9a1a1;box-shadow:none}
-  .trash{width:30px;height:30px;border-radius:8px;background:var(--red-soft);color:var(--red);display:inline-grid;place-items:center;padding:0;vertical-align:middle;border:1px solid transparent}
+  .trash{width:26px;height:26px;border-radius:8px;background:var(--red-soft);color:var(--red);display:inline-grid;place-items:center;padding:0;vertical-align:middle;border:1px solid transparent}
   .trash:hover{background:var(--red);color:#fff}
   .trash svg{width:15px;height:15px}
-  .board td.adm{width:72px;text-align:right;white-space:nowrap}
-  .pencil{width:30px;height:30px;border-radius:8px;background:var(--green-soft);color:var(--green-dark);display:inline-grid;place-items:center;padding:0;vertical-align:middle;border:1px solid transparent;margin-right:4px}
+  .board td.adm{width:66px;text-align:right;white-space:nowrap}
+  .pencil{width:26px;height:26px;border-radius:8px;background:var(--green-soft);color:var(--green-dark);display:inline-grid;place-items:center;padding:0;vertical-align:middle;border:1px solid transparent;margin-right:4px}
   .pencil:hover{background:var(--green);color:#fff}
   .pencil svg{width:15px;height:15px}
   .delbox{margin-top:12px;padding:14px 16px;border-radius:12px;background:var(--red-soft);border:1.5px solid var(--red);animation:nagIn .2s ease-out}
@@ -1123,10 +1147,12 @@
         <div class="profside">
           <div class="namerow"><b id="acctWho"></b><span class="stkbig" id="acctStreak" hidden></span></div>
           <span class="handle" id="acctHandle"></span>
+          <div class="profbio" id="acctBio"></div>
           <div class="profbtns">
             <button class="btn btn-secondary sm" id="avPick">Choose photo</button>
             <button class="btn btn-secondary sm" id="avClear">Remove</button>
             <button class="btn btn-secondary sm" id="nameEdit">Edit name</button>
+            <button class="btn btn-secondary sm" id="bioEdit">Edit bio</button>
             <button class="btn btn-secondary sm" id="colorEdit" hidden><span class="cdot" id="colorDot"></span>Line color</button>
           </div>
         </div>
@@ -1139,6 +1165,7 @@
         </div>
       </div>
       <div id="nameBox" hidden><div class="prow2"><input class="tin" id="nameNew" maxlength="16" placeholder="New display name" spellcheck="false"><button class="btn btn-primary" id="nameSave">Save</button></div></div>
+      <div id="bioBox" hidden><div class="prow2"><input class="tin" id="bioNew" maxlength="90" placeholder="One sentence about you" autocomplete="off"><button class="btn btn-primary" id="bioSave">Save</button></div></div>
       <div id="pinBox" hidden><div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="12" placeholder="0000" autocomplete="off"><button class="btn btn-primary" id="acctChange">Save</button></div></div>
       <div class="acctmsg" id="acctMsg2"></div>
       <button class="btn btn-secondary btn-block" id="friendsBtn">Friends <span id="frCount" class="dim"></span></button>
@@ -1173,13 +1200,7 @@
         <button class="btn btn-secondary btn-block" id="adminShow" style="margin-top:10px">Show admin controls</button>
       </div>
       <div id="adminOn" hidden>
-        <div class="rsub" style="margin-top:8px" id="adminWhy">Admin is on. Leaderboard rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.</div>
-        <div class="label">Rename an account</div>
-        <div class="prow2"><input class="tin" id="adminRnKey" placeholder="handle" autocomplete="off" spellcheck="false"><input class="tin" id="adminRnName" maxlength="16" placeholder="new name" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="adminRnGo">Rename</button></div>
-        <div class="label">Remove or ban an account</div>
-        <div class="prow2"><input class="tin" id="adminAcct" placeholder="handle" autocomplete="off" spellcheck="false"><button class="btn btn-secondary danger" id="adminAcctGo">Remove</button><button class="btn btn-secondary danger" id="adminBanGo">Ban</button></div>
-        <div class="rsub" style="margin-top:8px">Remove deletes the account. Ban also wipes its scores and maps and stops the handle being claimed again.</div>
-        <div class="acctmsg" id="adminMsg2"></div>
+        <div class="rsub" style="margin-top:8px" id="adminWhy"></div>
         <div class="twobtn"><button class="btn btn-secondary sm" id="adminHide">Hide controls this visit</button><button class="btn btn-secondary sm" id="adminExit" hidden>Exit admin mode</button></div>
       </div>
     </div>
@@ -1297,6 +1318,35 @@
   </div>
 </div>
 
+<div id="dlgWrap" class="dlgwrap" hidden><div class="dlg" role="dialog"><h3 id="dlgTitle"></h3><p id="dlgBody"></p><input class="tin" id="dlgInput" hidden autocomplete="off"><div class="row"><button class="btn btn-secondary" id="dlgCancel">Cancel</button><button class="btn btn-primary" id="dlgOk">OK</button></div></div></div>
+<div id="profile" class="screen" hidden>
+  <div class="setup-wrap narrow">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Profile</b></div><button class="btn btn-secondary" id="profBack" style="margin-left:auto">Back</button></div>
+    <div class="card">
+      <div class="prof"><div class="av-big" id="profAv"></div><div class="profside">
+        <div class="namerow"><b id="profName">…</b><span id="profTags"></span></div>
+        <span class="handle" id="profHandle"></span>
+        <div class="profbio" id="profBio"></div>
+        <div class="rsub" id="profMeta"></div>
+        <div class="profbtns" id="profBtns" style="margin-top:10px"></div>
+      </div></div>
+      <div class="acctmsg" id="profMsg"></div>
+    </div>
+    <div class="card wide" id="profAdmin" hidden>
+      <h2 style="margin:0 0 4px">Admin</h2>
+      <div class="rsub" id="profAdminSub"></div>
+      <div class="label">Send a warning</div>
+      <div class="prow2"><input class="tin" id="profWarn" maxlength="200" placeholder="What they need to fix" autocomplete="off"><button class="btn btn-secondary" id="profWarnGo">Send</button></div>
+      <div class="label">Rename</div>
+      <div class="prow2"><input class="tin" id="profRn" maxlength="16" placeholder="New display name" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="profRnGo">Rename</button></div>
+      <div class="label">Ban</div>
+      <div class="twobtn" style="margin-top:6px"><button class="btn btn-secondary sm danger" data-ban="3">3 days</button><button class="btn btn-secondary sm danger" data-ban="7">7 days</button><button class="btn btn-secondary sm danger" data-ban="30">30 days</button><button class="btn btn-secondary sm danger" data-ban="0">Permanently</button><button class="btn btn-secondary sm" id="profUnban" hidden>Lift the ban</button></div>
+      <div class="rsub" style="margin-top:8px">A timed ban locks the account and hides its scores until it ends. A permanent ban also wipes its scores and maps, and the handle can never be claimed again.</div>
+      <div class="acctmsg" id="profAdminMsg"></div>
+    </div>
+    <div class="card wide"><h2 style="margin-bottom:4px">Maps</h2><div class="rsub" id="profMapsSub"></div><div class="cmgrid" id="profMaps"></div></div>
+  </div>
+</div>
 <div id="cmstats" class="screen" hidden>
   <div class="setup-wrap">
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Map analytics</b></div><button class="btn btn-secondary" id="statsBack" style="margin-left:auto">Back</button></div>
@@ -1319,9 +1369,9 @@
       <div class="label" style="margin-top:0">Name</div>
       <input class="tin" id="mkName" maxlength="32" placeholder="Name your map" autocomplete="off">
       <div class="label">Thumbnail</div>
-      <div class="thumbrow"><img id="mkThumb" class="mkthumb" alt="" src="images/mode-custom.jpg"><div class="thumbside">
+      <div class="thumbrow"><div class="thumbbox"><img id="mkThumb" class="mkthumb" alt="" src="images/mode-custom.jpg"><canvas id="mkThumbCv" class="mkthumb cv" width="480" height="270" hidden></canvas></div><div class="thumbside">
         <div class="seg" id="mkThumbSeg"><button data-th="auto" class="on">Auto</button><button data-th="spot">From a spot</button><button data-th="upload">Upload</button></div>
-        <div id="mkThumbSpot" hidden><select class="tin" id="mkThumbSel" style="margin-top:8px"></select><div class="prow2" style="margin-top:8px"><input type="range" id="mkThumbHead" min="0" max="359" value="0" style="flex:1"><span class="dim" id="mkThumbDeg" style="min-width:36px;text-align:right">0°</span></div><button class="btn btn-secondary sm" id="mkThumbRender" style="margin-top:8px">Use this view</button></div>
+        <div id="mkThumbSpot" hidden><select class="tin" id="mkThumbSel" style="margin-top:8px"></select><div class="thumbzoom"><button class="btn btn-secondary sm" id="mkThumbOut" title="Zoom out">−</button><button class="btn btn-secondary sm" id="mkThumbIn" title="Zoom in">+</button><span class="dim" id="mkThumbDeg" style="flex:1">Drag the picture to look around</span></div><button class="btn btn-secondary sm" id="mkThumbRender" style="margin-top:8px">Use this view</button></div>
         <div id="mkThumbUp" hidden><button class="btn btn-secondary sm" id="mkThumbFile" style="margin-top:8px">Choose an image</button><input type="file" id="mkThumbInput" accept="image/*" hidden></div>
         <div class="rsub" id="mkThumbNote" style="margin-top:8px">Auto shows one of your spots.</div>
       </div></div>
@@ -1565,6 +1615,7 @@
     <div class="rank" id="standings" hidden></div>
     <div class="save-row" id="saveRow">
       <input id="nameInput" maxlength="20" placeholder="Your name">
+      <label class="aitog" id="aiRow"><input type="checkbox" id="aiUsed"> AI was used in this game</label>
       <button class="btn btn-secondary" id="saveBtn">Save to global leaderboard</button>
       <span class="saved" id="savedMsg" hidden></span>
     </div>
@@ -2283,7 +2334,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-235128';
+const BUILD='20260918-001357';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2305,19 +2356,29 @@ function lbClean(e){
   const out={id:String(e.id||'').slice(0,24)||('x'+ts), name, score,
           rounds:isFinite(rounds)&&rounds>0?rounds:0, time:isFinite(time)&&time>=0?time:0, ts};
   if(k) out.k=k;   // whose account saved it, so friends can be marked on the board
+  if(e.ai===true) out.ai=true;   // the player said an AI helped
   return out;
 }
 /* Scores an admin removed. One retained list of entry ids; every client drops them on merge and on reconcile,
    so a removed score can't creep back from the browser that saved it. */
 const BAN_ROOT='worlddrop/v1/ban';
-lb.ban=new Set(); lb.banK=new Set();
+lb.ban=new Set(); lb.banK=new Set(); lb.banPerm=new Set(); lb.banExp={};
 /* Admin is the @silas account, automatically. A code also turns it on for one visit. */
 const ADMIN_KEY='silas', ADMIN_CODE='6996';
 const admin={on:false,temp:false,hidden:false,ready:false};
 function banMerge(list){ if(Array.isArray(list)) for(const id of list.slice(-800)) if(typeof id==='string') lb.ban.add(id); }
-function banKMerge(list){ if(Array.isArray(list)) for(const k of list.slice(-800)) if(typeof k==='string'&&k!==ADMIN_KEY) lb.banK.add(k); }
+/* Handles: a plain string is a permanent ban, {k,until} a timed one. Timed bans that have run out are simply dropped. */
+function banKMerge(list){
+  if(!Array.isArray(list)) return;
+  for(const it of list.slice(-800)){
+    if(typeof it==='string'){ if(it!==ADMIN_KEY){ lb.banPerm.add(it); lb.banK.add(it); } }
+    else if(it&&typeof it.k==='string'&&it.k!==ADMIN_KEY&&+it.until>Date.now()){ lb.banExp[it.k]=Math.max(+it.until,lb.banExp[it.k]||0); lb.banK.add(it.k); }
+  }
+}
+function banUntil(k){ if(lb.banPerm.has(k)) return Infinity; const u=lb.banExp[k]; return u&&u>Date.now()?u:0; }
+function banLift(k){ lb.banPerm.delete(k); delete lb.banExp[k]; lb.banK.delete(k); }
 function banPublish(){ const payload=JSON.stringify([...lb.ban].slice(-800)); for(const l of lb.links) if(l.ready){ try{ l.client.publish(BAN_ROOT+'/ids',payload,{qos:1,retain:true}); }catch(e){} } }
-function banKPublish(){ const payload=JSON.stringify([...lb.banK].slice(-800)); for(const l of lb.links) if(l.ready){ try{ l.client.publish(BAN_ROOT+'/handles',payload,{qos:1,retain:true}); }catch(e){} } }
+function banKPublish(){ const now=Date.now(); const list=[...lb.banPerm,...Object.entries(lb.banExp).filter(([k,u])=>u>now&&!lb.banPerm.has(k)).map(([k,until])=>({k,until}))].slice(-800); const payload=JSON.stringify(list); for(const l of lb.links) if(l.ready){ try{ l.client.publish(BAN_ROOT+'/handles',payload,{qos:1,retain:true}); }catch(e){} } }
 /* A score is gone if its id was removed or its account was banned. */
 function banned(e){ return !e||lb.ban.has(e.id)||(!!e.k&&lb.banK.has(e.k)); }
 function banApply(){ for(const id of Object.keys(lb.boards)) lb.boards[id]=lb.boards[id].filter(e=>!banned(e)); lb.daily=(lb.daily||[]).filter(e=>!banned(e)); }
@@ -2401,11 +2462,12 @@ function lbConnect(){
     let c; try{ c=mqtt.connect(url,{connectTimeout:8000,reconnectPeriod:20000,keepalive:30,clean:true,clientId:'wdlb_'+Math.random().toString(36).slice(2,10)}); }catch(e){ continue; }
     const link={url,client:c,ready:false}; lb.links.push(link);
     c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); lb.dailyDate=dailyDate();
-      c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+',DL_ROOT+'/'+lb.dailyDate,BAN_ROOT+'/+'],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint(); });
+      c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+',DL_ROOT+'/'+lb.dailyDate,BAN_ROOT+'/+'],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint();
+      if(!soc.dirWarmed){ soc.dirWarmed=true; setTimeout(()=>fetchDirectory(2600).then(()=>lbPaint()),400); } });   // faces on the boards for everyone, signed in or not
     c.on('message',(t,payload)=>{ const parts=t.split('/'); const id=parts.pop(); let data=null; try{ data=JSON.parse(payload.toString()); }catch(e){ return; }
       if(parts[parts.length-1]==='st'){ if(data&&MODES[id]) stats.got[id]={r:stClean(data.r),g:stClean(data.g)}; return; }
       if(parts[parts.length-1]==='dl'){ if(id===dailyDate()){ lb.dailySeen=true; lb.dailyDate=id; dlMerge(data); lbPaint(); } return; }
-      if(parts[parts.length-1]==='ban'){ if(id==='handles'){ banKMerge(data); if(acct.key&&lb.banK.has(acct.key)){ acctClear(); paintAcct(); toast('This account was removed by an admin.'); } } else banMerge(data); banApply(); lbPaint(); return; }
+      if(parts[parts.length-1]==='ban'){ if(id==='handles'){ lb.banK=new Set(); lb.banPerm=new Set(); lb.banExp={}; banKMerge(data); if(acct.key&&lb.banK.has(acct.key)){ const u=banUntil(acct.key); acctClear(); paintAcct(); toast(u===Infinity?'This account was banned by an admin.':`This account is banned until ${new Date(u).toLocaleDateString(undefined,{month:'short',day:'numeric'})}.`); } } else banMerge(data); banApply(); lbPaint(); return; }
       lb.seen[id]=true; lbMerge(id,data); lbPaint(); });
     c.on('error',()=>{}); c.on('close',()=>{ link.ready=false; }); c.on('offline',()=>{ link.ready=false; lbPaint(); });
   }
@@ -2420,7 +2482,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:2};
+const VERSION={major:3,minor:4,patch:3};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2568,7 +2630,7 @@ function renderBoard(highlightId){
   wrap.innerHTML=`<table class="board"><tr><th>#</th><th>Name</th>${showMode?'<th>Setup</th>':'<th>Date</th>'}<th style="text-align:right">Score</th></tr>`+
     b.slice(0,10).map((e,i)=>{ const em=entryMode(e);
       const setup=`${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}`;
-      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td>${trashCell(e.id,'classic')}</tr>`; }).join('')+`</table>`;
+      return `<tr class="${e.id===highlightId?'me':''}"><td class="rank">${i+1}</td>${nameCell(e)}<td class="mode">${showMode?setup:new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td>${trashCell(e.id,'classic')}</tr>`; }).join('')+`</table>`;
   $('boardCount').textContent=foot;
 }
 /* ---------- Accounts ----------
@@ -2592,7 +2654,7 @@ function paintPrefs(){
 applyPrefs();
 
 const ACCT_ROOT='worlddrop/v1/acct';
-const acct={key:null,name:null,av:null,streak:null,color:null};
+const acct={key:null,name:null,av:null,streak:null,color:null,bio:''};
 /* ---------- Day streak ----------
    A day counts if you finish any game in it (days roll over at midnight in New York, like the daily).
    Miss a day and it's gone. The count lives in the account record, so it follows you between devices. */
@@ -2626,9 +2688,9 @@ async function acctHash(pin,salt,key){
   const buf=await crypto.subtle.digest('SHA-256',data);
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function acctLoad(){ try{ const a=JSON.parse(localStorage.getItem('pp_acct')||'null'); if(a&&a.key&&a.name){ acct.key=a.key; acct.name=a.name; acct.av=a.av||null; acct.streak=a.streak||null; acct.color=a.color||null; } }catch(e){} }
-function acctSave(){ try{ localStorage.setItem('pp_acct',JSON.stringify({key:acct.key,name:acct.name,av:acct.av||null,streak:acct.streak||null,color:acct.color||null})); }catch(e){} }
-function acctClear(){ acct.key=null; acct.name=null; acct.av=null; acct.streak=null; acct.color=null; try{ localStorage.removeItem('pp_acct'); }catch(e){} }
+function acctLoad(){ try{ const a=JSON.parse(localStorage.getItem('pp_acct')||'null'); if(a&&a.key&&a.name){ acct.key=a.key; acct.name=a.name; acct.av=a.av||null; acct.streak=a.streak||null; acct.color=a.color||null; acct.bio=a.bio||''; } }catch(e){} }
+function acctSave(){ try{ localStorage.setItem('pp_acct',JSON.stringify({key:acct.key,name:acct.name,av:acct.av||null,streak:acct.streak||null,color:acct.color||null,bio:acct.bio||''})); }catch(e){} }
+function acctClear(){ acct.key=null; acct.name=null; acct.av=null; acct.streak=null; acct.color=null; acct.bio=''; try{ localStorage.removeItem('pp_acct'); }catch(e){} }
 /* Read one account's retained record: subscribe, wait briefly for the broker to hand it over, unsubscribe. */
 function acctFetch(key){
   const topic=ACCT_ROOT+'/'+key;
@@ -2654,6 +2716,7 @@ function paintAcct(){
   if($('acctWho')) $('acctWho').textContent=acct.name||'';
   if($('acctStreak')){ const n=streakNow(acct.streak); $('acctStreak').hidden=n<2; $('acctStreak').innerHTML=`${FLAME}${n}-day streak`; }
   if($('acctHandle')) $('acctHandle').textContent=acct.key?'@'+acct.key:'';
+  if($('acctBio')){ $('acctBio').textContent=acct.bio||''; $('acctBio').hidden=!acct.bio; }
   if(admin.ready){ const was=admin.on; adminSync(); if(was!==admin.on) lbPaint(); }
   avPaint(); paintPrefs();
   if(acct.key&&!soc.loaded) socWarm().then(()=>{ const c=$('frCount'); if(c&&soc.mine.size) c.textContent=''; });
@@ -2669,7 +2732,7 @@ async function acctContinue(){
   const bad=el=>{ const n=$(el); n.classList.remove('bad'); void n.offsetWidth; n.classList.add('bad'); n.focus(); };
   if(key.length<2){ acctMsg('acctMsg','Pick a name of at least two letters or numbers.','bad'); bad('acctName'); return; }
   if(!/^\d{4,12}$/.test(pin)){ acctMsg('acctMsg','The code is 4 to 12 digits.','bad'); bad('acctPin'); return; }
-  if(lb.banK.has(key)){ acctMsg('acctMsg','That name isn\'t available.','bad'); bad('acctName'); return; }
+  if(lb.banK.has(key)){ const u=banUntil(key); acctMsg('acctMsg',u===Infinity?'That account is banned.':`That account is banned until ${new Date(u).toLocaleDateString(undefined,{month:'short',day:'numeric'})}.`,'bad'); bad('acctName'); return; }
   $('acctGo').disabled=true; acctMsg('acctMsg','Checking…');
   const got=await acctFetch(key);
   if(got.error==='offline'){ $('acctGo').disabled=false; acctMsg('acctMsg','Not connected yet. Give it a second and try again.','bad'); return; }
@@ -2677,7 +2740,7 @@ async function acctContinue(){
     if(got.record){
       const h=await acctHash(pin,got.record.salt||'',key);
       if(h!==got.record.hash){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is taken and the code doesn\'t match it.','bad'); bad('acctPin'); return; }
-      acct.key=key; acct.name=got.record.name||raw.slice(0,16); acct.av=got.record.av||null; acct.streak=got.record.streak||null; acct.color=okColor(got.record.color); acctSave();
+      acct.key=key; acct.name=got.record.name||raw.slice(0,16); acct.av=got.record.av||null; acct.streak=got.record.streak||null; acct.color=okColor(got.record.color); acct.bio=cleanName(got.record.bio||'').slice(0,90); acctSave();
       acctPublish({...got.record,seen:Date.now()});   // republish so the record stays alive on every broker
       acctMsg('acctMsg','Signed in.','ok');
     } else {
@@ -2732,6 +2795,15 @@ async function saveDisplayName(){
   $('nameBox').hidden=true; mp.me.name=v; if($('mpName')) $('mpName').value=v;
 }
 $('nameSave').addEventListener('click',saveDisplayName);
+$('bioEdit').addEventListener('click',()=>{ const b=$('bioBox'); b.hidden=!b.hidden; $('nameBox').hidden=true; $('pinBox').hidden=true; acctMsg('acctMsg2',''); if(!b.hidden){ $('bioNew').value=acct.bio||''; $('bioNew').focus(); } });
+async function saveBio(){
+  const v=cleanName($('bioNew').value).slice(0,90); acctMsg('acctMsg2','Saving…');
+  const got=await acctFetch(acct.key); if(!got.record){ acctMsg('acctMsg2','Could not reach your account. Try again.','bad'); return; }
+  acct.bio=v; acctSave(); paintAcct(); if(soc.dir[acct.key]) soc.dir[acct.key].bio=v;
+  const ok=acctPublish({...got.record,bio:v}); acctMsg('acctMsg2',ok?(v?'Bio saved.':'Bio cleared.'):'Could not reach the server.',ok?'ok':'bad'); $('bioBox').hidden=true;
+}
+$('bioSave').addEventListener('click',saveBio);
+$('bioNew').addEventListener('keydown',e=>{ if(e.key==='Enter') saveBio(); });
 $('nameNew').addEventListener('keydown',e=>{ if(e.key==='Enter') saveDisplayName(); });
 $('themeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; prefs.theme=b.dataset.theme; savePrefs(); applyPrefs(); sfx('click'); });
 $('sizeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; prefs.size=b.dataset.size; savePrefs(); applyPrefs(); sfx('click'); });
@@ -2888,7 +2960,7 @@ function fetchDirectory(ms){
       resolve(soc.dir); };
     const onMsg=(t,payload)=>{ if(!t.startsWith(ACCT_ROOT+'/')) return; const k=t.split('/').pop();
       let rec=null; try{ rec=JSON.parse(payload.toString()); }catch(e){}
-      if(rec&&rec.name) soc.dir[k]={name:rec.name,av:rec.av||null,streak:rec.streak||null};
+      if(rec&&rec.name) soc.dir[k]={name:rec.name,av:rec.av||null,streak:rec.streak||null,bio:cleanName(rec.bio||'').slice(0,90),made:+rec.made||0};
     };
     for(const l of links){ try{ l.client.on('message',onMsg); l.client.subscribe(wild,{qos:0}); }catch(e){} }
     const timer=setTimeout(finish,ms||2200);
@@ -2928,6 +3000,12 @@ function iFollow(k){ return soc.mine.has(k); }
 function friendKeys(){ return [...soc.mine].filter(followsMe); }
 function personName(k){ return (soc.dir[k]&&soc.dir[k].name)||k; }
 function personAv(k){ return soc.dir[k]&&soc.dir[k].av; }
+const SIL='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M3.5 21.5c0-4.6 3.8-7.5 8.5-7.5s8.5 2.9 8.5 7.5z"/></svg>';
+/* A face for a board row: the photo if we know it, otherwise the plain silhouette. */
+function faceOf(k,size){ const url=k&&personAv(k); return url?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`:`<span class="pav sil" style="width:${size}px;height:${size}px">${SIL}</span>`; }
+function adminTag(k){ return k===ADMIN_KEY?' <span class="fchip adm">Admin</span>':''; }
+function aiTag(e){ return e&&e.ai?' <span class="fchip ai" title="The player said an AI helped">AI</span>':''; }
+function nameCell(e){ const k=e.k||''; return `<td class="name"><span class="who${k?' lnk':''}"${k?` data-prof="${esc(k)}"`:''}>${faceOf(k,26)}<span class="nm">${esc(e.name)}</span>${adminTag(k)}${friendTag(e)}${aiTag(e)}${streakTag(e)}</span></td>`; }
 function frFace(k,size){
   const url=personAv(k);
   return url?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`
@@ -3009,7 +3087,9 @@ function allNotes(){
   const inv=notes.items.filter(n=>n&&n.kind==='invite'&&Date.now()-(n.ts||0)<2*3600*1000);
   const ch=notes.items.filter(n=>n&&n.kind==='chal'&&Date.now()-(n.ts||0)<7*86400*1000);
   const cc=notes.items.filter(n=>n&&n.kind==='cmc'&&Date.now()-(n.ts||0)<14*86400*1000).map(n=>({...n,id:n.id||('cmc-'+n.map+'-'+n.ts),title:`${n.name||n.from} commented on ${n.mapName||'your map'}`,body:n.text||''}));
-  return [...inv,...ch,...cc,...noteFriends(),...noteDaily()];
+  const wn=notes.items.filter(n=>n&&n.kind==='warn'&&Date.now()-(n.ts||0)<60*86400*1000).map(n=>({...n,id:n.id||('warn-'+n.ts),title:`Warning from ${n.fromName||n.from||'an admin'}`,body:n.text||''}));
+  const rp=notes.items.filter(n=>n&&n.kind==='report'&&Date.now()-(n.ts||0)<30*86400*1000).map(n=>({...n,id:n.id||('rep-'+n.ts),title:`${n.fromName||n.from} reported @${n.about}`,body:n.text||''}));
+  return [...wn,...rp,...inv,...ch,...cc,...noteFriends(),...noteDaily()];
 }
 function paintBell(){
   const list=allNotes(); const unseen=list.filter(n=>!notes.seen.has(n.id)).length;
@@ -3019,11 +3099,13 @@ function paintBell(){
 function renderNotes(){
   const list=allNotes();
   $('noteList').innerHTML=list.length?list.map(n=>{
-    const face=n.kind==='friend'?frFace(n.who,32):(n.kind==='invite'||n.kind==='cmc'||(n.kind==='chal'&&n.from))?frFace(n.from,32):`<span class="pav ini" style="width:32px;height:32px">${n.kind==='chal'?'🏁':'★'}</span>`;
+    const face=n.kind==='friend'?frFace(n.who,32):(n.kind==='invite'||n.kind==='cmc'||n.kind==='warn'||n.kind==='report'||(n.kind==='chal'&&n.from))?frFace(n.from,32):`<span class="pav ini" style="width:32px;height:32px">${n.kind==='chal'?'🏁':'★'}</span>`;
     const act=n.kind==='friend'?`<button class="btn btn-primary" data-nadd="${esc(n.who)}">Add</button>`
       :n.kind==='invite'?`<button class="btn btn-primary" data-njoin="${esc(n.code||'')}">Join</button>`
       :n.kind==='chal'?`<button class="btn btn-primary" data-nch="${esc(n.ch||'')}" data-nfrom="${esc(n.from||n.fromName||'')}">See</button>`
       :n.kind==='cmc'?`<button class="btn btn-primary" data-nmap="${esc(n.map||'')}">Open</button>`
+      :n.kind==='warn'?''
+      :n.kind==='report'?`<button class="btn btn-primary" data-nprof="${esc(n.about||'')}">Profile</button>`
       :`<button class="btn btn-primary" data-ndaily="1">Play</button>`;
     return `<div class="noterow ${notes.seen.has(n.id)?'':'unseen'}">${face}<span class="nt"><b>${esc(n.title)}</b><span>${esc(n.body||'')}</span></span>${act}</div>`;
   }).join(''):'<div class="noteempty">Nothing new.</div>';
@@ -3043,7 +3125,8 @@ document.addEventListener('click',e=>{ if(notes.open&&!e.target.closest('.hero-l
   const inv=$('inviteList'); if(inv&&!inv.hidden&&!e.target.closest('.invitebox')) inv.hidden=true; },true);
 $('noteList').addEventListener('click',e=>{
   const add=e.target.closest('[data-nadd]'), join=e.target.closest('[data-njoin]'), day=e.target.closest('[data-ndaily]'), see=e.target.closest('[data-nch]');
-  const nmap=e.target.closest('[data-nmap]');
+  const nmap=e.target.closest('[data-nmap]'), nprof=e.target.closest('[data-nprof]');
+  if(nprof){ notes.open=false; $('notePanel').hidden=true; openProfile(nprof.dataset.nprof); return; }
   if(see){ notes.open=false; $('notePanel').hidden=true; chalOpen(see.dataset.nch,see.dataset.nfrom); }
   else if(nmap){ notes.open=false; $('notePanel').hidden=true; cm.from='menu'; cmapOpen(nmap.dataset.nmap); }
   else if(add){ frToggle(add.dataset.nadd,true); renderNotes(); toast('Friends with '+personName(add.dataset.nadd)); }
@@ -3242,11 +3325,12 @@ function renderCmaps(){
   if(q) list=list.filter(r=>r.name.toLowerCase().includes(q)||String(r.byName||'').toLowerCase().includes(q)||String(r.by||'').toLowerCase().includes(q));
   list.sort((a,b)=>(b.plays||0)-(a.plays||0)||(b.made||0)-(a.made||0));
   $('cmSub').textContent=Object.keys(cm.all).length?`${Object.keys(cm.all).length} map${Object.keys(cm.all).length===1?'':'s'}${q?` · ${list.length} match`:''}`:(lbLive()?'No custom maps yet. Make the first one.':'Connecting…');
-  $('cmList').innerHTML=list.map(r=>`<button class="cmcard" data-id="${esc(r.id)}"><img class="thumb" src="${thumbOf(r)}" alt="" loading="lazy">${admin.on?`<span class="trash" role="button" data-cmdel="${esc(r.id)}" title="Delete this map for everyone">${TRASH}</span>`:''}<b>${esc(r.name)}</b><span class="by">${r.by?frFace(r.by,18):''}${esc(r.byName||r.by||'someone')}</span><span class="meta"><span><b>${r.pins.length}</b> spots</span><span><b>${(r.plays||0).toLocaleString()}</b> plays</span><span class="lk">♥ <b>${(r.likes||[]).length}</b></span></span></button>`).join('');
+  $('cmList').innerHTML=list.map(r=>`<button class="cmcard" data-id="${esc(r.id)}"><img class="thumb" src="${thumbOf(r)}" alt="" loading="lazy">${admin.on?`<span class="trash" role="button" data-cmdel="${esc(r.id)}" title="Delete this map for everyone">${TRASH}</span>`:''}<b>${esc(r.name)}</b><span class="by${r.by?' lnk':''}"${r.by?` data-prof="${esc(r.by)}"`:''}>${r.by?faceOf(r.by,18):''}${esc(r.byName||r.by||'someone')}</span><span class="meta"><span><b>${r.pins.length}</b> spots</span><span><b>${(r.plays||0).toLocaleString()}</b> plays</span><span class="lk">♥ <b>${(r.likes||[]).length}</b></span></span></button>`).join('');
 }
 $('cmSearch').addEventListener('input',renderCmaps);
 $('cmList').addEventListener('click',e=>{
-  const d=e.target.closest('[data-cmdel]'); if(d){ e.stopPropagation(); if(!admin.on) return; const r=cm.all[d.dataset.cmdel]; if(r&&confirm(`Delete "${r.name}" by ${r.byName||r.by} for everyone?`)){ cmapDelete(r.id); renderCmaps(); toast('Map deleted','ok'); } return; }
+  if(e.target.closest('[data-prof]')) return;
+  const d=e.target.closest('[data-cmdel]'); if(d){ e.stopPropagation(); if(!admin.on) return; const r=cm.all[d.dataset.cmdel]; if(!r) return; ask({title:`Delete "${r.name}"?`,body:`By ${r.byName||r.by}. It goes away for everyone.`,ok:'Delete',danger:true}).then(ok=>{ if(ok){ cmapDelete(r.id); renderCmaps(); toast('Map deleted','ok'); } }); return; }
   const b=e.target.closest('.cmcard'); if(b) cmapOpen(b.dataset.id); });
 $('cmapsBack').addEventListener('click',()=>{ show(cm.from==='lobby'?'lobby':'setup'); });
 async function cmapOpen(id){
@@ -3274,7 +3358,7 @@ function renderCmc(){
   const rec=cm.cur; if(!rec) return; const list=(cm.comments||[]).slice().sort((a,b)=>b.ts-a.ts);
   $('cmcCount').textContent=list.length?String(list.length):''; $('cmcWrite').hidden=!acct.key; $('cmcSignIn').hidden=!!acct.key;
   const canDel=c=>acct.key&&(c.k===acct.key||rec.by===acct.key||admin.on);
-  $('cmcList').innerHTML=list.length?list.map(c=>`<div class="cmc">${frFace(c.k,30)}<div class="body"><div class="who">${esc(c.name)}${c.k===rec.by?' <span class="dim">maker</span>':''}<small>${agoTxt(c.ts)}</small></div><div class="txt">${esc(c.text)}</div>${canDel(c)?`<button class="del" data-cdel="${esc(c.id)}">Delete</button>`:''}</div></div>`).join(''):'<div class="frempty">No comments yet. Say something about this map.</div>';
+  $('cmcList').innerHTML=list.length?list.map(c=>`<div class="cmc">${frFace(c.k,30)}<div class="body"><div class="who lnk" data-prof="${esc(c.k)}">${esc(c.name)}${adminTag(c.k)}${c.k===rec.by?' <span class="dim">maker</span>':''}<small>${agoTxt(c.ts)}</small></div><div class="txt">${esc(c.text)}</div>${canDel(c)?`<button class="del" data-cdel="${esc(c.id)}">Delete</button>`:''}</div></div>`).join(''):'<div class="frempty">No comments yet. Say something about this map.</div>';
 }
 async function cmcPost(){
   const rec=cm.cur; if(!rec||!acct.key) return; const text=cleanName($('cmcText').value).slice(0,280); if(text.length<1) return;
@@ -3287,14 +3371,14 @@ async function cmcPost(){
 $('cmcPost').addEventListener('click',cmcPost);
 $('cmcText').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); cmcPost(); } });
 $('cmcSignIn').addEventListener('click',()=>{ acctMsg('acctMsg',''); paintAcct(); show('acct'); $('acct').scrollTo(0,0); });
-$('cmcList').addEventListener('click',async e=>{ const b=e.target.closest('[data-cdel]'); if(!b||!cm.cur) return; if(!confirm('Delete this comment?')) return;
+$('cmcList').addEventListener('click',async e=>{ const b=e.target.closest('[data-cdel]'); if(!b||!cm.cur) return; if(!await ask({title:'Delete this comment?',ok:'Delete',danger:true})) return;
   const list=(await cmcFetch(cm.cur.id)).filter(c=>c.id!==b.dataset.cdel); cmcPublish(cm.cur.id,list); cm.comments=list; renderCmc(); });
 function renderCmap(){
   const rec=cm.cur; const lobby=mp.role==='host';
   $('cmHero').style.backgroundImage=`url("${thumbOf(rec)}")`;
   $('cmTitle').textContent=rec.name;
   const likes=Array.isArray(rec.likes)?rec.likes:[]; const liked=!!acct.key&&likes.includes(acct.key);
-  $('cmFacts').innerHTML=[['Spots',rec.pins.length],['By',rec.byName||rec.by||'someone'],['Plays',(rec.plays||0).toLocaleString()],['Likes',likes.length.toLocaleString()]].map(([k,v])=>`<div class="dfact"><small>${k}</small><b>${esc(String(v))}</b></div>`).join('');
+  $('cmFacts').innerHTML=[['Spots',rec.pins.length],['By',rec.byName||rec.by||'someone',rec.by],['Plays',(rec.plays||0).toLocaleString()],['Likes',likes.length.toLocaleString()]].map(([k,v,pk])=>`<div class="dfact"${pk?` data-prof="${esc(pk)}" style="cursor:pointer"`:''}><small>${k}</small><b>${esc(String(v))}</b></div>`).join('');
   $('cmLike').textContent=liked?`♥ Liked · ${likes.length}`:`♡ Like · ${likes.length}`; $('cmLike').classList.toggle('on',liked);
   const N=rec.pins.length; const opts=[5,10].filter(n=>n<=N); if(N>10) opts.push(N);   // 5 or 10, and everything if there is more than 10
   if(!opts.includes(cm.rounds)) cm.rounds=opts[0];
@@ -3306,15 +3390,15 @@ function renderCmap(){
   if(!$('cmOwner').hidden) $('cmOwner').innerHTML=(mine?'This is your map. ':'Admin: ')+'<button class="link" id="cmDelete">Delete it'+(mine?'':' for everyone')+'</button>';
   rec.top=(rec.top||[]).filter(e=>e&&!(e.k&&lb.banK.has(e.k))).sort((a,b)=>b.score-a.score||a.ts-b.ts); const top=rec.top;
   $('cmBoardSub').textContent=top.length?`${top.length} player${top.length===1?'':'s'} · best score per account`:'Nobody has played it yet.';
-  $('cmBoard').innerHTML=top.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th style="text-align:right">Score</th></tr>`+top.slice(0,15).map((e,i)=>`<tr class="${e.k&&e.k===acct.key?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${e.k?friendTag({k:e.k,name:e.name}):''}${e.k?streakTag({k:e.k}):''}</td><td class="mode">${e.rounds} rounds · ${e.time?e.time+'s':'no limit'}</td><td class="score">${(+e.score).toLocaleString()}</td>${trashCell(String(i),'cmap')}</tr>`).join('')+'</table>':'<div class="cmap-empty">Be the first.</div>';
+  $('cmBoard').innerHTML=top.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th style="text-align:right">Score</th></tr>`+top.slice(0,15).map((e,i)=>`<tr class="${e.k&&e.k===acct.key?'me':''}"><td class="rank">${i+1}</td>${nameCell(e)}<td class="mode">${e.rounds} rounds · ${e.time?e.time+'s':'no limit'}</td><td class="score">${(+e.score).toLocaleString()}</td>${trashCell(String(i),'cmap')}</tr>`).join('')+'</table>':'<div class="cmap-empty">Be the first.</div>';
   $('cmLink').textContent=cmapLink(rec.id);
 }
 $('cmTimeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cm.time=+b.dataset.t; renderCmap(); sfx('click'); });
 $('cmRoundSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; cm.rounds=+b.dataset.r; renderCmap(); sfx('click'); });
 $('cmCopy').addEventListener('click',()=>copyText(cmapLink(cm.cur.id),$('cmCopy'),'Copy link'));
-$('cmapBack').addEventListener('click',()=>{ if(cm.from==='menu'){ show('menu'); return; } if(cm.from==='stats'){ openStats(); return; } openCmaps(cm.from); });
+$('cmapBack').addEventListener('click',()=>{ if(cm.from==='menu'){ show('menu'); return; } if(cm.from==='stats'){ openStats(); return; } if(cm.from==='profile'){ openProfile(prof.key); return; } openCmaps(cm.from); });
 function cmapDelete(id){ for(const l of lb.links) if(l.ready){ try{ l.client.publish(CM_ROOT+'/'+id,'',{qos:1,retain:true}); }catch(e){} } delete cm.all[id]; }
-$('cmOwner').addEventListener('click',async e=>{ if(!e.target.closest('#cmDelete')||!cm.cur) return; if(!confirm(`Delete "${cm.cur.name}" for everyone?`)) return;
+$('cmOwner').addEventListener('click',async e=>{ if(!e.target.closest('#cmDelete')||!cm.cur) return; if(!await ask({title:`Delete "${cm.cur.name}"?`,body:'The map, its board and its comments go away for everyone.',ok:'Delete',danger:true})) return;
   cmapDelete(cm.cur.id); toast('Map deleted','ok'); openCmaps(cm.from); });
 $('cmEdit').addEventListener('click',()=>{ if(cm.cur) openMake(cm.cur); });
 $('cmPlay').addEventListener('click',()=>{
@@ -3344,7 +3428,7 @@ async function cmapFinish(){
 }
 /* The final screen says where the game went. */
 async function paintCustomSave(){
-  const map=state.custom; $('saveBtn').hidden=true; $('nameInput').hidden=true; $('saveRow').hidden=!acct.key; $('signUp').hidden=!!acct.key;
+  const map=state.custom; $('saveBtn').hidden=true; $('nameInput').hidden=true; $('aiRow').hidden=true; $('saveRow').hidden=!acct.key; $('signUp').hidden=!!acct.key;
   $('viewBoardBtn').hidden=false; $('viewBoardBtn').textContent='View map board';
   if(!acct.key){ $('signUp').querySelector('b').textContent=`Get on the ${map.name} board`; cmapFinish(); return; }
   $('savedMsg').hidden=false; $('savedMsg').textContent=`Saving to the ${map.name} board…`;
@@ -3363,7 +3447,8 @@ function openMake(rec){
     mk.thumb=rec.thumb&&rec.thumb.img?{...rec.thumb}:null; mk.thMode=mk.thumb?(mk.thumb.pano?'spot':'upload'):'auto'; mk.start=rec.start&&isFinite(+rec.start.lat)?{lat:+rec.start.lat,lng:+rec.start.lng,z:+rec.start.z||3}:null;
   } else if(mk.edit){ mk.edit=null; mk.pins=[]; $('mkName').value=''; mk.thumb=null; mk.thMode='auto'; mk.start=null; }
   $('mkTitle').textContent=mk.edit?'Edit map':'Create a map';
-  paintThumb(); paintStart();
+  tview.pano=null; tview.band=null; paintThumb(); paintStart();
+  if(mk.thMode==='spot'&&mk.thumb){ paintThumbSel(); const i=mk.pins.findIndex(p=>p.pano===mk.thumb.pano); if(i>=0) $('mkThumbSel').value=String(i); thumbLook(); }
   setTimeout(()=>{ mk.map.invalidateSize(); if(!mk.pins.length) mk.map.fitBounds([[-55,-170],[72,180]],{animate:false}); else mk.map.fitBounds(L.latLngBounds(mk.pins.map(p=>[p.lat,p.lng])).pad(0.2),{animate:false,maxZoom:12}); },60);
   renderMk();
 }
@@ -3495,18 +3580,50 @@ function paintThumb(){
   $('mkThumbSpot').hidden=mk.thMode!=='spot'; $('mkThumbUp').hidden=mk.thMode!=='upload';
   const fake={id:mk.edit?mk.edit.id:'new',pins:mk.pins,thumb:mk.thumb};
   $('mkThumb').src=thumbOf(fake);
-  $('mkThumbNote').textContent=mk.thMode==='auto'?'Auto shows one of your spots.':mk.thMode==='spot'?(mk.thumb&&mk.thumb.pano?'Using the view you picked. Change the spot or angle and press Use this view again.':'Pick a spot, turn the slider, press Use this view.'):(mk.thumb&&!mk.thumb.pano?'Using your image.':'A 16:9 image works best, like a YouTube thumbnail.');
+  if(mk.thMode!=='spot'){ $('mkThumbCv').hidden=true; $('mkThumb').hidden=false; }
+  $('mkThumbNote').textContent=mk.thMode==='auto'?'Auto shows one of your spots.':mk.thMode==='spot'?(mk.thumb&&mk.thumb.pano?'Using the view you picked. Drag or zoom and press Use this view again to change it.':'Pick a spot, drag the picture to look around, zoom, then press Use this view.'):(mk.thumb&&!mk.thumb.pano?'Using your image.':'A 16:9 image works best, like a YouTube thumbnail.');
   paintThumbSel();
 }
 function paintThumbSel(){ const mk=cm.mk; if(!mk) return; const sel=$('mkThumbSel'); const cur=sel.value; sel.innerHTML=mk.pins.map((p,i)=>`<option value="${i}">${esc(p.label||'Spot '+(i+1))}</option>`).join(''); if(cur&&mk.pins[+cur]) sel.value=cur; }
 $('mkThumbSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const mk=cm.mk; mk.thMode=b.dataset.th; if(mk.thMode==='auto') mk.thumb=null; if(mk.thMode==='spot'&&mk.thumb&&!mk.thumb.pano) mk.thumb=null; if(mk.thMode==='upload'&&mk.thumb&&mk.thumb.pano) mk.thumb=null;
-  if(mk.thMode==='spot'&&mk.pins.length){ const p=mk.pins[+$('mkThumbSel').value||0]; $('mkThumbHead').value=p.heading||0; $('mkThumbDeg').textContent=(p.heading||0)+'°'; } paintThumb(); sfx('click'); });
-$('mkThumbHead').addEventListener('input',e=>{ $('mkThumbDeg').textContent=e.target.value+'°'; });
-$('mkThumbSel').addEventListener('change',()=>{ const p=cm.mk.pins[+$('mkThumbSel').value]; if(p){ $('mkThumbHead').value=p.heading||0; $('mkThumbDeg').textContent=(p.heading||0)+'°'; } });
-async function renderThumbFrom(pano,heading){ const c=document.createElement('canvas'); c.width=480; c.height=270; await renderBandTo(c,pano,heading,90,58.7,2,0); return c.toDataURL('image/jpeg',0.72); }
-$('mkThumbRender').addEventListener('click',async()=>{ const mk=cm.mk; const p=mk.pins[+$('mkThumbSel').value]; if(!p){ toast('Add a spot first'); return; } const btn=$('mkThumbRender'); btn.disabled=true; btn.textContent='Rendering…';
-  try{ const heading=+$('mkThumbHead').value||0; const img=await renderThumbFrom(p.pano,heading); mk.thumb={img,pano:p.pano,heading}; paintThumb(); sfx('click'); }catch(e){ toast('Could not render that view'); }
-  btn.disabled=false; btn.textContent='Use this view'; });
+  paintThumb(); if(mk.thMode==='spot') thumbLook(); sfx('click'); });
+$('mkThumbSel').addEventListener('change',()=>thumbLook());
+/* The live viewer: the spot's tiles are loaded once, then dragged around and zoomed on a canvas, and Use this view keeps what is on it. */
+const tview={pano:null,heading:0,pitch:0,fov:90,band:null,meta:null,busy:false,raf:0};
+const bandCache=new Map();
+async function bandFor(pano){ if(bandCache.has(pano)) return bandCache.get(pano); const meta=await panoMeta(pano); const band=await loadBand(pano,3,meta,66); const v={band,meta}; if(bandCache.size>6) bandCache.delete(bandCache.keys().next().value); bandCache.set(pano,v); return v; }
+function renderPersp(c,band,meta,heading,hfov,pitch){
+  const w=c.width,h=c.height; const ctx=c.getContext('2d'); const o=ctx.createImageData(w,h); const d=o.data; const {img,W,H,yOff}=band; const src=img.data,bw=img.width,bh=img.height;
+  const f=(w/2)/Math.tan(hfov/2*Math.PI/180); const cx=w/2, cy=h/2; const lon0=(heading-meta.center)*Math.PI/180; const pr=pitch*Math.PI/180; const sp=Math.sin(pr), cp=Math.cos(pr);
+  for(let py=0;py<h;py++){ const dy=py+0.5-cy; const y=-dy; const yc=y*cp, ys=-y*sp;
+    for(let px=0;px<w;px++){ const x=px+0.5-cx; const y2=yc+f*sp, z2=ys+f*cp;
+      const yaw=Math.atan2(x,z2), pit=Math.atan2(y2,Math.sqrt(x*x+z2*z2));
+      let u=((lon0+yaw)/(2*Math.PI)+0.5); u-=Math.floor(u); const sx=Math.min(bw-1,(u*W)|0);
+      const sy=Math.min(bh-1,Math.max(0,((0.5-pit/Math.PI)*H-yOff)|0));
+      const i=(sy*bw+sx)*4, k=(py*w+px)*4; d[k]=src[i]; d[k+1]=src[i+1]; d[k+2]=src[i+2]; d[k+3]=255; } }
+  ctx.putImageData(o,0,0);
+}
+function tviewDraw(){ if(!tview.band) return; cancelAnimationFrame(tview.raf); tview.raf=requestAnimationFrame(()=>{ renderPersp($('mkThumbCv'),tview.band,tview.meta,tview.heading,tview.fov,tview.pitch); }); }
+async function thumbLook(){
+  const mk=cm.mk; const p=mk.pins[+$('mkThumbSel').value||0]; const cv=$('mkThumbCv'); if(!p){ cv.hidden=true; $('mkThumb').hidden=false; return; }
+  cv.hidden=false; $('mkThumb').hidden=true;
+  if(mk.thumb&&mk.thumb.pano===p.pano){ tview.heading=+mk.thumb.heading||0; tview.pitch=+mk.thumb.pitch||0; tview.fov=+mk.thumb.fov||90; } else { tview.heading=p.heading||0; tview.pitch=0; tview.fov=90; }
+  if(tview.pano===p.pano&&tview.band){ tviewDraw(); return; }
+  tview.pano=p.pano; tview.band=null; $('mkThumbDeg').textContent='Loading the picture…'; const ctx=cv.getContext('2d'); ctx.fillStyle='#1a2a20'; ctx.fillRect(0,0,cv.width,cv.height);
+  try{ const {band,meta}=await bandFor(p.pano); if(tview.pano!==p.pano) return; tview.band=band; tview.meta=meta; $('mkThumbDeg').textContent='Drag to look around, scroll or + − to zoom'; tviewDraw(); }
+  catch(e){ if(tview.pano===p.pano) $('mkThumbDeg').textContent='This spot has no picture to render'; }
+}
+{ const cv=$('mkThumbCv'); let drag=null;
+  cv.addEventListener('pointerdown',e=>{ if(!tview.band) return; drag={x:e.clientX,y:e.clientY,h:tview.heading,p:tview.pitch}; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove',e=>{ if(!drag) return; const sc=tview.fov/cv.clientWidth; tview.heading=(drag.h-(e.clientX-drag.x)*sc+360)%360; tview.pitch=Math.max(-35,Math.min(35,drag.p+(e.clientY-drag.y)*sc)); tviewDraw(); });
+  const end=()=>{ drag=null; }; cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end);
+  cv.addEventListener('wheel',e=>{ if(!tview.band) return; e.preventDefault(); tview.fov=Math.max(35,Math.min(110,tview.fov+(e.deltaY>0?5:-5))); tviewDraw(); },{passive:false});
+  $('mkThumbIn').addEventListener('click',()=>{ tview.fov=Math.max(35,tview.fov-10); tviewDraw(); sfx('click'); });
+  $('mkThumbOut').addEventListener('click',()=>{ tview.fov=Math.min(110,tview.fov+10); tviewDraw(); sfx('click'); });
+}
+$('mkThumbRender').addEventListener('click',()=>{ const mk=cm.mk; const p=mk.pins[+$('mkThumbSel').value]; if(!p||!tview.band||tview.pano!==p.pano){ toast('Pick a spot and wait for the picture'); return; }
+  renderPersp($('mkThumbCv'),tview.band,tview.meta,tview.heading,tview.fov,tview.pitch);
+  mk.thumb={img:$('mkThumbCv').toDataURL('image/jpeg',0.72),pano:p.pano,heading:Math.round(tview.heading),pitch:Math.round(tview.pitch),fov:Math.round(tview.fov)}; paintThumb(); toast('Thumbnail set','ok'); sfx('click'); });
 $('mkThumbFile').addEventListener('click',()=>$('mkThumbInput').click());
 $('mkThumbInput').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return; const url=URL.createObjectURL(f); const im=new Image();
   im.onload=()=>{ const c=document.createElement('canvas'); c.width=480; c.height=270; const ctx=c.getContext('2d'); const s=Math.max(480/im.width,270/im.height); const w=im.width*s,h=im.height*s; ctx.drawImage(im,(480-w)/2,(270-h)/2,w,h); cm.mk.thumb={img:c.toDataURL('image/jpeg',0.8)}; URL.revokeObjectURL(url); paintThumb(); sfx('click'); };
@@ -3524,6 +3641,80 @@ $('createBtn').addEventListener('click',()=>{ cm.from='setup'; openMake(); });
 $('makeBar').addEventListener('click',()=>{ cm.from='menu'; openMake(); });
 $('cmCreate2').addEventListener('click',openMake);
 $('lobbyCustomBtn').addEventListener('click',()=>openCmaps('lobby'));
+
+/* ---------- A small in-app dialog, instead of the browser's prompt and confirm ---------- */
+let dlgResolve=null;
+function ask(o){
+  return new Promise(res=>{ dlgResolve=res; $('dlgTitle').textContent=o.title||''; $('dlgBody').textContent=o.body||''; $('dlgBody').hidden=!o.body;
+    const inp=$('dlgInput'); inp.hidden=!o.input; inp.value=o.value||''; inp.placeholder=o.placeholder||''; inp.maxLength=o.max||60;
+    $('dlgOk').textContent=o.ok||'OK'; $('dlgOk').className='btn '+(o.danger?'btn-secondary danger':'btn-primary'); $('dlgCancel').hidden=o.noCancel===true;
+    $('dlgWrap').hidden=false; if(o.input) setTimeout(()=>{ inp.focus(); inp.select(); },30); else $('dlgOk').focus(); });
+}
+function dlgClose(v){ $('dlgWrap').hidden=true; const r=dlgResolve; dlgResolve=null; if(r) r(v); }
+$('dlgOk').addEventListener('click',()=>dlgClose($('dlgInput').hidden?true:$('dlgInput').value));
+$('dlgCancel').addEventListener('click',()=>dlgClose(null));
+$('dlgWrap').addEventListener('click',e=>{ if(e.target===$('dlgWrap')) dlgClose(null); });
+$('dlgInput').addEventListener('keydown',e=>{ if(e.key==='Enter') $('dlgOk').click(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('dlgWrap').hidden) dlgClose(null); });
+
+/* ---------- Profiles: anyone's, from any name ---------- */
+const prof={key:null,from:'menu',rec:null};
+async function openProfile(k){
+  k=acctKey(k); if(!k) return;
+  const was=currentScreen(); if(was!=='profile') prof.from=was;
+  prof.key=k; prof.rec=null; show('profile'); $('profile').scrollTo(0,0); $('profMsg').textContent=''; $('profAdminMsg').textContent='';
+  const d=soc.dir[k]||{}; paintProfile({name:d.name||k,av:d.av||null,streak:d.streak||null,bio:d.bio||'',made:d.made||0},true);
+  $('profMaps').innerHTML=''; $('profMapsSub').textContent='Loading…';
+  const got=await acctFetch(k); if(prof.key!==k) return;
+  if(got.record){ const r=got.record; prof.rec=r; soc.dir[k]={name:r.name,av:r.av||null,streak:r.streak||null,bio:cleanName(r.bio||'').slice(0,90),made:+r.made||0}; paintProfile(soc.dir[k],false); }
+  else if(!d.name){ $('profName').textContent='No such account'; $('profHandle').textContent='@'+k; $('profBtns').innerHTML=''; $('profAdmin').hidden=true; }
+  await cmapList(); if(prof.key!==k) return;
+  const maps=Object.values(cm.all).filter(r=>r.by===k).sort((a,b)=>(b.plays||0)-(a.plays||0));
+  $('profMapsSub').textContent=maps.length?`${maps.length} map${maps.length===1?'':'s'}`:'No maps yet.';
+  $('profMaps').innerHTML=maps.map(r=>`<button class="cmcard" data-pmap="${esc(r.id)}"><img class="thumb" src="${thumbOf(r)}" alt="" loading="lazy"><b>${esc(r.name)}</b><span class="meta"><span><b>${r.pins.length}</b> spots</span><span><b>${(r.plays||0).toLocaleString()}</b> plays</span><span class="lk">♥ <b>${(r.likes||[]).length}</b></span></span></button>`).join('');
+}
+function paintProfile(d,loading){
+  const k=prof.key; const me=k===acct.key;
+  $('profAv').style.backgroundImage=d.av?`url(${d.av})`:''; $('profAv').innerHTML=d.av?'':SIL; $('profAv').classList.toggle('silbig',!d.av);
+  $('profName').textContent=d.name||k; $('profHandle').textContent='@'+k;
+  const fr=acct.key&&!me&&friendKeys().includes(k); const u=banUntil(k);
+  const tags=[k===ADMIN_KEY?'<span class="ptag adm">Admin</span>':'',fr?'<span class="ptag fr">Friend</span>':'',me?'<span class="ptag">You</span>':'',u?`<span class="ptag ban">${u===Infinity?'Banned':'Banned until '+new Date(u).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span>`:''].join('');
+  $('profTags').innerHTML=tags;
+  $('profBio').textContent=d.bio||''; $('profBio').hidden=!d.bio;
+  const st=streakNow(d.streak); $('profMeta').innerHTML=[st>=2?`${FLAME}${st}-day streak`:'',d.made?`Joined ${new Date(d.made).toLocaleDateString(undefined,{month:'short',year:'numeric'})}`:''].filter(Boolean).join(' · ')||(loading?'Loading…':'');
+  let btns='';
+  if(me) btns=`<button class="btn btn-secondary sm" id="profEdit">Edit in Settings</button>`;
+  else if(acct.key){ const f=iFollow(k); btns=`<button class="btn ${f?'btn-secondary':'btn-primary'} sm" id="profFollow">${f?(fr?'Remove friend':'Cancel request'):(followsMe(k)?'Accept friend':'Add friend')}</button><button class="btn btn-secondary sm" id="profReport">Report</button>`; }
+  else btns=`<button class="btn btn-secondary sm" id="profSignIn">Sign in to add friends</button>`;
+  $('profBtns').innerHTML=btns;
+  $('profAdmin').hidden=!(admin.on&&!me&&k!==ADMIN_KEY);
+  if(!$('profAdmin').hidden){ $('profAdminSub').textContent=`Everything here reaches @${k} and every player's browser.`; $('profUnban').hidden=!u; }
+}
+$('profBack').addEventListener('click',()=>{ const to=prof.from==='profile'?'menu':prof.from; if(to==='board') renderBoardPage(); if(to==='menu') lbPaint(); show(to); });
+$('profBtns').addEventListener('click',async e=>{
+  const b=e.target.closest('button'); if(!b) return; const k=prof.key;
+  if(b.id==='profEdit'){ show('acct'); $('acct').scrollTo(0,0); return; }
+  if(b.id==='profSignIn'){ acctMsg('acctMsg',''); paintAcct(); show('acct'); return; }
+  if(b.id==='profFollow'){ await frToggle(k,!iFollow(k)); paintProfile(soc.dir[k]||{name:k},false); return; }
+  if(b.id==='profReport'){ const why=await ask({title:`Report @${k}`,body:'Tell the admin what is wrong. Cheating, a bad name, or something in a comment or map.',input:true,placeholder:'What happened',max:200,ok:'Send report'}); if(!why||!cleanName(why)) return;
+    try{ await inboxPush(ADMIN_KEY,{id:'rep-'+k+'-'+Date.now(),kind:'report',from:acct.key,fromName:acct.name,about:k,text:cleanName(why).slice(0,200),ts:Date.now()}); acctMsg('profMsg','Report sent.','ok'); }catch(err){ acctMsg('profMsg','Could not send it. Try again.','bad'); } }
+});
+$('profMaps').addEventListener('click',e=>{ const b=e.target.closest('[data-pmap]'); if(b){ cm.from='profile'; cmapOpen(b.dataset.pmap); } });
+/* admin tools on a profile */
+$('profWarnGo').addEventListener('click',async()=>{ if(!admin.on) return; const k=prof.key; const text=cleanName($('profWarn').value).slice(0,200); if(text.length<3){ acctMsg('profAdminMsg','Write what they need to fix.','bad'); return; }
+  try{ await inboxPush(k,{id:'warn-'+Date.now(),kind:'warn',from:acct.key||ADMIN_KEY,fromName:acct.name||'Admin',text,ts:Date.now()}); $('profWarn').value=''; acctMsg('profAdminMsg',`Warning sent to @${k}.`,'ok'); }catch(e){ acctMsg('profAdminMsg','Could not send it.','bad'); } });
+$('profRnGo').addEventListener('click',async()=>{ if(!admin.on) return; const k=prof.key; const name=cleanName($('profRn').value).slice(0,16); if(name.length<2){ acctMsg('profAdminMsg','A name needs at least two characters.','bad'); return; }
+  const k2=acctKey(name); if(k2&&k2!==k&&k2===ADMIN_KEY){ acctMsg('profAdminMsg','Not that one.','bad'); return; }
+  acctMsg('profAdminMsg','Renaming…'); await adminRenameAcct(k,name); $('profRn').value=''; openProfile(k); });
+$('profAdmin').addEventListener('click',async e=>{ const b=e.target.closest('[data-ban]'); if(!b||!admin.on) return; const k=prof.key; const days=+b.dataset.ban;
+  const ok=await ask({title:days?`Ban @${k} for ${days} days?`:`Ban @${k} permanently?`,body:days?'They are signed out everywhere, cannot sign in, and their scores are hidden until it ends.':'The account, every score under it and every map it made are removed for everyone, and the handle can never be claimed again. This cannot be undone.',ok:days?`Ban ${days} days`:'Ban forever',danger:true}); if(!ok) return;
+  acctMsg('profAdminMsg','Banning…');
+  if(days){ lb.banExp[k]=Date.now()+days*86400000; lb.banK.add(k); banKPublish(); banApply(); lbPaint(); acctMsg('profAdminMsg',`@${k} is banned for ${days} days.`,'ok'); }
+  else { const maps=await adminBan(k); acctMsg('profAdminMsg',`@${k} banned for good. ${maps} map${maps===1?'':'s'} removed.`,'ok'); }
+  paintProfile(soc.dir[k]||{name:k},false); });
+$('profUnban').addEventListener('click',()=>{ if(!admin.on) return; const k=prof.key; banLift(k); banKPublish(); acctMsg('profAdminMsg',`Ban lifted for @${k}.`,'ok'); paintProfile(soc.dir[k]||{name:k},false); });
+/* any name with a handle behind it opens the profile */
+document.addEventListener('click',e=>{ const p=e.target.closest('[data-prof]'); if(!p) return; if(e.target.closest('[data-trash],[data-edit],[data-cdel],[data-cmdel]')) return; e.preventDefault(); e.stopPropagation(); openProfile(p.dataset.prof); },true);
 
 /* ---------- Map analytics ----------
    Every finished play on a custom map adds one play and its seconds to that day in the map's own record,
@@ -3584,7 +3775,7 @@ function adminSync(){ admin.on=(acct.key===ADMIN_KEY||admin.temp)&&!admin.hidden
 function paintAdmin(){
   const me=acct.key===ADMIN_KEY, has=me||admin.temp;
   $('adminOff').hidden=has; $('adminOn').hidden=!(has&&!admin.hidden); $('adminHid').hidden=!(has&&admin.hidden);
-  $('adminWhy').textContent=me?'Admin is on because you are @silas. Leaderboard rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.':'Admin mode is on for this visit. Leaderboard rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.';
+  $('adminWhy').textContent=(me?'Admin is on because you are @silas. ':'Admin mode is on for this visit. ')+'Open anyone\'s profile from a leaderboard, a comment or a map to warn, rename or ban them. Board rows get a pencil and a trash button, every custom map gets Edit and Delete, and all of it goes to the servers, so it changes for everyone.';
   $('adminExit').hidden=me;
 }
 $('adminGo').addEventListener('click',()=>{
@@ -3619,56 +3810,36 @@ function adminRename(id,board,name){
   try{ saveBoard(loadBoard().map(e=>e.id===id?{...e,name}:e)); }catch(e){}
   lbPaint(); toast('Name changed for everyone','ok'); sfx('click');
 }
-document.addEventListener('click',e=>{
+document.addEventListener('click',async e=>{
   const p=e.target.closest('[data-edit]');
-  if(p&&admin.on){ e.preventDefault(); e.stopPropagation(); const row=p.closest('tr'); const cur=row?row.querySelector('td.name').firstChild.textContent.trim():'';
-    const v=prompt('New name for this row, shown to everyone:',cur); const name=cleanName(v||'').slice(0,20); if(name.length>=2&&name!==cur) adminRename(p.dataset.edit,p.dataset.board,name); return; }
+  if(p&&admin.on){ e.preventDefault(); e.stopPropagation(); const row=p.closest('tr'); const cur=row?row.querySelector('.nm').textContent.trim():'';
+    const v=await ask({title:'Rename this row',body:'Shown to everyone on this board.',input:true,value:cur,max:20,ok:'Rename'}); const name=cleanName(v||'').slice(0,20); if(name.length>=2&&name!==cur) adminRename(p.dataset.edit,p.dataset.board,name); return; }
   const b=e.target.closest('[data-trash]'); if(!b||!admin.on) return; e.preventDefault(); e.stopPropagation();
-  const row=b.closest('tr'); const who=row?row.querySelector('td.name').textContent.trim():'this score';
-  if(confirm(`Remove ${who} from the leaderboard for everyone? This can't be undone.`)) adminRemove(b.dataset.trash,b.dataset.board); },true);
+  const row=b.closest('tr'); const who=row?row.querySelector('.nm').textContent.trim():'this score';
+  if(await ask({title:`Remove ${who}'s score?`,body:'It comes off this board for everyone and cannot come back.',ok:'Remove',danger:true})) adminRemove(b.dataset.trash,b.dataset.board); },true);
 /* Rename an account: its record, and every board row that carries its handle. */
 async function adminRenameAcct(key,name){
-  const got=await acctFetch(key); if(!got.record){ acctMsg('adminMsg2',`No account @${key}.`,'bad'); return; }
+  const got=await acctFetch(key); if(!got.record){ acctMsg('profAdminMsg',`No account @${key}.`,'bad'); return; }
   acctPublish({...got.record,name}); if(soc.dir[key]) soc.dir[key].name=name; if(acct.key===key){ acct.name=name; acctSave(); paintAcct(); }
   let n=0;
   for(const id of Object.keys(lb.boards)){ let hit=false; for(const e of lb.boards[id]) if(e.k===key&&e.name!==name){ e.name=name; hit=true; n++; } if(hit) lbPublish(id); }
   let hd=false; for(const e of lb.daily||[]) if(e.k===key&&e.name!==name){ e.name=name; hd=true; n++; } if(hd) dlPublish();
-  lbPaint(); acctMsg('adminMsg2',`@${key} is now "${name}". ${n} score${n===1?'':'s'} updated.`,'ok');
+  lbPaint(); acctMsg('profAdminMsg',`@${key} is now "${name}". ${n} score${n===1?'':'s'} updated.`,'ok');
 }
-$('adminRnGo').addEventListener('click',()=>{
-  if(!admin.on) return; const key=acctKey($('adminRnKey').value), name=cleanName($('adminRnName').value).slice(0,16);
-  if(key.length<2){ acctMsg('adminMsg2','Type a handle.','bad'); return; } if(name.length<2){ acctMsg('adminMsg2','Type a name of at least two characters.','bad'); return; }
-  const k2=acctKey(name); if(k2&&k2!==key&&k2===ADMIN_KEY){ acctMsg('adminMsg2','Not that one.','bad'); return; }
-  acctMsg('adminMsg2','Renaming…'); adminRenameAcct(key,name); $('adminRnKey').value=''; $('adminRnName').value='';
-});
 function adminDropAcct(key){
   let sent=0; for(const l of lb.links) if(l.ready){ for(const t of [ACCT_ROOT+'/'+key,SOC_ROOT+'/'+key,INBOX_ROOT+'/'+key]){ try{ l.client.publish(t,'',{qos:1,retain:true}); sent++; }catch(e){} } }
   if(sent){ delete soc.dir[key]; if(acct.key===key){ acctClear(); paintAcct(); } }
   return sent>0;
 }
-$('adminAcctGo').addEventListener('click',()=>{
-  if(!admin.on) return; const key=acctKey($('adminAcct').value); if(key.length<2){ acctMsg('adminMsg2','Type a handle.','bad'); return; }
-  if(key===ADMIN_KEY){ acctMsg('adminMsg2','Not that one.','bad'); return; }
-  if(!confirm(`Remove the account @${key} for everyone? Their name, photo, passcode and friends list are deleted. This can't be undone.`)) return;
-  if(!adminDropAcct(key)){ acctMsg('adminMsg2','Not connected.','bad'); return; }
-  $('adminAcct').value=''; acctMsg('adminMsg2',`@${key} removed.`,'ok'); lbPaint();
-});
-/* Ban: the handle can't be claimed again, every score under it goes, every map it made goes, the account goes. */
+/* Permanent ban: the handle can't be claimed again, every score under it goes, every map it made goes, the account goes. */
 async function adminBan(key){
-  lb.banK.add(key); banKPublish();
+  lb.banPerm.add(key); lb.banK.add(key); banKPublish();
   for(const id of Object.keys(lb.boards)){ const before=lb.boards[id].length; lb.boards[id]=lb.boards[id].filter(e=>e.k!==key); if(lb.boards[id].length!==before) lbPublish(id); }
   const bd=(lb.daily||[]).length; lb.daily=(lb.daily||[]).filter(e=>e.k!==key); if(lb.daily.length!==bd) dlPublish();
   adminDropAcct(key); lbPaint();
   await cmapList(); let maps=0; for(const r of Object.values(cm.all)) if(r.by===key){ cmapDelete(r.id); maps++; }
   return maps;
 }
-$('adminBanGo').addEventListener('click',async()=>{
-  if(!admin.on) return; const key=acctKey($('adminAcct').value); if(key.length<2){ acctMsg('adminMsg2','Type a handle.','bad'); return; }
-  if(key===ADMIN_KEY){ acctMsg('adminMsg2','Not that one.','bad'); return; }
-  if(!confirm(`Ban @${key}? The account, every score under it and every map it made are removed for everyone, and the handle can't be claimed again. This can't be undone.`)) return;
-  acctMsg('adminMsg2','Banning…'); const maps=await adminBan(key);
-  $('adminAcct').value=''; acctMsg('adminMsg2',`@${key} banned. ${maps} map${maps===1?'':'s'} removed.`,'ok');
-});
 admin.ready=true; adminSync();
 
 /* ---------- Where in the world: pick a continent, then narrow to a country ---------- */
@@ -3781,7 +3952,7 @@ function renderDailyBoard(wrapId,subId){
   const me=dailyDone(); const mineId=me&&me.date===dailyDate()?me.id:null;
   const wrap=$(wrapId); if(!wrap) return;
   wrap.innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th style="text-align:right">Score</th></tr>`+
-    rows.slice(0,10).map((e,i)=>`<tr class="${e.id===mineId?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="score">${e.score.toLocaleString()}</td>${trashCell(e.id,'daily')}</tr>`).join('')+`</table>`
+    rows.slice(0,10).map((e,i)=>`<tr class="${e.id===mineId?'me':''}"><td class="rank">${i+1}</td>${nameCell(e)}<td class="score">${e.score.toLocaleString()}</td>${trashCell(e.id,'daily')}</tr>`).join('')+`</table>`
     :`<div class=\"empty\">${lbLive()?'Nobody has played today yet. Go first.':'Connecting…'}</div>`;
   if($(subId)) $(subId).textContent=rows.length?`${rows.length} player${rows.length===1?'':'s'} today`:'Everyone plays the same five locations';
   if($('menuDailyCount')) $('menuDailyCount').textContent=rows.length?`${rows.length} played today`:'';
@@ -3816,7 +3987,7 @@ function renderBoardPage(){
 
   $('bpWrap').innerHTML=rows.length?`<table class="board"><tr><th>#</th><th>Name</th><th>Setup</th><th>Date</th><th style="text-align:right">Score</th></tr>`+
     rows.slice(0,25).map((e,i)=>{ const em=entryMode(e);
-      return `<tr class="${e.id===bp.highlight?'me':''}"><td class="rank">${i+1}</td><td class="name">${esc(e.name)}${friendTag(e)}${streakTag(e)}</td><td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="mode">${new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td>${trashCell(e.id,bp.mode)}</tr>`; }).join('')+`</table>`
+      return `<tr class="${e.id===bp.highlight?'me':''}"><td class="rank">${i+1}</td>${nameCell(e)}<td class="mode">${em.rounds} round${em.rounds===1?'':'s'} · ${em.time?em.time+'s':'no limit'}</td><td class="mode">${new Date(e.ts).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td class="score">${e.score.toLocaleString()}</td>${trashCell(e.id,bp.mode)}</tr>`; }).join('')+`</table>`
     :`<div class=\"empty\">${all.length?'No scores with these settings.':'Finish a game in this mode and save your score.'}</div>`;
   $('bpCount').textContent=rows.length?`${rows.length} game${rows.length===1?'':'s'} shown`:'';
   $('bpModes').innerHTML=Object.entries(MODES).filter(([id,mm])=>!mm.mp&&!mm.custom).map(([id,mm])=>{
@@ -3903,7 +4074,9 @@ function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); renderDailyBoard('me
 $('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
 $('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
 
-function show(id){ for(const s of ['menu','setup','acct','friends','region','daily','board','lobby','game','result','final','chal','cmaps','cmake','cmap','cmstats']) $(s).hidden = s!==id;
+const SCREENS=['menu','setup','acct','friends','region','daily','board','lobby','game','result','final','chal','cmaps','cmake','cmap','cmstats','profile'];
+function currentScreen(){ return SCREENS.find(s=>!$(s).hidden)||'menu'; }
+function show(id){ for(const s of SCREENS) $(s).hidden = s!==id;
   if(id==='result'){ $('game').hidden=false; const m=modeOf(state.mode); $('rTitle').textContent=`Round ${state.round}`+(mp.role&&m.duel?` · damage ×${duelMult(state.round)}`:(state.totalRounds<99?` of ${state.totalRounds}`:'')); }   // the street stays behind the wash
   document.body.classList.toggle('in-game',id==='game'); if(id!=='final'){ $('shareBox').hidden=true; $('shareCard').hidden=true; } }
 
@@ -4236,7 +4409,7 @@ function showFinal(){
 
   chalFinish(); $('againBtn').textContent=state.chal?'New game':'Play again';
   // Leaderboard save
-  state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false; hideNag();
+  state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false; $('aiUsed').checked=false; $('aiRow').hidden=false; hideNag();
   const signedIn=!!acct.name; $('signUp').hidden=signedIn; $('saveRow').hidden=!signedIn;
   $('nameInput').value=''; $('nameInput').placeholder=acct.name||'';
   const rank=boardFor(state.totalRounds,state.timeLimit,state.mode).filter(e=>e.score>state.score).length+1;
@@ -4251,12 +4424,12 @@ function recordScore(name){
     const done=dailyDone();
     if(done&&done.date===state.daily.date&&done.id) return {id:done.id};
     const e=dlSubmit({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
-      score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now(),k:acct.key||''});
+      score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now(),k:acct.key||'',ai:!!($('aiUsed')&&$('aiUsed').checked)});
     if(e) try{ localStorage.setItem('pp_daily',JSON.stringify({date:state.daily.date,score:state.score,id:e.id})); }catch(err){}
     return e||{id:''};
   }
   const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
-    score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now(),k:acct.key||''};
+    score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now(),k:acct.key||'',ai:!!($('aiUsed')&&$('aiUsed').checked)};
   const b=loadBoard(); b.push(entry); saveBoard(b);
   lbSubmit(entry);
   stGame(state.mode,state.score,state.totalRounds*5000);
@@ -4272,7 +4445,7 @@ $('saveBtn').addEventListener('click',()=>{
   state.saved=true; state.savedId=entry.id;
   const same=boardFor(state.totalRounds,state.timeLimit,state.mode);
   const rank=same.filter(e=>e.score>entry.score).length+1;
-  $('saveBtn').hidden=true; $('nameInput').hidden=true; hideNag();
+  $('saveBtn').hidden=true; $('nameInput').hidden=true; $('aiRow').hidden=true; hideNag();
   $('savedMsg').hidden=false; $('savedMsg').textContent=`Saved · #${rank} of ${same.length} in ${modeLabel()}${lbLive()?' worldwide':' (offline, it will post when you reconnect)'}`;
   renderBoard(state.mode==='classic'?entry.id:undefined);
 });

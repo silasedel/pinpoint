@@ -53,7 +53,7 @@ Anyone signed in can build a map: give it a name, click spots on a world map (ea
 
 **Getting spots exactly right.** A typed address or coordinates is looked up, then Street View is searched in widening rings (40 m, 120 m, 300 m, 800 m, 3.5 km) so the spot lands on the street you asked for rather than the nearest covered road a block over, and the view is turned to face the point you typed. Typed spots open in the Look preview as soon as they land, and the builder says how far from the point the nearest Street View was if it's more than 60 m. Map clicks search 250 m, then 1.2 km, then 3.5 km.
 
-**Thumbnail.** Every map has a picture. Auto uses a slice of one of its spots. From a spot lets you pick a spot and an angle on a slider, and Use this view renders that view from the Street View tiles into a 480×270 JPEG kept in the record. Upload takes any image, cropped to 16:9. The picture is the card in the browse grid, the hero of the map page and the row in analytics.
+**Thumbnail.** Every map has a picture. Auto uses a slice of one of its spots. From a spot loads that spot's tiles into a live viewer you drag to look around and up and down, zoom with the wheel or the + and − buttons, and Use this view keeps exactly what is on it as a 480×270 JPEG in the record. Upload takes any image, cropped to 16:9. The picture is the card in the browse grid, the hero of the map page and the row in analytics.
 
 **Start view.** Zoom the builder map into a city, state or country and press Use the current map view, and players' guess map opens there on every round instead of the whole world. Rooms get it too.
 
@@ -111,13 +111,17 @@ Delete account sits beside Sign out: it explains what goes (name, photo, passcod
 
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
-## Admin
+## Profiles, tags and admin
 
-Signed in as @silas, admin is simply on, with no code. From any other account, or signed out, the Admin card at the bottom of Settings takes a four-digit code that turns admin on for the current visit only (Exit admin mode turns it off; the code is in the page source, so it keeps honest people honest, nothing more). The handle silas can't be claimed fresh, so a broker outage can't hand the account to someone else. Passcodes can be 4 to 12 digits.
+Every name that has an account behind it is a link: on the mode boards, the daily, a custom map's board, a comment, a map card or the By fact on a map page. It opens that player's profile: photo (or the plain silhouette if they have none), name, handle, a one-sentence bio they write in Settings, streak, join month, tags, and their maps. Signed in, you can add or remove them as a friend or report them (the report lands in the admin's bell with a Profile button). Board rows carry the face next to the name, then tags: Admin, Friend, AI, and the streak flame from five days.
 
-While admin is on, every leaderboard row (mode boards, the daily, each custom map's board) has a pencil that renames that row and a trash button that removes it, every custom map has Edit map and Delete, and the map list has a trash on each card. The card can rename an account (the record plus every board row carrying its handle), remove an account, or ban it. A ban puts the handle on a retained list (`worlddrop/v1/ban/handles`) that every client honors: the handle can't be claimed again, its rows are dropped from every board and from the local mirror that would otherwise re-upload them, its maps are deleted, and a browser still signed in as it is signed out. Removed score ids keep their own list (`worlddrop/v1/ban/ids`). Hide controls this visit tucks the buttons away while playing.
+**AI tag.** The final screen has an "AI was used in this game" checkbox next to Save, off by default. A saved score with it on shows an AI chip on every board, so an AI-assisted run is never mistaken for a human one.
 
-**Names.** A handle is folded before it's compared, so a Cyrillic or Greek lookalike, a fullwidth letter, an accent or a zero-width character can't produce a second "silas". A display name that folds to someone else's handle is refused, so nobody can appear on a board under another player's name.
+**Admin.** Signed in as @silas, admin is simply on, with no code. From any other account, or signed out, the Admin card at the bottom of Settings takes a four-digit code that turns admin on for the current visit only (it's in the page source, so it keeps honest people honest, nothing more). Admin does everything from a player's profile: send a warning (lands in their bell as "Warning from Silas" with the text), rename them (the record plus every board row carrying their handle), ban for 3, 7 or 30 days (signed out everywhere, can't sign in, scores hidden until it ends, and a Lift the ban button), or ban permanently (account, scores and maps wiped, handle never claimable again). Board rows keep a pencil and a trash button for one-off fixes, and every prompt is an in-app dialog rather than the browser's. The handle silas can't be claimed fresh. Passcodes can be 4 to 12 digits.
+
+Bans live on one retained list (`worlddrop/v1/ban/handles`): plain strings are permanent, `{k, until}` entries are timed and drop out on their own. Every client honors it when merging boards, when reconciling its local mirror and at sign-in. Removed score ids keep their own list (`worlddrop/v1/ban/ids`).
+
+**Names.** A handle is folded before it's compared, so a Cyrillic or Greek lookalike, a fullwidth letter, an accent or a zero-width character can't produce a second "silas". A display name that folds to someone else's handle is refused.
 
 It is all client-side on public brokers, so it is a lock on the door rather than a vault: it stops anyone using the app from impersonating or gaining admin, not someone writing raw MQTT to the brokers.
 
