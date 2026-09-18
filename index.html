@@ -678,6 +678,8 @@
   .peekbar b{font-size:15px;white-space:nowrap}
   .peekbar .peekpos{flex:1;min-width:120px;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .peek iframe{flex:1;width:100%;border:0;background:#000}
+  .peekcv{flex:1;width:100%;min-height:0;object-fit:contain;background:#0b1a12;cursor:grab;touch-action:none} .peekcv:active{cursor:grabbing}
+  .peekcv[hidden]{display:none}
   .peekx{width:34px;height:34px;border-radius:50%;background:var(--sunk);font-size:22px;line-height:1;padding:0;display:grid;place-items:center;color:var(--text)} .peekx:hover{background:var(--red-soft);color:var(--red)}
   .mkrow.new{animation:rowIn .5s ease-out} @keyframes rowIn{from{background:var(--green-soft);transform:translateX(-6px)}to{transform:none}}
   .thumbrow{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
@@ -1365,8 +1367,9 @@
   </div>
 </div>
 <div id="peek" class="peek" hidden>
-  <div class="peekbar"><b id="peekTitle">Spot</b><span class="peekpos" id="peekSub"></span><button class="btn btn-secondary sm" id="peekPrev">Previous</button><button class="btn btn-secondary sm" id="peekNext">Next</button><button class="btn btn-secondary sm danger" id="peekDel">Remove this spot</button><button class="btn btn-primary sm" id="peekClose">Done</button><button class="peekx" id="peekX" aria-label="Close">×</button></div>
+  <div class="peekbar"><b id="peekTitle">Spot</b><span class="peekpos" id="peekSub"></span><span id="peekNav"><button class="btn btn-secondary sm" id="peekPrev">Previous</button><button class="btn btn-secondary sm" id="peekNext">Next</button><button class="btn btn-secondary sm" id="peekFace">Set facing</button><button class="btn btn-secondary sm danger" id="peekDel">Remove this spot</button><button class="btn btn-primary sm" id="peekClose">Done</button></span><span id="peekFacing" hidden><span class="dim" style="font-size:12.5px;margin-right:6px">Drag to turn, scroll or + − to zoom, then</span><button class="btn btn-secondary sm" id="peekFaceOut">−</button><button class="btn btn-secondary sm" id="peekFaceIn">+</button><button class="btn btn-primary sm" id="peekFaceOk">Face this way</button><button class="btn btn-secondary sm" id="peekFaceX">Cancel</button></span><button class="peekx" id="peekX" aria-label="Close">×</button></div>
   <iframe id="peekFrame" allowfullscreen referrerpolicy="no-referrer-when-downgrade" title="Street View preview"></iframe>
+  <canvas id="peekCv" class="peekcv" width="960" height="540" hidden></canvas>
 </div>
 <div id="cmake" class="screen" hidden>
   <div class="setup-wrap">
@@ -2228,7 +2231,7 @@ const panos=[document.getElementById('pano0'),document.getElementById('pano1')];
 let front=0;
 const preload={idx:-1,promise:null};
 function embedUrl(l){
-  return `https://www.google.com/maps/embed?pb=!4v${Date.now()}!6m8!1m7!1s${l.pano}!2m2!1d${l.lat}!2d${l.lng}!3f${l.heading}!4f0!5f0.7820865974627469`;
+  return `https://www.google.com/maps/embed?pb=!4v${Date.now()}!6m8!1m7!1s${l.pano}!2m2!1d${l.lat}!2d${l.lng}!3f${l.heading}!4f${Math.max(-40,Math.min(40,Math.round(+l.pitch||0)))}!5f0.7820865974627469`;
 }
 function loadInto(frame,loc){
   return new Promise(res=>{
@@ -2363,7 +2366,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-075043';
+const BUILD='20260918-080413';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2514,7 +2517,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:11};
+const VERSION={major:3,minor:4,patch:12};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3358,7 +3361,7 @@ function cmapList(ms){
     const timer=setTimeout(finish,ms||2600); }).then(v=>{ cm.loaded=true; return v; });
 }
 /* The rounds of a game on this map: a shuffle of its spots, as location objects the game understands. */
-async function customLocs(map,n){ const pins=shuffle(map.pins.slice()).slice(0,Math.max(1,Math.min(n,map.pins.length))); return pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:Math.floor(Math.random()*360),place:null,continent:null,region:map.name})); }
+async function customLocs(map,n){ const pins=shuffle(map.pins.slice()).slice(0,Math.max(1,Math.min(n,map.pins.length))); return pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:Math.floor(Math.random()*360),pitch:+p.pitch||0,place:null,continent:null,region:map.name})); }
 async function openCmaps(from){
   cm.from=from||'setup'; show('cmaps'); $('cmaps').scrollTo(0,0); $('cmSearch').value='';
   $('cmSub').textContent='Loading…'; renderCmaps();
@@ -3488,7 +3491,7 @@ function openMake(rec){
     cm.mk.map.on('click',e=>mkAdd(e.latlng.lat,e.latlng.lng,{})); }
   const mk=cm.mk;
   if(rec&&Array.isArray(rec.pins)){   // editing a published map: its spots come in, and Save puts them back under the same id
-    mk.edit=rec; $('mkName').value=rec.name; mk.pins=rec.pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:0,label:p.label||''})); mkLabels();
+    mk.edit=rec; $('mkName').value=rec.name; mk.pins=rec.pins.map(p=>({pano:p.pano,lat:+p.lat,lng:+p.lng,heading:p.heading!=null?+p.heading:0,pitch:+p.pitch||0,label:p.label||''})); mkLabels();
     mk.thumb=rec.thumb&&rec.thumb.img?{...rec.thumb}:null; mk.thMode=mk.thumb?(mk.thumb.pano?'spot':'upload'):'auto'; mk.start=rec.start&&isFinite(+rec.start.lat)?{lat:+rec.start.lat,lng:+rec.start.lng,z:+rec.start.z||3}:null;
     mk.scale=+rec.scale>0?+rec.scale:null;   // older maps have none, so they get Auto until saved
   } else if(mk.edit){ mk.edit=null; mk.pins=[]; $('mkName').value=''; mk.thumb=null; mk.thMode='auto'; mk.start=null; mk.scale=null; }
@@ -3541,7 +3544,7 @@ function renderMk(){
   $('mkProg').style.width=Math.min(100,n/MIN*100)+'%'; $('mkProg').classList.toggle('done',n>=MIN);
   $('mkNeed').textContent=n<MIN?`${MIN-n} more to reach the ${MIN}-spot minimum. After that, up to 2,000.`:`${n} spots. Up to 2,000, keep adding or ${mk.edit?'save':'publish'}.`;
   paintThumbSel();
-  $('mkList').innerHTML=mk.pins.length?mk.pins.map((p,i)=>`<div class="mkrow${p.dead?' dead':''}"><img src="${SV_TILE(p.pano,0,0,0)}" alt="" data-look="${i}" title="Look at this spot"><span class="mkt">${esc(p.label||'Spot '+(i+1))}<small>${p.dead?'Gone from Street View · ':''}${p.lat}, ${p.lng}</small></span><button class="look" data-look="${i}">Look</button><button data-del="${i}">Remove</button></div>`).join(''):'<div class="frempty">Nothing yet. Click the map.</div>';
+  $('mkList').innerHTML=mk.pins.length?mk.pins.map((p,i)=>`<div class="mkrow${p.dead?' dead':''}"><img src="${SV_TILE(p.pano,0,0,0)}" alt="" data-look="${i}" title="Look at this spot"><span class="mkt">${esc(p.label||'Spot '+(i+1))}<small>${p.dead?'Gone from Street View · ':''}${p.lat}, ${p.lng}${p.faced||p.pitch?` · faces ${Math.round(p.heading)}°`:''}</small></span><button class="look" data-look="${i}">Look</button><button data-del="${i}">Remove</button></div>`).join(''):'<div class="frempty">Nothing yet. Click the map.</div>';
   $('mkTools').hidden=!n; $('mkDropDead').hidden=!mk.pins.some(p=>p.dead);
   paintScale();
   const verb=mk.edit?'Save':'Publish', nm=$('mkName').value.trim();
@@ -3558,16 +3561,37 @@ function peekOpen(i){
   const mk=cm.mk; if(!mk||!mk.pins.length) return; const n=mk.pins.length; peek.i=((i%n)+n)%n; const p=mk.pins[peek.i];
   $('peekTitle').textContent=`Spot ${peek.i+1} of ${n}`;
   $('peekSub').textContent=[p.label||'',p.dead?'gone from Street View':'',`${p.lat}, ${p.lng}`].filter(Boolean).join(' · ');
-  $('peekFrame').src=embedUrl({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading||0});
+  $('peekFrame').src=embedUrl({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading||0,pitch:p.pitch||0});
   $('peek').hidden=false;
 }
-function peekClose(){ $('peek').hidden=true; $('peekFrame').src='about:blank'; }
-$('peekPrev').addEventListener('click',()=>{ peekOpen(peek.i-1); sfx('click'); });
-$('peekNext').addEventListener('click',()=>{ peekOpen(peek.i+1); sfx('click'); });
+function peekClose(){ faceCancel(); $('peek').hidden=true; $('peekFrame').src='about:blank'; }
+/* Set facing: the spot's tiles in the draggable viewer, full screen. Face this way keeps the direction (and tilt) as the spot's start view. */
+const fview={pano:null,heading:0,pitch:0,fov:90,band:null,meta:null,raf:0,on:false};
+function fviewDraw(){ if(!fview.band) return; cancelAnimationFrame(fview.raf); fview.raf=requestAnimationFrame(()=>renderPersp($('peekCv'),fview.band,fview.meta,fview.heading,fview.fov,fview.pitch)); }
+async function faceOpen(){
+  const mk=cm.mk; const p=mk&&mk.pins[peek.i]; if(!p) return;
+  fview.on=true; $('peekNav').hidden=true; $('peekFacing').hidden=false; $('peekFrame').hidden=true; const cv=$('peekCv'); cv.hidden=false;
+  fview.heading=+p.heading||0; fview.pitch=+p.pitch||0; fview.fov=90;
+  const ctx=cv.getContext('2d'); ctx.fillStyle='#0b1a12'; ctx.fillRect(0,0,cv.width,cv.height);
+  if(fview.pano!==p.pano||!fview.band){ fview.pano=p.pano; fview.band=null; $('peekSub').textContent='Loading the picture…';
+    try{ const {band,meta}=await bandFor(p.pano); if(fview.pano!==p.pano||!fview.on) return; fview.band=band; fview.meta=meta; }
+    catch(e){ if(fview.on){ toast('This spot has no picture to render'); faceCancel(); } return; } }
+  $('peekSub').textContent=`Spot ${peek.i+1}: drag until you are looking the way players should start`; fviewDraw();
+}
+function faceCancel(){ if(!fview.on) return; fview.on=false; $('peekNav').hidden=false; $('peekFacing').hidden=true; $('peekFrame').hidden=false; $('peekCv').hidden=true; const p=cm.mk&&cm.mk.pins[peek.i]; if(p) $('peekSub').textContent=[p.label||'',p.dead?'gone from Street View':'',`${p.lat}, ${p.lng}`].filter(Boolean).join(' · '); }
+$('peekFace').addEventListener('click',()=>{ faceOpen(); sfx('click'); });
+$('peekFaceX').addEventListener('click',()=>{ faceCancel(); sfx('click'); });
+$('peekFaceOk').addEventListener('click',()=>{ const mk=cm.mk; const p=mk&&mk.pins[peek.i]; if(!p||!fview.band) return;
+  p.heading=Math.round(fview.heading)%360; p.pitch=Math.max(-40,Math.min(40,Math.round(fview.pitch))); p.faced=true; mk.dirty=true; renderMk(); faceCancel(); peekOpen(peek.i); toast('Players will start facing this way','ok'); sfx('lock'); });
+$('peekFaceIn').addEventListener('click',()=>{ fview.fov=Math.max(35,fview.fov-10); fviewDraw(); });
+$('peekFaceOut').addEventListener('click',()=>{ fview.fov=Math.min(110,fview.fov+10); fviewDraw(); });
+attachLook($('peekCv'),fview,fviewDraw);
+$('peekPrev').addEventListener('click',()=>{ faceCancel(); peekOpen(peek.i-1); sfx('click'); });
+$('peekNext').addEventListener('click',()=>{ faceCancel(); peekOpen(peek.i+1); sfx('click'); });
 $('peekClose').addEventListener('click',()=>{ peekClose(); sfx('click'); });
 $('peekX').addEventListener('click',()=>{ peekClose(); sfx('click'); });
 $('peekDel').addEventListener('click',()=>{ const mk=cm.mk; if(!mk||!mk.pins.length) return; mk.pins.splice(peek.i,1); mk.dirty=true; renderMk(); sfx('click'); if(!mk.pins.length) peekClose(); else peekOpen(peek.i); });
-document.addEventListener('keydown',e=>{ if($('peek').hidden) return; if(e.key==='Escape') peekClose(); else if(e.key==='ArrowRight') peekOpen(peek.i+1); else if(e.key==='ArrowLeft') peekOpen(peek.i-1); });
+document.addEventListener('keydown',e=>{ if($('peek').hidden) return; if(e.key==='Escape'){ if(fview.on) faceCancel(); else peekClose(); } else if(fview.on) return; else if(e.key==='ArrowRight') peekOpen(peek.i+1); else if(e.key==='ArrowLeft') peekOpen(peek.i-1); });
 $('mkReview').addEventListener('click',()=>{ peekOpen(0); sfx('click'); });
 /* Ask Google about every spot; the ones it no longer has get flagged so they can be dropped in one go. */
 async function mkCheck(){
@@ -3614,7 +3638,7 @@ $('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefau
 $('mkSave').addEventListener('click',()=>{
   const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<10||name.length<2) return;
   const big=mk.pins.length>400;   // past 400 spots the place names are dropped so the record stays light on the wire
-  const pins=mk.pins.map(p=>big?{pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}:{pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading,label:(p.label||'').slice(0,40)});
+  const pins=mk.pins.map(p=>{ const o={pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}; if(p.pitch) o.pitch=p.pitch; if(!big) o.label=(p.label||'').slice(0,40); return o; });
   const thumb=mk.thumb&&mk.thumb.img?mk.thumb:null, start=mk.start||null, scale=Math.round(mkScaleKm()*100)/100;
   const rec=mk.edit?{...mk.edit,name,pins,thumb,start,scale,edited:Date.now()}
     :{id:Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,5),v:1,name,by:acct.key,byName:acct.name,made:Date.now(),plays:0,top:[],likes:[],stats:{},thumb,start,scale,pins};
@@ -3661,14 +3685,15 @@ async function thumbLook(){
   try{ const {band,meta}=await bandFor(p.pano); if(tview.pano!==p.pano) return; tview.band=band; tview.meta=meta; $('mkThumbDeg').textContent='Drag to look around, scroll or + − to zoom'; tviewDraw(); }
   catch(e){ if(tview.pano===p.pano) $('mkThumbDeg').textContent='This spot has no picture to render'; }
 }
-{ const cv=$('mkThumbCv'); let drag=null;
-  cv.addEventListener('pointerdown',e=>{ if(!tview.band) return; drag={x:e.clientX,y:e.clientY,h:tview.heading,p:tview.pitch}; cv.setPointerCapture(e.pointerId); });
-  cv.addEventListener('pointermove',e=>{ if(!drag) return; const sc=tview.fov/cv.clientWidth; tview.heading=(drag.h-(e.clientX-drag.x)*sc+360)%360; tview.pitch=Math.max(-35,Math.min(35,drag.p+(e.clientY-drag.y)*sc)); tviewDraw(); });
+function attachLook(cv,st,draw){ let drag=null;
+  cv.addEventListener('pointerdown',e=>{ if(!st.band) return; drag={x:e.clientX,y:e.clientY,h:st.heading,p:st.pitch}; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove',e=>{ if(!drag) return; const sc=st.fov/cv.clientWidth; st.heading=(drag.h-(e.clientX-drag.x)*sc+360)%360; st.pitch=Math.max(-35,Math.min(35,drag.p+(e.clientY-drag.y)*sc)); draw(); });
   const end=()=>{ drag=null; }; cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end);
-  cv.addEventListener('wheel',e=>{ if(!tview.band) return; e.preventDefault(); tview.fov=Math.max(35,Math.min(110,tview.fov+(e.deltaY>0?5:-5))); tviewDraw(); },{passive:false});
-  $('mkThumbIn').addEventListener('click',()=>{ tview.fov=Math.max(35,tview.fov-10); tviewDraw(); sfx('click'); });
-  $('mkThumbOut').addEventListener('click',()=>{ tview.fov=Math.min(110,tview.fov+10); tviewDraw(); sfx('click'); });
+  cv.addEventListener('wheel',e=>{ if(!st.band) return; e.preventDefault(); st.fov=Math.max(35,Math.min(110,st.fov+(e.deltaY>0?5:-5))); draw(); },{passive:false});
 }
+attachLook($('mkThumbCv'),tview,tviewDraw);
+$('mkThumbIn').addEventListener('click',()=>{ tview.fov=Math.max(35,tview.fov-10); tviewDraw(); sfx('click'); });
+$('mkThumbOut').addEventListener('click',()=>{ tview.fov=Math.min(110,tview.fov+10); tviewDraw(); sfx('click'); });
 $('mkThumbRender').addEventListener('click',()=>{ const mk=cm.mk; const p=mk.pins[+$('mkThumbSel').value]; if(!p||!tview.band||tview.pano!==p.pano){ toast('Pick a spot and wait for the picture'); return; }
   renderPersp($('mkThumbCv'),tview.band,tview.meta,tview.heading,tview.fov,tview.pitch);
   mk.thumb={img:$('mkThumbCv').toDataURL('image/jpeg',0.72),pano:p.pano,heading:Math.round(tview.heading),pitch:Math.round(tview.pitch),fov:Math.round(tview.fov)}; mk.dirty=true; paintThumb(); toast('Thumbnail set','ok'); sfx('click'); });
@@ -5221,7 +5246,7 @@ function connFailed(why){
 /* ----- host side ----- */
 function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,col:p.col||null,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null,hp:p.hp??null})); }
 /* The wire form of a location: everything a guest needs to load and score it, nothing else. */
-function locPayload(l){ return {pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,pol:l.pol,key:l.key,from:l.from,fresh:l.fresh}; }
+function locPayload(l){ return {pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,pitch:l.pitch||0,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,pol:l.pol,key:l.key,from:l.from,fresh:l.fresh}; }
 /* A duel has no fixed length, so the host keeps finding spots a few rounds ahead and hands them over as it goes. */
 async function duelPrefetch(){
   const m0=modeOf(mp.settings.mode); const m=regionOK(mp.settings.mode)?applyRegion(m0,mp.settings.region):m0;
