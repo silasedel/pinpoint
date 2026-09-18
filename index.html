@@ -2231,7 +2231,7 @@ const panos=[document.getElementById('pano0'),document.getElementById('pano1')];
 let front=0;
 const preload={idx:-1,promise:null};
 function embedUrl(l){
-  return `https://www.google.com/maps/embed?pb=!4v${Date.now()}!6m8!1m7!1s${l.pano}!2m2!1d${l.lat}!2d${l.lng}!3f${l.heading}!4f${Math.max(-40,Math.min(40,Math.round(+l.pitch||0)))}!5f0.7820865974627469`;
+  return `https://www.google.com/maps/embed?pb=!4v${Date.now()}!6m8!1m7!1s${l.pano}!2m2!1d${l.lat}!2d${l.lng}!3f${l.heading}!4f${Math.max(-40,Math.min(40,Math.round(+l.pitch||0)))}!5f0.4`;
 }
 function loadInto(frame,loc){
   return new Promise(res=>{
@@ -2366,7 +2366,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-083928';
+const BUILD='20260918-093525';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2517,7 +2517,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:13};
+const VERSION={major:3,minor:4,patch:14};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3559,7 +3559,7 @@ $('mkList').addEventListener('click',e=>{
 /* ----- looking at a spot: our own viewer of its tiles, full screen. Drag to turn, zoom, Previous / Next / Remove.
    Set facing keeps whatever is on screen as the spot's start view. Google view swaps in Google's embed for walking. ----- */
 const peek={i:0,google:false};
-const fview={pano:null,heading:0,pitch:0,fov:90,band:null,meta:null,raf:0};
+const fview={pano:null,heading:0,pitch:0,fov:110,band:null,meta:null,raf:0};
 function fviewDraw(){ if(!fview.band) return; cancelAnimationFrame(fview.raf); fview.raf=requestAnimationFrame(()=>renderPersp($('peekCv'),fview.band,fview.meta,fview.heading,fview.fov,fview.pitch)); }
 function peekSub(p){ $('peekSub').textContent=[p.label||'',p.dead?'gone from Street View':'',`${p.lat}, ${p.lng}`,p.faced||p.pitch?`faces ${Math.round(p.heading)}°`:''].filter(Boolean).join(' · '); }
 async function peekOpen(i){
@@ -3568,7 +3568,7 @@ async function peekOpen(i){
   $('peekFace').disabled=peek.google; $('peekGoogle').textContent=peek.google?'Our viewer':'Google view';
   $('peekFrame').hidden=!peek.google; $('peekCv').hidden=peek.google;
   if(peek.google){ $('peekFrame').src=embedUrl({pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading||0,pitch:p.pitch||0}); return; }
-  fview.heading=+p.heading||0; fview.pitch=+p.pitch||0; fview.fov=90;
+  fview.heading=+p.heading||0; fview.pitch=+p.pitch||0; fview.fov=110;
   if(fview.pano!==p.pano||!fview.band){
     fview.pano=p.pano; fview.band=null; const cv=$('peekCv'); const ctx=cv.getContext('2d'); ctx.fillStyle='#0b1a12'; ctx.fillRect(0,0,cv.width,cv.height);
     $('peekSub').textContent='Loading the picture…';
@@ -3585,7 +3585,7 @@ $('peekClose').addEventListener('click',()=>{ peekClose(); sfx('click'); });
 $('peekX').addEventListener('click',()=>{ peekClose(); sfx('click'); });
 $('peekDel').addEventListener('click',()=>{ const mk=cm.mk; if(!mk||!mk.pins.length) return; mk.pins.splice(peek.i,1); mk.dirty=true; renderMk(); sfx('click'); if(!mk.pins.length) peekClose(); else peekOpen(peek.i); });
 $('peekIn').addEventListener('click',()=>{ fview.fov=Math.max(35,fview.fov-10); fviewDraw(); });
-$('peekOut').addEventListener('click',()=>{ fview.fov=Math.min(110,fview.fov+10); fviewDraw(); });
+$('peekOut').addEventListener('click',()=>{ fview.fov=Math.min(120,fview.fov+10); fviewDraw(); });
 $('peekGoogle').addEventListener('click',()=>{ peek.google=!peek.google; peekOpen(peek.i); sfx('click'); });
 $('peekFace').addEventListener('click',()=>{ const mk=cm.mk; const p=mk&&mk.pins[peek.i]; if(!p||!fview.band||peek.google) return;
   p.heading=Math.round(fview.heading)%360; p.pitch=Math.max(-40,Math.min(40,Math.round(fview.pitch))); p.faced=true; mk.dirty=true; renderMk(); peekSub(p); toast(`Spot ${peek.i+1} now starts facing this way`,'ok'); sfx('lock'); });
@@ -3660,7 +3660,7 @@ $('mkThumbSeg').addEventListener('click',e=>{ const b=e.target.closest('button')
   paintThumb(); if(mk.thMode==='spot') thumbLook(); sfx('click'); });
 $('mkThumbSel').addEventListener('change',()=>thumbLook());
 /* The live viewer: the spot's tiles are loaded once, then dragged around and zoomed on a canvas, and Use this view keeps what is on it. */
-const tview={pano:null,heading:0,pitch:0,fov:90,band:null,meta:null,busy:false,raf:0};
+const tview={pano:null,heading:0,pitch:0,fov:110,band:null,meta:null,busy:false,raf:0};
 const bandCache=new Map();
 async function bandFor(pano){ if(bandCache.has(pano)) return bandCache.get(pano); const meta=await panoMeta(pano); const band=await loadBand(pano,3,meta,66); const v={band,meta}; if(bandCache.size>12) bandCache.delete(bandCache.keys().next().value); bandCache.set(pano,v); return v; }
 function renderPersp(c,band,meta,heading,hfov,pitch){
@@ -3678,7 +3678,7 @@ function tviewDraw(){ if(!tview.band) return; cancelAnimationFrame(tview.raf); t
 async function thumbLook(){
   const mk=cm.mk; const p=mk.pins[+$('mkThumbSel').value||0]; const cv=$('mkThumbCv'); if(!p){ cv.hidden=true; $('mkThumb').hidden=false; return; }
   cv.hidden=false; $('mkThumb').hidden=true;
-  if(mk.thumb&&mk.thumb.pano===p.pano){ tview.heading=+mk.thumb.heading||0; tview.pitch=+mk.thumb.pitch||0; tview.fov=+mk.thumb.fov||90; } else { tview.heading=p.heading||0; tview.pitch=0; tview.fov=90; }
+  if(mk.thumb&&mk.thumb.pano===p.pano){ tview.heading=+mk.thumb.heading||0; tview.pitch=+mk.thumb.pitch||0; tview.fov=+mk.thumb.fov||110; } else { tview.heading=p.heading||0; tview.pitch=0; tview.fov=110; }
   if(tview.pano===p.pano&&tview.band){ tviewDraw(); return; }
   tview.pano=p.pano; tview.band=null; $('mkThumbDeg').textContent='Loading the picture…'; const ctx=cv.getContext('2d'); ctx.fillStyle='#1a2a20'; ctx.fillRect(0,0,cv.width,cv.height);
   try{ const {band,meta}=await bandFor(p.pano); if(tview.pano!==p.pano) return; tview.band=band; tview.meta=meta; $('mkThumbDeg').textContent='Drag to look around, scroll or + − to zoom'; tviewDraw(); }
@@ -3688,11 +3688,11 @@ function attachLook(cv,st,draw){ let drag=null;
   cv.addEventListener('pointerdown',e=>{ if(!st.band) return; drag={x:e.clientX,y:e.clientY,h:st.heading,p:st.pitch}; cv.setPointerCapture(e.pointerId); });
   cv.addEventListener('pointermove',e=>{ if(!drag) return; const sc=st.fov/cv.clientWidth; st.heading=(drag.h-(e.clientX-drag.x)*sc+360)%360; st.pitch=Math.max(-35,Math.min(35,drag.p+(e.clientY-drag.y)*sc)); draw(); });
   const end=()=>{ drag=null; }; cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end);
-  cv.addEventListener('wheel',e=>{ if(!st.band) return; e.preventDefault(); st.fov=Math.max(35,Math.min(110,st.fov+(e.deltaY>0?5:-5))); draw(); },{passive:false});
+  cv.addEventListener('wheel',e=>{ if(!st.band) return; e.preventDefault(); st.fov=Math.max(35,Math.min(120,st.fov+(e.deltaY>0?5:-5))); draw(); },{passive:false});
 }
 attachLook($('mkThumbCv'),tview,tviewDraw);
 $('mkThumbIn').addEventListener('click',()=>{ tview.fov=Math.max(35,tview.fov-10); tviewDraw(); sfx('click'); });
-$('mkThumbOut').addEventListener('click',()=>{ tview.fov=Math.min(110,tview.fov+10); tviewDraw(); sfx('click'); });
+$('mkThumbOut').addEventListener('click',()=>{ tview.fov=Math.min(120,tview.fov+10); tviewDraw(); sfx('click'); });
 $('mkThumbRender').addEventListener('click',()=>{ const mk=cm.mk; const p=mk.pins[+$('mkThumbSel').value]; if(!p||!tview.band||tview.pano!==p.pano){ toast('Pick a spot and wait for the picture'); return; }
   renderPersp($('mkThumbCv'),tview.band,tview.meta,tview.heading,tview.fov,tview.pitch);
   mk.thumb={img:$('mkThumbCv').toDataURL('image/jpeg',0.72),pano:p.pano,heading:Math.round(tview.heading),pitch:Math.round(tview.pitch),fov:Math.round(tview.fov)}; mk.dirty=true; paintThumb(); toast('Thumbnail set','ok'); sfx('click'); });

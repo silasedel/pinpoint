@@ -115,6 +115,10 @@ Delete account sits beside Sign out: it explains what goes (name, photo, passcod
 
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
+## Field of view
+
+Every Street View embed (the game, the home-page background, the Google view in the builder) asks for Google's widest view. The embed URL's `5f` value is a zoom level, larger meaning closer; 0.78 is Google's default and anything at 0.6 or below is already its maximum zoom-out, so the app passes 0.4. Pinpoint's own tile viewers (the spot preview and the thumbnail picker) open at 110° to match and zoom between 35° and 120°.
+
 ## Profiles, tags and admin
 
 **Reload lands you where you were.** The last screen you were on (home, setup, settings, friends, daily, a leaderboard, the map list, a map page, analytics or a profile) is remembered on the device, and a reload within two minutes reopens it; after that you start at home. A shared challenge or map link still wins.
