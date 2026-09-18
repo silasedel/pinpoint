@@ -377,12 +377,12 @@
   .hud-brand svg{width:30px;height:30px}
 
   .ctl{position:absolute;left:16px;bottom:16px;z-index:6;display:flex;gap:8px}
-  .ctl.shift{left:150px}
+  .ctl.shift{left:206px}
   .ctl .icon-btn.wide{width:auto;padding:0 14px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
   .ctl .icon-btn.wide svg{width:16px;height:16px}
   .ctl .icon-btn.busy{opacity:.6;cursor:wait}
   .copymenu{position:absolute;left:16px;bottom:70px;z-index:9;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;min-width:250px}
-  .copymenu.shift{left:150px}
+  .copymenu.shift{left:206px}
   .copymenu button{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:8px;background:none;font-size:13px;font-weight:600}
   .copymenu button:hover{background:var(--green-soft);color:var(--green-dark)}
   .copymenu button small{display:block;font-weight:500;color:var(--muted);font-size:11px}
@@ -745,9 +745,37 @@
   .rrow .rt{color:var(--muted);font-size:12px;min-width:70px;text-align:right}
   .rrow .pos{color:var(--muted);width:20px;font-weight:700}
   .rrow.first .pos{color:#a06d00}
-  .mic{position:fixed;right:16px;bottom:16px;z-index:20;display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:99px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);font-weight:700;font-size:14px;color:var(--text)}
+  .microw{position:fixed;right:16px;bottom:16px;z-index:20;display:flex;align-items:center;gap:8px}
+  body.in-game .microw{left:16px;right:auto;flex-direction:row-reverse}
+  .mic{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:99px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);font-weight:700;font-size:14px;color:var(--text)}
+  .chatbtn{position:relative;width:50px;height:50px;border-radius:50%;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--text)}
+  .chatbtn:hover{background:var(--hover)}
+  .chatbtn svg{width:22px;height:22px}
+  .chatbtn.open{background:var(--green);border-color:var(--green);color:#fff}
+  .chatbtn .badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:99px;background:var(--red);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 5px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .chatpeek{position:absolute;bottom:60px;right:0;max-width:min(320px,70vw);padding:8px 12px;border-radius:12px;background:var(--text);color:#fff;font-size:13px;line-height:1.35;box-shadow:var(--shadow);animation:nagIn .2s ease-out;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.in-game .chatpeek{right:auto;left:0}
+  .chatpeek b{color:#9fe0b8;margin-right:6px}
+  .chatpanel{position:fixed;right:16px;bottom:78px;z-index:22;width:min(340px,calc(100vw - 32px));height:min(420px,60vh);display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);animation:nagIn .18s ease-out;overflow:hidden}
+  body.in-game .chatpanel{right:auto;left:16px;top:84px;bottom:auto;height:min(400px,calc(100vh - 170px))}
+  .chathead{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px}
+  .chathead b{flex:none}
+  .chathead .dim{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chathead .x{background:none;color:var(--muted);font-size:16px;padding:2px 6px;line-height:1}
+  .chathead .x:hover{color:var(--text)}
+  .chatlog{flex:1;overflow:auto;padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.35}
+  .chatmsg{display:flex;gap:8px;align-items:flex-start;animation:nagIn .15s ease-out}
+  .chatmsg .pav{margin-top:1px}
+  .chatmsg .ct{min-width:0;word-wrap:break-word;overflow-wrap:anywhere}
+  .chatmsg .ct b{margin-right:5px}
+  .chatmsg.me .ct b{color:var(--green-dark)}
+  .chatmsg.sys{color:var(--muted);font-size:12px;justify-content:center;text-align:center}
+  .chatempty{color:var(--muted);font-size:13px;text-align:center;padding:16px 0}
+  .chatform{display:flex;gap:6px;padding:8px;border-top:1px solid var(--line)}
+  .chatform input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;outline:none;background:var(--raise);color:var(--text);font-family:inherit}
+  .chatform input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  .chatform .btn{padding:10px 14px;font-size:13px}
   .mic:hover{background:var(--hover)}
-  body.in-game .mic{left:16px;right:auto}
   .mic .ico{width:32px;height:32px;border-radius:50%;background:#e63946;display:grid;place-items:center;color:#fff;transition:background .15s}
   .mic .ico svg{width:18px;height:18px;display:block}
   .mic .ico .slash{display:block}
@@ -1340,7 +1368,16 @@
   </div>
   <button class="btn btn-secondary sharebtn" id="shareBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button>
 </div>
+<div class="chatpanel" id="chatPanel" hidden>
+  <div class="chathead"><b>Room chat</b><span class="dim" id="chatWho"></span><button class="x" id="chatClose" title="Close">✕</button></div>
+  <div class="chatlog" id="chatLog"><div class="chatempty">Nothing yet. Say hi.</div></div>
+  <form class="chatform" id="chatForm"><input id="chatIn" maxlength="200" placeholder="Say something…" autocomplete="off" spellcheck="true"><button class="btn btn-primary" type="submit">Send</button></form>
+</div>
+<div class="microw" id="micRow">
+<div class="chatpeek" id="chatPeek" hidden></div>
+<button class="chatbtn" id="chatBtn" hidden title="Room chat (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H8l-5 3 1.2-4.2A8 8 0 1 1 21 12z"/></svg><span class="badge" id="chatBadge" hidden>0</span></button>
 <button class="mic" id="micBtn" hidden title="Toggle microphone (M)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/><line class="slash" x1="4" y1="3.5" x2="20" y2="20.5"/></svg></span><span id="micTxt">Mic off</span></button>
+</div>
 <canvas id="confetti" hidden></canvas>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
@@ -2040,7 +2077,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260917-202546';
+const BUILD='20260917-204221';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2162,7 +2199,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game — duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:0,patch:0};
+const VERSION={major:3,minor:1,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4186,6 +4223,7 @@ function mpSetup(role,code,kind){
   closeLinks();
   mp.role=role; mp.code=code; mp.players={}; mp.guesses={}; mp.phase='lobby'; mp.cd=null; mp.seen={}; mp.hostSeen=0; mp.pending={}; mp.revs=[]; mp.sentUpTo=-1;
   mp.me={id:null,name:myName(),color:null,vpeer:null};
+  chatReset();
   if(role==='host'){ mp.settings.kind=kind||'party'; mp.settings.mode=mp.settings.kind==='duo'?'duel':'classic'; mp.settings.rounds=5; mp.settings.time=60;
     mp.settings.custom=null; mp.settings.blind={eyes:'host',swap:true}; mp.settings.region={type:'all',value:null}; mp.settings.nomove=false; mp.settings.lock=false;
     $('lobbyModeGrid').innerHTML=modeTiles(mp.settings.kind); }
@@ -4249,6 +4287,7 @@ function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color;
 function hostDrop(id){
   if(!mp.players[id]||id==='host') return;
   const name=mp.players[id].name||'A player'; const vp=mp.players[id].vpeer; delete mp.players[id]; delete mp.seen[id]; if(vp) voiceDrop(vp);
+  const leftNote={t:'chat',id:'sys',sys:true,name:'',text:`${name} left`,ts:Date.now()}; mpBroadcast(leftNote); chatAdd(leftNote);
   if(mp.phase==='lobby') hostSync(); else { toast(name+' left'); mpBroadcast({t:'players',players:pubPlayers()}); updateStrip(); hostCheckRound(); }
 }
 function hostOnMessage(from,m,link){
@@ -4260,6 +4299,7 @@ function hostOnMessage(from,m,link){
     if(playerList().length>=cap){ mpSendTo(from,{t:'reject',why:cap===2?'That duo already has its two players.':'That game is full (10 players).'}); return; }
     mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link};
     mp.seen[from]=Date.now(); dlog('joined '+from); mpSendTo(from,{t:'welcome'}); hostSync();
+    const joinNote={t:'chat',id:'sys',sys:true,name:'',text:`${mp.players[from].name||'Someone'} joined`,ts:Date.now()}; mpBroadcast(joinNote); chatAdd(joinNote);
     setTimeout(()=>mpSendTo(from,{t:'avall',map:avCache}),300);   // hand the newcomer everyone's photo, including the host's
     return;
   }
@@ -4273,6 +4313,7 @@ function hostOnMessage(from,m,link){
     mpBroadcast({t:'av',id:from,av:m.av||''});
     if(mp.phase==='lobby') hostSync(); else { mpBroadcast({t:'players',players:pubPlayers()}); renderLobby(); updateStrip(); }
     return; }
+  if(m.t==='chat'){ const text=String(m.text||'').trim().slice(0,200); if(!text) return; const out={t:'chat',id:from,name:pl.name||('Player'),text,ts:+m.ts||Date.now()}; mpBroadcast(out); chatAdd(out); return; }
   if(m.t==='name'){ pl.name=String(m.name||'').slice(0,16); if(mp.phase==='lobby') hostSync(); else mpBroadcast({t:'players',players:pubPlayers()}); }
   else if(m.t==='color'){
     pl.chose=true;
@@ -4402,6 +4443,7 @@ function guestOnMessage(m){
   if(m.t==='welcome'){ sendAvatar(); $('connBox').className='conn ok'; $('connBox').textContent='Connected ✓'; $('connBox').hidden=false; setTimeout(()=>{ if(mp.role==='guest') $('connBox').hidden=true; },2500); return; }
   if(m.t==='hb') return;
   if(m.t==='host-left'){ toast('The host left the game'); mpLeave(); show('menu'); return; }
+  if(m.t==='chat'){ chatAdd(m); return; }
   if(m.t==='reject'){ connFailed(m.why); return; }
   if(m.t==='lobby'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; mp.settings=m.settings; const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; renderLobby(); voiceConnect(); }
   else if(m.t==='players'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; updateStrip(); }
@@ -4732,7 +4774,50 @@ function silentTrack(){
   voice.silent=dst.stream.getAudioTracks()[0]; return voice.silent;
 }
 function currentTrack(){ return voice.on&&voice.micStream ? voice.micStream.getAudioTracks()[0] : silentTrack(); }
-function voiceShow(){ $('micBtn').hidden=!mp.role; $('resetBtn').parentElement.classList.toggle('shift',!!mp.role); renderMic(); }
+function voiceShow(){ $('micBtn').hidden=!mp.role; $('chatBtn').hidden=!mp.role; $('resetBtn').parentElement.classList.toggle('shift',!!mp.role); renderMic(); }
+/* ---------- Room chat ----------
+   A typed feed beside the mic. Guests send to the host, the host stamps and rebroadcasts, so everyone
+   sees the same order. It rides on the game's own topics and lives as long as the room does. */
+const chat={items:[],open:false,unread:0,peekT:null};
+function chatReset(){ chat.items=[]; chat.unread=0; chat.open=false; $('chatPanel').hidden=true; $('chatBtn').classList.remove('open'); $('chatPeek').hidden=true; renderChat(); }
+function chatAdd(m){
+  if(!m||typeof m.text!=='string') return;
+  if(chat.items.some(x=>x.id===m.id&&x.ts===m.ts)) return;   // our own message coming back
+  chat.items.push({id:m.id,name:String(m.name||'').slice(0,16),text:m.text.slice(0,200),ts:m.ts||Date.now(),sys:!!m.sys});
+  if(chat.items.length>80) chat.items.shift();
+  const mine=m.id===mp.me.id;
+  if(!chat.open&&!mine){ chat.unread++; chatPeek(m); sfx('click'); }
+  renderChat();
+}
+function chatPeek(m){
+  const el=$('chatPeek'); el.innerHTML=`<b>${esc(m.name||'?')}</b>${esc(m.text)}`; el.hidden=false;
+  if(chat.peekT) clearTimeout(chat.peekT); chat.peekT=setTimeout(()=>{ el.hidden=true; },4000);
+}
+function renderChat(){
+  const b=$('chatBadge'); b.hidden=!chat.unread; b.textContent=chat.unread>9?'9+':String(chat.unread);
+  const log=$('chatLog');
+  log.innerHTML=chat.items.length?chat.items.map(m=>m.sys?`<div class="chatmsg sys">${esc(m.text)}</div>`
+    :`<div class="chatmsg ${m.id===mp.me.id?'me':''}">${avTag(m.id,m.name,22)}<span class="ct"><b>${esc(m.name||'?')}</b>${esc(m.text)}</span></div>`).join('')
+    :'<div class="chatempty">Nothing yet. Say hi.</div>';
+  log.scrollTop=log.scrollHeight;
+  $('chatWho').textContent=mp.role?`${playerList().length} in the room`:'';
+}
+function chatToggle(force){
+  chat.open=force!=null?force:!chat.open;
+  $('chatPanel').hidden=!chat.open; $('chatBtn').classList.toggle('open',chat.open);
+  if(chat.open){ chat.unread=0; $('chatPeek').hidden=true; renderChat(); setTimeout(()=>$('chatIn').focus(),50); }
+}
+function chatSend(){
+  const inp=$('chatIn'); const text=inp.value.trim().slice(0,200); if(!text||!mp.role) return;
+  inp.value='';
+  const m={t:'chat',text,ts:Date.now()};
+  if(mp.role==='host') hostOnMessage('host',m,null); else { chatAdd({id:mp.me.id,name:mp.me.name||anonName(),text,ts:m.ts}); mpSend(m); }
+}
+$('chatBtn').addEventListener('click',()=>chatToggle());
+$('chatClose').addEventListener('click',()=>chatToggle(false));
+$('chatForm').addEventListener('submit',e=>{ e.preventDefault(); chatSend(); });
+$('chatIn').addEventListener('keydown',e=>{ if(e.key==='Escape'){ chatToggle(false); e.target.blur(); } e.stopPropagation(); });
+document.addEventListener('keydown',e=>{ if(e.code==='KeyC'&&mp.role&&e.target.tagName!=='INPUT'&&!e.metaKey&&!e.ctrlKey){ e.preventDefault(); chatToggle(); } });
 function voiceConnect(){
   if(!mp.peer||!mp.me.vpeer||mp.peer.destroyed) return;
   for(const p of playerList()){
@@ -4814,6 +4899,7 @@ function swapTracks(){
 }
 function renderMic(){ const b=$('micBtn'); b.classList.toggle('live',voice.on); b.classList.toggle('busy',voice.busy); $('micTxt').textContent=voice.busy?'Asking for mic…':voice.on?'Mic on':'Mic off'; }
 function voiceStop(){
+  $('chatBtn').hidden=true; chatReset();
   for(const id of Object.keys(voice.calls)) voiceDrop(id);
   const mk=mp.me.vpeer||mp.me.id; if(voice.meters[mk]){ clearInterval(voice.meters[mk].timer); delete voice.meters[mk]; }
   if(voice.micStream){ voice.micStream.getTracks().forEach(t=>t.stop()); voice.micStream=null; }
