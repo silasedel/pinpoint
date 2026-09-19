@@ -2473,7 +2473,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-195523';
+const BUILD='20260918-195637';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2624,7 +2624,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:5,patch:3};
+const VERSION={major:3,minor:5,patch:4};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4075,7 +4075,7 @@ async function srvAfterHostLeft(){
 /* loop: after a game, the next one starts by itself */
 function srvLoopStart(){
   clearInterval(srv.loopT); let n=20; const el=$('finalWait'); el.hidden=false; mpBroadcast({t:'loop',secs:n});
-  const tick=()=>{ el.textContent=`Next game in ${n}s · this server loops`; if(n--<=0){ clearInterval(srv.loopT); srv.loopT=null; if(mp.role!=='host'||$('final').hidden) return; mpBroadcast({t:'lobby-return'}); mpToLobby(); if(playerList().length>=2) hostStartGame(); else toast('Waiting for one more player to loop'); } };
+  const tick=()=>{ el.textContent=`Next game in ${n}s · this server loops`; if(n--<=0){ clearInterval(srv.loopT); srv.loopT=null; if(mp.role!=='host'||$('final').hidden) return; mpBroadcast({t:'lobby-return'}); mpToLobby(); hostStartGame(); } };
   tick(); srv.loopT=setInterval(tick,1000);
 }
 function srvLoopStop(){ if(srv.loopT){ clearInterval(srv.loopT); srv.loopT=null; } }
@@ -6280,7 +6280,7 @@ function setLobbyMode(id){ mp.settings.mode=id; if(!regionOK(id)) mp.settings.re
 $('lobbyModeGrid').addEventListener('click',e=>{ const b=e.target.closest('.tile'); if(b) setLobbyMode(b.dataset.mode); });
 const mpTimePick=picker('mpTimeSeg','mpTimeCustom','t',1,180,v=>{ mp.settings.time=v; hostSync(); });
 const mpRoundPick=picker('mpRoundSeg','mpRoundCustom','r',1,100,v=>{ mp.settings.rounds=v; hostSync(); });
-$('mpStartBtn').addEventListener('click',()=>{ if(playerList().length<2){ toast(mp.settings.kind==='duo'?'Your opponent hasn\'t joined yet':'You need at least one more player'); return; } hostStartGame(); });
+$('mpStartBtn').addEventListener('click',()=>{ if(mp.settings.kind==='duo'&&playerList().length<2){ toast('Your opponent hasn\'t joined yet'); return; } hostStartGame(); });   // a room runs with one person in it; only a duo needs two
 
 /* ---------- Menu extras: live hero panorama (double-buffered) + page loader ---------- */
 const heroFrames=[document.getElementById('hero0'),document.getElementById('hero1')];
