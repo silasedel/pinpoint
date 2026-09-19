@@ -2473,7 +2473,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-195637';
+const BUILD='20260918-201716';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2624,7 +2624,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:5,patch:4};
+const VERSION={major:3,minor:5,patch:5};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3974,10 +3974,11 @@ document.addEventListener('click',e=>{ const p=e.target.closest('[data-prof]'); 
    acting host refreshes every 20 s (who hosts, how many are in, the phase). Whoever is in the room keeps it running:
    when the host leaves, another player takes over hosting with the same code and settings, and the others rejoin.
    Only managers change settings; a non-manager who ends up hosting runs the saved ones. Nobody in and no host for
-   90 s means asleep: listed gray, and only a manager can wake it. */
+   90 s means asleep: listed gray, and only a manager can wake it, unless it loops: a looping server starts a new game
+   the moment one ends, whoever ends up hosting starts one on arrival, and anyone can wake it. */
 const SRV_ROOT='worlddrop/v1/srv';
 const SRV_TAGS=['Quick','Blitz','Long','Chill','Custom maps','Hard','Beginners','Voice'];
-const srv={cur:null,list:{},lastPub:0,timer:null,thumb:null,tags:new Set(),loopT:null};
+const srv={cur:null,list:{},lastPub:0,timer:null,thumb:null,tags:new Set(),loopT:null,revT:null};
 function srvIsManager(rec){ rec=rec||srv.cur; if(!rec) return false; if(admin.on) return true; if(!acct.key) return false; return !!((rec.by&&rec.by.k===acct.key)||(rec.managers||[]).includes(acct.key)); }
 function srvAlive(rec){ const l=rec&&rec.live; return !!(l&&l.up&&Date.now()-(+l.ts||0)<90000); }
 function srvSend(rec){ for(const l of lb.links) if(l.ready){ try{ l.client.publish(SRV_ROOT+'/'+rec.code,JSON.stringify(rec),{qos:1,retain:true}); }catch(e){} } }
@@ -4005,7 +4006,7 @@ function renderPub(){
   const list=Object.values(srv.list).sort((a,b)=>(srvAlive(b)?1:0)-(srvAlive(a)?1:0)||((b.live&&b.live.players)||0)-((a.live&&a.live.players)||0)||(b.made||0)-(a.made||0));
   const live=list.filter(srvAlive).length, asleep=list.length-live;
   $('pubSub').textContent=list.length?`${live} up${asleep?` · ${asleep} asleep`:''}`:(lbLive()?'':'Connecting…');
-  $('pubList').innerHTML=list.length?list.map(r=>{ const alive=srvAlive(r); const l=r.live||{}; const ingame=alive&&l.phase!=='lobby'; const full=alive&&(l.players||0)>=MAX_PLAYERS; const st=r.settings||{}; const modeName=st.custom?st.custom.name:(MODES[st.mode]?MODES[st.mode].name:'Classic'); const canWake=!alive&&srvIsManager(r); const bars=srvBars(r);
+  $('pubList').innerHTML=list.length?list.map(r=>{ const alive=srvAlive(r); const l=r.live||{}; const ingame=alive&&l.phase!=='lobby'; const full=alive&&(l.players||0)>=MAX_PLAYERS; const st=r.settings||{}; const modeName=st.custom?st.custom.name:(MODES[st.mode]?MODES[st.mode].name:'Classic'); const canWake=!alive&&(srvIsManager(r)||!!st.endless); const bars=srvBars(r);
     const go=!alive?(canWake?'<span class="go wake">Wake it</span>':'<span class="go dim">Asleep</span>'):full?'<span class="go dim">Full</span>':ingame?'<span class="go">Join · next round</span>':'<span class="go">Join</span>';
     return `<button class="srvrow ${alive?'':'asleep'} ${canWake?'canwake':''}" data-srv="${esc(r.code)}">${srvThumbOf(r)}<span class="body"><span class="name">${alive?'<i class="live"></i>':''}${esc(r.name)}</span>${r.desc?`<span class="desc">${esc(r.desc)}</span>`:''}${(r.tags||[]).length?`<span class="tags">${r.tags.map(t=>`<span class="tag ro">${esc(t)}</span>`).join('')}</span>`:''}<span class="meta"><span class="by">${r.by&&r.by.k?faceOf(r.by.k,18):''}by <b>${esc(r.by&&r.by.name||'someone')}</b></span>${alive&&l.hostName&&l.hostK!==(r.by&&r.by.k)?`<span>${esc(l.hostName)} hosting</span>`:''}<span><b>${esc(modeName)}</b>${st.time?` · ${st.time}s`:' · no limit'}${st.rounds&&!(MODES[st.mode]&&MODES[st.mode].duel)?` · ${st.rounds} rounds`:''}</span>${st.endless?'<span>↻ looping</span>':''}</span></span><span class="right"><span class="bars b${bars}" title="${alive?'Up':'Asleep'}"><i></i><i></i><i></i><i></i></span><span class="count"><b>${alive?(l.players||0):0}</b> / ${MAX_PLAYERS}</span>${go}</span></button>`; }).join('')
     :`<div class="empty">${lbLive()?'No servers yet. Be the first: create your own above.':'Connecting to the servers…'}</div>`;
@@ -4041,16 +4042,18 @@ function srvEnter(rec){
   clearInterval(srv.timer); srv.cur=rec;
   if(srvAlive(rec)){ if((rec.live.players||0)>=MAX_PLAYERS){ toast('That server is full right now'); return; } mpJoin(rec.code); show('lobby'); return; }
   if(srvIsManager(rec)){ srvHost(rec); return; }
+  if(rec.settings&&rec.settings.endless){ srvHost(rec,true); return; }   // a looping server never turns anyone away
   toast('That server is asleep. One of its managers has to open it.');
 }
 /* host a server: the room takes its code and its saved settings */
-async function srvHost(rec){
+async function srvHost(rec,go){
   srv.cur=rec; await mpHost('party',rec.code);
   const st=rec.settings||{};
   Object.assign(mp.settings,{mode:MODES[st.mode]?st.mode:'classic',time:st.time!=null?+st.time:60,rounds:+st.rounds||5,region:st.region||{type:'all',value:null},nomove:!!st.nomove,lock:!!st.lock,custom:st.custom||null,endless:!!st.endless});
   if(mp.settings.custom){ try{ const m=await cmapFetch(mp.settings.custom.id); if(m&&m.pins){ mp.customPins=m.pins; mp.settings.custom={id:m.id,name:m.name,n:m.pins.length,start:m.start||null,scale:+m.scale>0?+m.scale:autoScale(m.pins)}; mp.settings.mode='custom'; } else { mp.settings.custom=null; if(mp.settings.mode==='custom') mp.settings.mode='classic'; } }catch(e){ mp.settings.custom=null; if(mp.settings.mode==='custom') mp.settings.mode='classic'; } }
   mp.settings.srv={code:rec.code,name:rec.name,desc:rec.desc||'',tags:rec.tags||[],by:rec.by,managers:rec.managers||[]};
   show('lobby'); hostSync(); setTimeout(srvPublish,1500); setTimeout(srvPublish,5000);
+  if(go&&mp.settings.endless){ toast(`${rec.name} loops, the next game is starting`,'ok'); setTimeout(()=>{ if(mp.role==='host'&&mp.phase==='lobby'&&!mp.starting) hostStartGame(); },+go>1?+go:900); }   // go = ms to wait, so rejoining players make it in first
 }
 /* the host is leaving: hand the room to someone still in it (a manager first), or put the server to sleep */
 function srvHandOff(){
@@ -4068,17 +4071,25 @@ async function srvAfterHostLeft(){
   const successor=h&&h.to?h.to:others[0];
   const rec0=srv.cur&&srv.cur.code===code?srv.cur:null;
   mpLeave();
-  if(successor===mp.me.id){ const rec=(await srvGet(code))||rec0||(info?{code,name:info.name,desc:info.desc,tags:info.tags,by:info.by,managers:info.managers,settings:{},live:null}:null); if(!rec){ show('menu'); return; } await srvHost(rec); toast(`You are hosting ${rec.name} now`,'ok'); return; }
+  if(successor===mp.me.id){ const rec=(await srvGet(code))||rec0||(info?{code,name:info.name,desc:info.desc,tags:info.tags,by:info.by,managers:info.managers,settings:{},live:null}:null); if(!rec){ show('menu'); return; } await srvHost(rec,6000); toast(`You are hosting ${rec.name} now`,'ok'); return; }
   show('lobby'); connStatus('The host left. Reconnecting to the server…'); $('connBox').hidden=false;
   setTimeout(async()=>{ const rec=(await srvGet(code))||rec0; if(rec) srv.cur=rec; mpJoin(code); },3500);
 }
 /* loop: after a game, the next one starts by itself */
+const LOOP_PAUSE=5;
 function srvLoopStart(){
-  clearInterval(srv.loopT); let n=20; const el=$('finalWait'); el.hidden=false; mpBroadcast({t:'loop',secs:n});
-  const tick=()=>{ el.textContent=`Next game in ${n}s · this server loops`; if(n--<=0){ clearInterval(srv.loopT); srv.loopT=null; if(mp.role!=='host'||$('final').hidden) return; mpBroadcast({t:'lobby-return'}); mpToLobby(); hostStartGame(); } };
+  clearInterval(srv.loopT); let n=LOOP_PAUSE; const el=$('finalWait'); el.hidden=false; mpBroadcast({t:'loop',secs:n});
+  const tick=()=>{ el.textContent=`Next game in ${n}s · this server loops`; if(n--<=0){ clearInterval(srv.loopT); srv.loopT=null; if(mp.role!=='host'||$('final').hidden) return; srvLoopNext(); } };
   tick(); srv.loopT=setInterval(tick,1000);
 }
-function srvLoopStop(){ if(srv.loopT){ clearInterval(srv.loopT); srv.loopT=null; } }
+/* the next game of a loop: reset the room without showing the lobby and start straight away */
+function srvLoopNext(){
+  if(mp.role!=='host') return;
+  mpBroadcast({t:'loop-next'}); mpToLobby(true);
+  const el=$('finalWait'); if(el&&!$('final').hidden){ el.hidden=false; el.textContent='Next game starting…'; }
+  hostStartGame();
+}
+function srvLoopStop(){ if(srv.loopT){ clearInterval(srv.loopT); srv.loopT=null; } clearTimeout(srv.revT); srv.revT=null; }
 /* the lobby shows the server and, for a manager who is hosting, its tools */
 function paintLobbyPub(){
   const el=$('lobbyPub'); const info=mp.settings&&mp.settings.srv; const on=!!(mp.role&&info); el.hidden=!on;
@@ -5531,6 +5542,9 @@ function mpSendTo(id,m){ const p=mp.players[id]; const l=(p&&p.link)||mp.links.f
 function mpSend(m){ if(mp.role==='host') hostOnMessage('host',m,null); else if(mp.link){ m.id=mp.me.id; pub(mp.link.client,T.host(mp.code),m); } }
 function connStatus(text){ if(mp.role!=='guest') return; const box=$('connBox'); box.hidden=false; box.className='conn'; box.textContent=text; }
 function connFailed(why){
+  // a server whose host vanished before its record said so: take it over if it loops or you manage it
+  const rec=srv.cur&&srv.cur.code===mp.code?srv.cur:null;
+  if(rec&&mp.role==='guest'&&(srvIsManager(rec)||(rec.settings&&rec.settings.endless))){ mpLeave(); toast(`Nobody was hosting ${rec.name}, so you are`,'ok'); srvHost(rec,true); return; }
   const box=$('connBox'); box.hidden=false; box.className='conn fail';
   box.innerHTML=`<b>Couldn't join.</b> ${esc(why)}<div class="row"><button class="btn btn-primary" id="retryJoin">Try again</button><button class="btn btn-secondary" id="copyDebug">Copy debug info</button><button class="btn btn-secondary" id="backMenu">Back</button></div>`;
   $('retryJoin').onclick=()=>{ const c=mp.code; mpLeave(); mpJoin(c); };
@@ -5669,8 +5683,12 @@ function hostReveal(){
   const rev={t:'reveal',round:state.round,truth,place:loc.place||null,results,lie:loc.lie,extra:loc.extra?loc.extra.map(e=>({lat:e.lat,lng:e.lng})):null,truthCountry:mm.country?tn:undefined,ans:(mm.slider||mm.choice)?{tempF:loc.tempF??null,pol:loc.pol||null}:undefined,
              elim,duel,players:(mm.elim||mm.duel)?pubPlayers():null,over:mm.elim?alivePlayers().length<=1:(mm.duel?(playerList().length<2||playerList().some(p=>(p.hp??DUEL_HP)<=0)):false),add:mm.duel?hostPending():undefined};
   mpBroadcast(rev); showResultMP(rev);
+  // a looping server never waits on the host: the round recap moves on by itself
+  if(srv.cur&&mp.settings.endless){ clearTimeout(srv.revT); srv.revT=setTimeout(()=>{ if(mp.role==='host'&&mp.phase==='reveal'&&!$('result').hidden) mpHostNext(); },LOOP_REVEAL*1000); }
 }
+const LOOP_REVEAL=10;
 async function mpHostNext(){
+  clearTimeout(srv.revT); srv.revT=null;
   const mm=modeOf(mp.settings.mode);
   const over=state.round>=state.totalRounds||(mm.elim&&alivePlayers().length<=1)||(mm.duel&&(playerList().length<2||playerList().some(p=>(p.hp??DUEL_HP)<=0)));
   if(over){ mp.duelDone=true; const fin={t:'final',players:pubPlayers()}; mpBroadcast(fin); showFinalMP(fin); return; }
@@ -5705,7 +5723,7 @@ async function hostStartGame(){
   // Auto-assign colors and names
   for(const p of playerList()) if(p.face) p.color=null;   // photo players get a fresh line color each game
   const taken=new Set(playerList().map(p=>p.color).filter(c=>c!==null));
-  let n=1; for(const p of playerList()){ if(!p.name) p.name='Player '+(n++); if(p.color===null){ const c=COLORS.findIndex((_,i)=>!taken.has(i)); p.color=c<0?0:c; taken.add(p.color); } p.score=0; p.out=false; p.outRound=null; p.lives=null; }
+  let n=1; for(const p of playerList()){ if(!p.name) p.name='Player '+(n++); if(p.color===null){ const c=COLORS.findIndex((_,i)=>!taken.has(i)); p.color=c<0?0:c; taken.add(p.color); } p.score=0; p.out=false; p.outRound=null; p.lives=null; p.late=null; }
   const em=modeOf(mp.settings.mode);
   if(em.elim){ const np=playerList().length;
     // worst case: every player but one runs out of lives, and the survivor is down to their last one
@@ -5753,6 +5771,7 @@ function guestOnMessage(m){
     showResultMP(m); }
   else if(m.t==='final'){ showFinalMP(m); }
   else if(m.t==='lobby-return'){ mpToLobby(); }
+  else if(m.t==='loop-next'){ mpToLobby(true); const el=$('finalWait'); if(el&&!$('final').hidden){ el.hidden=false; el.textContent='Next game starting…'; } }
 }
 
 /* ----- shared ----- */
@@ -5887,10 +5906,11 @@ function renderLobby(){
 }
 $('blindSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b||mp.role!=='host') return; mp.settings.blind.eyes=b.dataset.eyes; hostSync(); sfx('click'); });
 $('blindSwap').addEventListener('click',()=>{ if(mp.role!=='host') return; mp.settings.blind.swap=!mp.settings.blind.swap; hostSync(); sfx('click'); });
-function mpToLobby(){ setTimeout(sendAvatar,400); mp.duelDone=true;
-  mp.phase='lobby'; mp.starting=false; mp.locPromise=null; mp.guesses={}; for(const p of playerList()){ p.score=0; p.out=false; p.outRound=null; p.lives=null; }
+function mpToLobby(quiet){ setTimeout(sendAvatar,400); mp.duelDone=true;
+  mp.phase='lobby'; mp.starting=false; mp.locPromise=null; mp.guesses={}; for(const p of playerList()){ p.score=0; p.out=false; p.outRound=null; p.lives=null; p.late=null; }
   $('countdown').hidden=true; $('mpStartBtn').disabled=false;
   $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
+  if(quiet){ if(mp.role==='host') hostSync(); return; }   // a looping server goes straight into the next game
   show('lobby'); if(mp.role==='host') hostSync(); else renderLobby();
 }
 
@@ -5983,8 +6003,9 @@ function elimBanner(rev){
 function showFinalMP(fin){
   bumpStreak();
   show('final'); $('finalRival').hidden=true; $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true; $('viewBoardBtn').hidden=false;
-  $('againBtn').hidden=mp.role!=='host'; $('finalWait').hidden=mp.role==='host'; $('againBtn').textContent='Back to lobby';
-  if(mp.role==='host'&&srv.cur&&mp.settings.endless) setTimeout(srvLoopStart,1200);
+  const loopHost=mp.role==='host'&&srv.cur&&mp.settings.endless;
+  $('againBtn').hidden=mp.role!=='host'||(loopHost&&!srvIsManager(srv.cur)); $('finalWait').hidden=mp.role==='host'&&!loopHost; $('againBtn').textContent='Back to lobby'; if(loopHost) $('finalWait').textContent='Next game soon · this server loops';
+  if(loopHost) setTimeout(srvLoopStart,1200);
   const max=state.totalRounds*5000;
   if(!finalMap) finalMap=makeMap('finalmap');
   if(finalLayer) finalLayer.remove();
