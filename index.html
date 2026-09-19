@@ -286,6 +286,7 @@
   .cdot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);margin-right:7px;vertical-align:-2px}
   .wheelwrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
   #wheel{width:240px;height:240px;border-radius:50%;cursor:crosshair;box-shadow:0 4px 0 var(--edge),0 12px 28px rgba(15,64,36,.15);touch-action:none;flex:none}
+  #shade{width:20px;height:240px;border-radius:10px;cursor:ns-resize;touch-action:none;flex:none;box-shadow:0 4px 0 var(--edge),0 8px 20px rgba(15,64,36,.12);margin-left:-6px}
   .wheelside{display:flex;flex-direction:column;gap:8px;align-items:center;flex:1;min-width:150px}
   .cprev{width:92px;height:92px;border-radius:50%;background:var(--green);display:grid;place-items:center;box-shadow:0 4px 0 rgba(0,0,0,.12);transition:background .1s}
   .cprev .pav{width:64px;height:64px;border:3px solid #fff}
@@ -1252,8 +1253,8 @@
       </div>
       <input type="file" id="avFile" accept="image/*" hidden>
       <div id="colorBox" hidden>
-        <div class="rsub" style="margin:4px 0 10px">Your lines on the map, wherever your photo is your token. Tap or drag on the wheel.</div>
-        <div class="wheelwrap"><canvas id="wheel" width="240" height="240"></canvas>
+        <div class="rsub" style="margin:4px 0 10px">Your lines on the map, wherever your photo is your token. Tap or drag on the wheel, slide the bar for a darker shade.</div>
+        <div class="wheelwrap"><canvas id="wheel" width="240" height="240"></canvas><canvas id="shade" width="20" height="240"></canvas>
           <div class="wheelside"><div class="cprev" id="cprev"><span class="pav" id="cprevAv"></span></div><div class="cval" id="cval"></div><button class="btn btn-primary sm" id="colorSave">Use this color</button><button class="btn btn-secondary sm" id="colorAuto">Pick from photo</button></div>
         </div>
       </div>
@@ -2473,7 +2474,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-203310';
+const BUILD='20260918-203552';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2624,7 +2625,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:5,patch:6};
+const VERSION={major:3,minor:5,patch:7};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -2964,7 +2965,8 @@ function avPaint(){
 }
 /* ---------- Line color: a hue wheel, white in the middle, drawn once on a canvas ---------- */
 function okColor(v){ return typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v)?v.toLowerCase():null; }
-const wheel={drawn:false,pick:null,R:120};
+const wheel={drawn:false,pick:null,R:120,h:0,s:1,v:0.96};
+const SHADE_MIN=0.3;   // never black: a line has to show on a map
 function hsvHex(h,sat,v){ const c=v*sat, x=c*(1-Math.abs((h/60)%2-1)), m=v-c; let r,g,b; if(h<60){r=c;g=x;b=0;}else if(h<120){r=x;g=c;b=0;}else if(h<180){r=0;g=c;b=x;}else if(h<240){r=0;g=x;b=c;}else if(h<300){r=x;g=0;b=c;}else{r=c;g=0;b=x;}
   return '#'+[r,g,b].map(u=>Math.round((u+m)*255).toString(16).padStart(2,'0')).join(''); }
 function hexHsv(hex){ const n=parseInt(hex.slice(1),16); const r=(n>>16&255)/255,g=(n>>8&255)/255,b=(n&255)/255; const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn; let h=0; if(d){ if(mx===r) h=60*(((g-b)/d)%6); else if(mx===g) h=60*((b-r)/d+2); else h=60*((r-g)/d+4); } if(h<0) h+=360; return {h,s:mx?d/mx:0,v:mx}; }
@@ -2975,18 +2977,34 @@ function drawWheel(){
     d[k]=n>>16&255; d[k+1]=n>>8&255; d[k+2]=n&255; d[k+3]=r>R-1.5?Math.round(255*(R-r+0.5)):255; }
   x.putImageData(img,0,0); wheel.img=img; wheel.drawn=true;
 }
-function wheelMark(hex){
+/* the shade bar beside the wheel: the picked hue at full brightness on top, down to a deep shade at the bottom */
+function drawShade(){
+  const c=$('shade'); const x=c.getContext('2d'); x.clearRect(0,0,20,240);
+  const g=x.createLinearGradient(0,0,0,240); g.addColorStop(0,hsvHex(wheel.h,wheel.s,1)); g.addColorStop(1,hsvHex(wheel.h,wheel.s,SHADE_MIN));
+  x.fillStyle=g; x.beginPath(); x.roundRect(0,0,20,240,10); x.fill();
+  const py=(1-(wheel.v-SHADE_MIN)/(1-SHADE_MIN))*240; const cy=Math.max(9,Math.min(231,py));
+  x.beginPath(); x.arc(10,cy,7,0,7); x.lineWidth=3; x.strokeStyle='#fff'; x.stroke(); x.beginPath(); x.arc(10,cy,7,0,7); x.lineWidth=1; x.strokeStyle='rgba(0,0,0,.45)'; x.stroke();
+}
+function wheelSet(h,s,v){
   if(!wheel.drawn) drawWheel();
+  wheel.h=h; wheel.s=s; wheel.v=Math.max(SHADE_MIN,Math.min(1,v));
+  const hex=hsvHex(h,s,wheel.v);
   const c=$('wheel'); const x=c.getContext('2d'); x.putImageData(wheel.img,0,0);   // wipe the old ring
-  const {h,s}=hexHsv(hex); const R=wheel.R; const a=h*Math.PI/180; const px=R+Math.cos(a)*s*R, py=R+Math.sin(a)*s*R;
+  const R=wheel.R; const a=h*Math.PI/180; const px=R+Math.cos(a)*s*R, py=R+Math.sin(a)*s*R;
   x.beginPath(); x.arc(px,py,9,0,7); x.lineWidth=3; x.strokeStyle='#fff'; x.stroke(); x.beginPath(); x.arc(px,py,9,0,7); x.lineWidth=1; x.strokeStyle='rgba(0,0,0,.45)'; x.stroke();
+  drawShade();
   $('cprev').style.background=hex; $('cval').textContent=hex.toUpperCase(); wheel.pick=hex;
 }
+function wheelMark(hex){ const {h,s,v}=hexHsv(hex); wheelSet(h,s,v); }
 function wheelPickAt(e){
   const c=$('wheel'); const b=c.getBoundingClientRect(); const R=wheel.R; const sx=240/b.width;
   let dx=(e.clientX-b.left)*sx-R, dy=(e.clientY-b.top)*sx-R; const r=Math.min(R,Math.sqrt(dx*dx+dy*dy));
   let h=Math.atan2(dy,dx)*180/Math.PI; if(h<0) h+=360; const sat=Math.max(0.15,r/R);   // never pure white: a line has to show on a map
-  wheelMark(hsvHex(h,sat,0.96));
+  wheelSet(h,sat,wheel.v);
+}
+function shadePickAt(e){
+  const c=$('shade'); const b=c.getBoundingClientRect(); const y=Math.max(0,Math.min(1,(e.clientY-b.top)/b.height));
+  wheelSet(wheel.h,wheel.s,1-y*(1-SHADE_MIN));
 }
 function openColor(){
   const box=$('colorBox'); box.hidden=!box.hidden; $('nameBox').hidden=true; $('pinBox').hidden=true; acctMsg('acctMsg2','');
@@ -2999,7 +3017,11 @@ $('colorAuto').addEventListener('click',()=>{ const d=acct.av&&dominantColor(acc
 (function(){ const c=$('wheel'); let down=false;
   c.addEventListener('pointerdown',e=>{ down=true; c.setPointerCapture(e.pointerId); wheelPickAt(e); });
   c.addEventListener('pointermove',e=>{ if(down) wheelPickAt(e); });
-  const up=()=>{ down=false; }; c.addEventListener('pointerup',up); c.addEventListener('pointercancel',up); })();
+  const up=()=>{ down=false; }; c.addEventListener('pointerup',up); c.addEventListener('pointercancel',up);
+  const sh=$('shade'); let sdown=false;
+  sh.addEventListener('pointerdown',e=>{ sdown=true; sh.setPointerCapture(e.pointerId); shadePickAt(e); });
+  sh.addEventListener('pointermove',e=>{ if(sdown) shadePickAt(e); });
+  const sup=()=>{ sdown=false; }; sh.addEventListener('pointerup',sup); sh.addEventListener('pointercancel',sup); })();
 $('colorSave').addEventListener('click',async()=>{
   if(!acct.key||!wheel.pick) return;
   acct.color=wheel.pick; acctSave(); avPaint(); paintAcct();
