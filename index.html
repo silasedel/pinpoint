@@ -135,8 +135,6 @@
   .srvrow .thumb{width:168px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;display:block;background:linear-gradient(120deg,#4a2fb0,#8b6cf0)}
   .srvrow .thumb.txt{display:grid;place-items:center;color:#fff;font-size:30px;font-weight:800;letter-spacing:-.5px}
   .srvrow .body{min-width:0} .srvrow .name{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;letter-spacing:-.3px;line-height:1.2}
-  .srvrow .live{width:9px;height:9px;border-radius:50%;background:#2bb673;box-shadow:0 0 0 0 rgba(43,182,115,.5);animation:livepulse 1.8s infinite;flex:none}
-  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(43,182,115,.55)}70%{box-shadow:0 0 0 8px rgba(43,182,115,0)}100%{box-shadow:0 0 0 0 rgba(43,182,115,0)}}
   .srvrow .desc{font-size:13.5px;color:var(--text);margin-top:2px;line-height:1.35}
   .srvrow .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
   .srvrow .meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);margin-top:7px;align-items:center} .srvrow .meta b{color:var(--text)} .srvrow .meta .by{display:inline-flex;align-items:center;gap:5px}
@@ -2474,7 +2472,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-205828';
+const BUILD='20260918-210455';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2625,7 +2623,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:5,patch:8};
+const VERSION={major:3,minor:5,patch:9};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4030,7 +4028,7 @@ function renderPub(){
   $('pubSub').textContent=list.length?`${live} up${asleep?` · ${asleep} asleep`:''}`:(lbLive()?'':'Connecting…');
   $('pubList').innerHTML=list.length?list.map(r=>{ const alive=srvAlive(r); const l=r.live||{}; const ingame=alive&&l.phase!=='lobby'; const full=alive&&(l.players||0)>=MAX_PLAYERS; const st=r.settings||{}; const modeName=st.custom?st.custom.name:(MODES[st.mode]?MODES[st.mode].name:'Classic'); const canWake=!alive&&(srvIsManager(r)||!!st.endless); const bars=srvBars(r);
     const go=!alive?(canWake?'<span class="go wake">Wake it</span>':'<span class="go dim">Asleep</span>'):full?'<span class="go dim">Full</span>':ingame?'<span class="go">Join · next round</span>':'<span class="go">Join</span>';
-    return `<button class="srvrow ${alive?'':'asleep'} ${canWake?'canwake':''}" data-srv="${esc(r.code)}">${srvThumbOf(r)}<span class="body"><span class="name">${alive?'<i class="live"></i>':''}${esc(r.name)}</span>${r.desc?`<span class="desc">${esc(r.desc)}</span>`:''}${(r.tags||[]).length?`<span class="tags">${r.tags.map(t=>`<span class="tag ro">${esc(t)}</span>`).join('')}</span>`:''}<span class="meta"><span class="by">${r.by&&r.by.k?faceOf(r.by.k,18):''}by <b>${esc(r.by&&r.by.name||'someone')}</b></span>${alive&&l.hostName&&l.hostK!==(r.by&&r.by.k)?`<span>${esc(l.hostName)} hosting</span>`:''}<span><b>${esc(modeName)}</b>${st.time?` · ${st.time}s`:' · no limit'}${st.rounds&&!(MODES[st.mode]&&MODES[st.mode].duel)?` · ${st.rounds} rounds`:''}</span>${st.endless?'<span>↻ looping</span>':''}</span></span><span class="right"><span class="bars b${bars}" title="${alive?'Up':'Asleep'}"><i></i><i></i><i></i><i></i></span><span class="count"><b>${alive?(l.players||0):0}</b> / ${MAX_PLAYERS}</span>${go}</span></button>`; }).join('')
+    return `<button class="srvrow ${alive?'':'asleep'} ${canWake?'canwake':''}" data-srv="${esc(r.code)}">${srvThumbOf(r)}<span class="body"><span class="name">${esc(r.name)}</span>${r.desc?`<span class="desc">${esc(r.desc)}</span>`:''}${(r.tags||[]).length?`<span class="tags">${r.tags.map(t=>`<span class="tag ro">${esc(t)}</span>`).join('')}</span>`:''}<span class="meta"><span class="by">${r.by&&r.by.k?faceOf(r.by.k,18):''}by <b>${esc(r.by&&r.by.name||'someone')}</b></span>${alive&&l.hostName&&l.hostK!==(r.by&&r.by.k)?`<span>${esc(l.hostName)} hosting</span>`:''}<span><b>${esc(modeName)}</b>${st.time?` · ${st.time}s`:' · no limit'}${st.rounds&&!(MODES[st.mode]&&MODES[st.mode].duel)?` · ${st.rounds} rounds`:''}</span>${st.endless?'<span>↻ looping</span>':''}</span></span><span class="right"><span class="bars b${bars}" title="${alive?'Up':'Asleep'}"><i></i><i></i><i></i><i></i></span><span class="count"><b>${alive?(l.players||0):0}</b> / ${MAX_PLAYERS}</span>${go}</span></button>`; }).join('')
     :`<div class="empty">${lbLive()?'No servers yet. Be the first: create your own above.':'Connecting to the servers…'}</div>`;
   if($('pubCount')) $('pubCount').textContent=live?`${live} up`:'Open';
 }
