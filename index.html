@@ -105,7 +105,10 @@
   @media (max-width:560px){ .learnbar{flex-direction:column;align-items:flex-start;gap:12px} .learnbar .lr{align-self:stretch;text-align:center} }
   /* each bar has its own color: Learn green, maps amber, lobbies purple, the daily blue */
   .learnbar.make .lmark,.learnbar.make .lr{background:#fff1dc;color:#b45309} .learnbar.make:hover{border-color:#f59e0b}
-  .learnbar.pub .lmark,.learnbar.pub .lr{background:#efe7ff;color:#5b3fb8} .learnbar.pub:hover{border-color:#8b6cf0}
+  .learnbar.pub{background:linear-gradient(120deg,#3b1f8f,#6d4fd6 55%,#8b6cf0);color:#fff;border-color:transparent;box-shadow:0 5px 0 #2a1668,0 16px 34px rgba(74,47,176,.35);position:relative;overflow:hidden}
+  .learnbar.pub::after{content:'';position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.09);pointer-events:none}
+  .learnbar.pub .ll span{color:rgba(255,255,255,.85)} .learnbar.pub .lmark{background:rgba(255,255,255,.16);color:#fff;border-color:transparent} .learnbar.pub .lr{background:#fff;color:#5b3fb8;border-color:transparent}
+  .learnbar.pub:hover{border-color:transparent;transform:translateY(-2px)}
   html[data-theme="dark"] .learnbar.make .lmark,html[data-theme="dark"] .learnbar.make .lr{background:#3a2a10;color:#fbbf24}
   html[data-theme="dark"] .learnbar.pub .lmark,html[data-theme="dark"] .learnbar.pub .lr{background:#2a2145;color:#c4b5fd}
   .pubbtn{background:#6d4fd6;box-shadow:0 3px 0 #4a2fb0} .pubbtn:hover{background:#5b3fb8;box-shadow:0 4px 0 #4a2fb0}
@@ -119,6 +122,31 @@
   .pubcard .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;margin-top:auto;align-items:center} .pubcard .meta b{color:var(--text)}
   .pubcard .meta .st{margin-left:auto;font-weight:800;color:#5b3fb8} .pubcard .meta .st.ingame{color:var(--muted)}
   .pubthumb{width:200px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:linear-gradient(120deg,#4a2fb0,#8b6cf0)}
+  .srvcreate{display:flex;align-items:center;gap:16px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:0;border-radius:20px;padding:20px 24px;color:#fff;
+    background:linear-gradient(120deg,#3b1f8f,#6d4fd6 55%,#8b6cf0);box-shadow:0 5px 0 #2a1668,0 16px 34px rgba(74,47,176,.35);position:relative;overflow:hidden;transition:transform .15s}
+  .srvcreate::after{content:'';position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.09);pointer-events:none}
+  .srvcreate:hover{transform:translateY(-2px)} .srvcreate:active{transform:translateY(2px);box-shadow:0 2px 0 #2a1668}
+  .srvcreate .sc-mark{flex:none;width:54px;height:54px;border-radius:16px;background:rgba(255,255,255,.16);display:grid;place-items:center} .srvcreate .sc-mark svg{width:26px;height:26px}
+  .srvcreate .sc-text{flex:1;min-width:0} .srvcreate .sc-text b{display:block;font-size:22px;letter-spacing:-.4px;line-height:1.15} .srvcreate .sc-text span{display:block;font-size:13.5px;color:rgba(255,255,255,.85);margin-top:3px}
+  .srvcreate .sc-go{flex:none;font-weight:800;font-size:14px;color:#5b3fb8;background:#fff;border-radius:99px;padding:10px 18px}
+  .srvlist{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+  .srvrow{display:grid;grid-template-columns:168px 1fr auto;gap:16px;align-items:center;width:100%;text-align:left;font-family:inherit;color:var(--text);padding:12px;border:1.5px solid var(--line);border-radius:18px;background:var(--raise);cursor:pointer;box-shadow:0 3px 0 var(--edge);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,border-color .15s}
+  .srvrow:hover{transform:translateY(-2px);border-color:#8b6cf0;box-shadow:0 5px 0 var(--edge),0 14px 30px rgba(74,47,176,.14)}
+  .srvrow .thumb{width:168px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;display:block;background:linear-gradient(120deg,#4a2fb0,#8b6cf0)}
+  .srvrow .thumb.txt{display:grid;place-items:center;color:#fff;font-size:30px;font-weight:800;letter-spacing:-.5px}
+  .srvrow .body{min-width:0} .srvrow .name{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;letter-spacing:-.3px;line-height:1.2}
+  .srvrow .live{width:9px;height:9px;border-radius:50%;background:#2bb673;box-shadow:0 0 0 0 rgba(43,182,115,.5);animation:livepulse 1.8s infinite;flex:none}
+  @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(43,182,115,.55)}70%{box-shadow:0 0 0 8px rgba(43,182,115,0)}100%{box-shadow:0 0 0 0 rgba(43,182,115,0)}}
+  .srvrow .desc{font-size:13.5px;color:var(--text);margin-top:2px;line-height:1.35}
+  .srvrow .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .srvrow .meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);margin-top:7px;align-items:center} .srvrow .meta b{color:var(--text)} .srvrow .meta .by{display:inline-flex;align-items:center;gap:5px}
+  .srvrow .right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:120px}
+  .srvrow .count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums} .srvrow .count b{color:var(--text);font-size:16px}
+  .srvrow .go{font-weight:800;font-size:14px;color:#fff;background:linear-gradient(120deg,#5b3fb8,#8b6cf0);border-radius:99px;padding:9px 20px;box-shadow:0 3px 0 #3b1f8f}
+  .srvrow .go.dim{background:var(--sunk);color:var(--muted);box-shadow:none} .srvrow .go.wake{background:linear-gradient(120deg,#b45309,#f59e0b);box-shadow:0 3px 0 #7c3a06}
+  .srvrow.asleep{opacity:.55;filter:grayscale(.7);cursor:default} .srvrow.asleep:hover{transform:none;border-color:var(--line);box-shadow:0 3px 0 var(--edge)} .srvrow.asleep.canwake{opacity:.9;filter:none;cursor:pointer}
+  .srvlist .empty{padding:28px 10px;text-align:center;color:var(--muted);font-size:14px}
+  @media (max-width:640px){ .srvrow{grid-template-columns:1fr;gap:10px} .srvrow .thumb{width:100%} .srvrow .right{flex-direction:row;align-items:center;justify-content:space-between;width:100%} }
   .tagrow{display:flex;flex-wrap:wrap;gap:6px} .tag{padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;font-family:inherit}
   .tag.on{background:#efe7ff;color:#5b3fb8;border-color:#8b6cf0} .tag.ro{cursor:default;padding:2px 8px;font-size:11px;background:#efe7ff;color:#5b3fb8;border-color:transparent}
   .pubcard .tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 14px}
@@ -1404,21 +1432,23 @@
 <div id="pub" class="screen" hidden>
   <div class="setup-wrap">
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Servers</b></div><button class="btn btn-secondary" id="pubBack" style="margin-left:auto">Back</button></div>
-    <div class="card">
-      <div class="prow2" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><div><h2 style="margin:0">Servers</h2><div class="rsub" id="pubSub" style="margin-top:4px">Loading…</div></div><button class="btn btn-primary pubbtn" id="pubCreateBtn">Create a server</button></div>
-      <div id="pubForm" hidden style="margin-top:14px;padding:16px;border:1.5px solid var(--line);border-radius:14px;background:var(--raise)">
-        <div class="label" style="margin-top:0">Server name</div>
-        <input class="tin" id="pubName" maxlength="32" placeholder="Friday night classics" autocomplete="off">
-        <div class="label">One line about it</div>
-        <input class="tin" id="pubDesc" maxlength="90" placeholder="Custom maps only, mostly Europe, chill" autocomplete="off">
-        <div class="label">Tags</div>
-        <div class="tagrow" id="pubTags"></div>
-        <div class="label">Thumbnail <span class="dim">(optional)</span></div>
-        <div class="prow2" style="flex-wrap:wrap"><img id="pubThumb" class="pubthumb" alt="" src="" hidden><button class="btn btn-secondary sm" id="pubThumbBtn">Choose an image</button><button class="btn btn-secondary sm" id="pubThumbClear" hidden>Remove</button><input type="file" id="pubThumbFile" accept="image/*" hidden></div>
-        <div class="rsub" style="margin-top:10px">The server stays on the list for good. You and anyone you add as a manager pick the mode, the map and whether games loop; whoever is in the room keeps it running even when you leave.</div>
-        <div class="twobtn"><button class="btn btn-primary pubbtn" id="pubGo">Create and open it</button><button class="btn btn-secondary" id="pubCancel">Cancel</button></div>
-      </div>
-      <div class="cmgrid" id="pubList" style="margin-top:14px"></div>
+    <button class="srvcreate" id="pubCreateBtn"><span class="sc-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="sc-text"><b>Create your own</b><span>Name it, tag it, set the mode and let it loop. It stays on this list for good.</span></span><span class="sc-go">New server</span></button>
+    <div class="card" id="pubForm" hidden style="margin-top:14px">
+      <h2 style="margin:0 0 4px">New server</h2>
+      <div class="label">Server name</div>
+      <input class="tin" id="pubName" maxlength="32" placeholder="Friday night classics" autocomplete="off">
+      <div class="label">One line about it</div>
+      <input class="tin" id="pubDesc" maxlength="90" placeholder="Custom maps only, mostly Europe, chill" autocomplete="off">
+      <div class="label">Tags <span class="dim">(up to four)</span></div>
+      <div class="tagrow" id="pubTags"></div>
+      <div class="label">Thumbnail <span class="dim">(optional)</span></div>
+      <div class="prow2" style="flex-wrap:wrap"><img id="pubThumb" class="pubthumb" alt="" src="" hidden><button class="btn btn-secondary sm" id="pubThumbBtn">Choose an image</button><button class="btn btn-secondary sm" id="pubThumbClear" hidden>Remove</button><input type="file" id="pubThumbFile" accept="image/*" hidden></div>
+      <div class="rsub" style="margin-top:10px">You and anyone you add as a manager pick the mode, the map and whether games loop. Whoever is in the room keeps it running after you leave.</div>
+      <div class="twobtn"><button class="btn btn-primary pubbtn" id="pubGo">Create and open it</button><button class="btn btn-secondary" id="pubCancel">Cancel</button></div>
+    </div>
+    <div class="card wide" style="margin-top:14px">
+      <div class="prow2" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><h2 style="margin:0">Server list</h2><span class="rsub" id="pubSub">Loading…</span></div>
+      <div class="srvlist" id="pubList"></div>
     </div>
   </div>
 </div>
@@ -2443,7 +2473,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-193954';
+const BUILD='20260918-194337';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2594,7 +2624,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:29};
+const VERSION={major:3,minor:5,patch:1};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3973,10 +4003,12 @@ function srvBars(rec){ if(!srvAlive(rec)) return 0; const age=Date.now()-(+rec.l
 function srvThumbOf(r){ return r.thumb?`<img class="thumb" src="${r.thumb}" alt="">`:`<div class="thumb txt">${esc((r.name||'?').trim().slice(0,2).toUpperCase())}</div>`; }
 function renderPub(){
   const list=Object.values(srv.list).sort((a,b)=>(srvAlive(b)?1:0)-(srvAlive(a)?1:0)||((b.live&&b.live.players)||0)-((a.live&&a.live.players)||0)||(b.made||0)-(a.made||0));
-  const live=list.filter(srvAlive).length;
-  $('pubSub').textContent=list.length?`${live} of ${list.length} server${list.length===1?'':'s'} up right now`:(lbLive()?'No servers yet. Create the first one.':'Connecting…');
-  $('pubList').innerHTML=list.map(r=>{ const alive=srvAlive(r); const l=r.live||{}; const ingame=alive&&l.phase!=='lobby'; const full=alive&&(l.players||0)>=MAX_PLAYERS; const st=r.settings||{}; const modeName=st.custom?st.custom.name:(MODES[st.mode]?MODES[st.mode].name:'Classic'); const canWake=!alive&&srvIsManager(r); const bars=srvBars(r);
-    return `<button class="pubcard ${alive?'':'asleep'} ${canWake?'canwake':''}" data-srv="${esc(r.code)}">${srvThumbOf(r)}<b>${esc(r.name)}</b>${r.desc?`<span class="desc">${esc(r.desc)}</span>`:''}${(r.tags||[]).length?`<span class="tags">${r.tags.map(t=>`<span class="tag ro">${esc(t)}</span>`).join('')}</span>`:''}<span class="by">${r.by&&r.by.k?faceOf(r.by.k,18):''}by ${esc(r.by&&r.by.name||'someone')}${alive&&l.hostName&&l.hostK!==(r.by&&r.by.k)?` · ${esc(l.hostName)} hosting`:''}</span><span class="meta"><span><b>${alive?(l.players||0):0}</b>/${MAX_PLAYERS} in</span><span>${esc(modeName)}${st.endless?' · looping':''}</span><span class="bars b${bars}" title="${alive?'Up':'Asleep'}"><i></i><i></i><i></i><i></i></span><span class="st ${ingame?'ingame':''} ${alive?'':'asleep'}">${!alive?(canWake?'Wake it':'Asleep'):ingame?'In a game · join':full?'Full':'Join'}</span></span></button>`; }).join('');
+  const live=list.filter(srvAlive).length, asleep=list.length-live;
+  $('pubSub').textContent=list.length?`${live} up${asleep?` · ${asleep} asleep`:''}`:(lbLive()?'':'Connecting…');
+  $('pubList').innerHTML=list.length?list.map(r=>{ const alive=srvAlive(r); const l=r.live||{}; const ingame=alive&&l.phase!=='lobby'; const full=alive&&(l.players||0)>=MAX_PLAYERS; const st=r.settings||{}; const modeName=st.custom?st.custom.name:(MODES[st.mode]?MODES[st.mode].name:'Classic'); const canWake=!alive&&srvIsManager(r); const bars=srvBars(r);
+    const go=!alive?(canWake?'<span class="go wake">Wake it</span>':'<span class="go dim">Asleep</span>'):full?'<span class="go dim">Full</span>':ingame?'<span class="go">Join mid-game</span>':'<span class="go">Join</span>';
+    return `<button class="srvrow ${alive?'':'asleep'} ${canWake?'canwake':''}" data-srv="${esc(r.code)}">${srvThumbOf(r)}<span class="body"><span class="name">${alive?'<i class="live"></i>':''}${esc(r.name)}</span>${r.desc?`<span class="desc">${esc(r.desc)}</span>`:''}${(r.tags||[]).length?`<span class="tags">${r.tags.map(t=>`<span class="tag ro">${esc(t)}</span>`).join('')}</span>`:''}<span class="meta"><span class="by">${r.by&&r.by.k?faceOf(r.by.k,18):''}by <b>${esc(r.by&&r.by.name||'someone')}</b></span>${alive&&l.hostName&&l.hostK!==(r.by&&r.by.k)?`<span>${esc(l.hostName)} hosting</span>`:''}<span><b>${esc(modeName)}</b>${st.time?` · ${st.time}s`:' · no limit'}${st.rounds&&!(MODES[st.mode]&&MODES[st.mode].duel)?` · ${st.rounds} rounds`:''}</span>${st.endless?'<span>↻ looping</span>':''}</span></span><span class="right"><span class="bars b${bars}" title="${alive?'Up':'Asleep'}"><i></i><i></i><i></i><i></i></span><span class="count"><b>${alive?(l.players||0):0}</b> / ${MAX_PLAYERS}</span>${go}</span></button>`; }).join('')
+    :`<div class="empty">${lbLive()?'No servers yet. Be the first: create your own above.':'Connecting to the servers…'}</div>`;
   if($('pubCount')) $('pubCount').textContent=live?`${live} up`:'Open';
 }
 async function openPub(){
@@ -3988,7 +4020,7 @@ function paintTags(){ $('pubTags').innerHTML=SRV_TAGS.map(t=>`<button type="butt
 $('pubTags').addEventListener('click',e=>{ const b=e.target.closest('[data-tag]'); if(!b) return; const t=b.dataset.tag; if(srv.tags.has(t)) srv.tags.delete(t); else if(srv.tags.size<4) srv.tags.add(t); paintTags(); sfx('click'); });
 $('pubBar').addEventListener('click',openPub);
 $('pubBack').addEventListener('click',()=>{ clearInterval(srv.timer); show('menu'); });
-$('pubCreateBtn').addEventListener('click',()=>{ if(!acct.key) return needAcct('create a server'); $('pubForm').hidden=!$('pubForm').hidden; if(!$('pubForm').hidden){ paintTags(); $('pubName').focus(); } });
+$('pubCreateBtn').addEventListener('click',()=>{ if(!acct.key) return needAcct('create a server'); $('pubForm').hidden=!$('pubForm').hidden; if(!$('pubForm').hidden){ paintTags(); $('pubName').focus(); $('pubForm').scrollIntoView({block:'nearest'}); } });
 $('pubCancel').addEventListener('click',()=>{ $('pubForm').hidden=true; });
 $('pubThumbBtn').addEventListener('click',()=>$('pubThumbFile').click());
 $('pubThumbClear').addEventListener('click',()=>{ srv.thumb=null; $('pubThumb').hidden=true; $('pubThumbClear').hidden=true; });
