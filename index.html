@@ -1594,6 +1594,7 @@
         <div id="mpRoundsBox">
         <div class="label">Rounds</div>
         <div class="seg" id="mpRoundSeg"><button data-r="5" class="on">5</button><button data-r="10">10</button><button data-r="custom">Custom</button></div>
+        <div class="adminrow" id="srvLoopRow" hidden style="margin-top:12px"><span><b>Loop games</b><span class="rsub" style="display:inline;margin-left:10px">When a game ends the next one starts by itself.</span></span><label class="switch" id="srvLoopSw"><input type="checkbox" id="srvLoop"><i></i></label></div>
         <div class="custom-row" id="mpRoundCustom" hidden><input type="range" min="1" max="100" value="20"><input type="number" min="1" max="100" value="20"><span>rounds</span></div>
         </div>
       <div class="label">Where in the world</div>
@@ -1616,7 +1617,6 @@
     <div class="card" id="srvTools" hidden>
       <h2 style="margin:0 0 4px">Server</h2>
       <div class="rsub" id="srvToolsSub"></div>
-      <div class="adminrow" style="margin-top:12px"><span><b>Loop games</b><span class="rsub" style="display:inline;margin-left:10px">After a game ends, the next one starts on its own.</span></span><label class="switch" id="srvLoopSw"><input type="checkbox" id="srvLoop"><i></i></label></div>
       <div class="label">Managers</div>
       <div class="rsub" id="srvMgrs"></div>
       <div class="prow2" style="margin-top:8px"><input class="tin" id="srvMgrIn" placeholder="handle" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="srvMgrAdd">Add manager</button></div>
@@ -2473,7 +2473,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-194412';
+const BUILD='20260918-195523';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2624,7 +2624,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:5,patch:2};
+const VERSION={major:3,minor:5,patch:3};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4006,7 +4006,7 @@ function renderPub(){
   const live=list.filter(srvAlive).length, asleep=list.length-live;
   $('pubSub').textContent=list.length?`${live} up${asleep?` · ${asleep} asleep`:''}`:(lbLive()?'':'Connecting…');
   $('pubList').innerHTML=list.length?list.map(r=>{ const alive=srvAlive(r); const l=r.live||{}; const ingame=alive&&l.phase!=='lobby'; const full=alive&&(l.players||0)>=MAX_PLAYERS; const st=r.settings||{}; const modeName=st.custom?st.custom.name:(MODES[st.mode]?MODES[st.mode].name:'Classic'); const canWake=!alive&&srvIsManager(r); const bars=srvBars(r);
-    const go=!alive?(canWake?'<span class="go wake">Wake it</span>':'<span class="go dim">Asleep</span>'):full?'<span class="go dim">Full</span>':ingame?'<span class="go">Join mid-game</span>':'<span class="go">Join</span>';
+    const go=!alive?(canWake?'<span class="go wake">Wake it</span>':'<span class="go dim">Asleep</span>'):full?'<span class="go dim">Full</span>':ingame?'<span class="go">Join · next round</span>':'<span class="go">Join</span>';
     return `<button class="srvrow ${alive?'':'asleep'} ${canWake?'canwake':''}" data-srv="${esc(r.code)}">${srvThumbOf(r)}<span class="body"><span class="name">${alive?'<i class="live"></i>':''}${esc(r.name)}</span>${r.desc?`<span class="desc">${esc(r.desc)}</span>`:''}${(r.tags||[]).length?`<span class="tags">${r.tags.map(t=>`<span class="tag ro">${esc(t)}</span>`).join('')}</span>`:''}<span class="meta"><span class="by">${r.by&&r.by.k?faceOf(r.by.k,18):''}by <b>${esc(r.by&&r.by.name||'someone')}</b></span>${alive&&l.hostName&&l.hostK!==(r.by&&r.by.k)?`<span>${esc(l.hostName)} hosting</span>`:''}<span><b>${esc(modeName)}</b>${st.time?` · ${st.time}s`:' · no limit'}${st.rounds&&!(MODES[st.mode]&&MODES[st.mode].duel)?` · ${st.rounds} rounds`:''}</span>${st.endless?'<span>↻ looping</span>':''}</span></span><span class="right"><span class="bars b${bars}" title="${alive?'Up':'Asleep'}"><i></i><i></i><i></i><i></i></span><span class="count"><b>${alive?(l.players||0):0}</b> / ${MAX_PLAYERS}</span>${go}</span></button>`; }).join('')
     :`<div class="empty">${lbLive()?'No servers yet. Be the first: create your own above.':'Connecting to the servers…'}</div>`;
   if($('pubCount')) $('pubCount').textContent=live?`${live} up`:'Open';
@@ -4086,7 +4086,8 @@ function paintLobbyPub(){
   if(on){ const mgrs=(info.managers||[]).length; el.innerHTML=`<b>${esc(info.name)}</b><span class="line">${esc(info.desc||'')}${info.desc?' · ':''}by ${esc(info.by&&info.by.name||'someone')}${mgrs?' and '+mgrs+' manager'+(mgrs===1?'':'s'):''}${mp.settings.endless?' · looping':''}</span>${(info.tags||[]).map(t=>`<span class="tag ro">${esc(t)}</span>`).join('')}`; }
   const lockIt=on&&mp.role==='host'&&!hostMgr;
   for(const id of ['lobbySettings','lobbyModes']){ const c=$(id); if(c) c.classList.toggle('locked',lockIt); }
-  $('srvTools').hidden=!hostMgr;
+  $('srvTools').hidden=!hostMgr; $('srvLoopRow').hidden=!hostMgr;
+  const cb=document.querySelector('#lobby .code-box'); if(cb) cb.hidden=on;   // a server is joined from the list, not by code
   if(hostMgr){ const rec=srv.cur; $('srvToolsSub').textContent=`You manage ${rec.name}. Your mode, map, time and rounds are saved on the server; whoever hosts later runs them.`; $('srvLoop').checked=!!mp.settings.endless; $('srvLoopSw').classList.toggle('on',!!mp.settings.endless);
     const names=[rec.by&&rec.by.name?rec.by.name+' (creator)':'', ...(rec.managers||[]).map(k=>'@'+k)].filter(Boolean); $('srvMgrs').textContent=names.join(', '); $('srvDelete').hidden=!(admin.on||(rec.by&&rec.by.k===acct.key)); }
 }
@@ -5538,7 +5539,8 @@ function connFailed(why){
 }
 
 /* ----- host side ----- */
-function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,k:p.k||'',score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null,hp:p.hp??null})); }
+function roundPlayers(){ return alivePlayers().filter(p=>!(p.late!=null&&p.late>=state.round)); }   // everyone who was in when the round began
+function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,k:p.k||'',late:p.late??null,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null,hp:p.hp??null})); }
 /* The wire form of a location: everything a guest needs to load and score it, nothing else. */
 function locPayload(l){ return {pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,pitch:l.pitch||0,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,pol:l.pol,key:l.key,from:l.from,fresh:l.fresh}; }
 /* A duel has no fixed length, so the host keeps finding spots a few rounds ahead and hands them over as it goes. */
@@ -5573,7 +5575,14 @@ function hostOnMessage(from,m,link){
   if(!from) return;
   if(m.t==='hello'){
     if(mp.players[from]){ mp.players[from].link=link||mp.players[from].link; mp.seen[from]=Date.now(); mpSendTo(from,{t:'welcome'}); hostSync(); return; }
-    if(mp.phase!=='lobby'){ mpSendTo(from,{t:'reject',why:'That game is already in progress.'}); return; }
+    if(mp.phase!=='lobby'){
+      if(!srv.cur||mp.settings.kind==='duo'||playerList().length>=MAX_PLAYERS){ mpSendTo(from,{t:'reject',why:'That game is already in progress.'}); return; }
+      // a server mid-game: they come in now and play from the next round
+      const taken=new Set(playerList().map(p=>p.color).filter(c=>c!==null)); const c=COLORS.findIndex((_,i)=>!taken.has(i)); const gm=modeOf(mp.settings.mode);
+      mp.players[from]={id:from,name:String(m.name||'').slice(0,16)||('Player '+(playerList().length+1)),color:c<0?0:c,face:false,score:gm.bet?1000:0,host:false,vpeer:m.vpeer||null,link,k:acctKey(m.k||''),late:state.round,lives:gm.lives||null,out:false,hp:gm.duel?DUEL_HP:undefined};
+      mp.seen[from]=Date.now(); mpSendTo(from,{t:'welcome'});
+      mpSendTo(from,{t:'late',settings:mp.settings,locs:state.locs.slice(0,mp.sentUpTo+1).filter(l=>l&&!(l instanceof Error)).map(locPayload),players:pubPlayers(),round:state.round,phase:mp.phase});
+      mpBroadcast({t:'players',players:pubPlayers()}); updateStrip(); voiceConnect(); return; }
     const cap=mp.settings.kind==='duo'?2:MAX_PLAYERS;
     if(playerList().length>=cap){ mpSendTo(from,{t:'reject',why:cap===2?'That duo already has its two players.':`That game is full (${MAX_PLAYERS} players).`}); return; }
     mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link,k:acctKey(m.k||'')};
@@ -5608,7 +5617,7 @@ function hostOnMessage(from,m,link){
     mp.guesses[from]=(gm.slider||gm.choice)?(m.choice!=null?{choice:m.choice}:null)
       :m.guess?{lat:m.guess.lat,lng:m.guess.lng,left:m.left,bet:m.bet,country:m.guess.country||null}:(m.pick!=null?{pick:m.pick,bet:m.bet}:(gm.bet?{bet:m.bet||1}:null));
     if(gm.blind){ for(const p of alivePlayers()) mp.guesses[p.id]=mp.guesses[from]; }   // one pin for the pair
-    mpBroadcast({t:'guessed',id:from,n:Object.keys(mp.guesses).length,total:alivePlayers().length}); updateStrip(); updateWaitList();
+    mpBroadcast({t:'guessed',id:from,n:Object.keys(mp.guesses).length,total:roundPlayers().length}); updateStrip(); updateWaitList();
     if(gm.duel&&Object.keys(mp.guesses).length===1&&alivePlayers().length>1){ const secs=15; mpBroadcast({t:'hurry',secs}); hurryLocal(secs);
       if(mp.deadline) clearTimeout(mp.deadline); mp.deadline=setTimeout(()=>{ for(const p of alivePlayers()) if(mp.guesses[p.id]===undefined) mp.guesses[p.id]=null; hostReveal(); },(secs+3)*1000); }
     hostCheckRound();
@@ -5616,7 +5625,7 @@ function hostOnMessage(from,m,link){
 }
 function hostCheckRound(){
   if(mp.phase!=='round') return;
-  const ids=alivePlayers().map(p=>p.id);
+  const ids=roundPlayers().map(p=>p.id);
   if(ids.length&&ids.every(id=>mp.guesses[id]!==undefined)) hostReveal();
 }
 function hostReveal(){
@@ -5625,7 +5634,7 @@ function hostReveal(){
   const loc=state.locs[state.round-1]; const truth={lat:loc.lat,lng:loc.lng};
   const mm=modeOf(mp.settings.mode); const cd=mm.countdown;
   const tf=mm.country?countryAt(truth.lat,truth.lng):null; const tn=tf?tf.properties.name:null;
-  const results=alivePlayers().map(p=>{ const g=mp.guesses[p.id]||null;
+  const results=roundPlayers().map(p=>{ const g=mp.guesses[p.id]||null;
     if(mm.country){ const ok=!!(g&&g.country&&tn&&g.country===tn); const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:g&&g.country?{lat:g.lat,lng:g.lng}:null,country:g?g.country||null:null,ok,km:null,pts,total:p.score}; }
     if(mm.slider){ const sel=g&&g.choice!=null?g.choice:null; const err=sel==null?null:Math.abs(sel-loc.tempF); const pts=err==null?0:tempScore(err); p.score+=pts;
       return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:null,sel,err,km:null,pts,total:p.score}; }
@@ -5732,12 +5741,16 @@ function guestOnMessage(m){
   else if(m.t==='cancel'){ if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=true; }
   else if(m.t==='start'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; mp.me.color=mp.players[mp.me.id].color; mp.phase='round'; mpStartGameLocal(m.settings,m.locs); }
   else if(m.t==='round'){ if(m.add) for(const a of m.add) state.locs[a.i]=a.loc; mp.phase='round'; mpRound(); }
+  else if(m.t==='late'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mp.settings=m.settings; if(m.settings&&m.settings.srv&&!(srv.cur&&srv.cur.code===mp.code)) srvGet(mp.code).then(r=>{ if(r) srv.cur=r; }); mpLateJoinLocal(m); }
+  else if(m.t==='players'){ for(const p of m.players){ const old=mp.players[p.id]; mp.players[p.id]=old?{...old,...p}:p; } for(const id of Object.keys(mp.players)) if(!m.players.some(p=>p.id===id)) delete mp.players[id]; updateStrip(); updateWaitList(); if(!$('lobby').hidden) renderLobby(); }
   else if(m.t==='hurry'){ hurryLocal(m.secs||15); }
   else if(m.t==='guessed'){ mp.guesses[m.id]=true; updateStrip(); updateWaitList(m.n,m.total); }
   else if(m.t==='pin'){ if(m.id!==mp.me.id) peekShow(m.id,m.lat,m.lng); }
   else if(m.t==='av'){ avSet(m.id,m.av||null); if(okColor(m.col)) colCache[m.id]=m.col; else delete colCache[m.id]; renderLobby(); updateStrip(); }
   else if(m.t==='avall'){ if(m.map&&typeof m.map==='object') for(const k of Object.keys(m.map)){ if(k!==mp.me.id&&typeof m.map[k]==='string') avSet(k,m.map[k]); } if(m.cols&&typeof m.cols==='object') for(const k of Object.keys(m.cols)){ if(okColor(m.cols[k])) colCache[k]=m.cols[k]; } renderLobby(); updateStrip(); }
-  else if(m.t==='reveal'){ if(m.add) for(const a of m.add) state.locs[a.i]=a.loc; mp.phase='reveal'; showResultMP(m); }
+  else if(m.t==='reveal'){ if(m.add) for(const a of m.add) state.locs[a.i]=a.loc; mp.phase='reveal';
+    const me=mp.players[mp.me.id]; if(me&&me.late!=null&&me.late>=(m.round||state.round)){ $('waitOverlay').hidden=false; $('waitTxt').textContent=`Round ${m.round||state.round} just ended for the others. You play from the next one.`; return; }
+    showResultMP(m); }
   else if(m.t==='final'){ showFinalMP(m); }
   else if(m.t==='lobby-return'){ mpToLobby(); }
 }
@@ -5761,10 +5774,19 @@ async function mpStartGameLocal(settings,locs){
   show('game'); $('hudBrand').hidden=true; $('strip').hidden=false; $('waitOverlay').hidden=true; updateStrip();
   mpRound();
 }
+/* joined a server while a game was running: set up the game and wait for the next round */
+async function mpLateJoinLocal(m){
+  const settings=m.settings; state.mode=settings.mode||'classic'; state.custom=settings.custom||null; state.startedAt=Date.now();
+  resetGameState(); state.timeLimit=settings.time; state.totalRounds=modeOf(state.mode).duel?99:settings.rounds; state.locs=(m.locs||[]).map(l=>({...l}));
+  state.nomove=!!settings.nomove; state.lock=!!settings.lock; mp.guesses={}; mp.revs=[]; mp.phase=m.phase; state.round=m.round;
+  const mm=modeOf(state.mode); if(mm.country){ try{ await loadGeo(); ensureCountryLayer(); }catch(e){} }
+  show('game'); $('hudBrand').hidden=true; $('strip').hidden=false; updateStrip();
+  $('waitOverlay').hidden=false; $('waitTxt').textContent=`You're in. Round ${m.round} is running for the others, you play from the next one.`; updateWaitList();
+}
 async function mpRound(){
   mp.phase='round'; mp.guesses={}; $('waitOverlay').hidden=true; updateStrip(); peekClear();
   await nextRound();
-  if(mp.role==='host' && state.timeLimit){ if(mp.deadline) clearTimeout(mp.deadline); mp.deadline=setTimeout(()=>{ for(const p of alivePlayers()) if(mp.guesses[p.id]===undefined) mp.guesses[p.id]=null; hostReveal(); },(state.timeLimit+4)*1000); }
+  if(mp.role==='host' && state.timeLimit){ if(mp.deadline) clearTimeout(mp.deadline); mp.deadline=setTimeout(()=>{ for(const p of roundPlayers()) if(mp.guesses[p.id]===undefined) mp.guesses[p.id]=null; hostReveal(); },(state.timeLimit+4)*1000); }
 }
 function mpSubmitGuess(){
   const g=state.guess?{lat:state.guess.lat,lng:state.guess.lng,country:state.guess.country||undefined}:null;

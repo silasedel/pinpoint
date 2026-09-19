@@ -127,7 +127,9 @@ The purple bar on the home page. A server is a room that stays on the list for g
 
 **Managers.** The creator, plus anyone they add by handle in the lobby's Server card. Only a manager who is hosting can change the mode, map, time and rounds, and those changes are saved to the server. A non-manager who ends up hosting sees the settings locked and runs the saved ones. The creator (or admin) can delete the server.
 
-**Loop games.** A manager switch. After a game ends the final screen counts down twenty seconds and the next game starts on its own with the same settings, as long as two people are in.
+**Loop games.** A switch under Rounds, for a manager who is hosting. After a game ends the final screen counts down twenty seconds and the next game starts on its own with the same settings, as long as two people are in.
+
+**Joining.** A server lobby has no room code (you got there from the list) and shows who is in. Join while a game is running and you land straight in the game: the host adds you with a color and a zero score, you see the current round's wait screen ("Round 3 is running for the others, you play from the next one"), that round's reveal skips you, and you play from the next round. Round checks only count the players who were in when the round began, so a late joiner never holds up a reveal.
 
 **It stays up without you.** When the host leaves, the room is handed to someone still in it (a manager first, otherwise the earliest player): they become host with the same code and settings, everyone else reconnects in a few seconds, and the list never shows a gap. A host that vanishes without saying so is noticed within 30 s and the same handover happens. With nobody left the server goes to sleep: it stays listed, gray, and only a manager can wake it (their click opens it fresh with the saved settings).
 
