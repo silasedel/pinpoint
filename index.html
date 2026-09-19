@@ -898,6 +898,7 @@
   .rrow .pn{font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .rrow .rd{color:var(--muted);font-size:13px}
   .rrow .rp{font-weight:800;min-width:56px;text-align:right}
+  .rrow.lives .rp{min-width:auto;display:inline-flex;align-items:center}
   .rrow .rt{color:var(--muted);font-size:12px;min-width:70px;text-align:right}
   .rrow .pos{color:var(--muted);width:20px;font-weight:700}
   .rrow.first .pos{color:#a06d00}
@@ -2379,7 +2380,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-175338';
+const BUILD='20260918-190748';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2530,7 +2531,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:26};
+const VERSION={major:3,minor:4,patch:27};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -5689,7 +5690,16 @@ function showResultMP(rev){
     $('roundRank').innerHTML=''; return; }
   if(rev.duel){ const me=mp.players[mp.me.id], them=playerList().find(p=>p.id!==mp.me.id); const hp=p=>Math.max(0,(p&&p.hp)??DUEL_HP).toLocaleString();
     $('leaderLine').innerHTML=`<span class="crown" style="background:var(--green-soft);color:var(--green-dark)">You · <b>${hp(me)} HP</b></span><span>${them?esc(them.name)+' · <b>'+hp(them)+' HP</b>':''}</span><span>Round ${rev.round} · damage ×${rev.duel.mult}</span>`; }
+  else if(modeOf(state.mode).elim){   // knockout modes: nobody cares about points, only who is still in and how many lives they have
+    const total=modeOf(state.mode).lives||0; const alive=rev.results.filter(r=>!r.out); const me=rev.results.find(r=>r.id===mp.me.id); const myLives=me?(total?Math.max(0,me.lives??0):(me.out?0:1)):0;
+    $('leaderLine').innerHTML=`<span class="crown" style="background:var(--green-soft);color:var(--green-dark)">${alive.length} of ${rev.results.length} still standing</span><span>${me&&me.out?'You\'re out':total?`You have ${heartRow(myLives,total,false,16)}`:'You\'re still in'}</span>`; }
   else $('leaderLine').innerHTML=`<span class="crown"><span class="sw" style="${swStyle(lead)}"></span>${tied?'Tied for the lead':'🏆 '+esc(lead.name)+' leads'} · ${lead.total.toLocaleString()}</span><span>You're <b>${ord(myPos)}</b> of ${overall.length}${rev.round<state.totalRounds?` · ${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:''}</span>`;
+  if(modeOf(state.mode).elim){
+    const total=modeOf(state.mode).lives||0;
+    const lv=r=>r.out?-1:(total?(r.lives??total):1);
+    const sorted=rev.results.slice().sort((a,b)=>lv(b)-lv(a)||(a.km??1e9)-(b.km??1e9));
+    $('roundRank').innerHTML=elimBanner(rev)+sorted.map((r,i)=>`<div class="rrow lives ${r.id===mp.me.id?'me':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd dim">${r.guess?fmtDist(r.km):'no guess'}</span><span class="rp">${total?heartRow(r.out?0:Math.max(0,r.lives??total),total,!!r.out,18):(r.out?'<span class="dim">out</span>':'<span style="color:var(--green)">in</span>')}</span></div>`).join('');
+    return; }
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
   $('roundRank').innerHTML=elimBanner(rev)+duelBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out||r.lives!=null?' '+heartRow(r.lives??0,modeOf(state.mode).lives||3,!!r.out,14):''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
 }
