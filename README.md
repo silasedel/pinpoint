@@ -181,7 +181,7 @@ A picker reached from the solo setup screen and the multiplayer lobby: six conti
 
 ## Copy image
 
-The Copy image button renders the spot as four 90° views in one PNG. The export takes on the mode's look: Grayscale copies come out gray, Pixelated copies come out blocky at the same scale as the round you're playing.
+The Copy image button renders the spot as four 90° views in one PNG. The export takes on the mode's look: Grayscale copies come out gray, Pixelated copies come out blocky, 64 blocks across each view, chunkier than the round itself so the pixels still read at full size.
 
 ## Feel and rules
 

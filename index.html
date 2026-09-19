@@ -2474,7 +2474,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-203552';
+const BUILD='20260918-205828';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2625,7 +2625,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:5,patch:7};
+const VERSION={major:3,minor:5,patch:8};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4952,9 +4952,10 @@ async function buildCopyImage(pano){
   return c;
 }
 /* The copy should look like the round you're playing: gray stays gray, pixelated stays blocky. */
+const PIX_COPY_W=64;   // blocks across one 1200 px view, about 19 px each
 function modeLook(ctx,canvas,x,y,m){
   if(state.mode==='pixel'){
-    const bw=Math.round(VIEW_W/9), bh=Math.round(VIEW_H/9);   // same blockiness as the in-game canvas
+    const bw=PIX_COPY_W, bh=Math.round(PIX_COPY_W*VIEW_H/VIEW_W);   // chunkier than the in-game canvas so the blocks read at full size
     const tmp=document.createElement('canvas'); tmp.width=bw; tmp.height=bh;
     tmp.getContext('2d').drawImage(canvas,x,y,VIEW_W,VIEW_H,0,0,bw,bh);
     ctx.imageSmoothingEnabled=false; ctx.drawImage(tmp,0,0,bw,bh,x,y,VIEW_W,VIEW_H); ctx.imageSmoothingEnabled=true;
