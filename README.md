@@ -119,9 +119,19 @@ Delete account sits beside Sign out: it explains what goes (name, photo, passcod
 
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
-## Public lobbies
+## Servers
 
-The purple bar on the home page. Anyone can see the open rooms and walk into one; creating one needs an account. Create a public lobby asks for a name, one line about it and an optional thumbnail, then opens a normal room with you as host (voice, chat, modes and custom maps all as usual), with a purple line in the lobby saying it is public. The room is one retained message on the brokers (`worlddrop/v1/pub/<code>`: name, line, thumbnail, host, how many are in, the mode, whether a game is running) that the host refreshes every 20 s and on every change, and clears when the room closes; anything not refreshed in 90 s drops off the list. The list refreshes every 10 s while open, shows in-lobby rooms first, and a room that is mid-game or full says so instead of Join. The home bar shows how many are open.
+The purple bar on the home page. A server is a room that stays on the list for good. Anyone can see them and walk into one that is up; creating one needs an account. Create a server asks for a name, one line about it, up to four tags (Quick, Blitz, Long, Chill, Custom maps, Hard, Beginners, Voice) and an optional thumbnail, then opens a normal room with you hosting, with a purple badge in the lobby naming the server.
+
+**What is saved.** One retained message per server (`worlddrop/v1/srv/<code>`): name, line, tags, thumbnail, creator, managers, and the settings (mode, custom map, time, rounds, region, camera, loop), plus a live block the acting host refreshes every 20 s and on every change: who is hosting, how many are in, whether a game is running. The code is fixed for the server's life.
+
+**Managers.** The creator, plus anyone they add by handle in the lobby's Server card. Only a manager who is hosting can change the mode, map, time and rounds, and those changes are saved to the server. A non-manager who ends up hosting sees the settings locked and runs the saved ones. The creator (or admin) can delete the server.
+
+**Loop games.** A manager switch. After a game ends the final screen counts down twenty seconds and the next game starts on its own with the same settings, as long as two people are in.
+
+**It stays up without you.** When the host leaves, the room is handed to someone still in it (a manager first, otherwise the earliest player): they become host with the same code and settings, everyone else reconnects in a few seconds, and the list never shows a gap. A host that vanishes without saying so is noticed within 30 s and the same handover happens. With nobody left the server goes to sleep: it stays listed, gray, and only a manager can wake it (their click opens it fresh with the saved settings).
+
+**The list.** Each card: thumbnail or big initials, name, line, tags, the creator (and who is hosting right now if that is someone else), how many are in out of 20, the mode or custom map and whether it loops, four signal bars for how fresh the host's heartbeat is (green 4 under 15 s, 3 under 40 s, orange 2 under 90 s, red 1 when your own broker link is down, none when asleep), and Join, In a game · join, Full, Asleep or Wake it. It refreshes every 10 s while open, and the home bar says how many servers are up.
 
 ## What needs an account
 

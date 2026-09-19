@@ -119,6 +119,17 @@
   .pubcard .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;margin-top:auto;align-items:center} .pubcard .meta b{color:var(--text)}
   .pubcard .meta .st{margin-left:auto;font-weight:800;color:#5b3fb8} .pubcard .meta .st.ingame{color:var(--muted)}
   .pubthumb{width:200px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:linear-gradient(120deg,#4a2fb0,#8b6cf0)}
+  .tagrow{display:flex;flex-wrap:wrap;gap:6px} .tag{padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer;font-family:inherit}
+  .tag.on{background:#efe7ff;color:#5b3fb8;border-color:#8b6cf0} .tag.ro{cursor:default;padding:2px 8px;font-size:11px;background:#efe7ff;color:#5b3fb8;border-color:transparent}
+  .pubcard .tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 14px}
+  .pubcard.asleep{opacity:.55;filter:grayscale(.6)} .pubcard.asleep:hover{border-color:var(--line)} .pubcard.asleep.canwake{opacity:.8;filter:none;cursor:pointer}
+  .bars{display:inline-flex;align-items:flex-end;gap:2px;height:14px;margin-left:auto} .bars i{width:4px;background:var(--line);border-radius:1px} .bars i:nth-child(1){height:5px} .bars i:nth-child(2){height:8px} .bars i:nth-child(3){height:11px} .bars i:nth-child(4){height:14px}
+  .bars.b4 i,.bars.b3 i:nth-child(-n+3),.bars.b2 i:nth-child(-n+2),.bars.b1 i:nth-child(1){background:#2bb673} .bars.b1 i:nth-child(1){background:#e63946} .bars.b2 i:nth-child(-n+2){background:#f4772a}
+  .pubcard .meta .st.asleep{color:var(--muted)}
+  .srvbadge{margin:-8px 0 12px;padding:12px 16px;border-radius:14px;background:#efe7ff;color:#3b2a7a;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .srvbadge b{font-size:15px;color:#5b3fb8} .srvbadge .line{flex:1;min-width:160px;font-size:13.5px} .srvbadge .ro{background:#fff}
+  html[data-theme="dark"] .srvbadge{background:#2a2145;color:#e0d7ff} html[data-theme="dark"] .srvbadge .ro{background:#3a2f66;color:#e0d7ff}
+  .locked{opacity:.55;pointer-events:none}
   .wbar{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:1.5px solid var(--line);border-radius:14px;
     padding:14px 18px;margin-top:14px;background:var(--card);color:var(--text);font-weight:800;font-size:15px;transition:border-color .15s,transform .15s}
   .wbar:hover{border-color:var(--green);transform:translateY(-1px)}
@@ -1156,7 +1167,7 @@
     </button>
     <button class="learnbar pub" id="pubBar">
       <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 19c0-3.4 2.9-5.5 6.5-5.5s6.5 2.1 6.5 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 13.6c3 .1 6 1.9 6 5.4"/></svg></span>
-      <span class="ll"><b>Public lobbies</b><span>Open rooms anyone can walk into. Start one with a name and a line about it, or join whoever is playing right now.</span></span>
+      <span class="ll"><b>Servers</b><span>Rooms that stay up. Pick one and play with whoever is there, or start your own and set it looping.</span></span>
       <span class="lr" id="pubCount">Open</span>
     </button>
     <button class="dailybtn" id="dailyBtn">
@@ -1392,18 +1403,20 @@
 </div>
 <div id="pub" class="screen" hidden>
   <div class="setup-wrap">
-    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Public lobbies</b></div><button class="btn btn-secondary" id="pubBack" style="margin-left:auto">Back</button></div>
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Servers</b></div><button class="btn btn-secondary" id="pubBack" style="margin-left:auto">Back</button></div>
     <div class="card">
-      <div class="prow2" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><div><h2 style="margin:0">Open rooms</h2><div class="rsub" id="pubSub" style="margin-top:4px">Loading…</div></div><button class="btn btn-primary pubbtn" id="pubCreateBtn">Create a public lobby</button></div>
+      <div class="prow2" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><div><h2 style="margin:0">Servers</h2><div class="rsub" id="pubSub" style="margin-top:4px">Loading…</div></div><button class="btn btn-primary pubbtn" id="pubCreateBtn">Create a server</button></div>
       <div id="pubForm" hidden style="margin-top:14px;padding:16px;border:1.5px solid var(--line);border-radius:14px;background:var(--raise)">
-        <div class="label" style="margin-top:0">Lobby name</div>
+        <div class="label" style="margin-top:0">Server name</div>
         <input class="tin" id="pubName" maxlength="32" placeholder="Friday night classics" autocomplete="off">
         <div class="label">One line about it</div>
         <input class="tin" id="pubDesc" maxlength="90" placeholder="Custom maps only, mostly Europe, chill" autocomplete="off">
+        <div class="label">Tags</div>
+        <div class="tagrow" id="pubTags"></div>
         <div class="label">Thumbnail <span class="dim">(optional)</span></div>
         <div class="prow2" style="flex-wrap:wrap"><img id="pubThumb" class="pubthumb" alt="" src="" hidden><button class="btn btn-secondary sm" id="pubThumbBtn">Choose an image</button><button class="btn btn-secondary sm" id="pubThumbClear" hidden>Remove</button><input type="file" id="pubThumbFile" accept="image/*" hidden></div>
-        <div class="rsub" style="margin-top:10px">Anyone can join while it is open. Voice and text chat work like any room, and you host it.</div>
-        <div class="twobtn"><button class="btn btn-primary pubbtn" id="pubGo">Create and open the lobby</button><button class="btn btn-secondary" id="pubCancel">Cancel</button></div>
+        <div class="rsub" style="margin-top:10px">The server stays on the list for good. You and anyone you add as a manager pick the mode, the map and whether games loop; whoever is in the room keeps it running even when you leave.</div>
+        <div class="twobtn"><button class="btn btn-primary pubbtn" id="pubGo">Create and open it</button><button class="btn btn-secondary" id="pubCancel">Cancel</button></div>
       </div>
       <div class="cmgrid" id="pubList" style="margin-top:14px"></div>
     </div>
@@ -1525,7 +1538,7 @@
 <div id="lobby" class="screen" hidden>
   <div class="lobby-wrap">
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="leaveBtn" style="margin-left:auto">Leave</button></div>
-    <div class="rsub" id="lobbyPub" hidden style="margin:-8px 0 12px;padding:10px 14px;border-radius:12px;background:#efe7ff;color:#5b3fb8;font-weight:600"></div>
+    <div id="lobbyPub" class="srvbadge" hidden></div>
     <div class="code-box"><div class="cb-code"><small>Code</small><b id="roomCode">····</b></div><div class="cb-actions"><button class="btn btn-secondary" id="copyLink">Copy invite link</button><button class="btn btn-secondary" id="copyCode">Copy code</button><span class="invitebox"><button class="btn btn-secondary" id="inviteBtn">Invite friends</button><div class="invitelist" id="inviteList" hidden></div></span></div><div class="conn" id="connBox" hidden style="flex-basis:100%;margin:0"></div><div id="roomUrl" hidden></div></div>
     <div class="lobby-grid">
       <div class="card">
@@ -1569,6 +1582,15 @@
         </div>
         <button class="btn btn-primary start-big" id="mpStartBtn">Start Classic game</button>
       </div>
+    </div>
+    <div class="card" id="srvTools" hidden>
+      <h2 style="margin:0 0 4px">Server</h2>
+      <div class="rsub" id="srvToolsSub"></div>
+      <div class="adminrow" style="margin-top:12px"><span><b>Loop games</b><span class="rsub" style="display:inline;margin-left:10px">After a game ends, the next one starts on its own.</span></span><label class="switch" id="srvLoopSw"><input type="checkbox" id="srvLoop"><i></i></label></div>
+      <div class="label">Managers</div>
+      <div class="rsub" id="srvMgrs"></div>
+      <div class="prow2" style="margin-top:8px"><input class="tin" id="srvMgrIn" placeholder="handle" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="srvMgrAdd">Add manager</button></div>
+      <div class="twobtn"><button class="btn btn-secondary sm danger" id="srvDelete" hidden>Delete this server</button></div>
     </div>
     <div class="card modes" id="lobbyModes" hidden>
       <h3>Game mode</h3>
@@ -2421,7 +2443,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-193044';
+const BUILD='20260918-193954';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2572,7 +2594,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:28};
+const VERSION={major:3,minor:4,patch:29};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3916,59 +3938,131 @@ $('profUnban').addEventListener('click',()=>{ if(!admin.on) return; const k=prof
 /* any name with a handle behind it opens the profile */
 document.addEventListener('click',e=>{ const p=e.target.closest('[data-prof]'); if(!p) return; if(e.target.closest('[data-trash],[data-edit],[data-cdel],[data-cmdel]')) return; e.preventDefault(); e.stopPropagation(); openProfile(p.dataset.prof); },true);
 
-/* ---------- Public lobbies ----------
-   A host who opens a public lobby keeps one retained message under worlddrop/v1/pub/<code> with the name, the line,
-   the thumbnail, who is hosting, how many are in and whether a game is running, refreshed every 20 s and cleared when
-   the room closes. The list is the wildcard, and anything not refreshed in 90 s is stale. Joining is the normal join. */
-const PUB_ROOT='worlddrop/v1/pub';
-const plob={mine:null,list:{},lastPub:0,timer:null,thumb:null};
-function pubPublish(){
-  if(mp.role!=='host'||!plob.mine||!mp.code) return; plob.lastPub=Date.now();
-  const rec={code:mp.code,name:plob.mine.name,desc:plob.mine.desc||'',thumb:plob.mine.thumb||null,host:{k:acct.key||'',name:acct.name||mp.me.name||'someone'},players:playerList().length,cap:MAX_PLAYERS,mode:mp.settings.mode,custom:mp.settings.custom?mp.settings.custom.name:null,phase:mp.phase,ts:Date.now()};
-  for(const l of lb.links) if(l.ready){ try{ l.client.publish(PUB_ROOT+'/'+mp.code,JSON.stringify(rec),{qos:1,retain:true}); }catch(e){} }
+/* ---------- Servers ----------
+   A server is a room that stays on the list for good: one retained message under worlddrop/v1/srv/<code> holds its
+   name, line, tags, thumbnail, creator, managers and settings (mode, map, time, rounds, loop), plus a live block the
+   acting host refreshes every 20 s (who hosts, how many are in, the phase). Whoever is in the room keeps it running:
+   when the host leaves, another player takes over hosting with the same code and settings, and the others rejoin.
+   Only managers change settings; a non-manager who ends up hosting runs the saved ones. Nobody in and no host for
+   90 s means asleep: listed gray, and only a manager can wake it. */
+const SRV_ROOT='worlddrop/v1/srv';
+const SRV_TAGS=['Quick','Blitz','Long','Chill','Custom maps','Hard','Beginners','Voice'];
+const srv={cur:null,list:{},lastPub:0,timer:null,thumb:null,tags:new Set(),loopT:null};
+function srvIsManager(rec){ rec=rec||srv.cur; if(!rec) return false; if(admin.on) return true; if(!acct.key) return false; return !!((rec.by&&rec.by.k===acct.key)||(rec.managers||[]).includes(acct.key)); }
+function srvAlive(rec){ const l=rec&&rec.live; return !!(l&&l.up&&Date.now()-(+l.ts||0)<90000); }
+function srvSend(rec){ for(const l of lb.links) if(l.ready){ try{ l.client.publish(SRV_ROOT+'/'+rec.code,JSON.stringify(rec),{qos:1,retain:true}); }catch(e){} } }
+function srvSettingsOf(){ const t=mp.settings; return {mode:t.mode,time:t.time,rounds:t.rounds,region:t.region,nomove:!!t.nomove,lock:!!t.lock,custom:t.custom?{id:t.custom.id,name:t.custom.name,n:t.custom.n,start:t.custom.start||null,scale:t.custom.scale||null}:null,endless:!!t.endless}; }
+function srvPublish(){
+  const rec=srv.cur; if(!rec||mp.role!=='host'||mp.code!==rec.code) return; srv.lastPub=Date.now();
+  if(srvIsManager(rec)) rec.settings=srvSettingsOf();
+  rec.live={up:true,hostK:acct.key||'',hostName:acct.name||mp.me.name||'',players:playerList().length,phase:mp.phase,ts:Date.now()};
+  srvSend(rec);
 }
-function pubClear(code){ for(const l of lb.links) if(l.ready){ try{ l.client.publish(PUB_ROOT+'/'+code,'',{qos:1,retain:true}); }catch(e){} } }
-function pubList(ms){
-  const links=lb.links.filter(l=>l.ready); if(!links.length) return Promise.resolve(plob.list);
-  const wild=PUB_ROOT+'/+'; const fresh={};
+function srvDown(rec){ if(!rec) return; rec.live={...(rec.live||{}),up:false,players:0,phase:'lobby',ts:Date.now()}; srvSend(rec); }
+async function srvGet(code){ const got=await fetchMany(SRV_ROOT,[code],2600); const r=got[code]; return r&&r.code===code?r:null; }
+function srvList(ms){
+  const links=lb.links.filter(l=>l.ready); if(!links.length) return Promise.resolve(srv.list);
+  const wild=SRV_ROOT+'/+'; const got={};
   return new Promise(resolve=>{ let done=false;
-    const finish=()=>{ if(done) return; done=true; clearTimeout(timer); for(const l of links){ try{ l.client.removeListener('message',onMsg); l.client.unsubscribe(wild); }catch(e){} } plob.list=fresh; resolve(fresh); };
-    const onMsg=(t,payload)=>{ if(!t.startsWith(PUB_ROOT+'/')) return; let r=null; try{ r=JSON.parse(payload.toString()); }catch(e){} if(r&&r.code&&r.name&&Date.now()-(+r.ts||0)<90000) fresh[r.code]=r; };
+    const finish=()=>{ if(done) return; done=true; clearTimeout(timer); for(const l of links){ try{ l.client.removeListener('message',onMsg); l.client.unsubscribe(wild); }catch(e){} } srv.list=got; resolve(got); };
+    const onMsg=(t,payload)=>{ if(!t.startsWith(SRV_ROOT+'/')) return; let r=null; try{ r=JSON.parse(payload.toString()); }catch(e){} if(r&&r.code&&r.name) got[r.code]=r; };
     for(const l of links){ try{ l.client.on('message',onMsg); l.client.subscribe(wild,{qos:0}); }catch(e){} }
     const timer=setTimeout(finish,ms||2200); });
 }
-function pubThumbOf(r){ return r.thumb?`<img class="thumb" src="${r.thumb}" alt="">`:`<div class="thumb txt">${esc((r.name||'?').trim().slice(0,2).toUpperCase())}</div>`; }
+function srvBars(rec){ if(!srvAlive(rec)) return 0; const age=Date.now()-(+rec.live.ts||0); const b=age<15000?4:age<40000?3:2; return lbLive()?b:1; }
+function srvThumbOf(r){ return r.thumb?`<img class="thumb" src="${r.thumb}" alt="">`:`<div class="thumb txt">${esc((r.name||'?').trim().slice(0,2).toUpperCase())}</div>`; }
 function renderPub(){
-  const list=Object.values(plob.list).sort((a,b)=>(a.phase==='lobby'?0:1)-(b.phase==='lobby'?0:1)||b.ts-a.ts);
-  $('pubSub').textContent=list.length?`${list.length} room${list.length===1?'':'s'} open right now`:(lbLive()?'Nobody has a public lobby open. Start one and people can find it here.':'Connecting…');
-  $('pubList').innerHTML=list.map(r=>{ const ingame=r.phase!=='lobby'; const full=(r.players||0)>=(r.cap||MAX_PLAYERS); const modeName=r.custom?r.custom:(MODES[r.mode]?MODES[r.mode].name:'Classic');
-    return `<button class="pubcard" data-join="${esc(r.code)}" ${ingame||full?'data-busy="1"':''}>${pubThumbOf(r)}<b>${esc(r.name)}</b>${r.desc?`<span class="desc">${esc(r.desc)}</span>`:''}<span class="by">${r.host&&r.host.k?faceOf(r.host.k,18):''}hosted by ${esc(r.host&&r.host.name||'someone')}</span><span class="meta"><span><b>${r.players||0}</b>/${r.cap||MAX_PLAYERS} in</span><span>${esc(modeName)}</span><span class="st ${ingame?'ingame':''}">${ingame?'In a game':full?'Full':'Join'}</span></span></button>`; }).join('');
-  const n=list.filter(r=>r.phase==='lobby').length; if($('pubCount')) $('pubCount').textContent=n?`${n} open`:'Open';
+  const list=Object.values(srv.list).sort((a,b)=>(srvAlive(b)?1:0)-(srvAlive(a)?1:0)||((b.live&&b.live.players)||0)-((a.live&&a.live.players)||0)||(b.made||0)-(a.made||0));
+  const live=list.filter(srvAlive).length;
+  $('pubSub').textContent=list.length?`${live} of ${list.length} server${list.length===1?'':'s'} up right now`:(lbLive()?'No servers yet. Create the first one.':'Connecting…');
+  $('pubList').innerHTML=list.map(r=>{ const alive=srvAlive(r); const l=r.live||{}; const ingame=alive&&l.phase!=='lobby'; const full=alive&&(l.players||0)>=MAX_PLAYERS; const st=r.settings||{}; const modeName=st.custom?st.custom.name:(MODES[st.mode]?MODES[st.mode].name:'Classic'); const canWake=!alive&&srvIsManager(r); const bars=srvBars(r);
+    return `<button class="pubcard ${alive?'':'asleep'} ${canWake?'canwake':''}" data-srv="${esc(r.code)}">${srvThumbOf(r)}<b>${esc(r.name)}</b>${r.desc?`<span class="desc">${esc(r.desc)}</span>`:''}${(r.tags||[]).length?`<span class="tags">${r.tags.map(t=>`<span class="tag ro">${esc(t)}</span>`).join('')}</span>`:''}<span class="by">${r.by&&r.by.k?faceOf(r.by.k,18):''}by ${esc(r.by&&r.by.name||'someone')}${alive&&l.hostName&&l.hostK!==(r.by&&r.by.k)?` · ${esc(l.hostName)} hosting`:''}</span><span class="meta"><span><b>${alive?(l.players||0):0}</b>/${MAX_PLAYERS} in</span><span>${esc(modeName)}${st.endless?' · looping':''}</span><span class="bars b${bars}" title="${alive?'Up':'Asleep'}"><i></i><i></i><i></i><i></i></span><span class="st ${ingame?'ingame':''} ${alive?'':'asleep'}">${!alive?(canWake?'Wake it':'Asleep'):ingame?'In a game · join':full?'Full':'Join'}</span></span></button>`; }).join('');
+  if($('pubCount')) $('pubCount').textContent=live?`${live} up`:'Open';
 }
 async function openPub(){
   cm.from='menu'; show('pub'); $('pub').scrollTo(0,0); $('pubForm').hidden=true; renderPub();
-  clearInterval(plob.timer); const tick=async()=>{ if($('pub').hidden){ clearInterval(plob.timer); return; } await pubList(); if(!$('pub').hidden) renderPub(); };
-  await tick(); plob.timer=setInterval(tick,10000);
+  clearInterval(srv.timer); const tick=async()=>{ if($('pub').hidden){ clearInterval(srv.timer); return; } await srvList(); if(!$('pub').hidden) renderPub(); };
+  await tick(); srv.timer=setInterval(tick,10000);
 }
+function paintTags(){ $('pubTags').innerHTML=SRV_TAGS.map(t=>`<button type="button" class="tag ${srv.tags.has(t)?'on':''}" data-tag="${esc(t)}">${esc(t)}</button>`).join(''); }
+$('pubTags').addEventListener('click',e=>{ const b=e.target.closest('[data-tag]'); if(!b) return; const t=b.dataset.tag; if(srv.tags.has(t)) srv.tags.delete(t); else if(srv.tags.size<4) srv.tags.add(t); paintTags(); sfx('click'); });
 $('pubBar').addEventListener('click',openPub);
-$('pubBack').addEventListener('click',()=>{ clearInterval(plob.timer); show('menu'); });
-$('pubCreateBtn').addEventListener('click',()=>{ if(!acct.key) return needAcct('create a public lobby'); $('pubForm').hidden=!$('pubForm').hidden; if(!$('pubForm').hidden) $('pubName').focus(); });
+$('pubBack').addEventListener('click',()=>{ clearInterval(srv.timer); show('menu'); });
+$('pubCreateBtn').addEventListener('click',()=>{ if(!acct.key) return needAcct('create a server'); $('pubForm').hidden=!$('pubForm').hidden; if(!$('pubForm').hidden){ paintTags(); $('pubName').focus(); } });
 $('pubCancel').addEventListener('click',()=>{ $('pubForm').hidden=true; });
 $('pubThumbBtn').addEventListener('click',()=>$('pubThumbFile').click());
-$('pubThumbClear').addEventListener('click',()=>{ plob.thumb=null; $('pubThumb').hidden=true; $('pubThumbClear').hidden=true; });
+$('pubThumbClear').addEventListener('click',()=>{ srv.thumb=null; $('pubThumb').hidden=true; $('pubThumbClear').hidden=true; });
 $('pubThumbFile').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return; const url=URL.createObjectURL(f); const im=new Image();
-  im.onload=()=>{ const c=document.createElement('canvas'); c.width=320; c.height=180; const ctx=c.getContext('2d'); const sc=Math.max(320/im.width,180/im.height); const w=im.width*sc,h=im.height*sc; ctx.drawImage(im,(320-w)/2,(180-h)/2,w,h); plob.thumb=c.toDataURL('image/jpeg',0.72); URL.revokeObjectURL(url); $('pubThumb').src=plob.thumb; $('pubThumb').hidden=false; $('pubThumbClear').hidden=false; };
+  im.onload=()=>{ const c=document.createElement('canvas'); c.width=320; c.height=180; const ctx=c.getContext('2d'); const sc=Math.max(320/im.width,180/im.height); const w=im.width*sc,h=im.height*sc; ctx.drawImage(im,(320-w)/2,(180-h)/2,w,h); srv.thumb=c.toDataURL('image/jpeg',0.72); URL.revokeObjectURL(url); $('pubThumb').src=srv.thumb; $('pubThumb').hidden=false; $('pubThumbClear').hidden=false; };
   im.onerror=()=>{ URL.revokeObjectURL(url); toast('That image could not be read'); }; im.src=url; });
 $('pubGo').addEventListener('click',async()=>{
-  if(!acct.key) return needAcct('create a public lobby');
-  const name=cleanName($('pubName').value).slice(0,32); if(name.length<2){ toast('Give the lobby a name'); $('pubName').focus(); return; }
-  plob.mine={name,desc:cleanName($('pubDesc').value).slice(0,90),thumb:plob.thumb||null};
-  clearInterval(plob.timer); $('pubForm').hidden=true;
-  await mpHost('party'); setTimeout(pubPublish,1500); setTimeout(pubPublish,5000);
-  toast(`${name} is open. Anyone can join it now.`,'ok');
+  if(!acct.key) return needAcct('create a server');
+  const name=cleanName($('pubName').value).slice(0,32); if(name.length<2){ toast('Give the server a name'); $('pubName').focus(); return; }
+  let code=mkCode(); for(let i=0;i<8&&srv.list[code];i++) code=mkCode();
+  const rec={code,name,desc:cleanName($('pubDesc').value).slice(0,90),thumb:srv.thumb||null,tags:[...srv.tags],by:{k:acct.key,name:acct.name},managers:[],made:Date.now(),settings:{mode:'classic',time:60,rounds:5,region:{type:'all',value:null},nomove:false,lock:false,custom:null,endless:false},live:null};
+  clearInterval(srv.timer); $('pubForm').hidden=true; srv.thumb=null; srv.tags=new Set(); $('pubName').value=''; $('pubDesc').value=''; $('pubThumb').hidden=true; $('pubThumbClear').hidden=true;
+  await srvHost(rec); toast(`${name} is up. Anyone can join it now.`,'ok');
 });
-$('pubList').addEventListener('click',e=>{ const b=e.target.closest('[data-join]'); if(!b) return; if(b.dataset.busy){ toast(b.querySelector('.st').textContent==='Full'?'That room is full':'That room is mid-game, try again after their round'); return; } clearInterval(plob.timer); mpJoin(b.dataset.join); });
-function paintLobbyPub(){ const el=$('lobbyPub'); if(!el) return; const on=mp.role==='host'&&plob.mine; el.hidden=!on; if(on) el.textContent=`Public lobby: ${plob.mine.name}${plob.mine.desc?' · '+plob.mine.desc:''}. Anyone can join while it is open.`; }
+$('pubList').addEventListener('click',e=>{ const b=e.target.closest('[data-srv]'); if(!b) return; const rec=srv.list[b.dataset.srv]; if(!rec) return; srvEnter(rec); });
+/* into a server: join it if it is up, wake it if you manage it */
+function srvEnter(rec){
+  clearInterval(srv.timer); srv.cur=rec;
+  if(srvAlive(rec)){ if((rec.live.players||0)>=MAX_PLAYERS){ toast('That server is full right now'); return; } mpJoin(rec.code); show('lobby'); return; }
+  if(srvIsManager(rec)){ srvHost(rec); return; }
+  toast('That server is asleep. One of its managers has to open it.');
+}
+/* host a server: the room takes its code and its saved settings */
+async function srvHost(rec){
+  srv.cur=rec; await mpHost('party',rec.code);
+  const st=rec.settings||{};
+  Object.assign(mp.settings,{mode:MODES[st.mode]?st.mode:'classic',time:st.time!=null?+st.time:60,rounds:+st.rounds||5,region:st.region||{type:'all',value:null},nomove:!!st.nomove,lock:!!st.lock,custom:st.custom||null,endless:!!st.endless});
+  if(mp.settings.custom){ try{ const m=await cmapFetch(mp.settings.custom.id); if(m&&m.pins){ mp.customPins=m.pins; mp.settings.custom={id:m.id,name:m.name,n:m.pins.length,start:m.start||null,scale:+m.scale>0?+m.scale:autoScale(m.pins)}; mp.settings.mode='custom'; } else { mp.settings.custom=null; if(mp.settings.mode==='custom') mp.settings.mode='classic'; } }catch(e){ mp.settings.custom=null; if(mp.settings.mode==='custom') mp.settings.mode='classic'; } }
+  mp.settings.srv={code:rec.code,name:rec.name,desc:rec.desc||'',tags:rec.tags||[],by:rec.by,managers:rec.managers||[]};
+  show('lobby'); hostSync(); setTimeout(srvPublish,1500); setTimeout(srvPublish,5000);
+}
+/* the host is leaving: hand the room to someone still in it (a manager first), or put the server to sleep */
+function srvHandOff(){
+  const rec=srv.cur; if(!rec||mp.role!=='host'||mp.code!==rec.code) return;
+  const others=playerList().filter(p=>!p.host);
+  if(!others.length){ srvDown(rec); return; }
+  const mgr=others.find(p=>p.k&&((rec.by&&rec.by.k===p.k)||(rec.managers||[]).includes(p.k)));
+  const to=(mgr||others.slice().sort((a,b)=>a.id<b.id?-1:1)[0]).id;
+  mpBroadcast({t:'handover',to,code:rec.code});
+}
+/* a guest whose host went away: take over if it is my turn, otherwise come back in a moment */
+async function srvAfterHostLeft(){
+  const code=mp.code, info=mp.settings&&mp.settings.srv; const h=mp.handover; mp.handover=null;
+  const others=playerList().filter(p=>!p.host).map(p=>p.id).sort();
+  const successor=h&&h.to?h.to:others[0];
+  const rec0=srv.cur&&srv.cur.code===code?srv.cur:null;
+  mpLeave();
+  if(successor===mp.me.id){ const rec=(await srvGet(code))||rec0||(info?{code,name:info.name,desc:info.desc,tags:info.tags,by:info.by,managers:info.managers,settings:{},live:null}:null); if(!rec){ show('menu'); return; } await srvHost(rec); toast(`You are hosting ${rec.name} now`,'ok'); return; }
+  show('lobby'); connStatus('The host left. Reconnecting to the server…'); $('connBox').hidden=false;
+  setTimeout(async()=>{ const rec=(await srvGet(code))||rec0; if(rec) srv.cur=rec; mpJoin(code); },3500);
+}
+/* loop: after a game, the next one starts by itself */
+function srvLoopStart(){
+  clearInterval(srv.loopT); let n=20; const el=$('finalWait'); el.hidden=false; mpBroadcast({t:'loop',secs:n});
+  const tick=()=>{ el.textContent=`Next game in ${n}s · this server loops`; if(n--<=0){ clearInterval(srv.loopT); srv.loopT=null; if(mp.role!=='host'||$('final').hidden) return; mpBroadcast({t:'lobby-return'}); mpToLobby(); if(playerList().length>=2) hostStartGame(); else toast('Waiting for one more player to loop'); } };
+  tick(); srv.loopT=setInterval(tick,1000);
+}
+function srvLoopStop(){ if(srv.loopT){ clearInterval(srv.loopT); srv.loopT=null; } }
+/* the lobby shows the server and, for a manager who is hosting, its tools */
+function paintLobbyPub(){
+  const el=$('lobbyPub'); const info=mp.settings&&mp.settings.srv; const on=!!(mp.role&&info); el.hidden=!on;
+  const hostMgr=on&&mp.role==='host'&&srv.cur&&srvIsManager(srv.cur);
+  if(on){ const mgrs=(info.managers||[]).length; el.innerHTML=`<b>${esc(info.name)}</b><span class="line">${esc(info.desc||'')}${info.desc?' · ':''}by ${esc(info.by&&info.by.name||'someone')}${mgrs?' and '+mgrs+' manager'+(mgrs===1?'':'s'):''}${mp.settings.endless?' · looping':''}</span>${(info.tags||[]).map(t=>`<span class="tag ro">${esc(t)}</span>`).join('')}`; }
+  const lockIt=on&&mp.role==='host'&&!hostMgr;
+  for(const id of ['lobbySettings','lobbyModes']){ const c=$(id); if(c) c.classList.toggle('locked',lockIt); }
+  $('srvTools').hidden=!hostMgr;
+  if(hostMgr){ const rec=srv.cur; $('srvToolsSub').textContent=`You manage ${rec.name}. Your mode, map, time and rounds are saved on the server; whoever hosts later runs them.`; $('srvLoop').checked=!!mp.settings.endless; $('srvLoopSw').classList.toggle('on',!!mp.settings.endless);
+    const names=[rec.by&&rec.by.name?rec.by.name+' (creator)':'', ...(rec.managers||[]).map(k=>'@'+k)].filter(Boolean); $('srvMgrs').textContent=names.join(', '); $('srvDelete').hidden=!(admin.on||(rec.by&&rec.by.k===acct.key)); }
+}
+$('srvLoop').addEventListener('change',e=>{ mp.settings.endless=e.target.checked; $('srvLoopSw').classList.toggle('on',e.target.checked); hostSync(); srvPublish(); toast(e.target.checked?'Games will loop on this server':'Looping off','ok'); sfx('click'); });
+$('srvMgrAdd').addEventListener('click',async()=>{ const rec=srv.cur; if(!rec||!srvIsManager(rec)) return; const k=acctKey($('srvMgrIn').value); if(k.length<2) return; if((rec.by&&rec.by.k===k)||(rec.managers||[]).includes(k)){ toast('Already a manager'); return; }
+  const got=await acctFetch(k); if(!got.record){ toast(`No account @${k}`); return; } rec.managers=[...(rec.managers||[]),k].slice(0,20); mp.settings.srv.managers=rec.managers; $('srvMgrIn').value=''; srvPublish(); hostSync(); toast(`@${k} can manage this server now`,'ok'); });
+$('srvDelete').addEventListener('click',async()=>{ const rec=srv.cur; if(!rec) return; if(!await ask({title:`Delete ${rec.name}?`,body:'It comes off the server list for everyone. People in the room can finish, but nobody can come back to it.',ok:'Delete',danger:true})) return;
+  for(const l of lb.links) if(l.ready){ try{ l.client.publish(SRV_ROOT+'/'+rec.code,'',{qos:1,retain:true}); }catch(e){} } srv.cur=null; delete mp.settings.srv; hostSync(); toast('Server deleted','ok'); });
 
 /* ---------- Map analytics ----------
    Every finished play on a custom map adds one play and its seconds to that day in the map's own record,
@@ -4313,7 +4407,7 @@ function nagToSave(action){
 $('nagSave').addEventListener('click',()=>{ const go=nagAction; hideNag(); $('saveBtn').click(); if(go) go(); });
 $('nagSkip').addEventListener('click',()=>{ const go=nagAction; hideNag(); if(go) go(); });
 function finalAgain(){
-  if(mp.role==='host'){ mpBroadcast({t:'lobby-return'}); mpToLobby(); return; }
+  if(mp.role==='host'){ srvLoopStop(); mpBroadcast({t:'lobby-return'}); mpToLobby(); return; }
   if(mp.role) return;
   if(state.daily){ finalMenu(); return; }   // one drop a day; there's nothing to replay
   startGame();
@@ -5322,11 +5416,11 @@ function openVoicePeer(){
 }
 
 /* ---- host ---- */
-async function mpHost(kind){
-  const code=mkCode();
+async function mpHost(kind,fixedCode){
+  const code=fixedCode||mkCode();
   mpSetup('host',code,kind||'party');
   mp.me.id='host';
-  mp.players['host']={id:'host',name:mp.me.name,color:null,face:!!acct.av,col:acct.color||null,score:0,host:true,vpeer:null};
+  mp.players['host']={id:'host',name:mp.me.name,color:null,face:!!acct.av,col:acct.color||null,score:0,host:true,vpeer:null,k:acct.key||''};
   avSet('host',acct.av);
   renderLobby(); voiceShow();
   // Connect to every broker so guests can reach us through whichever one works for them.
@@ -5337,7 +5431,7 @@ async function mpHost(kind){
   }
   mp.hb=setInterval(()=>{
     mpBroadcast({t:'hb'});
-    if(plob.mine&&Date.now()-plob.lastPub>20000) pubPublish();
+    if(srv.cur&&Date.now()-srv.lastPub>20000) srvPublish();
     const now=Date.now();
     for(const p of playerList()){ if(p.host) continue; if(now-(mp.seen[p.id]||now)>25000){ dlog('dropping silent '+p.name); hostDrop(p.id); } }
   },5000);
@@ -5356,7 +5450,7 @@ async function mpJoin(code){
     mp.brokerIdx=i; connStatus(`Contacting the game… (${i+1}/${BROKERS.length})`);
     const link=openLink(BROKERS[i],{topic:T.host(code),msg:{t:'leave',id:mp.me.id}},(l,first)=>{
       if(mp.link&&mp.link!==l) return;
-      l.client.subscribe([T.all(code),T.one(code,mp.me.id)],{qos:0},()=>{ pub(l.client,T.host(code),{t:'hello',id:mp.me.id,name:mp.me.name,vpeer:mp.me.vpeer}); });
+      l.client.subscribe([T.all(code),T.one(code,mp.me.id)],{qos:0},()=>{ pub(l.client,T.host(code),{t:'hello',id:mp.me.id,name:mp.me.name,vpeer:mp.me.vpeer,k:acct.key||''}); });
       if(first){ mp.joinTimer=setTimeout(()=>{ if(mp.link!==l){ try{ l.client.end(true); }catch(e){} mp.links=mp.links.filter(x=>x!==l); tryBroker(i+1); } },6000); }
     },(l,topic,m)=>{
       if(mp.link&&mp.link!==l) return;
@@ -5368,7 +5462,7 @@ async function mpJoin(code){
     setTimeout(()=>{ if(mp.role==='guest'&&!link.ready&&!mp.link){ try{ link.client.end(true); }catch(e){} mp.links=mp.links.filter(x=>x!==link); tryBroker(i+1); } },8000);
   };
   tryBroker(0);
-  mp.hb=setInterval(()=>{ if(mp.link){ mpSend({t:'hb'}); if(mp.hostSeen&&Date.now()-mp.hostSeen>30000){ toast('Lost the host'); mpLeave(); show('menu'); } } },5000);
+  mp.hb=setInterval(()=>{ if(mp.link){ mpSend({t:'hb'}); if(mp.hostSeen&&Date.now()-mp.hostSeen>30000){ if(mp.settings&&mp.settings.srv){ toast('Lost the host, the server stays up'); srvAfterHostLeft(); } else { toast('Lost the host'); mpLeave(); show('menu'); } } } },5000);
   openVoicePeer();
 }
 function mpSetup(role,code,kind){
@@ -5391,7 +5485,7 @@ function mpLeave(){
   if(mp.deadline){ clearTimeout(mp.deadline); mp.deadline=null; }
   if(mp.hb){ clearInterval(mp.hb); mp.hb=null; }
   if(mp.joinTimer){ clearTimeout(mp.joinTimer); mp.joinTimer=null; }
-  if(mp.role==='host'&&plob.mine){ pubClear(mp.code); plob.mine=null; }
+  srvLoopStop(); if(mp.role==='host'&&srv.cur&&mp.code===srv.cur.code) srvHandOff();
   if(mp.role==='host') mpBroadcast({t:'host-left'}); else if(mp.link) mpSend({t:'leave',id:mp.me.id});
   voiceStop();
   try{ mp.peer&&mp.peer.destroy(); }catch(e){}
@@ -5412,7 +5506,7 @@ function connFailed(why){
 }
 
 /* ----- host side ----- */
-function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,col:p.col||null,score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null,hp:p.hp??null})); }
+function pubPlayers(){ return playerList().map(p=>({id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,k:p.k||'',score:p.score,host:!!p.host,vpeer:p.vpeer||null,lives:p.lives??null,out:!!p.out,outRound:p.outRound||null,hp:p.hp??null})); }
 /* The wire form of a location: everything a guest needs to load and score it, nothing else. */
 function locPayload(l){ return {pano:l.pano,lat:l.lat,lng:l.lng,heading:l.heading,pitch:l.pitch||0,continent:l.continent,place:l.place||null,extra:l.extra?l.extra.map(e=>({pano:e.pano,lat:e.lat,lng:e.lng,heading:e.heading})):undefined,lie:l.lie,tempF:l.tempF,pol:l.pol,key:l.key,from:l.from,fresh:l.fresh}; }
 /* A duel has no fixed length, so the host keeps finding spots a few rounds ahead and hands them over as it goes. */
@@ -5436,7 +5530,7 @@ function avTag(id,name,size,cls){
   return url ? `<span class="pav ${cls||''}" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`
              : `<span class="pav ${cls||''} ini" style="width:${size}px;height:${size}px">${initial}</span>`;
 }
-function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mpBroadcast({t:'lobby',players:pubPlayers(),settings:mp.settings,cd:mp.cd?mp.cdLeft:null}); renderLobby(); voiceConnect(); if(plob.mine&&Date.now()-plob.lastPub>3000) pubPublish(); }
+function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mpBroadcast({t:'lobby',players:pubPlayers(),settings:mp.settings,cd:mp.cd?mp.cdLeft:null}); renderLobby(); voiceConnect(); if(srv.cur&&Date.now()-srv.lastPub>3000) srvPublish(); }
 function hostDrop(id){
   if(!mp.players[id]||id==='host') return;
   const name=mp.players[id].name||'A player'; const vp=mp.players[id].vpeer; delete mp.players[id]; delete mp.seen[id]; if(vp) voiceDrop(vp);
@@ -5450,7 +5544,7 @@ function hostOnMessage(from,m,link){
     if(mp.phase!=='lobby'){ mpSendTo(from,{t:'reject',why:'That game is already in progress.'}); return; }
     const cap=mp.settings.kind==='duo'?2:MAX_PLAYERS;
     if(playerList().length>=cap){ mpSendTo(from,{t:'reject',why:cap===2?'That duo already has its two players.':`That game is full (${MAX_PLAYERS} players).`}); return; }
-    mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link};
+    mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link,k:acctKey(m.k||'')};
     mp.seen[from]=Date.now(); dlog('joined '+from); mpSendTo(from,{t:'welcome'}); hostSync();
     const joinNote={t:'chat',id:'sys',sys:true,name:'',text:`${mp.players[from].name||'Someone'} joined`,ts:Date.now()}; mpBroadcast(joinNote); chatAdd(joinNote);
     setTimeout(()=>mpSendTo(from,{t:'avall',map:avCache,cols:colCache}),300);   // hand the newcomer everyone's photo, including the host's
@@ -5595,10 +5689,12 @@ function guestOnMessage(m){
   mp.hostSeen=Date.now();
   if(m.t==='welcome'){ sendAvatar(); $('connBox').className='conn ok'; $('connBox').textContent='Connected ✓'; $('connBox').hidden=false; setTimeout(()=>{ if(mp.role==='guest') $('connBox').hidden=true; },2500); return; }
   if(m.t==='hb') return;
-  if(m.t==='host-left'){ toast('The host left the game'); mpLeave(); show('menu'); return; }
+  if(m.t==='host-left'){ if(mp.settings&&mp.settings.srv){ srvAfterHostLeft(); return; } toast('The host left the game'); mpLeave(); show('menu'); return; }
+  if(m.t==='handover'){ mp.handover={to:m.to,code:m.code||mp.code}; toast(m.to===mp.me.id?'The host is leaving. You take over.':'The host is leaving, the room stays up…'); return; }
+  if(m.t==='loop'){ const el=$('finalWait'); if(el&&!$('final').hidden){ el.hidden=false; el.textContent=`Next game in about ${m.secs}s · this server loops`; } return; }
   if(m.t==='chat'){ chatAdd(m); return; }
   if(m.t==='reject'){ connFailed(m.why); return; }
-  if(m.t==='lobby'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; mp.settings=m.settings; const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; renderLobby(); voiceConnect(); }
+  if(m.t==='lobby'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; mp.settings=m.settings; const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; if(m.settings&&m.settings.srv&&!(srv.cur&&srv.cur.code===mp.code)) srvGet(mp.code).then(r=>{ if(r) srv.cur=r; }); renderLobby(); voiceConnect(); }
   else if(m.t==='players'){ mp.players={}; for(const p of m.players) mp.players[p.id]=p; updateStrip(); }
   else if(m.t==='countdown'){ if(m.secs>0){ runCountdown(m.secs,()=>{}); } else { if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=false; $('countdown').textContent=m.msg||'Starting…'; } }
   else if(m.t==='cancel'){ if(mp.cd){ clearInterval(mp.cd); mp.cd=null; } $('countdown').hidden=true; }
@@ -5834,6 +5930,7 @@ function showFinalMP(fin){
   bumpStreak();
   show('final'); $('finalRival').hidden=true; $('standings').hidden=false; $('saveRow').hidden=true; $('roundChips').hidden=true; $('viewBoardBtn').hidden=false;
   $('againBtn').hidden=mp.role!=='host'; $('finalWait').hidden=mp.role==='host'; $('againBtn').textContent='Back to lobby';
+  if(mp.role==='host'&&srv.cur&&mp.settings.endless) setTimeout(srvLoopStart,1200);
   const max=state.totalRounds*5000;
   if(!finalMap) finalMap=makeMap('finalmap');
   if(finalLayer) finalLayer.remove();
@@ -6191,7 +6288,7 @@ function toast(msg,kind){ const t=document.createElement('div'); t.className='to
 paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion(); paintAcct();
 setTimeout(restoreScreen,50);   // a reload lands you back where you were
 paintBell(); setTimeout(paintBell,0);   // the daily's state settles a tick after the rest of the boot
-setTimeout(()=>{ paintBell(); if(acct.key){ socWarming=null; socWarm(); loadInbox(); } else fetchDirectory().then(lbPaint); pubList().then(()=>{ const n=Object.values(plob.list).filter(r=>r.phase==='lobby').length; if($('pubCount')) $('pubCount').textContent=n?`${n} open`:'Open'; }); },4000);   // the brokers are up by now
+setTimeout(()=>{ paintBell(); if(acct.key){ socWarming=null; socWarm(); loadInbox(); } else fetchDirectory().then(lbPaint); srvList().then(()=>{ const n=Object.values(srv.list).filter(srvAlive).length; if($('pubCount')) $('pubCount').textContent=n?`${n} up`:'Open'; }); },4000);   // the brokers are up by now
 setInterval(()=>{ fetchDirectory().then(lbPaint); },6*60*1000);   // streaks on the boards stay current
 setInterval(()=>{ paintBell(); if(acct.key&&!notes.open) loadInbox(); },90000);
 
