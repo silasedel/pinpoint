@@ -123,7 +123,7 @@ It is deliberately not security: a four-digit code is guessable, the record is p
 
 The purple bar on the home page. A server is a room that stays on the list for good. Anyone can see them and walk into one that is up; creating one needs an account. Create a server asks for a name, one line about it, up to four tags (Quick, Blitz, Long, Chill, Custom maps, Hard, Beginners, Voice) and an optional thumbnail, then opens a normal room with you hosting, with a purple badge in the lobby naming the server.
 
-**What is saved.** One retained message per server (`worlddrop/v1/srv/<code>`): name, line, tags, thumbnail, creator, managers, and the settings (mode, custom map, time, rounds, region, camera, loop), plus a live block the acting host refreshes every 20 s and on every change: who is hosting, how many are in, whether a game is running. The code is fixed for the server's life.
+**What is saved.** One retained message per server (`worlddrop/v1/srv/<code>`): name, line, tags, thumbnail, creator, managers, and the settings (mode, custom map, time, rounds, region, camera, loop), plus a live block the acting host refreshes every 20 s and on every change: who is hosting, how many are in, whether a game is running. The code is fixed for the server's life, and it is only used under the hood: a server is entered from the Servers page, and typing its code into the Join box is turned away.
 
 **Managers.** The creator, plus anyone they add by handle in the lobby's Server card. Only a manager who is hosting can change the mode, map, time and rounds, and those changes are saved to the server. A non-manager who ends up hosting sees the settings locked and runs the saved ones. The creator (or admin) can delete the server.
 

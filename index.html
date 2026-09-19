@@ -2473,7 +2473,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-201716';
+const BUILD='20260918-203310';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2624,7 +2624,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:5,patch:5};
+const VERSION={major:3,minor:5,patch:6};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4040,7 +4040,7 @@ $('pubList').addEventListener('click',e=>{ const b=e.target.closest('[data-srv]'
 /* into a server: join it if it is up, wake it if you manage it */
 function srvEnter(rec){
   clearInterval(srv.timer); srv.cur=rec;
-  if(srvAlive(rec)){ if((rec.live.players||0)>=MAX_PLAYERS){ toast('That server is full right now'); return; } mpJoin(rec.code); show('lobby'); return; }
+  if(srvAlive(rec)){ if((rec.live.players||0)>=MAX_PLAYERS){ toast('That server is full right now'); return; } mpJoin(rec.code,true); show('lobby'); return; }
   if(srvIsManager(rec)){ srvHost(rec); return; }
   if(rec.settings&&rec.settings.endless){ srvHost(rec,true); return; }   // a looping server never turns anyone away
   toast('That server is asleep. One of its managers has to open it.');
@@ -4073,7 +4073,7 @@ async function srvAfterHostLeft(){
   mpLeave();
   if(successor===mp.me.id){ const rec=(await srvGet(code))||rec0||(info?{code,name:info.name,desc:info.desc,tags:info.tags,by:info.by,managers:info.managers,settings:{},live:null}:null); if(!rec){ show('menu'); return; } await srvHost(rec,6000); toast(`You are hosting ${rec.name} now`,'ok'); return; }
   show('lobby'); connStatus('The host left. Reconnecting to the server…'); $('connBox').hidden=false;
-  setTimeout(async()=>{ const rec=(await srvGet(code))||rec0; if(rec) srv.cur=rec; mpJoin(code); },3500);
+  setTimeout(async()=>{ const rec=(await srvGet(code))||rec0; if(rec) srv.cur=rec; mpJoin(code,true); },3500);
 }
 /* loop: after a game, the next one starts by itself */
 const LOOP_PAUSE=5;
@@ -5482,10 +5482,10 @@ async function mpHost(kind,fixedCode){
   openVoicePeer();
 }
 /* ---- guest ---- */
-async function mpJoin(code){
+async function mpJoin(code,viaSrv){
   code=code.toUpperCase().replace(/[^A-Z]/g,'');
   if(code.length!==4){ toast('Enter the 4-letter room code'); return; }
-  mpSetup('guest',code);
+  mpSetup('guest',code); mp.viaSrv=!!viaSrv;   // servers are only entered from the Servers page, never by code
   mp.me.id=mkId();
   $('roomUrl').textContent='Connecting…'; connStatus('Contacting the game…');
   const tryBroker=(i)=>{
@@ -5494,7 +5494,7 @@ async function mpJoin(code){
     mp.brokerIdx=i; connStatus(`Contacting the game… (${i+1}/${BROKERS.length})`);
     const link=openLink(BROKERS[i],{topic:T.host(code),msg:{t:'leave',id:mp.me.id}},(l,first)=>{
       if(mp.link&&mp.link!==l) return;
-      l.client.subscribe([T.all(code),T.one(code,mp.me.id)],{qos:0},()=>{ pub(l.client,T.host(code),{t:'hello',id:mp.me.id,name:mp.me.name,vpeer:mp.me.vpeer,k:acct.key||''}); });
+      l.client.subscribe([T.all(code),T.one(code,mp.me.id)],{qos:0},()=>{ pub(l.client,T.host(code),{t:'hello',id:mp.me.id,name:mp.me.name,vpeer:mp.me.vpeer,k:acct.key||'',srv:!!mp.viaSrv}); });
       if(first){ mp.joinTimer=setTimeout(()=>{ if(mp.link!==l){ try{ l.client.end(true); }catch(e){} mp.links=mp.links.filter(x=>x!==l); tryBroker(i+1); } },6000); }
     },(l,topic,m)=>{
       if(mp.link&&mp.link!==l) return;
@@ -5547,7 +5547,7 @@ function connFailed(why){
   if(rec&&mp.role==='guest'&&(srvIsManager(rec)||(rec.settings&&rec.settings.endless))){ mpLeave(); toast(`Nobody was hosting ${rec.name}, so you are`,'ok'); srvHost(rec,true); return; }
   const box=$('connBox'); box.hidden=false; box.className='conn fail';
   box.innerHTML=`<b>Couldn't join.</b> ${esc(why)}<div class="row"><button class="btn btn-primary" id="retryJoin">Try again</button><button class="btn btn-secondary" id="copyDebug">Copy debug info</button><button class="btn btn-secondary" id="backMenu">Back</button></div>`;
-  $('retryJoin').onclick=()=>{ const c=mp.code; mpLeave(); mpJoin(c); };
+  $('retryJoin').onclick=()=>{ const c=mp.code, v=mp.viaSrv; mpLeave(); mpJoin(c,v); };
   $('copyDebug').onclick=()=>copyText(['Pinpoint debug','code '+mp.code,'ua '+navigator.userAgent,...diag.log].join('\n'),$('copyDebug'),'Copy debug info');
   $('backMenu').onclick=()=>{ mpLeave(); show('menu'); };
 }
@@ -5589,6 +5589,7 @@ function hostOnMessage(from,m,link){
   if(!from) return;
   if(m.t==='hello'){
     if(mp.players[from]){ mp.players[from].link=link||mp.players[from].link; mp.seen[from]=Date.now(); mpSendTo(from,{t:'welcome'}); hostSync(); return; }
+    if(srv.cur&&mp.settings.srv&&mp.code===srv.cur.code&&!m.srv){ mpSendTo(from,{t:'reject',why:`That code belongs to the server ${srv.cur.name}. Join it from the Servers page.`}); return; }
     if(mp.phase!=='lobby'){
       if(!srv.cur||mp.settings.kind==='duo'||playerList().length>=MAX_PLAYERS){ mpSendTo(from,{t:'reject',why:'That game is already in progress.'}); return; }
       // a server mid-game: they come in now and play from the next round
