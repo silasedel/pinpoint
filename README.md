@@ -119,6 +119,10 @@ Delete account sits beside Sign out: it explains what goes (name, photo, passcod
 
 It is deliberately not security: a four-digit code is guessable, the record is public, and the brokers accept writes from anyone. It exists so a name stays yours between devices and a sibling can't type it by accident. There is no code reset, since there's nothing to email.
 
+## Public lobbies
+
+The purple bar on the home page. Anyone can see the open rooms and walk into one; creating one needs an account. Create a public lobby asks for a name, one line about it and an optional thumbnail, then opens a normal room with you as host (voice, chat, modes and custom maps all as usual), with a purple line in the lobby saying it is public. The room is one retained message on the brokers (`worlddrop/v1/pub/<code>`: name, line, thumbnail, host, how many are in, the mode, whether a game is running) that the host refreshes every 20 s and on every change, and clears when the room closes; anything not refreshed in 90 s drops off the list. The list refreshes every 10 s while open, shows in-lobby rooms first, and a room that is mid-game or full says so instead of Join. The home bar shows how many are open.
+
 ## What needs an account
 
 Playing, guessing, rooms and the daily are open to everyone. Room chat, liking a map, commenting on one, making a map, sharing a challenge link, adding friends, reporting a player and map analytics need an account. Try one signed out and a dark banner says "You need an account to like maps. Create one or sign in"; tapping the link opens Settings with the same sentence above the sign-in form. The chat panel opens for reading but swaps its input for the same line.

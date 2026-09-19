@@ -103,6 +103,22 @@
   .learnbar .ll span{display:block;font-size:13.5px;color:var(--muted);margin-top:3px}
   .learnbar .lr{flex:none;font-weight:800;font-size:15px;color:var(--green-dark);background:var(--green-soft);border-radius:99px;padding:10px 20px;border:1.5px solid var(--line)}
   @media (max-width:560px){ .learnbar{flex-direction:column;align-items:flex-start;gap:12px} .learnbar .lr{align-self:stretch;text-align:center} }
+  /* each bar has its own color: Learn green, maps amber, lobbies purple, the daily blue */
+  .learnbar.make .lmark,.learnbar.make .lr{background:#fff1dc;color:#b45309} .learnbar.make:hover{border-color:#f59e0b}
+  .learnbar.pub .lmark,.learnbar.pub .lr{background:#efe7ff;color:#5b3fb8} .learnbar.pub:hover{border-color:#8b6cf0}
+  html[data-theme="dark"] .learnbar.make .lmark,html[data-theme="dark"] .learnbar.make .lr{background:#3a2a10;color:#fbbf24}
+  html[data-theme="dark"] .learnbar.pub .lmark,html[data-theme="dark"] .learnbar.pub .lr{background:#2a2145;color:#c4b5fd}
+  .pubbtn{background:#6d4fd6;box-shadow:0 3px 0 #4a2fb0} .pubbtn:hover{background:#5b3fb8;box-shadow:0 4px 0 #4a2fb0}
+  .pubcard{display:flex;flex-direction:column;gap:4px;padding:0 0 12px;border:1.5px solid var(--line);border-radius:14px;background:var(--raise);cursor:pointer;text-align:left;font-family:inherit;color:var(--text);overflow:hidden;box-shadow:0 2px 0 var(--edge)}
+  .pubcard:hover{border-color:#8b6cf0}
+  .pubcard .thumb{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:linear-gradient(120deg,#4a2fb0,#8b6cf0);margin-bottom:6px}
+  .pubcard .thumb.txt{display:grid;place-items:center;color:#fff;font-size:34px;font-weight:800;letter-spacing:-.5px}
+  .pubcard>b,.pubcard .by,.pubcard .meta,.pubcard .desc{padding:0 14px}
+  .pubcard>b{font-size:15px;line-height:1.2} .pubcard .desc{font-size:13px;color:var(--text);line-height:1.35}
+  .pubcard .by{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .pubcard .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;margin-top:auto;align-items:center} .pubcard .meta b{color:var(--text)}
+  .pubcard .meta .st{margin-left:auto;font-weight:800;color:#5b3fb8} .pubcard .meta .st.ingame{color:var(--muted)}
+  .pubthumb{width:200px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:linear-gradient(120deg,#4a2fb0,#8b6cf0)}
   .wbar{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;font-family:inherit;border:1.5px solid var(--line);border-radius:14px;
     padding:14px 18px;margin-top:14px;background:var(--card);color:var(--text);font-weight:800;font-size:15px;transition:border-color .15s,transform .15s}
   .wbar:hover{border-color:var(--green);transform:translateY(-1px)}
@@ -113,7 +129,7 @@
   .wbar.on{border-color:var(--green);background:var(--green-soft);box-shadow:0 0 0 3px var(--green-soft)}
   .dailybtn{display:flex;align-items:center;gap:16px;width:100%;text-align:left;cursor:pointer;font-family:inherit;
     border:0;border-radius:20px;padding:20px 24px;margin:26px 0 0;color:#fff;
-    background:linear-gradient(120deg,#14532d,#1f9d55 55%,#2bb673);box-shadow:0 12px 30px rgba(20,60,38,.35);
+    background:linear-gradient(120deg,#1e3a8a,#2563eb 55%,#3b82f6);box-shadow:0 12px 30px rgba(30,58,138,.35);
     position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
   .dailybtn::after{content:'';position:absolute;right:-40px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.09)}
   .dailybtn:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(20,60,38,.42)}
@@ -649,7 +665,7 @@
   .chrep td{padding:8px;border-bottom:1px solid var(--hair)}
   .chrep td.w{font-weight:800;color:var(--green-dark)}
   .chrep td small{display:block;color:var(--muted);font-weight:500;font-size:12px}
-  #chal,#cmaps,#cmap,#cmake,#cmstats,#profile{overflow:auto;padding:30px 20px 60px}
+  #chal,#cmaps,#cmap,#cmake,#cmstats,#profile,#pub{overflow:auto;padding:30px 20px 60px}
   #chal .ddone{margin:14px 22px 22px}
   .cmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
   .cmcard{display:flex;flex-direction:column;gap:4px;padding:0 0 12px;border:1.5px solid var(--line);border-radius:14px;background:var(--raise);cursor:pointer;text-align:left;font-family:inherit;color:var(--text);overflow:hidden}
@@ -976,7 +992,7 @@
   .acctchip .gear{opacity:1}
   .bellcount{border:2px solid #fff}
   html[data-theme="dark"] .acctchip{background:#1f9d55;border-color:rgba(255,255,255,.25)} html[data-theme="dark"] .acctchip:hover{background:#26b364}
-  .dailybtn{box-shadow:0 5px 0 #0b4a27,0 16px 34px rgba(20,60,38,.35)}
+  .dailybtn{box-shadow:0 5px 0 #172b6b,0 16px 34px rgba(30,58,138,.35)}
   .dailybtn:hover{transform:translateY(-2px);box-shadow:0 7px 0 #0b4a27,0 20px 40px rgba(20,60,38,.4)}
   .dailybtn:active{transform:translateY(3px);box-shadow:0 2px 0 #0b4a27,0 8px 20px rgba(20,60,38,.3)}
   .learnbar,.wbar{box-shadow:0 3px 0 var(--edge);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,border-color .15s}
@@ -1133,10 +1149,15 @@
       <span class="ll"><b>Learn</b><span>Hand-picked spots. After every round, the two or three things in that view that gave it away.</span></span>
       <span class="lr">Open</span>
     </button>
-    <button class="learnbar" id="makeBar">
+    <button class="learnbar make" id="makeBar">
       <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><path d="M12 8v6M9 11h6"/></svg></span>
       <span class="ll"><b>Create a custom map</b><span>Pick ten or more spots anywhere on Earth, name it, and anyone can play it.</span></span>
       <span class="lr">New</span>
+    </button>
+    <button class="learnbar pub" id="pubBar">
+      <span class="lmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 19c0-3.4 2.9-5.5 6.5-5.5s6.5 2.1 6.5 5.5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 13.6c3 .1 6 1.9 6 5.4"/></svg></span>
+      <span class="ll"><b>Public lobbies</b><span>Open rooms anyone can walk into. Start one with a name and a line about it, or join whoever is playing right now.</span></span>
+      <span class="lr" id="pubCount">Open</span>
     </button>
     <button class="dailybtn" id="dailyBtn">
       <span class="dmark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#dailymark"/></svg></span>
@@ -1369,6 +1390,25 @@
     <div class="card wide"><h2 style="margin-bottom:4px">Maps</h2><div class="rsub" id="profMapsSub"></div><div class="cmgrid" id="profMaps"></div></div>
   </div>
 </div>
+<div id="pub" class="screen" hidden>
+  <div class="setup-wrap">
+    <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Public lobbies</b></div><button class="btn btn-secondary" id="pubBack" style="margin-left:auto">Back</button></div>
+    <div class="card">
+      <div class="prow2" style="justify-content:space-between;flex-wrap:wrap;gap:10px"><div><h2 style="margin:0">Open rooms</h2><div class="rsub" id="pubSub" style="margin-top:4px">Loading…</div></div><button class="btn btn-primary pubbtn" id="pubCreateBtn">Create a public lobby</button></div>
+      <div id="pubForm" hidden style="margin-top:14px;padding:16px;border:1.5px solid var(--line);border-radius:14px;background:var(--raise)">
+        <div class="label" style="margin-top:0">Lobby name</div>
+        <input class="tin" id="pubName" maxlength="32" placeholder="Friday night classics" autocomplete="off">
+        <div class="label">One line about it</div>
+        <input class="tin" id="pubDesc" maxlength="90" placeholder="Custom maps only, mostly Europe, chill" autocomplete="off">
+        <div class="label">Thumbnail <span class="dim">(optional)</span></div>
+        <div class="prow2" style="flex-wrap:wrap"><img id="pubThumb" class="pubthumb" alt="" src="" hidden><button class="btn btn-secondary sm" id="pubThumbBtn">Choose an image</button><button class="btn btn-secondary sm" id="pubThumbClear" hidden>Remove</button><input type="file" id="pubThumbFile" accept="image/*" hidden></div>
+        <div class="rsub" style="margin-top:10px">Anyone can join while it is open. Voice and text chat work like any room, and you host it.</div>
+        <div class="twobtn"><button class="btn btn-primary pubbtn" id="pubGo">Create and open the lobby</button><button class="btn btn-secondary" id="pubCancel">Cancel</button></div>
+      </div>
+      <div class="cmgrid" id="pubList" style="margin-top:14px"></div>
+    </div>
+  </div>
+</div>
 <div id="cmstats" class="screen" hidden>
   <div class="setup-wrap">
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Map analytics</b></div><button class="btn btn-secondary" id="statsBack" style="margin-left:auto">Back</button></div>
@@ -1485,6 +1525,7 @@
 <div id="lobby" class="screen" hidden>
   <div class="lobby-wrap">
     <div class="brand-row" style="margin-bottom:18px"><div class="lockup"><svg viewBox="0 0 64 64" aria-hidden="true" style="width:34px;height:34px"><use href="#logo"/></svg><b style="font-size:22px">Pinpoint</b></div><button class="btn btn-secondary" id="leaveBtn" style="margin-left:auto">Leave</button></div>
+    <div class="rsub" id="lobbyPub" hidden style="margin:-8px 0 12px;padding:10px 14px;border-radius:12px;background:#efe7ff;color:#5b3fb8;font-weight:600"></div>
     <div class="code-box"><div class="cb-code"><small>Code</small><b id="roomCode">····</b></div><div class="cb-actions"><button class="btn btn-secondary" id="copyLink">Copy invite link</button><button class="btn btn-secondary" id="copyCode">Copy code</button><span class="invitebox"><button class="btn btn-secondary" id="inviteBtn">Invite friends</button><div class="invitelist" id="inviteList" hidden></div></span></div><div class="conn" id="connBox" hidden style="flex-basis:100%;margin:0"></div><div id="roomUrl" hidden></div></div>
     <div class="lobby-grid">
       <div class="card">
@@ -2380,7 +2421,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260918-190748';
+const BUILD='20260918-193044';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2531,7 +2572,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:4,patch:27};
+const VERSION={major:3,minor:4,patch:28};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3875,6 +3916,60 @@ $('profUnban').addEventListener('click',()=>{ if(!admin.on) return; const k=prof
 /* any name with a handle behind it opens the profile */
 document.addEventListener('click',e=>{ const p=e.target.closest('[data-prof]'); if(!p) return; if(e.target.closest('[data-trash],[data-edit],[data-cdel],[data-cmdel]')) return; e.preventDefault(); e.stopPropagation(); openProfile(p.dataset.prof); },true);
 
+/* ---------- Public lobbies ----------
+   A host who opens a public lobby keeps one retained message under worlddrop/v1/pub/<code> with the name, the line,
+   the thumbnail, who is hosting, how many are in and whether a game is running, refreshed every 20 s and cleared when
+   the room closes. The list is the wildcard, and anything not refreshed in 90 s is stale. Joining is the normal join. */
+const PUB_ROOT='worlddrop/v1/pub';
+const plob={mine:null,list:{},lastPub:0,timer:null,thumb:null};
+function pubPublish(){
+  if(mp.role!=='host'||!plob.mine||!mp.code) return; plob.lastPub=Date.now();
+  const rec={code:mp.code,name:plob.mine.name,desc:plob.mine.desc||'',thumb:plob.mine.thumb||null,host:{k:acct.key||'',name:acct.name||mp.me.name||'someone'},players:playerList().length,cap:MAX_PLAYERS,mode:mp.settings.mode,custom:mp.settings.custom?mp.settings.custom.name:null,phase:mp.phase,ts:Date.now()};
+  for(const l of lb.links) if(l.ready){ try{ l.client.publish(PUB_ROOT+'/'+mp.code,JSON.stringify(rec),{qos:1,retain:true}); }catch(e){} }
+}
+function pubClear(code){ for(const l of lb.links) if(l.ready){ try{ l.client.publish(PUB_ROOT+'/'+code,'',{qos:1,retain:true}); }catch(e){} } }
+function pubList(ms){
+  const links=lb.links.filter(l=>l.ready); if(!links.length) return Promise.resolve(plob.list);
+  const wild=PUB_ROOT+'/+'; const fresh={};
+  return new Promise(resolve=>{ let done=false;
+    const finish=()=>{ if(done) return; done=true; clearTimeout(timer); for(const l of links){ try{ l.client.removeListener('message',onMsg); l.client.unsubscribe(wild); }catch(e){} } plob.list=fresh; resolve(fresh); };
+    const onMsg=(t,payload)=>{ if(!t.startsWith(PUB_ROOT+'/')) return; let r=null; try{ r=JSON.parse(payload.toString()); }catch(e){} if(r&&r.code&&r.name&&Date.now()-(+r.ts||0)<90000) fresh[r.code]=r; };
+    for(const l of links){ try{ l.client.on('message',onMsg); l.client.subscribe(wild,{qos:0}); }catch(e){} }
+    const timer=setTimeout(finish,ms||2200); });
+}
+function pubThumbOf(r){ return r.thumb?`<img class="thumb" src="${r.thumb}" alt="">`:`<div class="thumb txt">${esc((r.name||'?').trim().slice(0,2).toUpperCase())}</div>`; }
+function renderPub(){
+  const list=Object.values(plob.list).sort((a,b)=>(a.phase==='lobby'?0:1)-(b.phase==='lobby'?0:1)||b.ts-a.ts);
+  $('pubSub').textContent=list.length?`${list.length} room${list.length===1?'':'s'} open right now`:(lbLive()?'Nobody has a public lobby open. Start one and people can find it here.':'Connecting…');
+  $('pubList').innerHTML=list.map(r=>{ const ingame=r.phase!=='lobby'; const full=(r.players||0)>=(r.cap||MAX_PLAYERS); const modeName=r.custom?r.custom:(MODES[r.mode]?MODES[r.mode].name:'Classic');
+    return `<button class="pubcard" data-join="${esc(r.code)}" ${ingame||full?'data-busy="1"':''}>${pubThumbOf(r)}<b>${esc(r.name)}</b>${r.desc?`<span class="desc">${esc(r.desc)}</span>`:''}<span class="by">${r.host&&r.host.k?faceOf(r.host.k,18):''}hosted by ${esc(r.host&&r.host.name||'someone')}</span><span class="meta"><span><b>${r.players||0}</b>/${r.cap||MAX_PLAYERS} in</span><span>${esc(modeName)}</span><span class="st ${ingame?'ingame':''}">${ingame?'In a game':full?'Full':'Join'}</span></span></button>`; }).join('');
+  const n=list.filter(r=>r.phase==='lobby').length; if($('pubCount')) $('pubCount').textContent=n?`${n} open`:'Open';
+}
+async function openPub(){
+  cm.from='menu'; show('pub'); $('pub').scrollTo(0,0); $('pubForm').hidden=true; renderPub();
+  clearInterval(plob.timer); const tick=async()=>{ if($('pub').hidden){ clearInterval(plob.timer); return; } await pubList(); if(!$('pub').hidden) renderPub(); };
+  await tick(); plob.timer=setInterval(tick,10000);
+}
+$('pubBar').addEventListener('click',openPub);
+$('pubBack').addEventListener('click',()=>{ clearInterval(plob.timer); show('menu'); });
+$('pubCreateBtn').addEventListener('click',()=>{ if(!acct.key) return needAcct('create a public lobby'); $('pubForm').hidden=!$('pubForm').hidden; if(!$('pubForm').hidden) $('pubName').focus(); });
+$('pubCancel').addEventListener('click',()=>{ $('pubForm').hidden=true; });
+$('pubThumbBtn').addEventListener('click',()=>$('pubThumbFile').click());
+$('pubThumbClear').addEventListener('click',()=>{ plob.thumb=null; $('pubThumb').hidden=true; $('pubThumbClear').hidden=true; });
+$('pubThumbFile').addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return; const url=URL.createObjectURL(f); const im=new Image();
+  im.onload=()=>{ const c=document.createElement('canvas'); c.width=320; c.height=180; const ctx=c.getContext('2d'); const sc=Math.max(320/im.width,180/im.height); const w=im.width*sc,h=im.height*sc; ctx.drawImage(im,(320-w)/2,(180-h)/2,w,h); plob.thumb=c.toDataURL('image/jpeg',0.72); URL.revokeObjectURL(url); $('pubThumb').src=plob.thumb; $('pubThumb').hidden=false; $('pubThumbClear').hidden=false; };
+  im.onerror=()=>{ URL.revokeObjectURL(url); toast('That image could not be read'); }; im.src=url; });
+$('pubGo').addEventListener('click',async()=>{
+  if(!acct.key) return needAcct('create a public lobby');
+  const name=cleanName($('pubName').value).slice(0,32); if(name.length<2){ toast('Give the lobby a name'); $('pubName').focus(); return; }
+  plob.mine={name,desc:cleanName($('pubDesc').value).slice(0,90),thumb:plob.thumb||null};
+  clearInterval(plob.timer); $('pubForm').hidden=true;
+  await mpHost('party'); setTimeout(pubPublish,1500); setTimeout(pubPublish,5000);
+  toast(`${name} is open. Anyone can join it now.`,'ok');
+});
+$('pubList').addEventListener('click',e=>{ const b=e.target.closest('[data-join]'); if(!b) return; if(b.dataset.busy){ toast(b.querySelector('.st').textContent==='Full'?'That room is full':'That room is mid-game, try again after their round'); return; } clearInterval(plob.timer); mpJoin(b.dataset.join); });
+function paintLobbyPub(){ const el=$('lobbyPub'); if(!el) return; const on=mp.role==='host'&&plob.mine; el.hidden=!on; if(on) el.textContent=`Public lobby: ${plob.mine.name}${plob.mine.desc?' · '+plob.mine.desc:''}. Anyone can join while it is open.`; }
+
 /* ---------- Map analytics ----------
    Every finished play on a custom map adds one play and its seconds to that day in the map's own record,
    so the maker gets a YouTube-style dashboard: plays and play time per day, this period against the last,
@@ -4227,9 +4322,9 @@ function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); renderDailyBoard('me
 $('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
 $('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
 
-const SCREENS=['menu','setup','acct','friends','region','daily','board','lobby','game','result','final','chal','cmaps','cmake','cmap','cmstats','profile'];
+const SCREENS=['menu','setup','acct','friends','region','daily','board','lobby','game','result','final','chal','cmaps','cmake','cmap','cmstats','profile','pub'];
 function currentScreen(){ return SCREENS.find(s=>!$(s).hidden)||'menu'; }
-const KEEP_SCREENS=['menu','setup','acct','friends','daily','board','cmaps','cmap','cmstats','profile'];
+const KEEP_SCREENS=['menu','setup','acct','friends','daily','board','cmaps','cmap','cmstats','profile','pub'];
 let bootScreen=null; try{ bootScreen=JSON.parse(localStorage.getItem('pp_screen')||'null'); }catch(e){}   // read before boot shows the menu
 function saveScreen(){ try{ const id=currentScreen(); if(!KEEP_SCREENS.includes(id)) return; localStorage.setItem('pp_screen',JSON.stringify({s:id,id:id==='cmap'&&cm.cur?cm.cur.id:id==='profile'?prof.key:id==='board'?bp.mode:null,ts:Date.now()})); }catch(e){} }
 function restoreScreen(){
@@ -4246,6 +4341,7 @@ function restoreScreen(){
     case 'cmap': if(sv.id){ cm.from='menu'; cmapOpen(sv.id); } break;
     case 'cmstats': if(acct.key) openStats(); break;
     case 'profile': if(sv.id){ prof.from='menu'; openProfile(sv.id); } break;
+    case 'pub': openPub(); break;
   } }catch(e){}
 }
 function show(id){ for(const s of SCREENS) $(s).hidden = s!==id; if(KEEP_SCREENS.includes(id)) setTimeout(saveScreen,0); if(id==='game'||id==='menu') confettiStop();
@@ -5241,6 +5337,7 @@ async function mpHost(kind){
   }
   mp.hb=setInterval(()=>{
     mpBroadcast({t:'hb'});
+    if(plob.mine&&Date.now()-plob.lastPub>20000) pubPublish();
     const now=Date.now();
     for(const p of playerList()){ if(p.host) continue; if(now-(mp.seen[p.id]||now)>25000){ dlog('dropping silent '+p.name); hostDrop(p.id); } }
   },5000);
@@ -5294,6 +5391,7 @@ function mpLeave(){
   if(mp.deadline){ clearTimeout(mp.deadline); mp.deadline=null; }
   if(mp.hb){ clearInterval(mp.hb); mp.hb=null; }
   if(mp.joinTimer){ clearTimeout(mp.joinTimer); mp.joinTimer=null; }
+  if(mp.role==='host'&&plob.mine){ pubClear(mp.code); plob.mine=null; }
   if(mp.role==='host') mpBroadcast({t:'host-left'}); else if(mp.link) mpSend({t:'leave',id:mp.me.id});
   voiceStop();
   try{ mp.peer&&mp.peer.destroy(); }catch(e){}
@@ -5338,7 +5436,7 @@ function avTag(id,name,size,cls){
   return url ? `<span class="pav ${cls||''}" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`
              : `<span class="pav ${cls||''} ini" style="width:${size}px;height:${size}px">${initial}</span>`;
 }
-function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mpBroadcast({t:'lobby',players:pubPlayers(),settings:mp.settings,cd:mp.cd?mp.cdLeft:null}); renderLobby(); voiceConnect(); }
+function hostSync(){ const me=mp.players[mp.me.id]; if(me) mp.me.color=me.color; mpBroadcast({t:'lobby',players:pubPlayers(),settings:mp.settings,cd:mp.cd?mp.cdLeft:null}); renderLobby(); voiceConnect(); if(plob.mine&&Date.now()-plob.lastPub>3000) pubPublish(); }
 function hostDrop(id){
   if(!mp.players[id]||id==='host') return;
   const name=mp.players[id].name||'A player'; const vp=mp.players[id].vpeer; delete mp.players[id]; delete mp.seen[id]; if(vp) voiceDrop(vp);
@@ -5619,8 +5717,8 @@ function renderBlindSetup(){
 }
 function renderLobby(){
   const ps=playerList();
-  const duo=mp.settings.kind==='duo', cap=duo?2:10, lm=modeOf(mp.settings.mode);
-  $('pcount').textContent=ps.length?`(${ps.length}/${cap})`:'';
+  const duo=mp.settings.kind==='duo', cap=duo?2:MAX_PLAYERS, lm=modeOf(mp.settings.mode);
+  $('pcount').textContent=ps.length?`(${ps.length}/${cap})`:''; paintLobbyPub();
   $('plistTitle').textContent=duo?(lm.blind?'Partner':'Opponent'):'Players';
   if($('mpRoundsBox')) $('mpRoundsBox').hidden=!!lm.duel;
   renderBlindSetup();
@@ -6093,7 +6191,7 @@ function toast(msg,kind){ const t=document.createElement('div'); t.className='to
 paintDailyButton(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintRegion(); paintAcct();
 setTimeout(restoreScreen,50);   // a reload lands you back where you were
 paintBell(); setTimeout(paintBell,0);   // the daily's state settles a tick after the rest of the boot
-setTimeout(()=>{ paintBell(); if(acct.key){ socWarming=null; socWarm(); loadInbox(); } else fetchDirectory().then(lbPaint); },4000);   // the brokers are up by now
+setTimeout(()=>{ paintBell(); if(acct.key){ socWarming=null; socWarm(); loadInbox(); } else fetchDirectory().then(lbPaint); pubList().then(()=>{ const n=Object.values(plob.list).filter(r=>r.phase==='lobby').length; if($('pubCount')) $('pubCount').textContent=n?`${n} open`:'Open'; }); },4000);   // the brokers are up by now
 setInterval(()=>{ fetchDirectory().then(lbPaint); },6*60*1000);   // streaks on the boards stay current
 setInterval(()=>{ paintBell(); if(acct.key&&!notes.open) loadInbox(); },90000);
 
