@@ -355,6 +355,10 @@
   .rgrid.small button{padding:10px 11px;font-size:13.5px;font-weight:600}
   .rgrid button:hover{border-color:var(--green);background:var(--green-soft)}
   .rgrid button.on{background:var(--green);border-color:var(--green);color:#fff}
+  .rgrid button.some{border-color:var(--green);background:var(--green-soft)}
+  .rgrid button.gone{opacity:.45;cursor:default;background:var(--sunk)}
+  .rgrid button.gone:hover{transform:none;border-color:var(--line);background:var(--sunk)}
+  .rgrid button.open{box-shadow:0 2px 0 var(--edge),inset 0 0 0 1.5px var(--green)}
   .rgrid button small{display:block;font-weight:600;font-size:11px;color:var(--muted);margin-top:3px}
   .rgrid button.on small{color:rgba(255,255,255,.85)}
   @media (max-width:640px){ .rgrid{grid-template-columns:repeat(2,1fr)} }
@@ -1949,6 +1953,11 @@ function continentPlan(n,rng){ const plan=[]; while(plan.length<n) plan.push(...
 /* ---------- Where in the world: a continent, a country, or anywhere ---------- */
 const CONT_NAMES={NA:'North America',SA:'South America',EU:'Europe',AF:'Africa',AS:'Asia',OC:'Oceania'};
 /* Built on first use: countryOfRegion leans on tables defined further down the file. */
+/* Countries the app lists that Google has never driven: five points in each country's boxes, a
+   60 km snap radius, nothing found. They stay on the picker, greyed, rather than vanishing, so it
+   is clear the game knows about them and there is simply nothing to show. */
+const NO_SV=new Set(['Tanzania','Madagascar','Egypt','Democratic Republic of the Congo','Ethiopia','Pakistan','Vanuatu']);
+function countriesIn(c){ return Object.keys(countryIndex()[c]).filter(k=>!NO_SV.has(k)); }
 let _ci=null;
 function countryIndex(){
   if(_ci) return _ci;
@@ -1956,18 +1965,40 @@ function countryIndex(){
   for(const c of CONTINENTS){ _ci[c]={}; for(const p of PLACES[c]){ const k=countryOfRegion(p[0])||p[0]; (_ci[c][k]=_ci[c][k]||[]).push(p[0]); } }
   return _ci;
 }
+/* One continent, one country, or any mix of both. Whatever is picked reads back as two sets, and
+   a pick of exactly one writes back out in the old single-value shape, so scores, challenges and
+   rooms saved before this still say what they always said. */
+function regSel(r){
+  const c=new Set(), n=new Set();
+  if(r&&r.type==='continent') c.add(r.value);
+  else if(r&&r.type==='country') n.add(r.value);
+  else if(r&&r.type==='multi'&&r.value){ for(const x of r.value.c||[]) c.add(x); for(const x of r.value.n||[]) n.add(x); }
+  return {c,n};
+}
+function regFrom(sel){
+  const c=[...sel.c], n=[...sel.n].sort();
+  if(!c.length&&!n.length) return {type:'all',value:null};
+  if(c.length===1&&!n.length) return {type:'continent',value:c[0]};
+  if(n.length===1&&!c.length) return {type:'country',value:n[0]};
+  return {type:'multi',value:{c,n}};
+}
+function regCount(r){ const s=regSel(r); return s.c.size+s.n.size; }
 function regionLabel(r){
   if(!r||r.type==='all') return 'Anywhere';
   if(r.type==='continent') return CONT_NAMES[r.value]||r.value;
   if(r.type==='draw') return r.value.n||'Your own area';
+  if(r.type==='multi'){
+    const all=(r.value.c||[]).map(x=>CONT_NAMES[x]||x).concat(r.value.n||[]);
+    return all.length<=2?all.join(' and '):`${all[0]}, ${all[1]} and ${all.length-2} more`;
+  }
   return r.value;
 }
 /* Which PLACES entries a region allows. */
 function regionNames(r){
   if(!r||r.type==='all'||r.type==='draw') return null;
-  if(r.type==='continent') return new Set(PLACES[r.value].map(p=>p[0]));
-  const out=new Set();
-  for(const c of CONTINENTS) for(const p of PLACES[c]) if((countryOfRegion(p[0])||p[0])===r.value) out.add(p[0]);
+  const sel=regSel(r), out=new Set();
+  for(const c of sel.c) for(const p of PLACES[c]) out.add(p[0]);
+  if(sel.n.size) for(const c of CONTINENTS) for(const p of PLACES[c]) if(sel.n.has(countryOfRegion(p[0])||p[0])) out.add(p[0]);
   return out;
 }
 /* City and island lists carry no country, so fall back to the boxes they sit inside. */
@@ -2644,7 +2675,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260921-111650';
+const BUILD='20260921-124141';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2795,7 +2826,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:6,patch:0};
+const VERSION={major:3,minor:6,patch:1};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4427,7 +4458,8 @@ function paintRegion(){
   if($('regionBtn')) $('regionBtn').textContent=regionLabel(state.region);
   if($('mpRegionBtn')) $('mpRegionBtn').textContent=regionLabel(mp.settings.region);
   const lbl=regionLabel(curRegion());
-  if($('regionNow')) $('regionNow').textContent=curRegion().type==='all'?'Anywhere on Earth':`Currently: ${lbl}`;
+  if($('regionNow')){ const cur=curRegion(); const n=regCount(cur);
+    $('regionNow').textContent=cur.type==='all'?'Anywhere on Earth':n>2?`${n} picked: ${lbl}`:`Currently: ${lbl}`; }
 }
 function renderRegionScreen(){
   paintRegion();
@@ -4435,25 +4467,29 @@ function renderRegionScreen(){
   $('regionAll').classList.toggle('on',cur.type==='all');
   $('regionDraw').classList.toggle('on',cur.type==='draw');
   $('regionDraw').textContent=cur.type==='draw'?'Your own area · redraw it':'Draw your own area on the map';
+  const sel=regSel(cur);
   $('contGrid').innerHTML=CONTINENTS.map(c=>{
-    const n=Object.keys(countryIndex()[c]).length;
-    const on=(cur.type==='continent'&&cur.value===c)||regionCont===c;
-    return `<button data-cont="${c}" class="${on?'on':''}">${esc(CONT_NAMES[c])}<small>${n} countries</small></button>`;
+    const ks=countriesIn(c), n=ks.length;
+    const on=sel.c.has(c), part=!on&&ks.filter(k=>sel.n.has(k)).length;
+    return `<button data-cont="${c}" class="${on?'on':part?'some':''}${regionCont===c?' open':''}">${esc(CONT_NAMES[c])}<small>${on?`all ${n} countries`:part?`${part} of ${n} picked`:`${n} countries`}</small></button>`;
   }).join('');
   const box=$('countryBox');
   if(!regionCont){ box.hidden=true; return; }
   box.hidden=false;
-  $('countryLbl').textContent=`Countries in ${CONT_NAMES[regionCont]}`;
+  $('countryLbl').textContent=`Countries in ${CONT_NAMES[regionCont]} · tap to add or drop them`;
   const names=Object.keys(countryIndex()[regionCont]).sort();
+  const gone=n=>NO_SV.has(n);
   $('countryGrid').innerHTML=
-    `<button data-whole="${regionCont}" class="${cur.type==='continent'&&cur.value===regionCont?'on':''}">All of ${esc(CONT_NAMES[regionCont])}</button>`+
-    names.map(n=>`<button data-country="${esc(n)}" class="${cur.type==='country'&&cur.value===n?'on':''}">${esc(n)}</button>`).join('');
+    `<button data-whole="${regionCont}" class="${sel.c.has(regionCont)?'on':''}">All of ${esc(CONT_NAMES[regionCont])}</button>`+
+    names.map(n=>gone(n)
+      ? `<button class="gone" disabled>${esc(n)}<small>no Street View</small></button>`
+      : `<button data-country="${esc(n)}" class="${sel.c.has(regionCont)||sel.n.has(n)?'on':''}">${esc(n)}</button>`).join('');
 }
 function setRegion(r){ if(regionFrom==='lobby'){ mp.settings.region=r; hostSync(); } else state.region=r; paintRegion(); renderRegionScreen(); sfx('click'); }
 function openRegion(from){
   regionFrom=from; const cur=curRegion();
-  regionCont=cur.type==='country' ? CONTINENTS.find(c=>Object.keys(countryIndex()[c]).includes(cur.value))
-    : (cur.type==='continent'?cur.value:null);
+  const sel=regSel(cur);
+  regionCont=sel.c.size?[...sel.c][0]:(sel.n.size?CONTINENTS.find(c=>countryIndex()[c][[...sel.n][0]]):null);
   renderRegionScreen(); show('region'); $('region').scrollTo(0,0);
 }
 $('regionBtn').addEventListener('click',()=>openRegion('setup'));
@@ -4527,12 +4563,29 @@ $('drawUse').addEventListener('click',()=>{
   regionCont=null; setRegion({type:'draw',value:{p:draw.pts,n:'Your own area',id:'d'+Date.now().toString(36)}});
   show('region'); renderRegionScreen();
 });
+/* Turning a continent off when only one of its countries should go means listing the rest, and
+   ticking the last missing country folds them back into the continent again, so the label stays
+   readable however you got there. */
+function toggleCont(c){
+  const sel=regSel(curRegion());
+  if(sel.c.has(c)) sel.c.delete(c);
+  else { sel.c.add(c); for(const k of countriesIn(c)) sel.n.delete(k); }
+  setRegion(regFrom(sel));
+}
+function toggleCountry(name){
+  const sel=regSel(curRegion());
+  const cont=CONTINENTS.find(c=>countryIndex()[c][name]);
+  if(cont&&sel.c.has(cont)){ sel.c.delete(cont); for(const k of countriesIn(cont)) sel.n.add(k); }
+  if(sel.n.has(name)) sel.n.delete(name); else sel.n.add(name);
+  for(const c of CONTINENTS){ const ks=countriesIn(c);
+    if(ks.length&&ks.every(k=>sel.n.has(k))){ for(const k of ks) sel.n.delete(k); sel.c.add(c); } }
+  setRegion(regFrom(sel));
+}
 $('contGrid').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
-  regionCont=b.dataset.cont; renderRegionScreen(); sfx('click');
+  regionCont=b.dataset.cont; toggleCont(b.dataset.cont); sfx('click');
   $('countryBox').scrollIntoView({block:'nearest',behavior:'smooth'}); });
 $('countryGrid').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
-  if(b.dataset.whole) setRegion({type:'continent',value:b.dataset.whole});
-  else setRegion({type:'country',value:b.dataset.country}); });
+  if(b.dataset.whole) toggleCont(b.dataset.whole); else toggleCountry(b.dataset.country); sfx('click'); });
 
 /* ---------- The daily drop: one game a day, identical everywhere ---------- */
 const DAILY_MODES=['classic','classic','classic','gray','pixel','blink','murica','jungle','million','landmarks','coast','islands','stranded','snow','timemachine','countdown','country','capitals','altitude','temp','allin'];
