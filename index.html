@@ -220,9 +220,8 @@
   .board .who.lnk{cursor:pointer} .board .who.lnk:hover .nm{text-decoration:underline}
   .pav.sil{background:#c9d3cc;display:grid;place-items:center} .pav.sil svg{width:68%;height:68%;fill:#fff}
   html[data-theme="dark"] .pav.sil{background:#3a4a40}
-  .board .fchip.adm{background:var(--green-dark);color:#fff} .board .fchip.ai{background:#e8e2ff;color:#5a3fc0}
-  .fchip.adm{background:var(--green-dark);color:#fff} .fchip.ai{background:#e8e2ff;color:#5a3fc0}
-  .aitog{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);user-select:none;flex:none}
+  .board .fchip.adm{background:var(--green-dark);color:#fff}
+  .fchip.adm{background:var(--green-dark);color:#fff}
   .dlgwrap{position:fixed;inset:0;z-index:150;background:rgba(8,26,16,.5);display:grid;place-items:center;padding:16px}
   .dlgwrap[hidden]{display:none}
   .dlg{width:min(440px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px 22px;animation:nagIn .18s ease-out}
@@ -676,12 +675,7 @@
   .signup{margin:10px auto 0;max-width:430px;background:var(--green-soft);border:1.5px solid var(--green);border-radius:12px;padding:14px 16px;text-align:center}
   .signup b{display:block;font-size:15px;color:var(--text)}
   .signup span{display:block;font-size:13px;color:var(--muted);margin:3px 0 10px}
-  .savenag{margin:12px auto 0;max-width:430px;background:var(--green-soft);border:1.5px solid var(--green);border-radius:12px;padding:12px 14px;text-align:center;animation:nagIn .2s ease-out}
   @keyframes nagIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .savenag b{display:block;font-size:15px;color:var(--text)}
-  .savenag span{display:block;font-size:13px;color:var(--muted);margin:3px 0 10px}
-  .savenag .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-  .savenag .btn{padding:9px 16px;font-size:14px}
   .save-row{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap;justify-content:center}
   .save-row input{padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;width:220px;outline:none;background:var(--raise);color:var(--text)}
   .save-row input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
@@ -1761,17 +1755,11 @@
     <div class="save-row" id="saveRow">
       <input id="nameInput" maxlength="20" placeholder="Your name">
       <button class="btn btn-secondary" id="saveBtn">Save to global leaderboard</button>
-      <span class="aitog" id="aiRow"><span>AI used</span><label class="switch" id="aiSw" title="AI was used in this game"><input type="checkbox" id="aiUsed"><i></i></label></span>
       <span class="saved" id="savedMsg" hidden></span>
     </div>
     <div class="signup" id="signUp" hidden>
       <b>Save this score</b>
       <button class="btn btn-primary" id="signUpBtn" style="margin-top:8px">Create an account or sign in</button>
-    </div>
-    <div class="savenag" id="saveNag" hidden>
-      <b id="nagTitle">Save your score first?</b>
-      <span id="nagSub">Leave now and this game won't be on the leaderboard.</span>
-      <div class="row"><button class="btn btn-primary" id="nagSave">Save it</button><button class="btn btn-secondary" id="nagSkip">Leave anyway</button></div>
     </div>
     <div class="rivalline" id="finalRival" hidden></div>
     <div class="final-actions">
@@ -2675,7 +2663,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260921-124141';
+const BUILD='20260922-092641';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2697,7 +2685,6 @@ function lbClean(e){
   const out={id:String(e.id||'').slice(0,24)||('x'+ts), name, score,
           rounds:isFinite(rounds)&&rounds>0?rounds:0, time:isFinite(time)&&time>=0?time:0, ts};
   if(k) out.k=k;   // whose account saved it, so friends can be marked on the board
-  if(e.ai===true) out.ai=true;   // the player said an AI helped
   return out;
 }
 /* Scores an admin removed. One retained list of entry ids; every client drops them on merge and on reconcile,
@@ -2826,7 +2813,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:6,patch:1};
+const VERSION={major:3,minor:6,patch:2};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3372,7 +3359,6 @@ const SIL='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r=
 /* A face for a board row: the photo if we know it, otherwise the plain silhouette. */
 function faceOf(k,size){ const url=k&&personAv(k); return url?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`:`<span class="pav sil" style="width:${size}px;height:${size}px">${SIL}</span>`; }
 function adminTag(k){ return k===ADMIN_KEY?' <span class="fchip adm">Admin</span>':''; }
-function aiTag(e){ return e&&e.ai?' <span class="fchip ai" title="The player said an AI helped">AI</span>':''; }
 /* Old scores were saved before accounts were attached. If the row's name is exactly one account's handle or
    display name, the row is theirs: face, link and tags included. Two accounts with the same name means no guess. */
 let dirByName=null, dirByNameN=-1;
@@ -3383,7 +3369,7 @@ function keyFor(e){
   if(!dirByName||dirByNameN!==n){ dirByName={}; for(const k of Object.keys(soc.dir)){ const f=foldName(soc.dir[k].name).replace(/[^a-z0-9]/g,''); if(!f) continue; dirByName[f]=dirByName[f]?'!':k; } dirByNameN=n; }
   const k=dirByName[foldName(e.name).replace(/[^a-z0-9]/g,'')]; return k&&k!=='!'?k:'';
 }
-function nameCell(e0){ const k=keyFor(e0); const e=k&&!e0.k?{...e0,k}:e0; return `<td class="name"><span class="who${k?' lnk':''}"${k?` data-prof="${esc(k)}"`:''}>${faceOf(k,26)}<span class="nm">${esc(e.name)}</span>${adminTag(k)}${friendTag(e)}${aiTag(e)}${streakTag(e)}</span></td>`; }
+function nameCell(e0){ const k=keyFor(e0); const e=k&&!e0.k?{...e0,k}:e0; return `<td class="name"><span class="who${k?' lnk':''}"${k?` data-prof="${esc(k)}"`:''}>${faceOf(k,26)}<span class="nm">${esc(e.name)}</span>${adminTag(k)}${friendTag(e)}${streakTag(e)}</span></td>`; }
 function frFace(k,size){
   const url=personAv(k);
   return url?`<span class="pav" style="width:${size}px;height:${size}px;background-image:url(${url})"></span>`
@@ -3807,7 +3793,7 @@ async function cmapFinish(){
 }
 /* The final screen says where the game went. */
 async function paintCustomSave(){
-  const map=state.custom; $('saveBtn').hidden=true; $('nameInput').hidden=true; $('aiRow').hidden=true; $('saveRow').hidden=!acct.key; $('signUp').hidden=!!acct.key;
+  const map=state.custom; $('saveBtn').hidden=true; $('nameInput').hidden=true; $('saveRow').hidden=!acct.key; $('signUp').hidden=!!acct.key;
   $('viewBoardBtn').hidden=false; $('viewBoardBtn').textContent='View map board';
   if(!acct.key){ $('signUp').querySelector('b').textContent=`Get on the ${map.name} board`; cmapFinish(); return; }
   $('savedMsg').hidden=false; $('savedMsg').textContent=`Saving to the ${map.name} board…`;
@@ -4700,8 +4686,7 @@ $('bpFilters').addEventListener('click',e=>{ const b=e.target.closest('.chip'); 
 $('bpModes').addEventListener('click',e=>{ const b=e.target.closest('.bpmode'); if(!b) return;
   bp.mode=b.dataset.mode; bp.rounds='all'; bp.time='all'; bp.highlight=null; renderBoardPage(); $('board').scrollTo(0,0); });
 $('boardBack').addEventListener('click',()=>{ if(bp.from==='final'){ show('final'); } else { renderBoard(); show('menu'); } });
-$('boardMenu').addEventListener('click',()=>{ if(bp.from==='final'&&scoreUnsaved()){ show('final'); nagToSave(finalMenu); return; } if(mp.role) mpLeave(); renderBoard(); show('menu'); });
-$('aiUsed').addEventListener('change',e=>{ $('aiSw').classList.toggle('on',e.target.checked); sfx('click'); });
+$('boardMenu').addEventListener('click',()=>{ if(mp.role) mpLeave(); renderBoard(); show('menu'); });
 $('viewBoardBtn').addEventListener('click',()=>{ if(state.custom){ cm.from='setup'; cmapOpen(state.custom.id); return; } openBoardPage(state.mode,state.savedId,'final'); });
 $('allBoards').addEventListener('click',()=>openBoardPage('classic',null,'menu'));
 $('soloBoards').addEventListener('click',()=>openBoardPage('classic',null,'menu'));
@@ -4750,20 +4735,6 @@ picker('roundSeg','roundCustom','r',1,100,v=>{ state.userRounds=v; });
 state.userTime=60; state.userRounds=5;
 $('startBtn').addEventListener('click',()=>startGame());
 /* Leaving the final screen with an unsaved score asks first, it's easy to walk away from a run by accident. */
-let nagAction=null;
-function scoreUnsaved(){ return !$('saveRow').hidden && !state.saved; }
-function needsSave(){ return !$('final').hidden && canSave() && scoreUnsaved(); }
-function hideNag(){ $('saveNag').hidden=true; nagAction=null; }
-function nagToSave(action){
-  nagAction=action; const nag=$('saveNag'); nag.hidden=false;
-  $('nagTitle').textContent='Save your score first?';
-  $('nagSub').textContent="Leave now and this game won't be on the leaderboard.";
-  $('saveBtn').classList.remove('ready'); void $('saveBtn').offsetWidth; $('saveBtn').classList.add('ready');
-  const n=$('nameInput'); if(!n.value.trim()) n.focus();
-  nag.scrollIntoView({block:'nearest',behavior:'smooth'});
-}
-$('nagSave').addEventListener('click',()=>{ const go=nagAction; hideNag(); $('saveBtn').click(); if(go) go(); });
-$('nagSkip').addEventListener('click',()=>{ const go=nagAction; hideNag(); if(go) go(); });
 function finalAgain(){
   if(mp.role==='host'){ srvLoopStop(); mpBroadcast({t:'lobby-return'}); mpToLobby(); return; }
   if(mp.role) return;
@@ -4771,8 +4742,8 @@ function finalAgain(){
   startGame();
 }
 function finalMenu(){ if(mp.role) mpLeave(); renderBoard(); renderDailyBoard('menuDailyWrap','menuDailySub'); paintDailyButton(); show('menu'); }
-$('againBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalAgain); finalAgain(); });
-$('menuBtn').addEventListener('click',()=>{ if(needsSave()) return nagToSave(finalMenu); finalMenu(); });
+$('againBtn').addEventListener('click',()=>finalAgain());
+$('menuBtn').addEventListener('click',()=>finalMenu());
 
 const SCREENS=['menu','setup','acct','friends','region','draw','daily','board','lobby','game','result','final','chal','cmaps','cmake','cmap','cmstats','profile','pub'];
 function currentScreen(){ return SCREENS.find(s=>!$(s).hidden)||'menu'; }
@@ -5129,13 +5100,12 @@ function showFinal(){
 
   chalFinish(); $('againBtn').textContent=state.chal?'New game':'Play again';
   // Leaderboard save
-  state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('saveBtn').hidden=false; $('nameInput').hidden=false; $('aiUsed').checked=false; $('aiSw').classList.remove('on'); $('aiRow').hidden=false; hideNag();
-  const signedIn=!!acct.name; $('signUp').hidden=signedIn; $('saveRow').hidden=!signedIn;
-  $('nameInput').value=''; $('nameInput').placeholder=acct.name||'';
-  const rank=boardFor(state.totalRounds,state.timeLimit,state.mode).filter(e=>e.score>state.score).length+1;
-  $('saveBtn').textContent = rank<=10 ? `Save to leaderboard · #${rank} in ${modeLabel()}` : 'Save to leaderboard';
-  $('signUp').querySelector('b').textContent='Save this score'; $('viewBoardBtn').textContent='View leaderboard';
-  if(state.custom) paintCustomSave();
+  // With an account the score just goes on the board; there is nothing to press and nothing to lose
+  // by leaving. Without one, the button is there to explain why the board is out of reach.
+  state.saved=false; state.savedId=null; $('savedMsg').hidden=true; $('nameInput').hidden=true;
+  $('signUp').hidden=true; $('saveRow').hidden=false; $('saveBtn').hidden=false;
+  $('saveBtn').textContent='Save to leaderboard'; $('viewBoardBtn').textContent='View leaderboard';
+  if(state.custom) paintCustomSave(); else if(acct.name) saveScore();
   paintShare();
 }
 /* Every finished game lands on the board the same way, solo or with friends. */
@@ -5144,30 +5114,37 @@ function recordScore(name){
     const done=dailyDone();
     if(done&&done.date===state.daily.date&&done.id) return {id:done.id};
     const e=dlSubmit({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
-      score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now(),k:acct.key||'',ai:!!($('aiUsed')&&$('aiUsed').checked)});
+      score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now(),k:acct.key||''});
     if(e) try{ localStorage.setItem('pp_daily',JSON.stringify({date:state.daily.date,score:state.score,id:e.id})); }catch(err){}
     return e||{id:''};
   }
   const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
-    score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now(),k:acct.key||'',ai:!!($('aiUsed')&&$('aiUsed').checked)};
+    score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now(),k:acct.key||''};
   const b=loadBoard(); b.push(entry); saveBoard(b);
   lbSubmit(entry);
   stGame(state.mode,state.score,state.totalRounds*5000);
   stPublish();
   return entry;
 }
-$('saveBtn').addEventListener('click',()=>{
-  if(state.saved) return;
-  if(!acct.name){ show('acct'); return; }
+function saveScore(){
+  if(state.saved||!acct.name) return;
   const name=acct.name.slice(0,20);
   const entry=recordScore(name);
   try{ localStorage.setItem('pp_name',name); }catch(e){}
   state.saved=true; state.savedId=entry.id;
   const same=boardFor(state.totalRounds,state.timeLimit,state.mode);
   const rank=same.filter(e=>e.score>entry.score).length+1;
-  $('saveBtn').hidden=true; $('nameInput').hidden=true; $('aiRow').hidden=true; hideNag();
+  $('saveBtn').hidden=true; $('nameInput').hidden=true;
   $('savedMsg').hidden=false; $('savedMsg').textContent=`Saved · #${rank} of ${same.length} in ${modeLabel()}${lbLive()?' worldwide':' (offline, it will post when you reconnect)'}`;
   renderBoard(state.mode==='classic'?entry.id:undefined);
+}
+$('saveBtn').addEventListener('click',async()=>{
+  if(state.saved) return;
+  if(acct.name){ saveScore(); return; }
+  const go=await ask({title:'Create an account to save scores to the leaderboard',
+    body:'The global boards are a list of people, not of strangers, so a score needs a name behind it. An account is a name and a four-digit passcode, and it takes a few seconds.',
+    ok:'Create one or sign in'});
+  if(go){ acctMsg('acctMsg','Create an account or sign in to save scores to the leaderboard.'); paintAcct(); show('acct'); $('acct').scrollTo(0,0); if(!acct.name) $('acctName').focus(); }
 });
 $('nameInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('saveBtn').click(); } });
 $('signUpBtn').addEventListener('click',()=>{ acctMsg('acctMsg',''); paintAcct(); show('acct'); $('acct').scrollTo(0,0); $('acctName').focus(); });
@@ -5709,7 +5686,7 @@ document.addEventListener('keydown',e=>{
     if(!$('game').hidden && !$('guessbar').hidden && !$('gbLock').disabled && !state.locked){ e.preventDefault(); submitGuess(false); }
     else if(!$('game').hidden && state.guess && !state.locked){ e.preventDefault(); submitGuess(false); }
     else if(!$('result').hidden){ e.preventDefault(); $('nextBtn').click(); }
-    else if(!$('final').hidden && !mp.role){ e.preventDefault(); if(needsSave()) nagToSave(finalAgain); else startGame(); }
+    else if(!$('final').hidden && !mp.role){ e.preventDefault(); startGame(); }
     else if(!$('setup').hidden && document.activeElement===document.body){ e.preventDefault(); startGame(); }
   }
 });
