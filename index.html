@@ -242,6 +242,9 @@
   .stkbar svg{width:12px;height:12px}
   html[data-theme="dark"] .stkbar span{background:#3a2114;color:#ffb38a;border-color:#5a3520}
   .profbtns+.profbtns{margin-top:8px}
+  .warnbar{position:fixed;top:0;left:50%;transform:translate(-50%,-120%);z-index:400;background:#c2283a;color:#fff;font-weight:800;font-size:14.5px;padding:13px 22px;border-radius:0 0 14px 14px;box-shadow:0 8px 24px rgba(0,0,0,.28);max-width:min(92vw,520px);text-align:center;cursor:pointer;transition:transform .3s cubic-bezier(.2,1.4,.4,1)}
+  .warnbar.in{transform:translate(-50%,0)}
+  @media (prefers-reduced-motion:reduce){ .warnbar{transition:none} }
   .wfchips{display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow:auto;padding:2px}
   .wfchip{display:inline-flex;align-items:center;gap:5px;background:var(--sunk);border-radius:99px;padding:5px 6px 5px 11px;font-size:12.5px;font-weight:700}
   .wfchip button{border:0;background:var(--line);color:var(--text);width:18px;height:18px;border-radius:50%;line-height:1;cursor:pointer;font-size:13px;font-family:inherit;padding:0}
@@ -2702,7 +2705,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260923-133605';
+const BUILD='20260923-134849';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2737,27 +2740,59 @@ const BAN_ROOT='worlddrop/v1/ban';
    N I G, Ń.Í.Ǵ or N1G. Matching is on the fold as a substring, which does catch innocent words that
    contain a blocked one, which is exactly why the list is editable rather than baked in. */
 const WF_ROOT='worlddrop/v1/wf';
-const WF_SEED='nigger,nigga,niger,negro,faggot,fagot,fag,tranny,retard,retarded,spic,wetback,chink,gook,kike,heeb,paki,coon,raghead,towelhead,beaner,dyke,shemale,ladyboy,cripple,mongoloid,hitler,nazi,heilhitler,kkk,whitepower,gasthejews,rapist,rape,pedo,pedophile,childporn,cp,cunt,whore,slut,bitch,bastard,wanker,motherfucker,fuck,shit,piss,dick,cock,pussy,tits,anal,porn,hentai,nsfw,sex,penis,vagina,boobs,nudes,killyourself,kys,suicide'.split(',');
+const WF_SEED='nigger,nigga,niggah,niglet,negroid,jigaboo,porchmonkey,coon,spic,wetback,beaner,chink,gook,slanteye,zipperhead,jap,paki,currymuncher,sandnigger,raghead,towelhead,cameljockey,kike,heeb,yid,pikey,gypsy,coolie,darkie,darky,golliwog,mulatto,halfbreed,honky,redskin,injun,squaw,wop,dago,polack,tarbaby,faggot,fagot,faggy,dyke,tranny,shemale,ladyboy,heshe,retard,retarded,mongoloid,spastic,spaz,cripple,midget,windowlicker,hitler,nazi,heilhitler,siegheil,kkk,klansman,whitepower,whitepride,gasthejews,holohoax,racewar,porn,hentai,rape,rapist,molest,pedo,pedophile,paedophile,childporn,incest,bestiality,blowjob,handjob,dildo,fleshlight,milf,onlyfans,nudes,cum,jizz,anal,anus,cunt,whore,slut,hooker,prostitute,pussy,vagina,penis,boobs,tits,cock,dick,nsfw,sex,killyourself,killurself,kys,neckrope,suicide,fuck,motherfucker,fuckface,fuckyou,stfu,shit,bitch,bastard,asshole,dumbass,piss,wanker,twat,prick,bollocks,douchebag'.split(',');
+/* Words that merely contain a blocked one. Nigeria, Sussex, analysis, peacock, raccoon and
+   Dickinson are not insults, so they are cut out of the text before anything is matched. */
+const WF_SAFE='nigeria,nigerian,nigerien,niger,japan,japanese,pakistan,pakistani,guinea,guinean,sussex,essex,middlesex,wessex,sexton,scunthorpe,penistone,clitheroe,lightwater,cockburn,cockermouth,bangkok,hokkaido,cumbria,cumberland,dickens,dickinson,dickson,yiddish,spain,spanish,analysis,analyst,analytic,analytics,analog,analogue,analogy,canal,banal,arsenal,cardinal,signal,personal,seasonal,rational,original,peacock,hancock,woodcock,shuttlecock,babcock,cockpit,cocktail,cockroach,raccoon,cocoon,tycoon,suspicious,conspicuous,spice,spicy,grape,grapes,drape,trapeze,therapy,therapist,therapeutic,shiitake,mishit,assassin,class,classic,grass,compass,passage,assist,assign,asset,assess,massachusetts,bassist,embassy,harass,titan,titanic,competition,constitution,document,circumstance,accumulate,homogeneous,homogenous,benedict,verdict,predict,addict,cocoa,swop,sextant,sextet,sexagesimal'.split(',');
+/* Small capitals, Greek and Cyrillic letters that NFKD leaves alone because they are real
+   letters in their own right, mapped to the Latin letters they are being used to imitate. */
+const WF_LOOK={'ƒ':'f','ł':'l','ø':'o','đ':'d','ħ':'h','ŧ':'t','ĸ':'k','ſ':'s','ʃ':'s','ɔ':'c','ə':'e','ɛ':'e','ɑ':'a','ɒ':'a','ʋ':'v','ʍ':'w','ʎ':'y','ɟ':'j','ʈ':'t','ɖ':'d','ɱ':'m','ɳ':'n','ɲ':'n','ɾ':'r','ʂ':'s','ʐ':'z','ƀ':'b','ƈ':'c','ɗ':'d','ƙ':'k','ƥ':'p','ƭ':'t','ƴ':'y','ȼ':'c','ɇ':'e','ɉ':'j','ɍ':'r','ɏ':'y','ʞ':'k','ɥ':'h','ɯ':'m','ɰ':'m','ʛ':'g','ʜ':'h','ʟ':'l','ʙ':'b','ʏ':'y','ʑ':'z','ẞ':'b','þ':'p','ð':'d','ŉ':'n','ǥ':'g','ȿ':'s','ɀ':'z','ʉ':'u','ʊ':'u','ɨ':'i','ɪ':'i','ɵ':'o','ɸ':'o','ᴀ':'a','ʙ':'b','ᴄ':'c','ᴅ':'d','ᴇ':'e','ꜰ':'f','ɢ':'g','ʜ':'h','ɪ':'i','ᴊ':'j','ᴋ':'k','ʟ':'l','ᴍ':'m','ɴ':'n','ᴏ':'o','ᴘ':'p','ꞯ':'q','ʀ':'r','ꜱ':'s','ᴛ':'t','ᴜ':'u','ᴠ':'v','ᴡ':'w','ʏ':'y','ᴢ':'z','ʁ':'r','ɹ':'r','ʇ':'t','ɐ':'a','ǝ':'e','ᴎ':'n','ı':'i','α':'a','β':'b','γ':'y','δ':'d','ε':'e','ζ':'z','η':'n','θ':'o','ι':'i','κ':'k','λ':'l','μ':'u','ν':'v','ξ':'x','ο':'o','π':'n','ρ':'p','σ':'o','τ':'t','υ':'u','φ':'o','χ':'x','ψ':'w','ω':'w','в':'b','г':'r','д':'d','з':'z','к':'k','м':'m','н':'h','т':'t','ь':'b','я':'r','ф':'o','л':'n','п':'n','и':'u','й':'u','ч':'h','ш':'w','щ':'w','э':'e','ё':'e','ъ':'b'};
 let _wf=null;
 function wfList(){ if(!_wf){ try{ const a=JSON.parse(localStorage.getItem('pp_wf')||'null'); _wf=Array.isArray(a)?a:WF_SEED.slice(); }catch(e){ _wf=WF_SEED.slice(); } } return _wf; }
 function wfSet(list){ _wf=[...new Set(list.map(w=>wfFold(w)).filter(w=>w.length>=2))].slice(0,400); try{ localStorage.setItem('pp_wf',JSON.stringify(_wf)); }catch(e){} }
-const WF_SUB={'0':'o','1':'i','3':'e','4':'a','5':'s','7':'t','8':'b','9':'g','@':'a','$':'s','!':'i','|':'i','+':'t'};
-function wfFold(s){ return foldName(s).replace(/[0-9@$!|+]/g,ch=>WF_SUB[ch]||ch).replace(/[^a-z]/g,''); }
-function wfBlocked(text){
-  const f=wfFold(text); if(!f) return null;
-  for(const w of wfList()) if(w&&f.includes(w)) return w;
+const WF_SUB={'0':'o','1':'i','2':'z','3':'e','4':'a','5':'s','6':'g','7':'t','8':'b','9':'g','@':'a','$':'s','!':'i','|':'i','+':'t','(':'c','<':'c','{':'c','£':'e','€':'e','¡':'i'};
+function wfFold(s){
+  return foldName(String(s||'').replace(/[^\x00-\x7f]/g,ch=>WF_LOOK[ch]||ch))
+    .replace(/[0-9@$!|+(<{£€¡]/g,ch=>WF_SUB[ch]||ch).replace(/[^a-z]/g,'');
+}
+/* Every letter of a blocked word is allowed to repeat, so niiiigggerrr is caught while Niger, which
+   is a country and is missing a g, is not. Collapsing runs instead would have made those two the
+   same word, which is exactly the kind of blunt fix that gets people's names blocked. */
+const _wfRe={};
+function wfRe(w){ return _wfRe[w]||(_wfRe[w]=new RegExp([...w].map(c=>c+'+').join(''))); }
+/* Cut the innocent words out first, then look for a blocked one in what is left. */
+function wfScan(f,list,min){
+  let t=f; for(const w of WF_SAFE) if(w) t=t.split(w).join('\u00b7');
+  for(const w of list) if(w&&w.length>=(min||2)&&wfRe(w).test(t)) return w;
   return null;
+}
+/* Two looks at the same text: straight through, and backwards, because reggin is the oldest trick
+   there is. The safe words are cut out of both, so Nigeria survives either way. */
+function wfBlocked(text){
+  const raw=String(text||'');
+  if(raw.replace(/\D/g,'').includes('1488')) return '1488';
+  const f=wfFold(raw); if(!f) return null;
+  const list=wfList();
+  return wfScan(f,list) || wfScan([...f].reverse().join(''),list,4) || null;
 }
 function wfPublish(){
   const payload=JSON.stringify(wfList()); let sent=false;
   for(const l of lb.links) if(l.ready){ try{ l.client.publish(WF_ROOT,payload,{qos:1,retain:true}); sent=true; }catch(e){} }
   return sent;
 }
+/* A refusal belongs where you are looking, not in a corner. One red bar drops from the top, says
+   what is wrong and goes away again; nothing is saved either way. */
+let wfBarT=null;
+function warnTop(msg){
+  let b=$('warnBar');
+  if(!b){ b=document.createElement('div'); b.id='warnBar'; b.className='warnbar'; b.addEventListener('click',()=>b.classList.remove('in')); document.body.appendChild(b); }
+  b.textContent=msg; b.classList.remove('in'); void b.offsetWidth; b.classList.add('in');
+  sfx('low'); clearTimeout(wfBarT); wfBarT=setTimeout(()=>b.classList.remove('in'),4000);
+}
 /* Anything a player types that other people end up reading goes through here. */
 function wfGuard(text,what){
-  const hit=wfBlocked(text);
-  if(!hit) return false;
-  toast(`That ${what||'name'} contains a word this game doesn't allow.`);
+  if(!wfBlocked(text)) return false;
+  warnTop(`You aren't allowed to use that ${what||'name'}.`);
   return true;
 }
 lb.ban=new Set(); lb.banK=new Set(); lb.banPerm=new Set(); lb.banExp={};
@@ -2884,7 +2919,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:6,patch:5};
+const VERSION={major:3,minor:6,patch:6};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3145,7 +3180,7 @@ async function acctContinue(){
   const bad=el=>{ const n=$(el); n.classList.remove('bad'); void n.offsetWidth; n.classList.add('bad'); n.focus(); };
   if(key.length<2){ acctMsg('acctMsg','Pick a name of at least two letters or numbers.','bad'); bad('acctName'); return; }
   if(nameLen(cleanName(raw))>NAME_MAX){ acctMsg('acctMsg',`A name can be ${NAME_MAX} characters at most.`,'bad'); bad('acctName'); return; }
-  if(wfBlocked(raw)||wfBlocked(key)){ acctMsg('acctMsg','That name contains a word this game doesn\'t allow.','bad'); bad('acctName'); return; }
+  if(wfBlocked(raw)||wfBlocked(key)){ warnTop("You aren't allowed to use that name."); acctMsg('acctMsg',''); bad('acctName'); return; }
   if(!/^\d{4,12}$/.test(pin)){ acctMsg('acctMsg','The code is 4 to 12 digits.','bad'); bad('acctPin'); return; }
   if(lb.banK.has(key)){ const u=banUntil(key); acctMsg('acctMsg',u===Infinity?'That account is banned.':`That account is banned until ${new Date(u).toLocaleDateString(undefined,{month:'short',day:'numeric'})}.`,'bad'); bad('acctName'); return; }
   $('acctGo').disabled=true; acctMsg('acctMsg','Checking…');
@@ -3199,7 +3234,7 @@ $('nameEdit').addEventListener('click',()=>{ const b=$('nameBox'); b.hidden=!b.h
 async function saveDisplayName(){
   const v=cutName(cleanName($('nameNew').value));
   if(nameLen(v)<2){ acctMsg('acctMsg2','A name needs at least two characters.','bad'); return; }
-  if(wfBlocked(v)){ acctMsg('acctMsg2','That name contains a word this game doesn\'t allow.','bad'); return; }
+  if(wfBlocked(v)){ warnTop("You aren't allowed to use that name."); acctMsg('acctMsg2',''); return; }
   acctMsg('acctMsg2','Saving…');
   const k2=acctKey(v);   // a display name that reads as someone else's handle is theirs, not yours
   if(k2&&k2!==acct.key){ const other=await acctFetch(k2); if(other.record||k2===ADMIN_KEY){ acctMsg('acctMsg2',`That name belongs to @${k2}. Pick another.`,'bad'); return; } }
@@ -3215,7 +3250,7 @@ $('nameSave').addEventListener('click',saveDisplayName);
 $('bioEdit').addEventListener('click',()=>{ const b=$('bioBox'); b.hidden=!b.hidden; $('nameBox').hidden=true; $('pinBox').hidden=true; acctMsg('acctMsg2',''); if(!b.hidden){ $('bioNew').value=acct.bio||''; $('bioNew').focus(); } });
 async function saveBio(){
   const v=cleanName($('bioNew').value).slice(0,90);
-  if(wfBlocked(v)){ acctMsg('acctMsg2','That bio contains a word this game doesn\'t allow.','bad'); return; }
+  if(wfBlocked(v)){ warnTop("You aren't allowed to use that bio."); acctMsg('acctMsg2',''); return; }
   acctMsg('acctMsg2','Saving…');
   const got=await acctFetch(acct.key); if(!got.record){ acctMsg('acctMsg2','Could not reach your account. Try again.','bad'); return; }
   acct.bio=v; acctSave(); paintAcct(); if(soc.dir[acct.key]) soc.dir[acct.key].bio=v;
