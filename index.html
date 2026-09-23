@@ -2663,7 +2663,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260922-092641';
+const BUILD='20260923-073641';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2813,7 +2813,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:6,patch:2};
+const VERSION={major:3,minor:6,patch:3};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -5744,7 +5744,9 @@ const VOICE_ICE=[
 function openVoicePeer(){
   try{
     const peer=new Peer({debug:0,config:{iceServers:VOICE_ICE,sdpSemantics:'unified-plan'}}); mp.peer=peer;
-    peer.on('open',id=>{ mp.me.vpeer=id; if(mp.role==='host'&&mp.players[mp.me.id]) mp.players[mp.me.id].vpeer=id; if(mp.role==='guest') mpSend({t:'vpeer',vpeer:id}); if(mp.role==='host') hostSync(); voiceShow(); voiceConnect(); });
+    peer.on('open',id=>{ mp.me.vpeer=id; if(mp.role==='host'&&mp.players[mp.me.id]) mp.players[mp.me.id].vpeer=id;
+      if(mp.role==='guest'){ mpSend({t:'vpeer',vpeer:id}); setTimeout(()=>{ if(mp.role==='guest'&&mp.me.vpeer===id) mpSend({t:'vpeer',vpeer:id}); },1500); }
+      if(mp.role==='host') hostSync(); voiceShow(); voiceConnect(); });
     peer.on('call',voiceIncoming);
     peer.on('error',e=>dlog('voice peer error '+e.type));
     peer.on('disconnected',()=>{ try{ peer.reconnect(); }catch(e){} });
@@ -6347,7 +6349,14 @@ function showFinalMP(fin){
    Everyone always has a track (silent until the mic is on),
    so turning the mic on just swaps the track, no renegotiation dance.
    ========================================================= */
-const voice={ calls:{}, micStream:null, on:false, busy:false, ctx:null, silent:null, audios:{}, meters:{}, speaking:{} };
+const voice={ calls:{}, micStream:null, on:false, busy:false, ctx:null, silent:null, audios:{}, meters:{}, speaking:{}, rx:{}, direct:{}, hinted:false };
+/* Safari and every browser on an iPhone share one engine, and that engine cannot route a stream
+   coming off a peer connection through Web Audio: the graph builds, reports itself as running, and
+   produces silence. So on those the filtered path is skipped and the audio element plays directly. */
+const APPLE_WEBKIT=(()=>{ const ua=navigator.userAgent;
+  const ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const safari=/Safari/.test(ua)&&!/Chrome|Chromium|Edg|OPR|CriOS|FxiOS|Android/.test(ua);
+  return ios||safari; })();
 /* Ask the other side for full-band, high-bitrate Opus with no silence gating (defaults are narrow "phone call" speech). */
 const OPUS_PARAMS={minptime:'10',useinbandfec:'1',usedtx:'0',stereo:'0','sprop-stereo':'0',maxaveragebitrate:'128000',maxplaybackrate:'48000',cbr:'0'};
 function hifiSdp(sdp){
@@ -6390,12 +6399,16 @@ function wakeAudio(){
   try{ if(AC&&AC.state==='suspended') AC.resume().catch(()=>{}); }catch(e){}
 }
 for(const ev of ['pointerdown','keydown','touchstart']) document.addEventListener(ev,wakeAudio,{capture:true,passive:true});
-/* If the EQ chain isn't actually producing sound, play the raw element instead of staying silent. */
+/* If the EQ chain isn't actually producing sound, play the raw element instead of staying silent.
+   A call that has already been handed to the element stays there: re-muting it on the strength of a
+   context that merely claims to be running is what left people staring at a connected call in
+   silence. */
 function checkVoiceAudible(){
   for(const id of Object.keys(voice.audios)){
-    const a=voice.audios[id], m=voice.meters[id];
+    const a=voice.audios[id];
     if(!a) continue;
-    const live=voice.ctx&&voice.ctx.state==='running'&&m;
+    if(voice.direct[id]){ if(a.muted){ a.muted=false; } a.play().catch(()=>{}); continue; }
+    const live=voice.ctx&&voice.ctx.state==='running'&&voice.rx[id];
     if(!live&&a.muted){ a.muted=false; a.play().catch(()=>{}); dlog('voice: EQ chain not running, playing '+id.slice(0,6)+' direct'); }
     else if(live&&!a.muted){ a.muted=true; dlog('voice: EQ chain awake, back on the filtered path for '+id.slice(0,6)); }   // never both at once
   }
@@ -6454,6 +6467,11 @@ $('chatIn').addEventListener('keydown',e=>{ if(e.key==='Escape'){ chatToggle(fal
 document.addEventListener('keydown',e=>{ if(e.code==='KeyC'&&mp.role&&e.target.tagName!=='INPUT'&&!e.metaKey&&!e.ctrlKey){ e.preventDefault(); chatToggle(); } });
 function voiceConnect(){
   if(!mp.peer||!mp.me.vpeer||mp.peer.destroyed) return;
+  // Announcing a voice id once is not enough: the peer server can hand it over before the room link
+  // is up, and that one message is then gone for good. Whoever holds the higher id does the dialling,
+  // so a host that never heard yours will never call you and you will never call it. Silence, with
+  // chat working perfectly, for as long as the room lasts. So say it again until the host has it.
+  if(mp.role==='guest'){ const me=mp.players[mp.me.id]; if(me&&me.vpeer!==mp.me.vpeer) mpSend({t:'vpeer',vpeer:mp.me.vpeer}); }
   for(const p of playerList()){
     if(p.id===mp.me.id||!p.vpeer||voice.calls[p.vpeer]) continue;
     if(mp.me.vpeer>p.vpeer){ try{ const call=mp.peer.call(p.vpeer,new MediaStream([currentTrack()]),CALL_OPTS); if(call) attachCall(call); }catch(e){} }
@@ -6463,7 +6481,7 @@ function playerIdForVoice(vp){ if(vp===mp.me.vpeer) return mp.me.id; const p=pla
 function voiceIncoming(call){ if(!mp.role) return; if(voice.calls[call.peer]){ try{ voice.calls[call.peer].close(); }catch(e){} } try{ call.answer(new MediaStream([currentTrack()]),CALL_OPTS); attachCall(call); }catch(e){} }
 function attachCall(call){
   voice.calls[call.peer]=call;
-  call.on('stream',st=>{ playRemote(call.peer,st); const pc=call.peerConnection; if(pc){ boostSender(pc); pc.getReceivers().forEach(r=>{ try{ r.jitterBufferTarget=180; }catch(e){} try{ r.playoutDelayHint=0.18; }catch(e){} }); } });
+  call.on('stream',st=>{ playRemote(call.peer,st,call.peerConnection); voiceHint(); const pc=call.peerConnection; if(pc){ boostSender(pc); pc.getReceivers().forEach(r=>{ try{ r.jitterBufferTarget=180; }catch(e){} try{ r.playoutDelayHint=0.18; }catch(e){} }); } });
   const pc0=call.peerConnection;
   if(pc0) pc0.addEventListener('iceconnectionstatechange',()=>{
     const st=pc0.iceConnectionState; dlog('voice '+call.peer.slice(0,6)+' ice '+st);
@@ -6475,27 +6493,68 @@ function attachCall(call){
 function voiceDrop(id){
   const c=voice.calls[id]; delete voice.calls[id]; try{ c&&c.close(); }catch(e){}
   const a=voice.audios[id]; if(a){ a.srcObject=null; a.remove(); delete voice.audios[id]; }
-  if(voice.meters[id]){ clearInterval(voice.meters[id].timer); try{ voice.meters[id].nodes.forEach(n=>n.disconnect()); }catch(e){} delete voice.meters[id]; }
+  clearMeter(id);
+  const rx=voice.rx[id]; if(rx){ try{ rx.nodes.forEach(n=>n.disconnect()); }catch(e){} delete voice.rx[id]; }
+  delete voice.direct[id];
   delete voice.speaking[playerIdForVoice(id)];
 }
-function playRemote(id,st){
+/* The mic starts off and nothing on screen says the other person cannot hear you, which is its own
+   way of looking broken. Said once per room, the first time a call comes up. */
+function voiceHint(){
+  if(voice.hinted||voice.on) return; voice.hinted=true;
+  setTimeout(()=>{ if(!voice.on&&mp.role) toast('Voice is connected. Press Mic to let them hear you.'); },1200);
+}
+function playRemote(id,st,pc){
   let a=voice.audios[id];
   // The element keeps the remote track flowing; actual playback goes through the EQ chain when Web Audio is available.
   if(!a){ a=document.createElement('audio'); a.autoplay=true; a.playsInline=true; a.style.display='none'; document.body.appendChild(a); voice.audios[id]=a; }
   a.srcObject=st; a.muted=false; a.play().catch(()=>{});
-  if(voice.meters[id]){ clearInterval(voice.meters[id].timer); try{ voice.meters[id].nodes.forEach(n=>n.disconnect()); }catch(e){} delete voice.meters[id]; }
+  clearMeter(id); voice.direct[id]=false;
+  if(APPLE_WEBKIT){ rxDirect(id,pc,'this browser cannot filter a call'); return; }
   try{
-    const rx=buildRxChain(st); a.muted=true;   // EQ'd playback via Web Audio
+    const rx=buildRxChain(st); voice.rx[id]=rx; a.muted=true;   // EQ'd playback via Web Audio
     startMeter(id,rx.analyser,rx.nodes);
-    // Safety net: if the graph never wakes up, fall back to plain playback rather than silence.
-    let waited=0; const watch=setInterval(()=>{
-      waited+=1000;
-      const ok=voice.ctx&&voice.ctx.state==='running';
-      if(!voice.audios[id]||waited>6000){ clearInterval(watch); return; }
-      if(!ok&&a.muted){ a.muted=false; a.play().catch(()=>{}); dlog('voice: audio context asleep, playing '+id.slice(0,6)+' direct'); }
-      else if(ok&&waited>=3000){ clearInterval(watch); }
-    },1000);
-  }catch(e){ a.muted=false; a.play().catch(()=>{}); }
+    // Anything can break the graph, so prove it works. The stream's own RTP level says whether the
+    // other person is making a sound at all, and it reads the same whether or not the element is
+    // muted, so it can be compared against what the filter is passing. Sound arriving for a few
+    // seconds with nothing coming out the far end means the graph is dead: hand the call to the
+    // element and unhook the graph. A quiet room proves nothing and is left alone.
+    let sent=0, live=0;
+    const watch=setInterval(()=>{
+      if(!voice.audios[id]||voice.direct[id]){ clearInterval(watch); return; }
+      if(!voice.ctx||voice.ctx.state!=='running'){ if(a.muted){ a.muted=false; a.play().catch(()=>{}); } return; }   // suspended: play plainly until a tap wakes it
+      if(a.muted===false&&voice.rx[id]) a.muted=true;   // woken back up, filtered path again
+      if(rxLevel(rx.analyser)>0.004){ clearInterval(watch); return; }   // the filter is working, nothing to do
+      if(rtpLevel(pc)>0.02){ if(++sent>=8){ clearInterval(watch); rxDirect(id,pc,'sound arrived but the filter passed none of it'); } }
+      else sent=0;
+      if(++live>240) clearInterval(watch);   // two minutes of watching is plenty
+    },500);
+  }catch(e){ rxDirect(id,pc,'the filter could not be built'); }
+}
+function rxLevel(an){ const buf=new Uint8Array(an.fftSize); an.getByteTimeDomainData(buf); let s=0; for(let i=0;i<buf.length;i++){ const v=(buf[i]-128)/128; s+=v*v; } return Math.sqrt(s/buf.length); }
+function clearMeter(id){ const m=voice.meters[id]; if(!m) return; clearInterval(m.timer); try{ (m.nodes||[]).forEach(n=>n.disconnect()); }catch(e){} delete voice.meters[id]; }
+/* Play a call straight from its audio element, with the Web Audio graph unhooked so the two can
+   never both be heard at once. */
+function rxDirect(id,pc,why){
+  const rx=voice.rx[id];
+  if(rx){ try{ rx.nodes.forEach(n=>n.disconnect()); }catch(e){} delete voice.rx[id]; }
+  clearMeter(id);
+  voice.direct[id]=true;
+  const a=voice.audios[id]; if(a){ a.muted=false; a.volume=1; a.play().catch(()=>{}); }
+  if(pc) srcMeter(id,pc);
+  dlog('voice: '+id.slice(0,6)+' playing direct ('+(why||'fallback')+')');
+}
+/* Who is talking, read from the RTP stream itself rather than from Web Audio, so the dots still
+   light up on a browser that cannot give us the graph. */
+function rtpLevel(pc){
+  let lvl=0;
+  try{ for(const r of pc.getReceivers()){ if(!r.track||r.track.kind!=='audio'||!r.getSynchronizationSources) continue;
+    for(const src of r.getSynchronizationSources()) if(src.audioLevel>lvl) lvl=src.audioLevel; } }catch(e){}
+  return lvl;
+}
+function srcMeter(id,pc){
+  const timer=setInterval(()=>setSpeaking(id,rtpLevel(pc)>0.02),140);
+  voice.meters[id]={timer,nodes:[]};
 }
 function startMeter(id,an,nodes){
   const buf=new Uint8Array(an.fftSize);
@@ -6533,7 +6592,7 @@ function swapTracks(){
 }
 function renderMic(){ const b=$('micBtn'); b.classList.toggle('live',voice.on); b.classList.toggle('busy',voice.busy); $('micTxt').textContent=voice.busy?'Asking for mic…':voice.on?'Mic on':'Mic off'; }
 function voiceStop(){
-  $('chatBtn').hidden=true; chatReset();
+  $('chatBtn').hidden=true; chatReset(); voice.hinted=false;
   for(const id of Object.keys(voice.calls)) voiceDrop(id);
   const mk=mp.me.vpeer||mp.me.id; if(voice.meters[mk]){ clearInterval(voice.meters[mk].timer); delete voice.meters[mk]; }
   if(voice.micStream){ voice.micStream.getTracks().forEach(t=>t.stop()); voice.micStream=null; }
@@ -6542,7 +6601,7 @@ function voiceStop(){
 $('micBtn').addEventListener('click',toggleMic);
 $('spkMode').checked=speakerMode;
 $('spkMode').addEventListener('change',async()=>{ speakerMode=$('spkMode').checked; try{ localStorage.setItem('pp_spk',speakerMode?'1':'0'); }catch(e){} if(voice.on){ await toggleMic(); await toggleMic(); } });
-setInterval(()=>{ if(mp.role) voiceConnect(); },8000);   // re-dial anyone whose audio call dropped
+setInterval(()=>{ if(mp.role) voiceConnect(); },4000);   // re-dial anyone whose audio call dropped, and re-announce a voice id the host missed
 document.addEventListener('keydown',e=>{ if(e.code==='KeyM'&&mp.role&&e.target.tagName!=='INPUT'){ e.preventDefault(); toggleMic(); } });
 
 /* ----- lobby controls ----- */
