@@ -242,6 +242,10 @@
   .stkbar svg{width:12px;height:12px}
   html[data-theme="dark"] .stkbar span{background:#3a2114;color:#ffb38a;border-color:#5a3520}
   .profbtns+.profbtns{margin-top:8px}
+  .wfchips{display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow:auto;padding:2px}
+  .wfchip{display:inline-flex;align-items:center;gap:5px;background:var(--sunk);border-radius:99px;padding:5px 6px 5px 11px;font-size:12.5px;font-weight:700}
+  .wfchip button{border:0;background:var(--line);color:var(--text);width:18px;height:18px;border-radius:50%;line-height:1;cursor:pointer;font-size:13px;font-family:inherit;padding:0}
+  .wfchip button:hover{background:#c2283a;color:#fff}
   .adminlog{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:12.5px;color:var(--muted);max-height:180px;overflow:auto}
   .adminlog div{padding:3px 0} .adminlog b{color:var(--text)}
   .cmc .who.lnk{cursor:pointer} .cmc .who.lnk:hover{text-decoration:underline}
@@ -1259,7 +1263,7 @@
     <div class="card" id="acctOut">
       <h2 style="margin:0 0 14px">Create an account or sign in</h2>
       <div class="label" style="margin-top:0">Username</div>
-      <input class="tin" id="acctName" maxlength="16" placeholder="silas" autocomplete="username" spellcheck="false">
+      <input class="tin" id="acctName" maxlength="48" placeholder="silas" autocomplete="username" spellcheck="false">
       <div class="label">Passcode <span class="dim">(4 to 12 digits)</span></div>
       <input class="tin code" id="acctPin" inputmode="numeric" maxlength="12" placeholder="0000" autocomplete="off">
       <div class="acctmsg" id="acctMsg"></div>
@@ -1292,7 +1296,7 @@
           <div class="wheelside"><div class="cprev" id="cprev"><span class="pav" id="cprevAv"></span></div><div class="cval" id="cval"></div><button class="btn btn-primary sm" id="colorSave">Use this color</button><button class="btn btn-secondary sm" id="colorAuto">Pick from photo</button></div>
         </div>
       </div>
-      <div id="nameBox" hidden><div class="prow2"><input class="tin" id="nameNew" maxlength="16" placeholder="New display name" spellcheck="false"><button class="btn btn-primary" id="nameSave">Save</button></div></div>
+      <div id="nameBox" hidden><div class="prow2"><input class="tin" id="nameNew" maxlength="48" placeholder="New display name" spellcheck="false"><button class="btn btn-primary" id="nameSave">Save</button></div></div>
       <div id="bioBox" hidden><div class="prow2"><input class="tin" id="bioNew" maxlength="90" placeholder="One sentence about you" autocomplete="off"><button class="btn btn-primary" id="bioSave">Save</button></div></div>
       <div id="pinBox" hidden><div class="prow2"><input class="tin code" id="acctNewPin" inputmode="numeric" maxlength="12" placeholder="0000" autocomplete="off"><button class="btn btn-primary" id="acctChange">Save</button></div></div>
       <div class="acctmsg" id="acctMsg2"></div>
@@ -1319,6 +1323,14 @@
     </div>
     <div class="card wide" id="adminCard" hidden style="padding:14px 22px">
       <div class="adminrow"><span><b>Admin mode</b><span class="rsub" id="adminSub" style="display:inline;margin-left:10px"></span></span><label class="switch" id="adminSw"><input type="checkbox" id="adminTog"><i></i></label></div>
+      <div id="wfBox" hidden style="margin-top:14px">
+        <div class="label" style="margin-top:0">Blocked words <span class="dim" id="wfCount"></span></div>
+        <div class="rsub" style="margin:0 0 10px">Checked against names, bios, chat, maps and comments for everyone. Case, accents, lookalike letters and digits standing in for letters are folded away first, so Nig, N&Iacute;G and N1G are all the same word. A word here blocks anything containing it.</div>
+        <div class="prow2"><input class="tin" id="wfIn" maxlength="30" placeholder="Add a word" autocomplete="off" spellcheck="false"><button class="btn btn-primary" id="wfAdd">Add</button></div>
+        <div class="wfchips" id="wfChips"></div>
+        <div class="twobtn" style="margin-top:10px"><button class="btn btn-secondary sm" id="wfReset">Back to the default list</button></div>
+        <div class="acctmsg" id="wfMsg"></div>
+      </div>
       <div class="adminlog" id="adminLog" hidden></div>
     </div>
   </div>
@@ -1468,7 +1480,7 @@
       <div class="label">Send a warning</div>
       <div class="prow2"><input class="tin" id="profWarn" maxlength="200" placeholder="What they need to fix" autocomplete="off"><button class="btn btn-secondary" id="profWarnGo">Send</button></div>
       <div class="label">Rename</div>
-      <div class="prow2"><input class="tin" id="profRn" maxlength="16" placeholder="New display name" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="profRnGo">Rename</button></div>
+      <div class="prow2"><input class="tin" id="profRn" maxlength="48" placeholder="New display name" autocomplete="off" spellcheck="false"><button class="btn btn-secondary" id="profRnGo">Rename</button></div>
       <div class="label">Ban</div>
       <div class="twobtn" style="margin-top:6px"><button class="btn btn-secondary sm danger" data-ban="3">3 days</button><button class="btn btn-secondary sm danger" data-ban="7">7 days</button><button class="btn btn-secondary sm danger" data-ban="30">30 days</button><button class="btn btn-secondary sm danger" data-ban="0">Permanently</button><button class="btn btn-secondary sm" id="profUnban" hidden>Lift the ban</button></div>
       <div class="rsub" style="margin-top:8px">A timed ban locks the account and hides its scores until it ends. A permanent ban also wipes its scores and maps, and the handle can never be claimed again.</div>
@@ -1622,7 +1634,7 @@
       <div class="card">
         <h2>You</h2>
         <div class="label">Name</div>
-        <div class="name-row"><input id="mpName" maxlength="16" placeholder="Your name"></div>
+        <div class="name-row"><input id="mpName" maxlength="48" placeholder="Your name"></div>
         <div class="label">Color</div>
         <div class="swatches" id="swatches"></div>
         <div class="mic-lobby"><div><b>Voice chat</b> is built in. Use the mic button in the corner to talk.<br><label style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer"><input type="checkbox" id="spkMode"> I'm on speakers, not headphones (turns on echo cancelling)</label></div></div>
@@ -2690,7 +2702,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260923-074718';
+const BUILD='20260923-133605';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2705,7 +2717,7 @@ const lb={links:[], boards:{}, seen:{}, queue:[], upAt:0, daily:[], dailyDate:''
 function lbLive(){ return lb.links.some(l=>l.ready); }
 function lbClean(e){
   if(!e||typeof e!=='object') return null;
-  const name=String(e.name==null?'':e.name).replace(/[<>]/g,'').trim().slice(0,20);
+  const name=cutName(String(e.name==null?'':e.name).replace(/[<>]/g,'').trim());
   const score=Math.round(+e.score), ts=+e.ts, rounds=Math.round(+e.rounds), time=Math.round(+e.time);
   if(!name||!isFinite(score)||score<0||score>2e6||!isFinite(ts)) return null;
   const k=String(e.k==null?'':e.k).toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,20);
@@ -2717,6 +2729,37 @@ function lbClean(e){
 /* Scores an admin removed. One retained list of entry ids; every client drops them on merge and on reconcile,
    so a removed score can't creep back from the browser that saved it. */
 const BAN_ROOT='worlddrop/v1/ban';
+/* ---------- Word filter ----------
+   One retained message an admin owns, so a word blocked here is blocked for everyone the moment it
+   is published. Nothing is matched against the raw text: names are folded first (accents stripped,
+   Cyrillic and Greek lookalikes mapped to their Latin twins, digits and symbols standing in for
+   letters put back, everything not a letter dropped), so case never matters and neither does
+   N I G, Ń.Í.Ǵ or N1G. Matching is on the fold as a substring, which does catch innocent words that
+   contain a blocked one, which is exactly why the list is editable rather than baked in. */
+const WF_ROOT='worlddrop/v1/wf';
+const WF_SEED='nigger,nigga,niger,negro,faggot,fagot,fag,tranny,retard,retarded,spic,wetback,chink,gook,kike,heeb,paki,coon,raghead,towelhead,beaner,dyke,shemale,ladyboy,cripple,mongoloid,hitler,nazi,heilhitler,kkk,whitepower,gasthejews,rapist,rape,pedo,pedophile,childporn,cp,cunt,whore,slut,bitch,bastard,wanker,motherfucker,fuck,shit,piss,dick,cock,pussy,tits,anal,porn,hentai,nsfw,sex,penis,vagina,boobs,nudes,killyourself,kys,suicide'.split(',');
+let _wf=null;
+function wfList(){ if(!_wf){ try{ const a=JSON.parse(localStorage.getItem('pp_wf')||'null'); _wf=Array.isArray(a)?a:WF_SEED.slice(); }catch(e){ _wf=WF_SEED.slice(); } } return _wf; }
+function wfSet(list){ _wf=[...new Set(list.map(w=>wfFold(w)).filter(w=>w.length>=2))].slice(0,400); try{ localStorage.setItem('pp_wf',JSON.stringify(_wf)); }catch(e){} }
+const WF_SUB={'0':'o','1':'i','3':'e','4':'a','5':'s','7':'t','8':'b','9':'g','@':'a','$':'s','!':'i','|':'i','+':'t'};
+function wfFold(s){ return foldName(s).replace(/[0-9@$!|+]/g,ch=>WF_SUB[ch]||ch).replace(/[^a-z]/g,''); }
+function wfBlocked(text){
+  const f=wfFold(text); if(!f) return null;
+  for(const w of wfList()) if(w&&f.includes(w)) return w;
+  return null;
+}
+function wfPublish(){
+  const payload=JSON.stringify(wfList()); let sent=false;
+  for(const l of lb.links) if(l.ready){ try{ l.client.publish(WF_ROOT,payload,{qos:1,retain:true}); sent=true; }catch(e){} }
+  return sent;
+}
+/* Anything a player types that other people end up reading goes through here. */
+function wfGuard(text,what){
+  const hit=wfBlocked(text);
+  if(!hit) return false;
+  toast(`That ${what||'name'} contains a word this game doesn't allow.`);
+  return true;
+}
 lb.ban=new Set(); lb.banK=new Set(); lb.banPerm=new Set(); lb.banExp={};
 /* Admin is the @silas account. A toggle in Settings turns the controls on and off; the choice sticks on the device. */
 const ADMIN_KEY='silas';
@@ -2820,9 +2863,10 @@ function lbConnect(){
     let c; try{ c=mqtt.connect(url,{connectTimeout:8000,reconnectPeriod:20000,keepalive:30,clean:true,clientId:'wdlb_'+Math.random().toString(36).slice(2,10)}); }catch(e){ continue; }
     const link={url,client:c,ready:false}; lb.links.push(link);
     c.on('connect',()=>{ link.ready=true; if(!lb.upAt) lb.upAt=Date.now(); lb.dailyDate=dailyDate();
-      c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+',DL_ROOT+'/'+lb.dailyDate,BAN_ROOT+'/+'],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint();
+      c.subscribe([LB_ROOT+'/+',ST_ROOT+'/+',DL_ROOT+'/'+lb.dailyDate,BAN_ROOT+'/+',WF_ROOT],{qos:0}); setTimeout(()=>{ lbFlush(); lbReconcile(true); stPublish(); },1800); lbPaint();
       if(!soc.dirWarmed){ soc.dirWarmed=true; setTimeout(()=>fetchDirectory(2600).then(()=>lbPaint()),400); } });   // faces on the boards for everyone, signed in or not
     c.on('message',(t,payload)=>{ const parts=t.split('/'); const id=parts.pop(); let data=null; try{ data=JSON.parse(payload.toString()); }catch(e){ return; }
+      if(id==='wf'){ if(Array.isArray(data)){ wfSet(data); if(!$('acct').hidden) paintAdmin(); } return; }
       if(parts[parts.length-1]==='st'){ if(data&&MODES[id]) stats.got[id]={r:stClean(data.r),g:stClean(data.g)}; return; }
       if(parts[parts.length-1]==='dl'){ if(id===dailyDate()){ lb.dailySeen=true; lb.dailyDate=id; dlMerge(data); lbPaint(); } return; }
       if(parts[parts.length-1]==='ban'){ if(id==='handles'){ lb.banK=new Set(); lb.banPerm=new Set(); lb.banExp={}; banKMerge(data); if(acct.key&&lb.banK.has(acct.key)){ const u=banUntil(acct.key); acctClear(); paintAcct(); toast(u===Infinity?'This account was banned by an admin.':`This account is banned until ${new Date(u).toLocaleDateString(undefined,{month:'short',day:'numeric'})}.`); } } else banMerge(data); banApply(); lbPaint(); return; }
@@ -2840,7 +2884,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:6,patch:4};
+const VERSION={major:3,minor:6,patch:5};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -3041,6 +3085,15 @@ const HOMO={'\u0430':'a','\u0435':'e','\u043e':'o','\u0440':'p','\u0441':'c','\u
 function foldName(s){ return String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^\x00-\x7f]/g,ch=>HOMO[ch]||ch); }
 function acctKey(name){ return foldName(name).replace(/[^a-z0-9_-]/g,'').slice(0,20); }
 function cleanName(s){ return String(s||'').replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF\u0000-\u001f\u007f]/g,'').replace(/\s+/g,' ').trim(); }
+/* Names count in characters you can see, not in the two slots an emoji takes up in a JavaScript
+   string. Cutting on those slots splits a flag or a family down the middle and leaves a broken
+   square behind, so cut on graphemes and let the whole emoji through or none of it. Zero-width
+   joiners inside an emoji are kept; cleanName only strips the loose ones. */
+const NAME_MAX=24;
+const _seg=(()=>{ try{ return new Intl.Segmenter(undefined,{granularity:'grapheme'}); }catch(e){ return null; } })();
+function chars(s){ s=String(s==null?'':s); return _seg?[..._seg.segment(s)].map(g=>g.segment):Array.from(s); }
+function cutName(s,n){ const a=chars(s); return a.length<=(n||NAME_MAX)?a.join(''):a.slice(0,n||NAME_MAX).join(''); }
+function nameLen(s){ return chars(s).length; }
 async function acctHash(pin,salt,key){
   const data=new TextEncoder().encode(salt+':'+pin+':'+key);
   const buf=await crypto.subtle.digest('SHA-256',data);
@@ -3091,6 +3144,8 @@ async function acctContinue(){
   const key=acctKey(raw);
   const bad=el=>{ const n=$(el); n.classList.remove('bad'); void n.offsetWidth; n.classList.add('bad'); n.focus(); };
   if(key.length<2){ acctMsg('acctMsg','Pick a name of at least two letters or numbers.','bad'); bad('acctName'); return; }
+  if(nameLen(cleanName(raw))>NAME_MAX){ acctMsg('acctMsg',`A name can be ${NAME_MAX} characters at most.`,'bad'); bad('acctName'); return; }
+  if(wfBlocked(raw)||wfBlocked(key)){ acctMsg('acctMsg','That name contains a word this game doesn\'t allow.','bad'); bad('acctName'); return; }
   if(!/^\d{4,12}$/.test(pin)){ acctMsg('acctMsg','The code is 4 to 12 digits.','bad'); bad('acctPin'); return; }
   if(lb.banK.has(key)){ const u=banUntil(key); acctMsg('acctMsg',u===Infinity?'That account is banned.':`That account is banned until ${new Date(u).toLocaleDateString(undefined,{month:'short',day:'numeric'})}.`,'bad'); bad('acctName'); return; }
   $('acctGo').disabled=true; acctMsg('acctMsg','Checking…');
@@ -3100,14 +3155,14 @@ async function acctContinue(){
     if(got.record){
       const h=await acctHash(pin,got.record.salt||'',key);
       if(h!==got.record.hash){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is taken and the code doesn\'t match it.','bad'); bad('acctPin'); return; }
-      acct.key=key; acct.name=got.record.name||raw.slice(0,16); acct.av=got.record.av||null; acct.streak=got.record.streak||null; acct.color=okColor(got.record.color); acct.bio=cleanName(got.record.bio||'').slice(0,90); acctSave();
+      acct.key=key; acct.name=got.record.name||cutName(raw); acct.av=got.record.av||null; acct.streak=got.record.streak||null; acct.color=okColor(got.record.color); acct.bio=cleanName(got.record.bio||'').slice(0,90); acctSave();
       acctPublish({...got.record,seen:Date.now()});   // republish so the record stays alive on every broker
       acctMsg('acctMsg','Signed in.','ok');
     } else {
       if(key===ADMIN_KEY){ $('acctGo').disabled=false; acctMsg('acctMsg','That name is reserved.','bad'); bad('acctName'); return; }
       const salt=Math.random().toString(36).slice(2,10);
       const hash=await acctHash(pin,salt,key);
-      const rec={key,name:cleanName(raw).slice(0,16)||key,salt,hash,made:Date.now()};
+      const rec={key,name:cutName(cleanName(raw))||key,salt,hash,made:Date.now()};
       if(!acctPublish(rec)){ $('acctGo').disabled=false; acctMsg('acctMsg','Could not reach the server. Try again in a moment.','bad'); return; }
       acct.key=key; acct.name=rec.name; acctSave();
       acctMsg('acctMsg','Name claimed.','ok');
@@ -3142,8 +3197,9 @@ $('pinToggle').addEventListener('click',()=>{ const b=$('pinBox'); b.hidden=!b.h
 $('nameEdit').addEventListener('click',()=>{ const b=$('nameBox'); b.hidden=!b.hidden; $('pinBox').hidden=true; acctMsg('acctMsg2',''); if(!b.hidden){ $('nameNew').value=acct.name||''; $('nameNew').focus(); } });
 /* The display name is free to change; the @handle you sign in with stays put, so friends and sign-ins keep working. */
 async function saveDisplayName(){
-  const v=cleanName($('nameNew').value).slice(0,16);
-  if(v.length<2){ acctMsg('acctMsg2','A name needs at least two characters.','bad'); return; }
+  const v=cutName(cleanName($('nameNew').value));
+  if(nameLen(v)<2){ acctMsg('acctMsg2','A name needs at least two characters.','bad'); return; }
+  if(wfBlocked(v)){ acctMsg('acctMsg2','That name contains a word this game doesn\'t allow.','bad'); return; }
   acctMsg('acctMsg2','Saving…');
   const k2=acctKey(v);   // a display name that reads as someone else's handle is theirs, not yours
   if(k2&&k2!==acct.key){ const other=await acctFetch(k2); if(other.record||k2===ADMIN_KEY){ acctMsg('acctMsg2',`That name belongs to @${k2}. Pick another.`,'bad'); return; } }
@@ -3158,7 +3214,9 @@ async function saveDisplayName(){
 $('nameSave').addEventListener('click',saveDisplayName);
 $('bioEdit').addEventListener('click',()=>{ const b=$('bioBox'); b.hidden=!b.hidden; $('nameBox').hidden=true; $('pinBox').hidden=true; acctMsg('acctMsg2',''); if(!b.hidden){ $('bioNew').value=acct.bio||''; $('bioNew').focus(); } });
 async function saveBio(){
-  const v=cleanName($('bioNew').value).slice(0,90); acctMsg('acctMsg2','Saving…');
+  const v=cleanName($('bioNew').value).slice(0,90);
+  if(wfBlocked(v)){ acctMsg('acctMsg2','That bio contains a word this game doesn\'t allow.','bad'); return; }
+  acctMsg('acctMsg2','Saving…');
   const got=await acctFetch(acct.key); if(!got.record){ acctMsg('acctMsg2','Could not reach your account. Try again.','bad'); return; }
   acct.bio=v; acctSave(); paintAcct(); if(soc.dir[acct.key]) soc.dir[acct.key].bio=v;
   const ok=acctPublish({...got.record,bio:v}); acctMsg('acctMsg2',ok?(v?'Bio saved.':'Bio cleared.'):'Could not reach the server.',ok?'ok':'bad'); $('bioBox').hidden=true;
@@ -3755,6 +3813,7 @@ function renderCmc(){
 }
 async function cmcPost(){
   const rec=cm.cur; if(!rec) return; if(!acct.key) return needAcct('comment on maps'); const text=cleanName($('cmcText').value).slice(0,280); if(text.length<1) return;
+  if(wfGuard(text,'comment')) return;
   $('cmcPost').disabled=true;
   try{ const list=await cmcFetch(rec.id); list.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),k:acct.key,name:acct.name,text,ts:Date.now()});
     cmcPublish(rec.id,list); cm.comments=list; $('cmcText').value=''; renderCmc(); sfx('click');
@@ -4030,6 +4089,7 @@ $('mkCoordGo').addEventListener('click',mkCoordAdd);
 $('mkCoord').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); mkCoordAdd(); } });
 $('mkSave').addEventListener('click',()=>{
   const mk=cm.mk; const name=$('mkName').value.trim().slice(0,32); if(!mk||mk.pins.length<10||name.length<2) return;
+  if(wfGuard(name,'map name')) return;
   const big=mk.pins.length>400;   // past 400 spots the place names are dropped so the record stays light on the wire
   const pins=mk.pins.map(p=>{ const o={pano:p.pano,lat:p.lat,lng:p.lng,heading:p.heading}; if(p.pitch) o.pitch=p.pitch; if(p.faced) o.faced=1; if(!big) o.label=(p.label||'').slice(0,40); return o; });
   const thumb=mk.thumb&&mk.thumb.img?mk.thumb:null, start=mk.start||null, scale=Math.round(mkScaleKm()*100)/100;
@@ -4191,7 +4251,7 @@ $('profMaps').addEventListener('click',e=>{ const b=e.target.closest('[data-pmap
 /* admin tools on a profile */
 $('profWarnGo').addEventListener('click',async()=>{ if(!admin.on) return; const k=prof.key; const text=cleanName($('profWarn').value).slice(0,200); if(text.length<3){ acctMsg('profAdminMsg','Write what they need to fix.','bad'); return; }
   try{ await inboxPush(k,{id:'warn-'+Date.now(),kind:'warn',from:acct.key||ADMIN_KEY,fromName:acct.name||'Admin',text,ts:Date.now()}); $('profWarn').value=''; acctMsg('profAdminMsg',`Warning sent to @${k}.`,'ok'); admLog('Warned',k,text); }catch(e){ acctMsg('profAdminMsg','Could not send it.','bad'); } });
-$('profRnGo').addEventListener('click',async()=>{ if(!admin.on) return; const k=prof.key; const name=cleanName($('profRn').value).slice(0,16); if(name.length<2){ acctMsg('profAdminMsg','A name needs at least two characters.','bad'); return; }
+$('profRnGo').addEventListener('click',async()=>{ if(!admin.on) return; const k=prof.key; const name=cutName(cleanName($('profRn').value)); if(nameLen(name)<2){ acctMsg('profAdminMsg','A name needs at least two characters.','bad'); return; }
   const k2=acctKey(name); if(k2&&k2!==k&&k2===ADMIN_KEY){ acctMsg('profAdminMsg','Not that one.','bad'); return; }
   acctMsg('profAdminMsg','Renaming…'); await adminRenameAcct(k,name); admLog('Renamed',k,'to '+name); $('profRn').value=''; openProfile(k); });
 $('profAdmin').addEventListener('click',async e=>{ const b=e.target.closest('[data-ban]'); if(!b||!admin.on) return; const k=prof.key; const days=+b.dataset.ban;
@@ -4267,6 +4327,7 @@ $('pubThumbFile').addEventListener('change',e=>{ const f=e.target.files&&e.targe
 $('pubGo').addEventListener('click',async()=>{
   if(!acct.key) return needAcct('create a server');
   const name=cleanName($('pubName').value).slice(0,32); if(name.length<2){ toast('Give the server a name'); $('pubName').focus(); return; }
+  if(wfGuard(name,'server name')||wfGuard(cleanName($('pubDesc').value),'description')) return;
   let code=mkCode(); for(let i=0;i<8&&srv.list[code];i++) code=mkCode();
   const rec={code,name,desc:cleanName($('pubDesc').value).slice(0,90),thumb:srv.thumb||null,tags:[...srv.tags],by:{k:acct.key,name:acct.name},managers:[],made:Date.now(),settings:{mode:'classic',time:60,rounds:5,region:{type:'all',value:null},nomove:false,lock:false,custom:null,endless:false},live:null};
   clearInterval(srv.timer); $('pubForm').hidden=true; srv.thumb=null; srv.tags=new Set(); $('pubName').value=''; $('pubDesc').value=''; $('pubThumb').hidden=true; $('pubThumbClear').hidden=true;
@@ -4405,9 +4466,35 @@ function paintAdmin(){
   const me=acct.key===ADMIN_KEY; $('adminCard').hidden=!me; if(!me) return;
   $('adminTog').checked=admin.pref; $('adminSw').classList.toggle('on',admin.pref);
   $('adminSub').textContent=admin.pref?'On. Edit or remove anything from any leaderboard, map or profile.':'Off. Normal game.';
+  $('wfBox').hidden=!admin.pref;
+  if(admin.pref){
+    const list=wfList();
+    $('wfCount').textContent=`· ${list.length}`;
+    $('wfChips').innerHTML=list.slice().sort().map(w=>`<span class="wfchip">${esc(w)}<button data-wf="${esc(w)}" title="Remove">&times;</button></span>`).join('')||'<span class="dim">Nothing blocked.</span>';
+  }
   const log=admLogRead(); $('adminLog').hidden=!(admin.pref&&log.length);
   $('adminLog').innerHTML=log.map(e=>`<div>${agoTxt(e.ts)} · <b>${esc(e.kind)}</b> <span class="lnk" data-prof="${esc(e.who)}" style="cursor:pointer;text-decoration:underline">@${esc(e.who)}</span>${e.text?` · ${esc(e.text)}`:''}</div>`).join('');
 }
+function wfSave(list,msg){
+  wfSet(list); paintAdmin();
+  const ok=wfPublish();
+  acctMsg('wfMsg',ok?msg:'Saved on this device, but the brokers are not reachable yet.',ok?'ok':'bad');
+}
+$('wfAdd').addEventListener('click',()=>{
+  if(!admin.on) return;
+  const w=wfFold($('wfIn').value);
+  if(w.length<2){ acctMsg('wfMsg','A blocked word needs at least two letters.','bad'); return; }
+  if(wfList().includes(w)){ acctMsg('wfMsg',`${w} is already on the list.`,'bad'); return; }
+  $('wfIn').value=''; wfSave([...wfList(),w],`${w} is blocked for everyone.`); admLog('Blocked word',acct.key||'',w); sfx('click');
+});
+$('wfIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('wfAdd').click(); } });
+$('wfChips').addEventListener('click',e=>{ const b=e.target.closest('button[data-wf]'); if(!b||!admin.on) return;
+  const w=b.dataset.wf; wfSave(wfList().filter(x=>x!==w),`${w} is allowed again.`); admLog('Unblocked word',acct.key||'',w); sfx('click'); });
+$('wfReset').addEventListener('click',async()=>{
+  if(!admin.on) return;
+  if(!await ask({title:'Back to the default list?',body:'Every word you have added or removed goes, for everyone.',ok:'Reset it',danger:true})) return;
+  wfSave(WF_SEED.slice(),'Back to the default list.'); admLog('Word filter reset',acct.key||'','');
+});
 $('adminTog').addEventListener('change',e=>{ admin.pref=e.target.checked; try{ localStorage.setItem('pp_admin_on',admin.pref?'1':'0'); }catch(err){} adminSync(); lbPaint(); toast(admin.pref?'Admin mode on':'Admin mode off','ok'); sfx('click'); });
 const TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>';
 const PENCIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
@@ -5144,12 +5231,12 @@ function recordScore(name){
   if(state.daily){   // the daily has its own board and doesn't touch the all-time ones
     const done=dailyDone();
     if(done&&done.date===state.daily.date&&done.id) return {id:done.id};
-    const e=dlSubmit({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
+    const e=dlSubmit({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:cutName(String(name||anonName())),
       score:state.score,rounds:state.daily.rounds,time:state.daily.time,ts:Date.now(),k:acct.key||''});
     if(e) try{ localStorage.setItem('pp_daily',JSON.stringify({date:state.daily.date,score:state.score,id:e.id})); }catch(err){}
     return e||{id:''};
   }
-  const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(name||anonName()).slice(0,20),
+  const entry={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:cutName(String(name||anonName())),
     score:state.score,mode:modeLabel(),modeId:state.mode,rounds:state.totalRounds,time:state.timeLimit,ts:Date.now(),k:acct.key||''};
   const b=loadBoard(); b.push(entry); saveBoard(b);
   lbSubmit(entry);
@@ -5159,7 +5246,7 @@ function recordScore(name){
 }
 function saveScore(){
   if(state.saved||!acct.name) return;
-  const name=acct.name.slice(0,20);
+  const name=cutName(acct.name);
   const entry=recordScore(name);
   try{ localStorage.setItem('pp_name',name); }catch(e){}
   state.saved=true; state.savedId=entry.id;
@@ -6520,6 +6607,7 @@ $('chatNeedGo').addEventListener('click',()=>{ chatToggle(false); needAcct('chat
 function chatSend(){
   if(!acct.key) return needAcct('chat in rooms');
   const inp=$('chatIn'); const text=inp.value.trim().slice(0,200); if(!text||!mp.role) return;
+  if(wfGuard(text,'message')) return;
   inp.value='';
   const m={t:'chat',text,ts:Date.now()};
   if(mp.role==='host') hostOnMessage('host',m,null); else { chatAdd({id:mp.me.id,name:mp.me.name||anonName(),text,ts:m.ts}); mpSend(m); }
@@ -6685,7 +6773,7 @@ $('joinCode').addEventListener('keydown',e=>{ if(e.key==='Enter') mpJoin($('join
 $('joinCode2').addEventListener('keydown',e=>{ if(e.key==='Enter') mpJoin($('joinCode2').value); });
 $('leaveBtn').addEventListener('click',()=>{ mpLeave(); show('menu'); });
 window.addEventListener('pagehide',()=>{ if(mp.role) mpLeave(); });
-$('mpName').addEventListener('input',()=>{ mp.me.name=$('mpName').value.trim().slice(0,16); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
+$('mpName').addEventListener('input',()=>{ mp.me.name=cutName($('mpName').value.trim()); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
 /* Share your photo once the room knows who you are. */
 function sendAvatar(){ if(mp.role&&acct.av){ avSet(mp.me.id,acct.av); if(acct.color) colCache[mp.me.id]=acct.color; mpSend({t:'av',av:acct.av,col:acct.color||null}); } }
 $('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return;

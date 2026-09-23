@@ -159,6 +159,10 @@ Bans live on one retained list (`worlddrop/v1/ban/handles`): plain strings are p
 
 **Names.** A handle is folded before it's compared, so a Cyrillic or Greek lookalike, a fullwidth letter, an accent or a zero-width character can't produce a second "silas". A display name that folds to someone else's handle is refused.
 
+**Display names** run to 24 characters and take emoji. Length is counted in characters you can see rather than in the slots a string uses, and names are cut on grapheme boundaries, so a flag or a family counts as one and never gets sliced in half. The @handle you sign in with stays plain ASCII, which is why a name made only of emoji is refused: there would be nothing to sign in with.
+
+**Word filter.** Admin mode in Settings carries the blocked word list: a chip per word, a box to add one, an × to drop one, and a reset to the default. It lives in one retained message (`worlddrop/v1/wf`), so a word blocked here is blocked for everyone as soon as it is published, and it is checked against account names, display names, bios, chat, map names, server names and descriptions, and comments. Nothing is matched against the raw text. Everything is folded first: case dropped, accents stripped, Cyrillic and Greek lookalikes mapped to their Latin twins, digits and symbols standing in for letters put back (0 to o, 1 to i, 3 to e, 4 to a, 5 to s, @ to a, $ to s), and everything that is not a letter removed. So case never matters, and neither does N I G, Ń.Í.Ǵ or N1G. Matching is substring, which does catch innocent words containing a blocked one, which is exactly why the list is editable rather than baked in.
+
 It is all client-side on public brokers, so it is a lock on the door rather than a vault: it stops anyone using the app from impersonating or gaining admin, not someone writing raw MQTT to the brokers.
 
 ## Notifications
