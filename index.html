@@ -2705,7 +2705,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260923-134849';
+const BUILD='20260923-135836';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2746,13 +2746,39 @@ const WF_SEED='nigger,nigga,niggah,niglet,negroid,jigaboo,porchmonkey,coon,spic,
 const WF_SAFE='nigeria,nigerian,nigerien,niger,japan,japanese,pakistan,pakistani,guinea,guinean,sussex,essex,middlesex,wessex,sexton,scunthorpe,penistone,clitheroe,lightwater,cockburn,cockermouth,bangkok,hokkaido,cumbria,cumberland,dickens,dickinson,dickson,yiddish,spain,spanish,analysis,analyst,analytic,analytics,analog,analogue,analogy,canal,banal,arsenal,cardinal,signal,personal,seasonal,rational,original,peacock,hancock,woodcock,shuttlecock,babcock,cockpit,cocktail,cockroach,raccoon,cocoon,tycoon,suspicious,conspicuous,spice,spicy,grape,grapes,drape,trapeze,therapy,therapist,therapeutic,shiitake,mishit,assassin,class,classic,grass,compass,passage,assist,assign,asset,assess,massachusetts,bassist,embassy,harass,titan,titanic,competition,constitution,document,circumstance,accumulate,homogeneous,homogenous,benedict,verdict,predict,addict,cocoa,swop,sextant,sextet,sexagesimal'.split(',');
 /* Small capitals, Greek and Cyrillic letters that NFKD leaves alone because they are real
    letters in their own right, mapped to the Latin letters they are being used to imitate. */
-const WF_LOOK={'ƒ':'f','ł':'l','ø':'o','đ':'d','ħ':'h','ŧ':'t','ĸ':'k','ſ':'s','ʃ':'s','ɔ':'c','ə':'e','ɛ':'e','ɑ':'a','ɒ':'a','ʋ':'v','ʍ':'w','ʎ':'y','ɟ':'j','ʈ':'t','ɖ':'d','ɱ':'m','ɳ':'n','ɲ':'n','ɾ':'r','ʂ':'s','ʐ':'z','ƀ':'b','ƈ':'c','ɗ':'d','ƙ':'k','ƥ':'p','ƭ':'t','ƴ':'y','ȼ':'c','ɇ':'e','ɉ':'j','ɍ':'r','ɏ':'y','ʞ':'k','ɥ':'h','ɯ':'m','ɰ':'m','ʛ':'g','ʜ':'h','ʟ':'l','ʙ':'b','ʏ':'y','ʑ':'z','ẞ':'b','þ':'p','ð':'d','ŉ':'n','ǥ':'g','ȿ':'s','ɀ':'z','ʉ':'u','ʊ':'u','ɨ':'i','ɪ':'i','ɵ':'o','ɸ':'o','ᴀ':'a','ʙ':'b','ᴄ':'c','ᴅ':'d','ᴇ':'e','ꜰ':'f','ɢ':'g','ʜ':'h','ɪ':'i','ᴊ':'j','ᴋ':'k','ʟ':'l','ᴍ':'m','ɴ':'n','ᴏ':'o','ᴘ':'p','ꞯ':'q','ʀ':'r','ꜱ':'s','ᴛ':'t','ᴜ':'u','ᴠ':'v','ᴡ':'w','ʏ':'y','ᴢ':'z','ʁ':'r','ɹ':'r','ʇ':'t','ɐ':'a','ǝ':'e','ᴎ':'n','ı':'i','α':'a','β':'b','γ':'y','δ':'d','ε':'e','ζ':'z','η':'n','θ':'o','ι':'i','κ':'k','λ':'l','μ':'u','ν':'v','ξ':'x','ο':'o','π':'n','ρ':'p','σ':'o','τ':'t','υ':'u','φ':'o','χ':'x','ψ':'w','ω':'w','в':'b','г':'r','д':'d','з':'z','к':'k','м':'m','н':'h','т':'t','ь':'b','я':'r','ф':'o','л':'n','п':'n','и':'u','й':'u','ч':'h','ш':'w','щ':'w','э':'e','ё':'e','ъ':'b'};
+const WF_LOOK={'є':'e','ѕ':'s','і':'i','ј':'j','ґ':'g','ђ':'d','ћ':'h','џ':'u','ѡ':'w','ѵ':'v','ѧ':'a','ѥ':'e','ԁ':'d','ԛ':'q','ԝ':'w','ғ':'f','қ':'k','ң':'h','ҥ':'h','ө':'o','ұ':'y','ҷ':'h','ҽ':'e','ҿ':'e','ᴦ':'r','ᵷ':'g','ꞑ':'n','ꭺ':'a','ꮯ':'c','ꮐ':'g','ꮮ':'l','ꮪ':'s','ꮻ':'w','ꮤ':'w','ς':'c','ϲ':'c','ϳ':'j','ϱ':'p','ϰ':'k','ϐ':'b','ϑ':'o','ϕ':'o','ϖ':'w','ϒ':'y','ϵ':'e','ʀ':'r','ʁ':'r','ɴ':'n','ɢ':'g','ʟ':'l','ʜ':'h','ᴊ':'j','ᴘ':'p','ᴛ':'t','ᴠ':'v','ᴡ':'w','¢':'c','€':'e','£':'e','₴':'s','₦':'n','₽':'p','¥':'y','₤':'l','₮':'t','α':'a','ß':'b','ƒ':'f','ł':'l','ø':'o','đ':'d','ħ':'h','ŧ':'t','ĸ':'k','ſ':'s','ʃ':'s','ɔ':'c','ə':'e','ɛ':'e','ɑ':'a','ɒ':'a','ʋ':'v','ʍ':'w','ʎ':'y','ɟ':'j','ʈ':'t','ɖ':'d','ɱ':'m','ɳ':'n','ɲ':'n','ɾ':'r','ʂ':'s','ʐ':'z','ƀ':'b','ƈ':'c','ɗ':'d','ƙ':'k','ƥ':'p','ƭ':'t','ƴ':'y','ȼ':'c','ɇ':'e','ɉ':'j','ɍ':'r','ɏ':'y','ʞ':'k','ɥ':'h','ɯ':'m','ɰ':'m','ʛ':'g','ʜ':'h','ʟ':'l','ʙ':'b','ʏ':'y','ʑ':'z','ẞ':'b','þ':'p','ð':'d','ŉ':'n','ǥ':'g','ȿ':'s','ɀ':'z','ʉ':'u','ʊ':'u','ɨ':'i','ɪ':'i','ɵ':'o','ɸ':'o','ᴀ':'a','ʙ':'b','ᴄ':'c','ᴅ':'d','ᴇ':'e','ꜰ':'f','ɢ':'g','ʜ':'h','ɪ':'i','ᴊ':'j','ᴋ':'k','ʟ':'l','ᴍ':'m','ɴ':'n','ᴏ':'o','ᴘ':'p','ꞯ':'q','ʀ':'r','ꜱ':'s','ᴛ':'t','ᴜ':'u','ᴠ':'v','ᴡ':'w','ʏ':'y','ᴢ':'z','ʁ':'r','ɹ':'r','ʇ':'t','ɐ':'a','ǝ':'e','ᴎ':'n','ı':'i','α':'a','β':'b','γ':'y','δ':'d','ε':'e','ζ':'z','η':'n','θ':'o','ι':'i','κ':'k','λ':'l','μ':'u','ν':'v','ξ':'x','ο':'o','π':'n','ρ':'p','σ':'o','τ':'t','υ':'u','φ':'o','χ':'x','ψ':'w','ω':'w','в':'b','г':'r','д':'d','з':'z','к':'k','м':'m','н':'h','т':'t','ь':'b','я':'r','ф':'o','л':'n','п':'n','и':'u','й':'u','ч':'h','ш':'w','щ':'w','э':'e','ё':'e','ъ':'b'};
 let _wf=null;
 function wfList(){ if(!_wf){ try{ const a=JSON.parse(localStorage.getItem('pp_wf')||'null'); _wf=Array.isArray(a)?a:WF_SEED.slice(); }catch(e){ _wf=WF_SEED.slice(); } } return _wf; }
 function wfSet(list){ _wf=[...new Set(list.map(w=>wfFold(w)).filter(w=>w.length>=2))].slice(0,400); try{ localStorage.setItem('pp_wf',JSON.stringify(_wf)); }catch(e){} }
 const WF_SUB={'0':'o','1':'i','2':'z','3':'e','4':'a','5':'s','6':'g','7':'t','8':'b','9':'g','@':'a','$':'s','!':'i','|':'i','+':'t','(':'c','<':'c','{':'c','£':'e','€':'e','¡':'i'};
+/* Whole alphabets that Unicode normalisation leaves alone because they are pictures of letters
+   rather than letters: flag letters, the white-on-black circled and squared sets. Built once from
+   their ranges instead of listed out. */
+(function(){
+  const add=(start,from)=>{ for(let i=0;i<26;i++) WF_LOOK[String.fromCodePoint(start+i)]=String.fromCharCode(97+i); };
+  add(0x1F1E6);   // regional indicators, the letters flags are made of
+  add(0x1F150);   // negative circled
+  add(0x1F170);   // negative squared
+  add(0x1F130);   // squared
+  add(0x24B6);    // circled capitals
+  add(0x24D0);    // circled smalls
+  // The upside-down letters that are nothing else upright, so they read the same on their own as
+  // they do in a flipped word. The ones that swap in pairs (n and u, d and p, b and q) are left to
+  // the flip pass, where the whole word is turned over at once.
+  for(const [k,v] of Object.entries({'ɐ':'a','ɔ':'c','ǝ':'e','ɟ':'f','ƃ':'g','ɥ':'h','ı':'i','ᴉ':'i','ɾ':'j','ʞ':'k','ɯ':'m','ɹ':'r','ʇ':'t','ʌ':'v','ʍ':'w','ʎ':'y','ꞁ':'l','˥':'l','ɓ':'b'})) WF_LOOK[k]=v;
+})();
+/* Upside-down text reads as gibberish until you turn it over, and turning it over means swapping
+   n for u, which would wreck every ordinary word. So it is only flipped when at least two letters
+   could not have come from anywhere else. */
+const WF_FLIP={'ɐ':'a','ɔ':'c','ǝ':'e','ɟ':'f','ƃ':'g','ɥ':'h','ı':'i','ᴉ':'i','ɾ':'j','ʞ':'k','ꞁ':'l','ɯ':'m','u':'n','o':'o','d':'p','b':'q','ɹ':'r','s':'s','ʇ':'t','n':'u','ʌ':'v','ʍ':'w','x':'x','ʎ':'y','z':'z','q':'b','p':'d','ɓ':'b','ʃ':'l','˥':'l','ɥ':'h'};
+const WF_FLIP_SURE=new Set(['ɐ','ɔ','ǝ','ɟ','ƃ','ɥ','ı','ᴉ','ɾ','ʞ','ɯ','ɹ','ʇ','ʌ','ʍ','ʎ','˥','ꞁ','ɓ','¿','¡']);
+function wfUnflip(raw){
+  let sure=0; for(const ch of raw) if(WF_FLIP_SURE.has(ch)) sure++;
+  if(sure<2) return '';
+  return [...raw].map(ch=>WF_FLIP[ch]||ch).reverse().join('');
+}
 function wfFold(s){
-  return foldName(String(s||'').replace(/[^\x00-\x7f]/g,ch=>WF_LOOK[ch]||ch))
+  return foldName(String(s||'').replace(/[^\x00-\x7f]/gu,ch=>WF_LOOK[ch]||ch))
     .replace(/[0-9@$!|+(<{£€¡]/g,ch=>WF_SUB[ch]||ch).replace(/[^a-z]/g,'');
 }
 /* Every letter of a blocked word is allowed to repeat, so niiiigggerrr is caught while Niger, which
@@ -2773,7 +2799,11 @@ function wfBlocked(text){
   if(raw.replace(/\D/g,'').includes('1488')) return '1488';
   const f=wfFold(raw); if(!f) return null;
   const list=wfList();
-  return wfScan(f,list) || wfScan([...f].reverse().join(''),list,4) || null;
+  const flipped=wfUnflip(raw.toLowerCase());
+  return wfScan(f,list)
+      || wfScan([...f].reverse().join(''),list,4)
+      || (flipped?wfScan(wfFold(flipped),list,4):null)
+      || null;
 }
 function wfPublish(){
   const payload=JSON.stringify(wfList()); let sent=false;
@@ -2919,7 +2949,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:6,patch:6};
+const VERSION={major:3,minor:6,patch:7};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -5985,6 +6015,13 @@ function mpLeave(){
   $('strip').hidden=true; $('hudBrand').hidden=false; $('waitOverlay').hidden=true;
 }
 function mpBroadcast(m){ for(const l of mp.links){ if(l.ready) pub(l.client,T.all(mp.code),m); } }
+/* A name that walks in blocked never gets shown: it is swapped for a plain one at the door and
+   that player is asked for a new one. */
+function joinName(raw,n){
+  const nm=cutName(String(raw||''));
+  if(!nm||wfBlocked(nm)) return {name:'Player '+n,bad:!!nm};
+  return {name:nm,bad:false};
+}
 function mpSendTo(id,m){ const p=mp.players[id]; const l=(p&&p.link)||mp.links.find(x=>x.ready); if(l) pub(l.client,T.one(mp.code,id),m); }
 function mpSend(m){ if(mp.role==='host') hostOnMessage('host',m,null); else if(mp.link){ m.id=mp.me.id; pub(mp.link.client,T.host(mp.code),m); } }
 function connStatus(text){ if(mp.role!=='guest') return; const box=$('connBox'); box.hidden=false; box.className='conn'; box.textContent=text; }
@@ -6041,13 +6078,15 @@ function hostOnMessage(from,m,link){
       if(!srv.cur||mp.settings.kind==='duo'||playerList().length>=MAX_PLAYERS){ mpSendTo(from,{t:'reject',why:'That game is already in progress.'}); return; }
       // a server mid-game: they come in now and play from the next round
       const taken=new Set(playerList().map(p=>p.color).filter(c=>c!==null)); const c=COLORS.findIndex((_,i)=>!taken.has(i)); const gm=modeOf(mp.settings.mode);
-      mp.players[from]={id:from,name:String(m.name||'').slice(0,16)||('Player '+(playerList().length+1)),color:c<0?0:c,face:false,score:gm.bet?1000:0,host:false,vpeer:m.vpeer||null,link,k:acctKey(m.k||''),late:state.round,lives:gm.lives||null,out:false,hp:gm.duel?DUEL_HP:undefined};
+      const jn1=joinName(m.name,playerList().length+1); if(jn1.bad) setTimeout(()=>mpSendTo(from,{t:'rename',name:jn1.name}),700);
+      mp.players[from]={id:from,name:jn1.name,color:c<0?0:c,face:false,score:gm.bet?1000:0,host:false,vpeer:m.vpeer||null,link,k:acctKey(m.k||''),late:state.round,lives:gm.lives||null,out:false,hp:gm.duel?DUEL_HP:undefined};
       mp.seen[from]=Date.now(); mpSendTo(from,{t:'welcome'});
       mpSendTo(from,{t:'late',settings:mp.settings,locs:state.locs.slice(0,mp.sentUpTo+1).filter(l=>l&&!(l instanceof Error)).map(locPayload),players:pubPlayers(),round:state.round,phase:mp.phase});
       mpBroadcast({t:'players',players:pubPlayers()}); updateStrip(); voiceConnect(); return; }
     const cap=mp.settings.kind==='duo'?2:MAX_PLAYERS;
     if(playerList().length>=cap){ mpSendTo(from,{t:'reject',why:cap===2?'That duo already has its two players.':`That game is full (${MAX_PLAYERS} players).`}); return; }
-    mp.players[from]={id:from,name:String(m.name||'').slice(0,16),color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link,k:acctKey(m.k||'')};
+    const jn2=joinName(m.name,playerList().length+1); if(jn2.bad) setTimeout(()=>mpSendTo(from,{t:'rename',name:jn2.name}),700);
+    mp.players[from]={id:from,name:jn2.name,color:null,face:false,score:0,host:false,vpeer:m.vpeer||null,link,k:acctKey(m.k||'')};
     mp.seen[from]=Date.now(); dlog('joined '+from); mpSendTo(from,{t:'welcome'}); hostSync();
     const joinNote={t:'chat',id:'sys',sys:true,name:'',text:`${mp.players[from].name||'Someone'} joined`,ts:Date.now()}; mpBroadcast(joinNote); chatAdd(joinNote);
     setTimeout(()=>mpSendTo(from,{t:'avall',map:avCache,cols:colCache}),300);   // hand the newcomer everyone's photo, including the host's
@@ -6064,7 +6103,7 @@ function hostOnMessage(from,m,link){
     if(mp.phase==='lobby') hostSync(); else { mpBroadcast({t:'players',players:pubPlayers()}); renderLobby(); updateStrip(); }
     return; }
   if(m.t==='chat'){ const text=String(m.text||'').trim().slice(0,200); if(!text) return; const out={t:'chat',id:from,name:pl.name||('Player'),text,ts:+m.ts||Date.now()}; mpBroadcast(out); chatAdd(out); return; }
-  if(m.t==='name'){ pl.name=String(m.name||'').slice(0,16); if(mp.phase==='lobby') hostSync(); else mpBroadcast({t:'players',players:pubPlayers()}); }
+  if(m.t==='name'){ const nm=cutName(String(m.name||'')); if(wfBlocked(nm)) return; pl.name=nm; if(mp.phase==='lobby') hostSync(); else mpBroadcast({t:'players',players:pubPlayers()}); }
   else if(m.t==='color'){
     pl.chose=true;
     if(m.color==='av'){ if(avOf(from)){ pl.face=true; pl.color=null; } hostSync(); return; }
@@ -6172,7 +6211,16 @@ async function hostStartGame(){
   // Auto-assign colors and names
   for(const p of playerList()) if(p.face) p.color=null;   // photo players get a fresh line color each game
   const taken=new Set(playerList().map(p=>p.color).filter(c=>c!==null));
-  let n=1; for(const p of playerList()){ if(!p.name) p.name='Player '+(n++); if(p.color===null){ const c=COLORS.findIndex((_,i)=>!taken.has(i)); p.color=c<0?0:c; taken.add(p.color); } p.score=0; p.out=false; p.outRound=null; p.lives=null; p.late=null; }
+  // Nobody plays under a blocked name. The host swaps it for a plain one so the game is not held
+  // up, and tells that player to pick a new one while the locations are still loading.
+  let n=1;
+  for(const p of playerList()){
+    if(p.name&&wfBlocked(p.name)){
+      p.name='Player '+(n++);
+      if(p.id===mp.me.id) askNewName(); else mpSendTo(p.id,{t:'rename',name:p.name});
+    }
+  }
+  for(const p of playerList()){ if(!p.name) p.name='Player '+(n++); if(p.color===null){ const c=COLORS.findIndex((_,i)=>!taken.has(i)); p.color=c<0?0:c; taken.add(p.color); } p.score=0; p.out=false; p.outRound=null; p.lives=null; p.late=null; }
   const em=modeOf(mp.settings.mode);
   if(em.elim){ const np=playerList().length;
     // worst case: every player but one runs out of lives, and the survivor is down to their last one
@@ -6197,6 +6245,7 @@ function guestOnMessage(m){
   mp.hostSeen=Date.now();
   if(m.t==='welcome'){ sendAvatar(); $('connBox').className='conn ok'; $('connBox').textContent='Connected ✓'; $('connBox').hidden=false; setTimeout(()=>{ if(mp.role==='guest') $('connBox').hidden=true; },2500); return; }
   if(m.t==='hb') return;
+  if(m.t==='rename'){ mp.me.name=m.name||mp.me.name; if($('mpName')) $('mpName').value=mp.me.name; askNewName(); return; }
   if(m.t==='host-left'){ if(mp.settings&&mp.settings.srv){ srvAfterHostLeft(); return; } toast('The host left the game'); mpLeave(); show('menu'); return; }
   if(m.t==='handover'){ mp.handover={to:m.to,code:m.code||mp.code}; toast(m.to===mp.me.id?'The host is leaving. You take over.':'The host is leaving, the room stays up…'); return; }
   if(m.t==='loop'){ const el=$('finalWait'); if(el&&!$('final').hidden){ el.hidden=false; el.textContent=`Next game in about ${m.secs}s · this server loops`; } return; }
@@ -6639,6 +6688,31 @@ function chatToggle(force){
   if(chat.open){ chat.unread=0; $('chatPeek').hidden=true; renderChat(); const need=!acct.key; $('chatForm').hidden=need; $('chatNeed').hidden=!need; if(!need) setTimeout(()=>$('chatIn').focus(),50); }
 }
 $('chatNeedGo').addEventListener('click',()=>{ chatToggle(false); needAcct('chat in rooms'); document.querySelector('.toast.need .tlink').click(); });
+/* Asked for a new name in the middle of a game starting. The game carries on loading behind the
+   dialog; whatever is typed is checked the same way, and leaving it alone keeps the plain name the
+   host already gave you. */
+let askingName=false;
+async function askNewName(){
+  if(askingName) return; askingName=true;
+  warnTop("You aren't allowed to use that name. Pick another.");
+  try{
+    for(let i=0;i<6;i++){
+      const v=await ask({title:'Pick a different name',
+        body:i?"That one isn't allowed either. Try something else.":`Your name isn't allowed in this game, so you are ${mp.me.name} for now. Pick another and it will show for everyone.`,
+        input:true,value:'',placeholder:'Your name',max:48,ok:'Use this name'});
+      if(v===null) break;
+      const nm=cutName(cleanName(v));
+      if(nameLen(nm)<2) continue;
+      if(wfBlocked(nm)) continue;
+      mp.me.name=nm;
+      try{ localStorage.setItem('pp_name',nm); }catch(e){}
+      if($('mpName')) $('mpName').value=nm;
+      if(mp.role==='host'){ const me=mp.players[mp.me.id]; if(me) me.name=nm; hostSync(); }
+      else mpSend({t:'name',name:nm});
+      updateStrip(); break;
+    }
+  } finally { askingName=false; }
+}
 function chatSend(){
   if(!acct.key) return needAcct('chat in rooms');
   const inp=$('chatIn'); const text=inp.value.trim().slice(0,200); if(!text||!mp.role) return;
@@ -6809,6 +6883,7 @@ $('joinCode2').addEventListener('keydown',e=>{ if(e.key==='Enter') mpJoin($('joi
 $('leaveBtn').addEventListener('click',()=>{ mpLeave(); show('menu'); });
 window.addEventListener('pagehide',()=>{ if(mp.role) mpLeave(); });
 $('mpName').addEventListener('input',()=>{ mp.me.name=cutName($('mpName').value.trim()); try{ localStorage.setItem('pp_name',mp.me.name); }catch(e){} mpSend({t:'name',name:mp.me.name}); });
+$('mpName').addEventListener('change',()=>{ if(wfBlocked($('mpName').value)) warnTop("You aren't allowed to use that name."); });
 /* Share your photo once the room knows who you are. */
 function sendAvatar(){ if(mp.role&&acct.av){ avSet(mp.me.id,acct.av); if(acct.color) colCache[mp.me.id]=acct.color; mpSend({t:'av',av:acct.av,col:acct.color||null}); } }
 $('swatches').addEventListener('click',e=>{ const sw=e.target.closest('.swatch'); if(!sw||sw.classList.contains('taken')) return;
