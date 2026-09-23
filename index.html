@@ -505,6 +505,33 @@
   #game.blind-map .mappanel{width:100vw;height:calc(100vh - 72px);opacity:1;border-radius:0;transition:none}
   #game.blind-map .ctl #copyBtn,#game.blind-map .ctl #resetBtn{display:none}
   #game.blind-map .mappanel .grab{display:none}
+  /* Duel round: two health bars that drain. */
+  .duelrecap{display:flex;flex-direction:column;gap:10px;margin:0 0 4px}
+  .dhp-head{font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center}
+  .dhp{background:var(--hover);border-radius:12px;padding:10px 12px}
+  .dhp.me{background:var(--green-soft)}
+  .dhp-top{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:800;margin-bottom:7px}
+  .dhp-top .pav{width:26px;height:26px;flex:none}
+  .dhp-d{margin-left:auto;font-weight:700;font-size:13px;color:var(--muted)}
+  .dhp-track{display:block;position:relative;height:13px;border-radius:99px;background:var(--sunk);overflow:hidden}
+  .dhp-fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#2bb673,#5fd39b);transition:width .95s cubic-bezier(.22,.9,.3,1)}
+  .dhp-fill.mid{background:linear-gradient(90deg,#d98324,#f0b429)} .dhp-fill.low{background:linear-gradient(90deg,#c2283a,#e63946)}
+  .dhp-gone{position:absolute;top:0;bottom:0;background:#ff5a6a;opacity:.95}
+  .dhp-gone.go{animation:hpGone .95s cubic-bezier(.22,.9,.3,1) both}
+  @keyframes hpGone{0%{opacity:.95;transform:scaleY(1)}55%{opacity:.9}100%{opacity:0;transform:scaleY(.2)}}
+  .dhp-foot{display:flex;align-items:baseline;gap:10px;margin-top:6px;font-size:13px;font-weight:700;color:var(--muted)}
+  .dhp-foot b{font-size:16px;color:var(--text);font-variant-numeric:tabular-nums}
+  .dhp-dmg{margin-left:auto;color:#c2283a;font-weight:900;font-size:17px;font-variant-numeric:tabular-nums;animation:dmgPop 1.15s cubic-bezier(.2,1.4,.4,1) both}
+  @keyframes dmgPop{0%{opacity:0;transform:translateY(10px) scale(.7)}22%{opacity:1;transform:translateY(-3px) scale(1.18)}45%{transform:translateY(0) scale(1)}100%{opacity:1;transform:translateY(0) scale(1)}}
+  .dhp-ko{margin-left:auto;color:#fff;background:#c2283a;border-radius:99px;padding:3px 10px;font-weight:900;font-size:12.5px;letter-spacing:.04em}
+  .dhp.shook{animation:hpShake .5s cubic-bezier(.36,.07,.19,.97) both}
+  @keyframes hpShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}100%{transform:none}}
+  #result .dhp{background:rgba(255,255,255,.08)} #result .dhp.me{background:rgba(43,182,115,.16)}
+  #result .dhp-track{background:rgba(0,0,0,.35)}
+  #result .dhp-foot{color:rgba(255,255,255,.72)} #result .dhp-foot b{color:#fff}
+  #result .dhp-d{color:rgba(255,255,255,.7)} #result .dhp-head{color:rgba(255,255,255,.72)}
+  #result .dhp-dmg{color:#ff8b95}
+  @media (prefers-reduced-motion:reduce){ .dhp-fill{transition:none} .dhp.shook,.dhp-dmg,.dhp-gone.go{animation:none} }
   .duelrow{margin:0 0 8px;padding:10px 12px;border-radius:10px;background:var(--red-soft);color:#a3202c;font-weight:800;font-size:14px;text-align:center;animation:nagIn .35s cubic-bezier(.2,1.3,.4,1) both}
   .duelrow.win{background:var(--green-soft);color:var(--green-dark)}
   .duelrow.even{background:var(--hover);color:var(--muted)}
@@ -2663,7 +2690,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260923-073641';
+const BUILD='20260923-074718';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2813,7 +2840,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:6,patch:3};
+const VERSION={major:3,minor:6,patch:4};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -5001,15 +5028,19 @@ function showResult(r){
   const fit=()=>{ resultMap.invalidateSize(); if(hid){ resultMap.setView(r.guess||[20,0],r.guess?4:2,{animate:false}); return; } if(rpts.length>1) resultMap.fitBounds(L.latLngBounds(rpts),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(r.truth,5,{animate:false}); };
   fit(); setTimeout(fit,150); sfx('reveal'); paintRival();
   if(line) setTimeout(()=>{ for(const pl of [casing,line]){ const el=pl.getElement(); if(!el) continue; const len=el.getTotalLength(); el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.classList.add('draw-line'); void el.getBoundingClientRect(); el.style.strokeDashoffset=0; } },350);
-  const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(r.pts>=4000) pe.classList.add('great');
-  setTimeout(()=>{ if($('result').hidden) return; pe.classList.add('pop'); if(r.pts>=4500){ confetti(); flash(); sfx(r.pts>=4900?'perfect':'great'); } },600);
+  // A duel is settled in health, so the round score has nothing to say: the bars below carry it.
+  const duelling=!!(mp.role&&modeOf(state.mode).duel);
+  const pe=$('ptsNum').parentElement; pe.hidden=duelling; $('ptsBar').parentElement.hidden=duelling;
+  pe.classList.remove('pop','great'); if(r.pts>=4000&&!duelling) pe.classList.add('great');
+  if(!duelling) setTimeout(()=>{ if($('result').hidden) return; pe.classList.add('pop'); if(r.pts>=4500){ confetti(); flash(); sfx(r.pts>=4900?'perfect':'great'); } },600);
   stRound(state.mode,r.pts);
 
   $('distTxt').innerHTML = r.guess ? `Your guess was <b>${fmtDist(r.km)}</b> from the correct location.` : (hid?`You didn't place a pin.`:`You didn't place a pin. The location is marked with a flag.`);
   const busted=r.bet&&state.bank<=0;
   $('nextBtn').textContent = (state.round>=state.totalRounds||busted) ? 'See results' : 'Next round';
   $('ptsBar').style.width='0%';
-  if(r.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)} = ${r.bet.payout.toLocaleString()} back · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,r.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.bet.mult/5*100)+'%'; })); }
+  if(duelling){ /* no points readout to fill */ }
+  else if(r.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)} = ${r.bet.payout.toLocaleString()} back · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,r.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.bet.mult/5*100)+'%'; })); }
   else { $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; countUp($('ptsNum'),0,r.pts,1000); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(r.pts/50)+'%'; })); }
   renderVerdict(r);
   // Country info may still be loading; fill in when it arrives.
@@ -5972,8 +6003,9 @@ function hostReveal(){
   let duel=null;
   if(mm.duel){
     const mult=duelMult(state.round); const [a,b]=results; let dmg=0, loser=null;
+    const was=Object.fromEntries(playerList().map(p=>[p.id,p.hp??DUEL_HP]));
     if(a&&b&&a.pts!==b.pts){ loser=a.pts<b.pts?a:b; dmg=Math.round(Math.abs(a.pts-b.pts)*mult); const p=mp.players[loser.id]; if(p) p.hp=Math.max(0,(p.hp??DUEL_HP)-dmg); }
-    duel={mult,dmg,loser:loser?loser.id:null,hp:Object.fromEntries(playerList().map(p=>[p.id,p.hp??DUEL_HP]))};
+    duel={mult,dmg,loser:loser?loser.id:null,was,hp:Object.fromEntries(playerList().map(p=>[p.id,p.hp??DUEL_HP]))};
   }
   const rev={t:'reveal',round:state.round,truth,place:loc.place||null,results,lie:loc.lie,extra:loc.extra?loc.extra.map(e=>({lat:e.lat,lng:e.lng})):null,truthCountry:mm.country?tn:undefined,ans:(mm.slider||mm.choice)?{tempF:loc.tempF??null,pol:loc.pol||null}:undefined,
              elim,duel,players:(mm.elim||mm.duel)?pubPlayers():null,over:mm.elim?alivePlayers().length<=1:(mm.duel?(playerList().length<2||playerList().some(p=>(p.hp??DUEL_HP)<=0)):false),add:mm.duel?hostPending():undefined};
@@ -6240,10 +6272,14 @@ function showResultMP(rev){
   $('distTxt').innerHTML = mine.guess ? `Your guess was <b>${fmtDist(mine.km)}</b> away.` : `You didn't place a pin.`;
   $('nextBtn').textContent = (rev.round>=state.totalRounds||rev.over) ? 'See results' : 'Next round';
   $('ptsBar').style.width='0%';
-  if(mine.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${mine.bet.stake.toLocaleString()} × ${mine.bet.mult.toFixed(2)} = ${mine.bet.payout.toLocaleString()} back · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,mine.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.bet.mult/5*100)+'%'; })); }
+  // A duel is settled in health, so the round score has nothing to say here: the bars carry the round.
+  const duelling=!!rev.duel;
+  const pe=$('ptsNum').parentElement; pe.hidden=duelling; $('ptsBar').parentElement.hidden=duelling;
+  if(duelling){ /* no points readout to fill */ }
+  else if(mine.bet){ $('ptsNum').parentElement.querySelector('small').textContent=` chips · bet ${mine.bet.stake.toLocaleString()} × ${mine.bet.mult.toFixed(2)} = ${mine.bet.payout.toLocaleString()} back · bankroll ${state.bank.toLocaleString()}`; countUp($('ptsNum'),0,mine.pts,1000,true); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.bet.mult/5*100)+'%'; })); }
   else { $('ptsNum').parentElement.querySelector('small').textContent='/ 5,000'; countUp($('ptsNum'),0,mine.pts,1000); requestAnimationFrame(()=>requestAnimationFrame(()=>{ $('ptsBar').style.width=(mine.pts/50)+'%'; })); }
-  const pe=$('ptsNum').parentElement; pe.classList.remove('pop','great'); if(mine.pts>=4000) pe.classList.add('great');
-  setTimeout(()=>{ if($('result').hidden) return; pe.classList.add('pop'); if(mine.pts>=4500){ confetti(); flash(); sfx(mine.pts>=4900?'perfect':'great'); } },600);
+  pe.classList.remove('pop','great'); if(mine.pts>=4000&&!duelling) pe.classList.add('great');
+  if(!duelling) setTimeout(()=>{ if($('result').hidden) return; pe.classList.add('pop'); if(mine.pts>=4500){ confetti(); flash(); sfx(mine.pts>=4900?'perfect':'great'); } },600);
   stRound(state.mode,mine.pts);
   renderVerdict(me);
   (async()=>{ const [tp,gp]=await Promise.all([ me.loc.place||placeOf(rev.truth.lat,rev.truth.lng), mine.guess?placeOf(mine.guess.lat,mine.guess.lng):null ]); me.loc.place=tp; me.guessPlace=gp; if(!$('result').hidden) renderVerdict(me); })();
@@ -6253,8 +6289,7 @@ function showResultMP(rev){
   $('leaderLine').hidden=false;
   if(modeOf(state.mode).blind){ $('leaderLine').innerHTML=`<span class="crown" style="background:var(--green-soft);color:var(--green-dark)">Together · <b>${lead.total.toLocaleString()}</b></span><span>${rev.round<state.totalRounds?`${state.totalRounds-rev.round} round${state.totalRounds-rev.round===1?'':'s'} left`:'last round'}</span>`;
     $('roundRank').innerHTML=''; return; }
-  if(rev.duel){ const me=mp.players[mp.me.id], them=playerList().find(p=>p.id!==mp.me.id); const hp=p=>Math.max(0,(p&&p.hp)??DUEL_HP).toLocaleString();
-    $('leaderLine').innerHTML=`<span class="crown" style="background:var(--green-soft);color:var(--green-dark)">You · <b>${hp(me)} HP</b></span><span>${them?esc(them.name)+' · <b>'+hp(them)+' HP</b>':''}</span><span>Round ${rev.round} · damage ×${rev.duel.mult}</span>`; }
+  if(rev.duel){ $('leaderLine').hidden=true; $('roundRank').innerHTML=duelRecap(rev); return; }
   else if(modeOf(state.mode).elim){   // knockout modes: nobody cares about points, only who is still in and how many lives they have
     const total=modeOf(state.mode).lives||0; const alive=rev.results.filter(r=>!r.out); const me=rev.results.find(r=>r.id===mp.me.id); const myLives=me?(total?Math.max(0,me.lives??0):(me.out?0:1)):0;
     $('leaderLine').innerHTML=`<span class="crown" style="background:var(--green-soft);color:var(--green-dark)">${alive.length} of ${rev.results.length} still standing</span><span>${me&&me.out?'You\'re out':total?`You have ${heartRow(myLives,total,false,16)}`:'You\'re still in'}</span>`; }
@@ -6266,18 +6301,47 @@ function showResultMP(rev){
     $('roundRank').innerHTML=elimBanner(rev)+sorted.map((r,i)=>`<div class="rrow lives ${r.id===mp.me.id?'me':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd dim">${r.guess?fmtDist(r.km):'no guess'}</span><span class="rp">${total?heartRow(r.out?0:Math.max(0,r.lives??total),total,!!r.out,18):(r.out?'<span class="dim">out</span>':'<span style="color:var(--green)">in</span>')}</span></div>`).join('');
     return; }
   const sorted=rev.results.slice().sort((a,b)=>b.pts-a.pts);
-  $('roundRank').innerHTML=elimBanner(rev)+duelBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out||r.lives!=null?' '+heartRow(r.lives??0,modeOf(state.mode).lives||3,!!r.out,14):''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
+  $('roundRank').innerHTML=elimBanner(rev)+sorted.map((r,i)=>`<div class="rrow ${r.id===mp.me.id?'me':''} ${i===0?'first':''} ${r.out?'out':''}"><span class="pos">${i+1}</span><span class="sw" style="${swStyle(r)}"></span><span class="pn">${esc(r.name)}</span><span class="rd">${r.guess?fmtDist(r.km):'no guess'}${r.bet?` · bet ${r.bet.stake.toLocaleString()} × ${r.bet.mult.toFixed(2)}`:''}${r.out||r.lives!=null?' '+heartRow(r.lives??0,modeOf(state.mode).lives||3,!!r.out,14):''}</span><span class="rp">${r.pts>0?'+':''}${r.pts.toLocaleString()}</span><span class="rt">${r.total.toLocaleString()} ${r.bet?'chips':'total'}</span></div>`).join('');
 }
-/* Duel: who took the hit this round, and how hard. */
-function duelBanner(rev){
-  const d=rev.duel; if(!d) return '';
-  paintDuel();
-  const mine=d.loser===mp.me.id; const them=playerList().find(p=>p.id!==mp.me.id); const tn=them&&them.name?esc(them.name):'Your opponent';
-  if(!d.loser||!d.dmg) return `<div class="duelrow even">Even round, no damage</div>`;
-  const left=d.hp&&d.hp[d.loser]!=null?d.hp[d.loser]:null; const ko=left!=null&&left<=0;
-  if(mine){ sfx(ko?'out':'hurt'); return `<div class="duelrow">You take <b>${d.dmg.toLocaleString()}</b> damage · ×${d.mult}${ko?' · knocked out':''}</div>`; }
-  sfx('great');
-  return `<div class="duelrow win">You deal <b>${d.dmg.toLocaleString()}</b> damage to ${tn} · ×${d.mult}${ko?' · knockout!':''}</div>`;
+/* Duel: the round is the health, not the points. Nobody cares that the guess was worth 4,812; they
+   care that it cost them a fifth of the bar. Each bar opens where the player stood, holds a beat so
+   the chunk about to go is visible, then drains while the number counts down after it. */
+function duelRecap(rev){
+  const d=rev.duel; paintDuel();
+  const meId=mp.me.id;
+  const rows=rev.results.slice().sort((a,b)=>(a.id===meId?0:1)-(b.id===meId?0:1));
+  const now=d.hp||{};
+  const was=d.was||Object.fromEntries(rows.map(r=>[r.id,(now[r.id]??DUEL_HP)+(r.id===d.loser?d.dmg||0:0)]));
+  const ko=Object.values(now).some(v=>v<=0);
+  const html=rows.map(r=>{
+    const w=Math.max(0,was[r.id]??DUEL_HP), n=Math.max(0,now[r.id]??w), hit=Math.max(0,w-n);
+    const wp=w/DUEL_HP*100, np=n/DUEL_HP*100;
+    const out=n<=0;
+    return `<div class="dhp${r.id===meId?' me':''}${hit?' hit':''}${out?' ko':''}" data-to="${np}" data-hp="${n}" data-was="${w}">`+
+      `<span class="dhp-top">${avTag(r.id,r.name,26)}<b>${r.id===meId?'You':esc(r.name||'Opponent')}</b><span class="dhp-d">${r.guess?fmtDist(r.km):'no guess'}</span></span>`+
+      `<span class="dhp-track"><i class="dhp-gone" style="left:${np}%;width:${Math.max(0,wp-np)}%"></i><i class="dhp-fill ${hpClass(wp)}" style="width:${wp}%"></i></span>`+
+      `<span class="dhp-foot"><span><b class="dhp-n">${w.toLocaleString()}</b> HP</span>${hit?`<span class="dhp-dmg">-${hit.toLocaleString()}</span>`:''}${out?'<span class="dhp-ko">Knocked out</span>':''}</span>`+
+      `</div>`;
+  }).join('');
+  if(d.loser===meId) sfx(ko?'out':'hurt'); else if(d.dmg) sfx('great');
+  setTimeout(duelDrain,520);
+  return `<div class="duelrecap"><div class="dhp-head">Round ${rev.round} · damage ×${d.mult}${d.dmg?'':' · even round, nobody takes a hit'}</div>${html}</div>`;
+}
+function duelDrain(){
+  for(const el of document.querySelectorAll('.duelrecap .dhp')){
+    const fill=el.querySelector('.dhp-fill'); const to=+el.dataset.to;
+    if(fill){ fill.style.width=to+'%'; fill.className='dhp-fill '+hpClass(to); }
+    const gone=el.querySelector('.dhp-gone'); if(gone) gone.classList.add('go');
+    if(el.classList.contains('hit')){ el.classList.add('shook');
+      countTo(el.querySelector('.dhp-n'),+el.dataset.was,+el.dataset.hp,950); }
+  }
+}
+function countTo(el,from,to,ms){
+  if(!el) return; const t0=performance.now();
+  const step=now=>{ const k=Math.min(1,(now-t0)/ms), e=1-Math.pow(1-k,3);
+    el.textContent=Math.round(from+(to-from)*e).toLocaleString();
+    if(k<1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
 }
 /* One line on the result screen naming whoever just lost a life or got knocked out. */
 function elimBanner(rev){
