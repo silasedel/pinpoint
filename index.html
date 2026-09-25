@@ -586,6 +586,13 @@
   #flash.go{animation:flashIn .5s ease-out}
   @keyframes flashIn{0%{opacity:.55}100%{opacity:0}}
 
+  /* Circle mode: a fixed ring over the guess map. It never changes size on screen, so zooming is
+     the only thing that changes how much ground it covers. */
+  .ringwrap{position:absolute;inset:0;z-index:8;pointer-events:none;display:grid;place-items:center}
+  .ring{width:var(--ringsz,56%);aspect-ratio:1;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.45),0 0 0 9999px rgba(8,24,16,.32);position:relative}
+  .ring::after{content:'';position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.5)}
+  .ringlbl{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;background:rgba(8,24,16,.82);color:#fff;font-weight:800;font-size:12.5px;padding:5px 11px;border-radius:99px;white-space:nowrap}
+  .ringlbl b{color:#7fe3ab}
   .mappanel{position:absolute;right:0;bottom:0;z-index:7;width:340px;height:270px;border-radius:var(--radius) 0 0 0;overflow:hidden;opacity:.62;
     background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:opacity .18s,width .18s ease-out,height .18s ease-out}
   .mappanel.open,.mappanel.pinned{opacity:1}
@@ -597,6 +604,7 @@
   .compass .rose i{position:absolute;left:50%;top:50%;width:5px;height:32px;margin:-16px 0 0 -2.5px;border-radius:3px;background:linear-gradient(#e63946 0 50%,#2b2b2b 50% 100%)}
   .compass .rose b{position:absolute;top:1px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:#e63946;line-height:1}
   @media (max-width:820px){ .compass{right:12px;bottom:calc(34vh + 12px)} }
+  .mapbox{flex:1;position:relative;min-height:0;display:flex}
   #guessmap{flex:1;background:#bfd9e8}
   .mappanel.cty .coordbar{display:none}
   #draw{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);z-index:60}
@@ -1756,7 +1764,8 @@
 
   <div class="mappanel" id="mappanel">
     <div class="grab" id="mapGrab"><i></i></div>
-    <div id="guessmap"></div>
+    <div class="mapbox"><div id="guessmap"></div>
+      <div class="ringwrap" id="ringWrap" hidden><span class="ring" id="ring"></span><span class="ringlbl" id="ringLbl"></span></div></div>
     <div class="coordbar"><input id="coordIn" placeholder="Paste coordinates: 48.8584, 2.2945 (or a Google Maps link)" autocomplete="off" spellcheck="false"><button id="coordGo" title="Drop the pin at these coordinates">Go</button></div>
     <div class="mapbar">
       <button class="guess" id="guessBtn" disabled>Place your pin</button>
@@ -2264,6 +2273,7 @@ const MODES={
   timemachine:{name:'Time Machine', desc:'Only imagery from before 2010.', filter:OLD_COVERAGE, old:true},
   snow:     {name:'Snow Globe', desc:'Only winter imagery.', filter:n=>SNOW_NORTH.includes(n)||SNOW_SOUTH.includes(n), snow:true},
   countdown:{name:'Countdown', desc:'30 seconds. Every second costs you points.', time:30, countdown:true},
+  circle:   {name:'Circle', desc:'No pin. A ring sits on the map and you zoom until it covers where you think you are. The tighter the ring, the more it pays, but the spot has to be inside it.', circle:true},
   altitude: {name:'Altitude', desc:'Only places above 2,000 meters.', places:HIGH, radius:15000, alt:2000},
   allin:    {name:'All In', desc:'Bet chips every round. The closer you are, the bigger the multiplier.', bet:true},
   oddone:   {name:'Odd One Out', desc:'Three views, two pins. Which view has no pin?', trio:3, pins:2},
@@ -2595,6 +2605,27 @@ const WORLD_SCALE=1492.7;
 function scoreScale(){ const c=state.custom;
   if(!c){ const r=state.region; if(r&&r.type==='draw'&&r.value&&r.value.p) return areaScale(r.value.p); return WORLD_SCALE; } const sc=+c.scale>0?+c.scale:(Array.isArray(c.pins)&&c.pins.length>1?autoScale(c.pins):WORLD_SCALE); return Math.min(WORLD_SCALE,Math.max(1,sc)); }
 function scoreFor(km){ if(km<0.025) return 5000; return Math.round(5000*Math.exp(-km/scoreScale())); }
+/* Circle mode. The ring is a fixed slice of the map panel, so zooming is the only thing that changes
+   what it covers, and how much ground it covers is the whole bet. A ring 100 m across is a street
+   corner and pays everything; one across a continent is barely a guess and pays about a hundred.
+   Between those it falls with every tenfold widening: 1 km 3,957, 10 km 2,914, 100 km 1,871. */
+const CIRCLE_FULL=0.1;
+function circleScore(widthKm){
+  const w=Math.max(0.001,widthKm||0);
+  if(w<=CIRCLE_FULL) return 5000;
+  return Math.max(25,Math.min(5000,Math.round(3957-1043*Math.log10(w))));
+}
+/* Where the ring sits and how wide it really is, read off the map as it stands right now. */
+function circleNow(map){
+  const m=map||guessMap; if(!m) return null;
+  const size=m.getSize(); const px=Math.round(Math.min(size.x,size.y)*CIRCLE_FRAC/2);
+  if(!(px>0)) return null;
+  const c=m.getCenter();
+  const edge=m.containerPointToLatLng([size.x/2+px,size.y/2]);
+  const r=haversine({lat:c.lat,lng:c.lng},{lat:edge.lat,lng:edge.lng});
+  return {lat:c.lat,lng:((c.lng+180)%360+360)%360-180,r,w:r*2,px};
+}
+const CIRCLE_FRAC=0.56;
 function scaleWord(km){ return !(km>0)||km>=WORLD_SCALE*0.9?'World':km>=400?'Continent':km>=60?'Country':km>=8?'Region':'City'; }
 function spreadKm(pins){ if(!pins||pins.length<2) return 0; let a=90,b=-90,c=180,d=-180; for(const p of pins){ a=Math.min(a,+p.lat); b=Math.max(b,+p.lat); c=Math.min(c,+p.lng); d=Math.max(d,+p.lng); } return haversine({lat:a,lng:c},{lat:b,lng:d}); }
 function autoScale(pins){ return Math.min(WORLD_SCALE,Math.max(1,spreadKm(pins)/6)); }
@@ -2705,7 +2736,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260923-135836';
+const BUILD='20260925-133917';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2949,7 +2980,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:6,patch:7};
+const VERSION={major:3,minor:7,patch:0};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4753,7 +4784,7 @@ $('countryGrid').addEventListener('click',e=>{ const b=e.target.closest('button'
   if(b.dataset.whole) toggleCont(b.dataset.whole); else toggleCountry(b.dataset.country); sfx('click'); });
 
 /* ---------- The daily drop: one game a day, identical everywhere ---------- */
-const DAILY_MODES=['classic','classic','classic','gray','pixel','blink','murica','jungle','million','landmarks','coast','islands','stranded','snow','timemachine','countdown','country','capitals','altitude','temp','allin'];
+const DAILY_MODES=['classic','classic','classic','gray','pixel','blink','circle','murica','jungle','million','landmarks','coast','islands','stranded','snow','timemachine','countdown','country','capitals','altitude','temp','allin'];
 const DAILY_TIMES=[5,10,15,20,30,30,45,60,60,90,120,180];
 /* The drop turns over at midnight in New York, so everyone is on the same day at the same moment. */
 function dailyDate(d){
@@ -4955,7 +4986,8 @@ function ensureGuessMap(){
   if(guessMap) return;
   {
     guessMap=makeMap('guessmap');
-    guessMap.on('click',e=>{ if(state.locked||modeOf(state.mode).country||amOut()) return; setGuess(e.latlng); });
+    guessMap.on('click',e=>{ if(state.locked||modeOf(state.mode).country||modeOf(state.mode).circle||amOut()) return; setGuess(e.latlng); });
+    guessMap.on('move zoom moveend zoomend resize',()=>{ if(modeOf(state.mode).circle) paintRing(); });
     const panel=$('mappanel');
     const fitWorld=()=>{ if(state.fitDone) return; state.fitDone=true; guessMap.invalidateSize(); viewStart(guessMap); };
     const openMap=()=>{ if(panel.classList.contains('open')) return; panel.classList.add('open'); guessMap.invalidateSize(); setTimeout(()=>{ if(panel.classList.contains('open')) fitWorld(); },220); };
@@ -5039,7 +5071,9 @@ async function nextRound(){
   if(last){ countUp($('scoreLbl'),state.score-last.pts,state.score,900); $('scorePill').classList.remove('pop'); void $('scorePill').offsetWidth; $('scorePill').classList.add('pop');
     if(last.pts>0){ const f=document.createElement('span'); f.className='floater'; f.textContent='+'+last.pts.toLocaleString(); $('scorePill').appendChild(f); setTimeout(()=>f.remove(),1400); } }
   else $('scoreLbl').textContent='0';
-  $('guessBtn').disabled=true; $('guessBtn').textContent=modeOf(state.mode).country?'Click a country':'Place your pin';
+  $('guessBtn').disabled=true; $('guessBtn').textContent=modeOf(state.mode).country?'Click a country':modeOf(state.mode).circle?'Lock the ring':'Place your pin';
+  if($('ringWrap')) $('ringWrap').hidden=!modeOf(state.mode).circle;
+  if(modeOf(state.mode).circle) setTimeout(paintRing,60);
   if(mp.role&&amOut()){ $('guessBtn').disabled=true; $('guessBtn').textContent='Knocked out · spectating'; }
   if(modeOf(state.mode).country){ if(countryLayer&&!countryLayerOn){ countryLayer.addTo(guessMap); countryLayerOn=true; } if(countryLayer) countryLayer.resetStyle(); $('mappanel').classList.add('cty'); } else { if(countryLayerOn){ countryLayer.remove(); countryLayerOn=false; } $('mappanel').classList.remove('cty'); }
   $('loading').classList.remove('fade'); $('loadingText').textContent='Finding a location…';
@@ -5086,6 +5120,19 @@ async function nextRound(){
   if(!modeOf(state.mode).trio&&!canvasRound) preloadRound(idx+1);
 }
 
+/* Keep the ring's label honest as the map moves: it says how wide the ring is on the ground and
+   what that is worth if the spot turns out to be inside it. */
+function paintRing(){
+  const on=!!(modeOf(state.mode).circle&&!state.locked&&$('game')&&!$('game').hidden);
+  const w=$('ringWrap'); if(!w) return;
+  w.hidden=!on; if(!on) return;
+  const c=circleNow(); if(!c) return;
+  $('ring').style.setProperty('--ringsz',(CIRCLE_FRAC*100)+'%');
+  $('ringLbl').innerHTML=`${fmtDist(c.w)} across · <b>${circleScore(c.w).toLocaleString()}</b> if you're in it`;
+  state.guess={lat:c.lat,lng:c.lng,r:c.r,w:c.w};
+  const gb=$('guessBtn'); if(gb.disabled&&!amOut()){ gb.disabled=false; }
+  if(gb) gb.textContent='Lock the ring';
+}
 function setGuess(latlng){
   if(amOut()||blindRole()==='eyes') return;
   const ll=L.latLng(latlng.lat, ((latlng.lng+180)%360+360)%360-180);
@@ -5122,6 +5169,7 @@ function submitGuess(auto=false){
   if(m.trio){ if(state.pick==null && !auto) return; }
   else if(m.slider){ if(state.choice==null && !auto) return; }
   else if(m.choice){ const c=state.choice; if(!auto&&(!c||c.p==null||c.e==null)) return; }
+  else if(m.circle){ const c=circleNow(); if(c) state.guess={lat:c.lat,lng:c.lng,r:c.r,w:c.w}; if(!state.guess) return; }
   else if(!state.guess && !auto) return;
   if(m.bet&&!auto&&state.bet<1) return;   // a bet is required every round
   if(m.bet&&state.bet<1) state.bet=Math.min(1,state.bank);   // time ran out with no bet: the minimum stake goes in
@@ -5151,6 +5199,9 @@ function submitGuess(auto=false){
   const km=state.guess?haversine(state.guess,truth):null;
   const mult=m.countdown?countdownMult(state.timeLeft,state.timeLimit):1;
   let pts=state.guess?Math.round(scoreFor(km)*mult):0;
+  if(m.circle){ const g=state.guess; const inside=!!g&&km<=g.r; pts=inside?circleScore(g.w):0;
+    const r={round:state.round,circle:{r:g?g.r:0,w:g?g.w:0,inside},guess:g?{lat:g.lat,lng:g.lng}:null,truth,km,pts,timedOut:auto&&!g,loc:state.current,guessPlace:null};
+    state.score+=pts; state.results.push(r); showResult(r); return; }
   let bet=null;
   if(m.bet){ const base=pts; const payout=Math.round(state.bet*betMult(base)); bet={stake:state.bet,mult:betMult(base),payout,base}; pts=payout-state.bet; state.bank+=pts; state.score=state.bank; }
   else state.score+=pts;
@@ -5176,7 +5227,10 @@ function showResult(r){
     L.marker(r.guess,{icon:myIcon()}).addTo(resultLayer);
   }
   if(!hid) L.marker(r.truth,{icon:trueIcon}).addTo(resultLayer);
-  const rpts=[r.truth]; if(r.guess) rpts.push(r.guess); drawRival(resultLayer,r.truth,state.round-1,resultMap,rpts);
+  drawRing(resultMap,resultLayer,r);
+  const rpts=[r.truth]; if(r.guess) rpts.push(r.guess);
+  if(r.circle&&r.guess){ const d=r.circle.r/111; rpts.push({lat:r.guess.lat+d,lng:r.guess.lng},{lat:r.guess.lat-d,lng:r.guess.lng}); }
+  drawRival(resultLayer,r.truth,state.round-1,resultMap,rpts);
   const fit=()=>{ resultMap.invalidateSize(); if(hid){ resultMap.setView(r.guess||[20,0],r.guess?4:2,{animate:false}); return; } if(rpts.length>1) resultMap.fitBounds(L.latLngBounds(rpts),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(r.truth,5,{animate:false}); };
   fit(); setTimeout(fit,150); sfx('reveal'); paintRival();
   if(line) setTimeout(()=>{ for(const pl of [casing,line]){ const el=pl.getElement(); if(!el) continue; const len=el.getTotalLength(); el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.classList.add('draw-line'); void el.getBoundingClientRect(); el.style.strokeDashoffset=0; } },350);
@@ -5187,7 +5241,9 @@ function showResult(r){
   if(!duelling) setTimeout(()=>{ if($('result').hidden) return; pe.classList.add('pop'); if(r.pts>=4500){ confetti(); flash(); sfx(r.pts>=4900?'perfect':'great'); } },600);
   stRound(state.mode,r.pts);
 
-  $('distTxt').innerHTML = r.guess ? `Your guess was <b>${fmtDist(r.km)}</b> from the correct location.` : (hid?`You didn't place a pin.`:`You didn't place a pin. The location is marked with a flag.`);
+  $('distTxt').innerHTML = r.circle ? circleLine(r)
+    : r.guess ? `Your guess was <b>${fmtDist(r.km)}</b> from the correct location.`
+    : (hid?`You didn't place a pin.`:`You didn't place a pin. The location is marked with a flag.`);
   const busted=r.bet&&state.bank<=0;
   $('nextBtn').textContent = (state.round>=state.totalRounds||busted) ? 'See results' : 'Next round';
   $('ptsBar').style.width='0%';
@@ -5203,12 +5259,28 @@ function showResult(r){
     if(state.round===round && !$('result').hidden) renderVerdict(r);
   })();
 }
+/* Circle rounds say whether the spot landed inside the ring and how wide the ring was, since the
+   distance on its own tells you nothing about whether it counted. */
+function circleLine(r){
+  const c=r.circle; if(!c) return '';
+  if(!r.guess) return 'No ring locked in.';
+  return c.inside
+    ? `The spot was inside your ring. <b>${fmtDist(c.w)}</b> across.`
+    : `Outside your ring by <b>${fmtDist(Math.max(0,r.km-c.r))}</b>. It was ${fmtDist(c.w)} across.`;
+}
+function drawRing(map,layer,r){
+  if(!r||!r.circle||!r.guess) return;
+  L.circle([r.guess.lat,r.guess.lng],{radius:r.circle.r*1000,color:r.circle.inside?'#2bb673':'#e63946',weight:3,fillColor:r.circle.inside?'#2bb673':'#e63946',fillOpacity:.16}).addTo(layer);
+}
 function renderVerdict(r){
   const tp=r.loc.place, gp=r.guessPlace;
   const same=!!(tp&&gp&&tp.country===gp.country);
   let text,cls;
   const hide=false, hid=false;
   if(r.timedOut){ text="Time's up, no guess placed"; cls='bad'; }
+  else if(r.circle){ const c=r.circle;
+    text=!c.inside?'Outside the ring':c.w<=CIRCLE_FULL?'Dead on':c.w<=2?'Pinned it':c.w<=30?'Inside, and tight':c.w<=300?'Inside':'Inside, but a wide ring';
+    cls=!c.inside?'bad':c.w<=30?'good':'mid'; }
   else { [text,cls]=verdictFor(r.km,same&&!hid); if(same&&!hid&&r.km>=200) text=hide?'Right country':`Right country: ${tp.country}`; }
   const v=$('verdict'); v.textContent=text; v.className='verdict '+cls;
   const parts=[];
@@ -5216,8 +5288,9 @@ function renderVerdict(r){
   if(tp) parts.push(`<span>📍 Location: <b>${esc(tp.region?tp.region+', ':'')}${hide?'???':esc(tp.country)}</b></span>`);
   { const line=pctLine(state.mode,'r',r.pts/100,'guesses in '+modeOf(state.mode).name); if(line) parts.push(line); }
   if(modeOf(state.mode).deported) parts.push(deportTrail(r));
-  if(gp) parts.push(hide?(gp.region?`<span>Your pin: <b>${esc(gp.region)}</b></span>`:''):`<span>Your pin: <b>${esc(gp.region?gp.region+', ':'')}${esc(gp.country)}</b></span>`);
-  else if(r.guess && tp) parts.push(`<span>Your pin: <b>in the ocean</b></span>`);
+  const mine=r.circle?'Your ring':'Your pin';
+  if(gp) parts.push(hide?(gp.region?`<span>${mine}: <b>${esc(gp.region)}</b></span>`:''):`<span>${mine}: <b>${esc(gp.region?gp.region+', ':'')}${esc(gp.country)}</b></span>`);
+  else if(r.guess && tp) parts.push(`<span>${mine}: <b>in the ocean</b></span>`);
   $('placeTxt').innerHTML=parts.join('');
   paintClues(tp);
 }
@@ -6116,7 +6189,7 @@ function hostOnMessage(from,m,link){
     if(mp.phase!=='round' || mp.guesses[from]!==undefined) return;
     const gm=modeOf(mp.settings.mode);
     mp.guesses[from]=(gm.slider||gm.choice)?(m.choice!=null?{choice:m.choice}:null)
-      :m.guess?{lat:m.guess.lat,lng:m.guess.lng,left:m.left,bet:m.bet,country:m.guess.country||null}:(m.pick!=null?{pick:m.pick,bet:m.bet}:(gm.bet?{bet:m.bet||1}:null));
+      :m.guess?{lat:m.guess.lat,lng:m.guess.lng,left:m.left,bet:m.bet,country:m.guess.country||null,r:+m.guess.r||0,w:+m.guess.w||0}:(m.pick!=null?{pick:m.pick,bet:m.bet}:(gm.bet?{bet:m.bet||1}:null));
     if(gm.blind){ for(const p of alivePlayers()) mp.guesses[p.id]=mp.guesses[from]; }   // one pin for the pair
     mpBroadcast({t:'guessed',id:from,n:Object.keys(mp.guesses).length,total:roundPlayers().length}); updateStrip(); updateWaitList();
     if(gm.duel&&Object.keys(mp.guesses).length===1&&alivePlayers().length>1){ const secs=15; mpBroadcast({t:'hurry',secs}); hurryLocal(secs);
@@ -6143,6 +6216,9 @@ function hostReveal(){
       const okP=!!sel&&sel.p===loc.pol[0], okE=!!sel&&sel.e===loc.pol[1]; const pts=(okP?2500:0)+(okE?2500:0); p.score+=pts;
       return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:null,sel,okP,okE,ok:okP&&okE,km:null,pts,total:p.score}; }
     if(mm.trio){ const ok=!!g&&g.pick===loc.lie; const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:null,pick:g?g.pick:null,ok,km:null,pts,total:p.score}; }
+    if(mm.circle){ const has=!!(g&&g.lat!=null&&g.r>0); const km=has?haversine(g,truth):null;
+      const inside=has&&km<=g.r; const pts=inside?circleScore(g.w):0; p.score+=pts;
+      return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:has?{lat:g.lat,lng:g.lng}:null,circle:has?{r:g.r,w:g.w,inside}:null,km,pts,total:p.score}; }
     const has=!!(g&&g.lat!=null); const km=has?haversine(g,truth):null; let pts=has?Math.round(scoreFor(km)*(cd?countdownMult(g.left||0,state.timeLimit):1)):0; let bet=null;
     if(mm.bet){ const stake=Math.max(1,Math.min(p.score,(g&&g.bet)||1)); const mult=betMult(pts); const payout=Math.round(stake*mult); bet={stake,mult,payout,base:pts}; pts=payout-stake; }
     p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:has?{lat:g.lat,lng:g.lng}:null,km,pts,bet,total:p.score}; });
@@ -6308,7 +6384,7 @@ async function mpRound(){
   if(mp.role==='host' && state.timeLimit){ if(mp.deadline) clearTimeout(mp.deadline); mp.deadline=setTimeout(()=>{ for(const p of roundPlayers()) if(mp.guesses[p.id]===undefined) mp.guesses[p.id]=null; hostReveal(); },(state.timeLimit+4)*1000); }
 }
 function mpSubmitGuess(){
-  const g=state.guess?{lat:state.guess.lat,lng:state.guess.lng,country:state.guess.country||undefined}:null;
+  const g=state.guess?{lat:state.guess.lat,lng:state.guess.lng,country:state.guess.country||undefined,r:state.guess.r,w:state.guess.w}:null;
   mpSend({t:'guess',guess:g,left:state.timeLeft,bet:state.bet,pick:state.pick,choice:state.choice});
   $('waitOverlay').hidden=false; $('waitTxt').textContent=g?'Waiting for the others to guess…':"Time's up. Waiting for the others…"; updateWaitList();
 }
@@ -6432,15 +6508,17 @@ function showResultMP(rev){
     if(!hid){ L.polyline([r.guess,rev.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
     lines.push(L.polyline([r.guess,rev.truth],{color:lineColor(r),weight:3,opacity:1}).addTo(resultLayer)); }
     L.marker(r.guess,{icon:playerIcon(r)}).addTo(resultLayer).bindTooltip(r.name,{direction:'top',offset:[0,-40]});
+    if(r.circle) L.circle([r.guess.lat,r.guess.lng],{radius:r.circle.r*1000,color:lineColor(r),weight:2.5,fillColor:lineColor(r),fillOpacity:r.id===mp.me.id?.16:.07,dashArray:r.circle.inside?null:'6 5'}).addTo(resultLayer);
   }
   if(!hid) L.marker(rev.truth,{icon:trueIcon}).addTo(resultLayer);
   const fit=()=>{ resultMap.invalidateSize(); if(pts.length>1) resultMap.fitBounds(L.latLngBounds(pts),{padding:[70,70],maxZoom:hid?5:12,animate:false}); else if(pts.length===1) resultMap.setView(pts[0],hid?4:5,{animate:false}); else resultMap.setView([20,0],2,{animate:false}); };
   fit(); setTimeout(fit,150);
   const mine=rev.results.find(r=>r.id===mp.me.id)||{pts:0,km:null,guess:null};
   const cur=state.locs[rev.round-1]||{};
-  const me={round:rev.round,guess:mine.guess,truth:rev.truth,km:mine.km,pts:mine.pts,bet:mine.bet||null,timedOut:!mine.guess,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng,key:cur.key,fresh:cur.fresh},guessPlace:null};
+  const me={round:rev.round,guess:mine.guess,circle:mine.circle||null,truth:rev.truth,km:mine.km,pts:mine.pts,bet:mine.bet||null,timedOut:!mine.guess,loc:{place:rev.place,lat:rev.truth.lat,lng:rev.truth.lng,key:cur.key,fresh:cur.fresh},guessPlace:null};
   state.results.push(me); if(mine.bet){ state.bank+=mine.pts; state.score=state.bank; } else state.score+=mine.pts;
-  $('distTxt').innerHTML = mine.guess ? `Your guess was <b>${fmtDist(mine.km)}</b> away.` : `You didn't place a pin.`;
+  $('distTxt').innerHTML = mine.circle!==undefined&&modeOf(state.mode).circle ? circleLine({circle:mine.circle,guess:mine.guess,km:mine.km})
+    : mine.guess ? `Your guess was <b>${fmtDist(mine.km)}</b> away.` : `You didn't place a pin.`;
   $('nextBtn').textContent = (rev.round>=state.totalRounds||rev.over) ? 'See results' : 'Next round';
   $('ptsBar').style.width='0%';
   // A duel is settled in health, so the round score has nothing to say here: the bars carry the round.
