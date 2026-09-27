@@ -588,11 +588,7 @@
 
   /* Circle mode: a fixed ring over the guess map. It never changes size on screen, so zooming is
      the only thing that changes how much ground it covers. */
-  /* Leaflet's map pane sits at 400 and the guess map does not start a stacking context of its own,
-     so anything below that is painted over by the tiles. The ring lived at 8 and only showed in the
-     gaps while tiles were still loading, which is why it flashed past while the map moved. 650 puts
-     it over the map and under Leaflet's controls, which stay clickable. */
-  .ringwrap{position:absolute;inset:0;z-index:650;pointer-events:none;display:grid;place-items:center}
+  .ringwrap{position:absolute;inset:0;z-index:2;pointer-events:none;display:grid;place-items:center}
   .ringwrap .gring{width:120px;aspect-ratio:1;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.4),0 0 0 9999px rgba(8,24,16,.15);position:relative}
   .ringwrap .gring::after{content:'';position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.5)}
   .ringlbl{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;background:rgba(8,24,16,.82);color:#fff;font-weight:800;font-size:12.5px;padding:5px 11px;border-radius:99px;white-space:nowrap}
@@ -615,7 +611,11 @@
   .compass .rose i{position:absolute;left:50%;top:50%;width:5px;height:32px;margin:-16px 0 0 -2.5px;border-radius:3px;background:linear-gradient(#e63946 0 50%,#2b2b2b 50% 100%)}
   .compass .rose b{position:absolute;top:1px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:#e63946;line-height:1}
   @media (max-width:820px){ .compass{right:12px;bottom:calc(34vh + 12px)} }
-  .mapbox{flex:1;position:relative;min-height:0;display:flex}
+  /* The guess map is composited as one piece, so the ring beside it is simply above the map rather
+     than above one of Leaflet's layers and below another. Without this the map's own panes, which
+     run from 200 to 1000, are shuffled in with the ring and the tiles paint over it. */
+  .mapbox{flex:1;position:relative;min-height:0;display:flex;isolation:isolate}
+  .mapbox>#guessmap{isolation:isolate}
   #guessmap{flex:1;background:#bfd9e8}
   .mappanel.cty .coordbar{display:none}
   #draw{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);z-index:60}
@@ -2626,7 +2626,18 @@ function circleScore(widthKm){
   if(w<=CIRCLE_FULL) return 5000;
   return Math.max(25,Math.min(5000,Math.round(3957-1043*Math.log10(w))));
 }
-/* Where the ring sits and how wide it really is, read off the map as it stands right now. */
+/* The ring is a circle on the screen, and the screen is Mercator, so the thing you are actually
+   drawing round is a circle in Mercator metres, not a ring of constant distance on the ground. The
+   two are only the same near the middle of the view. Both are kept: rm is the real shape, used to
+   decide what is inside and to redraw it on the recap, and r is the distance across the ground
+   through the middle, which is the number worth showing and scoring on. */
+const MERC_W=20037508.342789244*2;
+const MERC=()=>L.CRS.EPSG3857;
+function mercDist(a,b){
+  const p=MERC().project(L.latLng(a.lat,a.lng)), q=MERC().project(L.latLng(b.lat,b.lng));
+  let dx=p.x-q.x; if(dx>MERC_W/2) dx-=MERC_W; else if(dx<-MERC_W/2) dx+=MERC_W;
+  const dy=p.y-q.y; return Math.sqrt(dx*dx+dy*dy);
+}
 function circleNow(map){
   const m=map||guessMap; if(!m) return null;
   const size=m.getSize(); const px=Math.round(Math.min(size.x,size.y)*CIRCLE_FRAC/2);
@@ -2634,7 +2645,18 @@ function circleNow(map){
   const c=m.getCenter();
   const edge=m.containerPointToLatLng([size.x/2+px,size.y/2]);
   const r=haversine({lat:c.lat,lng:c.lng},{lat:edge.lat,lng:edge.lng});
-  return {lat:c.lat,lng:((c.lng+180)%360+360)%360-180,r,w:r*2,px};
+  const rm=mercDist({lat:c.lat,lng:c.lng},{lat:edge.lat,lng:edge.lng});
+  return {lat:c.lat,lng:((c.lng+180)%360+360)%360-180,r,w:r*2,px,rm};
+}
+function inRing(g,truth){ return !!(g&&g.rm>0&&mercDist(g,truth)<=g.rm); }
+/* The ring as a ring of points, so it redraws as the same circle it was at any zoom instead of the
+   tall oval a constant-distance circle turns into. */
+function ringPoly(g,n){
+  n=n||96; const P=MERC(), c=P.project(L.latLng(g.lat,g.lng)), out=[];
+  for(let i=0;i<=n;i++){ const a=i/n*Math.PI*2;
+    const ll=P.unproject(L.point(c.x+Math.cos(a)*g.rm, c.y+Math.sin(a)*g.rm));
+    out.push([Math.max(-89,Math.min(89,ll.lat)), ll.lng]); }
+  return out;
 }
 const CIRCLE_FRAC=0.8;
 function scaleWord(km){ return !(km>0)||km>=WORLD_SCALE*0.9?'World':km>=400?'Continent':km>=60?'Country':km>=8?'Region':'City'; }
@@ -2747,7 +2769,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260927-124647';
+const BUILD='20260927-125358';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2991,7 +3013,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:7,patch:4};
+const VERSION={major:3,minor:7,patch:6};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -5141,7 +5163,7 @@ function paintRing(){
   const c=circleNow(); if(!c) return;
   $('ring').style.width=(c.px*2)+'px';   // exactly the circle being scored, never a different one
   $('ringLbl').innerHTML=`${fmtDist(c.w)} across · <b>${circleScore(c.w).toLocaleString()}</b> if you're in it`;
-  state.guess={lat:c.lat,lng:c.lng,r:c.r,w:c.w};
+  state.guess={lat:c.lat,lng:c.lng,r:c.r,w:c.w,rm:c.rm};
   const gb=$('guessBtn'); if(gb.disabled&&!amOut()){ gb.disabled=false; }
   if(gb) gb.textContent='Lock the ring';
 }
@@ -5181,7 +5203,7 @@ function submitGuess(auto=false){
   if(m.trio){ if(state.pick==null && !auto) return; }
   else if(m.slider){ if(state.choice==null && !auto) return; }
   else if(m.choice){ const c=state.choice; if(!auto&&(!c||c.p==null||c.e==null)) return; }
-  else if(m.circle){ const c=circleNow(); if(c) state.guess={lat:c.lat,lng:c.lng,r:c.r,w:c.w}; if(!state.guess) return; }
+  else if(m.circle){ const c=circleNow(); if(c) state.guess={lat:c.lat,lng:c.lng,r:c.r,w:c.w,rm:c.rm}; if(!state.guess) return; }
   else if(!state.guess && !auto) return;
   if(m.bet&&!auto&&state.bet<1) return;   // a bet is required every round
   if(m.bet&&state.bet<1) state.bet=Math.min(1,state.bank);   // time ran out with no bet: the minimum stake goes in
@@ -5211,8 +5233,8 @@ function submitGuess(auto=false){
   const km=state.guess?haversine(state.guess,truth):null;
   const mult=m.countdown?countdownMult(state.timeLeft,state.timeLimit):1;
   let pts=state.guess?Math.round(scoreFor(km)*mult):0;
-  if(m.circle){ const g=state.guess; const inside=!!g&&km<=g.r; pts=inside?circleScore(g.w):0;
-    const r={round:state.round,circle:{r:g?g.r:0,w:g?g.w:0,inside},guess:g?{lat:g.lat,lng:g.lng}:null,truth,km,pts,timedOut:auto&&!g,loc:state.current,guessPlace:null};
+  if(m.circle){ const g=state.guess; const inside=inRing(g,truth); pts=inside?circleScore(g.w):0;
+    const r={round:state.round,circle:{r:g?g.r:0,w:g?g.w:0,rm:g?g.rm:0,inside},guess:g?{lat:g.lat,lng:g.lng}:null,truth,km,pts,timedOut:auto&&!g,loc:state.current,guessPlace:null};
     state.score+=pts; state.results.push(r); showResult(r); return; }
   let bet=null;
   if(m.bet){ const base=pts; const payout=Math.round(state.bet*betMult(base)); bet={stake:state.bet,mult:betMult(base),payout,base}; pts=payout-state.bet; state.bank+=pts; state.score=state.bank; }
@@ -5241,7 +5263,7 @@ function showResult(r){
   if(!hid) L.marker(r.truth,{icon:trueIcon}).addTo(resultLayer);
   drawRing(resultMap,resultLayer,r);
   const rpts=[r.truth]; if(r.guess) rpts.push(r.guess);
-  if(r.circle&&r.guess){ const d=r.circle.r/111; rpts.push({lat:r.guess.lat+d,lng:r.guess.lng},{lat:r.guess.lat-d,lng:r.guess.lng}); }
+  if(r.circle&&r.guess){ for(const p of ringPoly({lat:r.guess.lat,lng:r.guess.lng,rm:r.circle.rm||r.circle.r*1000},16)) rpts.push({lat:p[0],lng:p[1]}); }
   drawRival(resultLayer,r.truth,state.round-1,resultMap,rpts);
   const fit=()=>{ resultMap.invalidateSize(); if(hid){ resultMap.setView(r.guess||[20,0],r.guess?4:2,{animate:false}); return; } if(rpts.length>1) resultMap.fitBounds(L.latLngBounds(rpts),{padding:[70,70],maxZoom:12,animate:false}); else resultMap.setView(r.truth,5,{animate:false}); };
   fit(); setTimeout(fit,150); sfx('reveal'); paintRival();
@@ -5282,7 +5304,9 @@ function circleLine(r){
 }
 function drawRing(map,layer,r){
   if(!r||!r.circle||!r.guess) return;
-  L.circle([r.guess.lat,r.guess.lng],{radius:r.circle.r*1000,color:r.circle.inside?'#2bb673':'#e63946',weight:3,fillColor:r.circle.inside?'#2bb673':'#e63946',fillOpacity:.16}).addTo(layer);
+  const c=r.circle.inside?'#2bb673':'#e63946';
+  const g={lat:r.guess.lat,lng:r.guess.lng,rm:r.circle.rm||r.circle.r*1000};
+  L.polygon(ringPoly(g),{color:c,weight:3,fillColor:c,fillOpacity:.16}).addTo(layer);
 }
 function renderVerdict(r){
   const tp=r.loc.place, gp=r.guessPlace;
@@ -6201,7 +6225,7 @@ function hostOnMessage(from,m,link){
     if(mp.phase!=='round' || mp.guesses[from]!==undefined) return;
     const gm=modeOf(mp.settings.mode);
     mp.guesses[from]=(gm.slider||gm.choice)?(m.choice!=null?{choice:m.choice}:null)
-      :m.guess?{lat:m.guess.lat,lng:m.guess.lng,left:m.left,bet:m.bet,country:m.guess.country||null,r:+m.guess.r||0,w:+m.guess.w||0}:(m.pick!=null?{pick:m.pick,bet:m.bet}:(gm.bet?{bet:m.bet||1}:null));
+      :m.guess?{lat:m.guess.lat,lng:m.guess.lng,left:m.left,bet:m.bet,country:m.guess.country||null,r:+m.guess.r||0,w:+m.guess.w||0,rm:+m.guess.rm||0}:(m.pick!=null?{pick:m.pick,bet:m.bet}:(gm.bet?{bet:m.bet||1}:null));
     if(gm.blind){ for(const p of alivePlayers()) mp.guesses[p.id]=mp.guesses[from]; }   // one pin for the pair
     mpBroadcast({t:'guessed',id:from,n:Object.keys(mp.guesses).length,total:roundPlayers().length}); updateStrip(); updateWaitList();
     if(gm.duel&&Object.keys(mp.guesses).length===1&&alivePlayers().length>1){ const secs=15; mpBroadcast({t:'hurry',secs}); hurryLocal(secs);
@@ -6229,8 +6253,8 @@ function hostReveal(){
       return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:null,sel,okP,okE,ok:okP&&okE,km:null,pts,total:p.score}; }
     if(mm.trio){ const ok=!!g&&g.pick===loc.lie; const pts=ok?5000:0; p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:null,pick:g?g.pick:null,ok,km:null,pts,total:p.score}; }
     if(mm.circle){ const has=!!(g&&g.lat!=null&&g.r>0); const km=has?haversine(g,truth):null;
-      const inside=has&&km<=g.r; const pts=inside?circleScore(g.w):0; p.score+=pts;
-      return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:has?{lat:g.lat,lng:g.lng}:null,circle:has?{r:g.r,w:g.w,inside}:null,km,pts,total:p.score}; }
+      const inside=has&&inRing(g,truth); const pts=inside?circleScore(g.w):0; p.score+=pts;
+      return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:has?{lat:g.lat,lng:g.lng}:null,circle:has?{r:g.r,w:g.w,rm:g.rm,inside}:null,km,pts,total:p.score}; }
     const has=!!(g&&g.lat!=null); const km=has?haversine(g,truth):null; let pts=has?Math.round(scoreFor(km)*(cd?countdownMult(g.left||0,state.timeLimit):1)):0; let bet=null;
     if(mm.bet){ const stake=Math.max(1,Math.min(p.score,(g&&g.bet)||1)); const mult=betMult(pts); const payout=Math.round(stake*mult); bet={stake,mult,payout,base:pts}; pts=payout-stake; }
     p.score+=pts; return {id:p.id,name:p.name,color:p.color,face:!!p.face,col:p.col||null,guess:has?{lat:g.lat,lng:g.lng}:null,km,pts,bet,total:p.score}; });
@@ -6396,7 +6420,7 @@ async function mpRound(){
   if(mp.role==='host' && state.timeLimit){ if(mp.deadline) clearTimeout(mp.deadline); mp.deadline=setTimeout(()=>{ for(const p of roundPlayers()) if(mp.guesses[p.id]===undefined) mp.guesses[p.id]=null; hostReveal(); },(state.timeLimit+4)*1000); }
 }
 function mpSubmitGuess(){
-  const g=state.guess?{lat:state.guess.lat,lng:state.guess.lng,country:state.guess.country||undefined,r:state.guess.r,w:state.guess.w}:null;
+  const g=state.guess?{lat:state.guess.lat,lng:state.guess.lng,country:state.guess.country||undefined,r:state.guess.r,w:state.guess.w,rm:state.guess.rm}:null;
   mpSend({t:'guess',guess:g,left:state.timeLeft,bet:state.bet,pick:state.pick,choice:state.choice});
   $('waitOverlay').hidden=false; $('waitTxt').textContent=g?'Waiting for the others to guess…':"Time's up. Waiting for the others…"; updateWaitList();
 }
@@ -6520,7 +6544,7 @@ function showResultMP(rev){
     if(!hid){ L.polyline([r.guess,rev.truth],{color:'#fff',weight:6,opacity:.9}).addTo(resultLayer);
     lines.push(L.polyline([r.guess,rev.truth],{color:lineColor(r),weight:3,opacity:1}).addTo(resultLayer)); }
     L.marker(r.guess,{icon:playerIcon(r)}).addTo(resultLayer).bindTooltip(r.name,{direction:'top',offset:[0,-40]});
-    if(r.circle) L.circle([r.guess.lat,r.guess.lng],{radius:r.circle.r*1000,color:lineColor(r),weight:2.5,fillColor:lineColor(r),fillOpacity:r.id===mp.me.id?.16:.07,dashArray:r.circle.inside?null:'6 5'}).addTo(resultLayer);
+    if(r.circle) L.polygon(ringPoly({lat:r.guess.lat,lng:r.guess.lng,rm:r.circle.rm||r.circle.r*1000}),{color:lineColor(r),weight:2.5,fillColor:lineColor(r),fillOpacity:r.id===mp.me.id?.16:.07,dashArray:r.circle.inside?null:'6 5'}).addTo(resultLayer);
   }
   if(!hid) L.marker(rev.truth,{icon:trueIcon}).addTo(resultLayer);
   const fit=()=>{ resultMap.invalidateSize(); if(pts.length>1) resultMap.fitBounds(L.latLngBounds(pts),{padding:[70,70],maxZoom:hid?5:12,animate:false}); else if(pts.length===1) resultMap.setView(pts[0],hid?4:5,{animate:false}); else resultMap.setView([20,0],2,{animate:false}); };
