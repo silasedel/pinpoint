@@ -886,14 +886,18 @@
   #bettray .bank b{display:block;font-size:26px;letter-spacing:0;color:var(--text);text-transform:none;font-variant-numeric:tabular-nums}
   #bettray .pot{text-align:right}
   #bettray .pot b{color:var(--green-dark)}
-  .chips{display:flex;gap:8px;margin-top:10px;align-items:center}
+  .chips{display:flex;gap:7px;margin-top:10px;align-items:center;flex-wrap:wrap}
   .chip-btn{width:50px;height:50px;border-radius:50%;border:4px dashed rgba(255,255,255,.85);box-shadow:0 2px 4px rgba(0,0,0,.35),inset 0 0 0 3px rgba(0,0,0,.15);color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center;text-shadow:0 1px 2px rgba(0,0,0,.5);transition:transform .1s}
   .chip-btn:hover{transform:translateY(-3px)} .chip-btn:active{transform:scale(.94)}
   .chip-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+  /* The house ladder, 1 to a million. Each one only appears once your bankroll can cover it. */
   .chip-btn.c1{background:#f1f3f5;color:#333;text-shadow:none;border-color:#c8ccd0} .chip-btn.c5{background:#d7263d} .chip-btn.c25{background:#1f9d55} .chip-btn.c100{background:#222} .chip-btn.c500{background:#6f42c1}
-  .chips .sm{margin-left:auto;display:flex;gap:6px}
-  .chips .sm button{padding:8px 10px;border-radius:8px;background:var(--sunk);font-size:12px;font-weight:700}
-  .chips .sm button.allin{background:#fff4d6;color:#7a5200}
+  .chip-btn.c1k{background:#e0a800;color:#3a2a00;text-shadow:none;border-color:#fff3cd} .chip-btn.c5k{background:#b5651d}
+  .chip-btn.c25k{background:#0d7d8c} .chip-btn.c100k{background:#c2186b} .chip-btn.c500k{background:#1b3a93}
+  .chip-btn.c1m{background:linear-gradient(140deg,#caa02a,#8a6a12 55%,#e7c860);color:#2a1f00;text-shadow:none;border-color:#f6e7a8;box-shadow:0 2px 6px rgba(0,0,0,.45),inset 0 0 0 3px rgba(0,0,0,.18)}
+  .betacts{display:flex;gap:6px;margin-top:9px}
+  .betacts button{padding:8px 12px;border-radius:8px;background:var(--sunk);font-size:12px;font-weight:700}
+  .betacts button.allin{background:#fff4d6;color:#7a5200;margin-left:auto}
   .potchips{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;min-height:14px}
   .potchips i{width:12px;height:12px;border-radius:50%;border:2px dashed rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.4)}
   #guessbar{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;z-index:8;width:min(720px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 20px 16px;opacity:.72;transition:opacity .18s}
@@ -1726,10 +1730,8 @@
   <div id="tmap" hidden><div class="handle"><span id="tmapTitle">Map</span><span class="hint" id="tmapHint">Hover to open</span><button class="btn btn-primary" id="trioLock" disabled>Pick one first</button></div><div id="triomap"></div></div>
   <div id="bettray" hidden>
     <div class="row"><div class="bank">Bankroll<b id="bankLbl">1,000</b></div><div class="bank pot">Your bet<b id="betLbl">0</b></div></div>
-    <div class="chips">
-      <button class="chip-btn c1" data-v="1">1</button><button class="chip-btn c5" data-v="5">5</button><button class="chip-btn c25" data-v="25">25</button><button class="chip-btn c100" data-v="100">100</button><button class="chip-btn c500" data-v="500">500</button>
-      <span class="sm"><button id="betClear">Clear</button><button id="betHalf">Half</button><button class="allin" id="betAll">All in</button></span>
-    </div>
+    <div class="chips" id="chipRow"></div>
+    <div class="betacts"><button id="betClear">Clear</button><button id="betHalf">Half</button><button class="allin" id="betAll">All in</button></div>
     <div class="potchips" id="potChips"></div>
   </div>
   <div id="guessbar" hidden>
@@ -2769,7 +2771,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260927-125358';
+const BUILD='20260927-175521';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -3013,7 +3015,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:7,patch:6};
+const VERSION={major:3,minor:7,patch:7};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -5633,16 +5635,26 @@ function drawPixel(){ paintCompass();
 })();
 
 /* ---------- All In: betting tray ---------- */
+/* A casino ladder rather than a round-number one, because that is what chips come in, carried up to
+   a million so a bankroll in the millions is still a few taps rather than fifty. */
+const CHIPS=[[1,'c1','1'],[5,'c5','5'],[25,'c25','25'],[100,'c100','100'],[500,'c500','500'],
+  [1000,'c1k','1K'],[5000,'c5k','5K'],[25000,'c25k','25K'],[100000,'c100k','100K'],[500000,'c500k','500K'],[1000000,'c1m','1M']];
 function renderBet(){
   $('bankLbl').textContent=state.bank.toLocaleString(); $('betLbl').textContent=state.bet.toLocaleString();
-  document.querySelectorAll('#bettray .chips .chip-btn').forEach(b=>{ b.disabled=state.locked||state.bet+(+b.dataset.v)>state.bank; });
-  const cls={1:'c1',5:'c5',25:'c25',100:'c100',500:'c500'}; let rest=state.bet; const parts=[]; for(const v of [500,100,25,5,1]){ while(rest>=v&&parts.length<60){ parts.push(cls[v]); rest-=v; } }
+  const row=$('chipRow');
+  const show=CHIPS.filter(c=>c[0]<=Math.max(500,state.bank));   // a chip you could never cover is just clutter
+  const want=show.map(c=>c[0]).join(',');
+  if(row.dataset.set!==want){ row.dataset.set=want;
+    row.innerHTML=show.map(([v,cls,lbl])=>`<button class="chip-btn ${cls}" data-v="${v}">${lbl}</button>`).join(''); }
+  row.querySelectorAll('.chip-btn').forEach(b=>{ b.disabled=state.locked||state.bet+(+b.dataset.v)>state.bank; });
+  const cls={}; for(const [v,c] of CHIPS) cls[v]=c;
+  let rest=state.bet; const parts=[]; for(const [v] of CHIPS.slice().reverse()){ while(rest>=v&&parts.length<60){ parts.push(cls[v]); rest-=v; } }
   $('potChips').innerHTML=parts.map(c=>`<i class="chip-btn ${c}" style="width:12px;height:12px;border-width:2px;box-shadow:0 1px 2px rgba(0,0,0,.4)"></i>`).join('');
   const gb=$('guessBtn');
   if(!state.locked){ if(state.guess&&state.bet>=1){ gb.disabled=false; gb.textContent=`Bet ${state.bet.toLocaleString()} · lock in`; } else { gb.disabled=true; gb.textContent=state.guess?'Add chips to bet':'Place your pin'; } }
 
 }
-document.querySelector('#bettray .chips').addEventListener('click',e=>{ const b=e.target.closest('.chip-btn'); if(!b||state.locked) return; const v=+b.dataset.v; if(state.bet+v<=state.bank){ state.bet+=v; renderBet(); } });
+$('chipRow').addEventListener('click',e=>{ const b=e.target.closest('.chip-btn'); if(!b||state.locked) return; const v=+b.dataset.v; if(state.bet+v<=state.bank){ state.bet+=v; renderBet(); } });
 $('betClear').addEventListener('click',()=>{ if(state.locked) return; state.bet=0; renderBet(); });
 $('betHalf').addEventListener('click',()=>{ if(state.locked) return; state.bet=Math.max(1,Math.round(state.bank/2)); renderBet(); });
 $('betAll').addEventListener('click',()=>{ if(state.locked) return; state.bet=state.bank; renderBet(); });
