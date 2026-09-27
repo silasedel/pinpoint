@@ -589,7 +589,7 @@
   /* Circle mode: a fixed ring over the guess map. It never changes size on screen, so zooming is
      the only thing that changes how much ground it covers. */
   .ringwrap{position:absolute;inset:0;z-index:8;pointer-events:none;display:grid;place-items:center}
-  .ringwrap .gring{width:var(--ringsz,56%);aspect-ratio:1;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.45),0 0 0 9999px rgba(8,24,16,.32);position:relative}
+  .ringwrap .gring{width:120px;aspect-ratio:1;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.4),0 0 0 9999px rgba(8,24,16,.15);position:relative}
   .ringwrap .gring::after{content:'';position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.5)}
   .ringlbl{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;background:rgba(8,24,16,.82);color:#fff;font-weight:800;font-size:12.5px;padding:5px 11px;border-radius:99px;white-space:nowrap}
   .ringlbl b{color:#7fe3ab}
@@ -2632,7 +2632,7 @@ function circleNow(map){
   const r=haversine({lat:c.lat,lng:c.lng},{lat:edge.lat,lng:edge.lng});
   return {lat:c.lat,lng:((c.lng+180)%360+360)%360-180,r,w:r*2,px};
 }
-const CIRCLE_FRAC=0.56;
+const CIRCLE_FRAC=0.8;
 function scaleWord(km){ return !(km>0)||km>=WORLD_SCALE*0.9?'World':km>=400?'Continent':km>=60?'Country':km>=8?'Region':'City'; }
 function spreadKm(pins){ if(!pins||pins.length<2) return 0; let a=90,b=-90,c=180,d=-180; for(const p of pins){ a=Math.min(a,+p.lat); b=Math.max(b,+p.lat); c=Math.min(c,+p.lng); d=Math.max(d,+p.lng); } return haversine({lat:a,lng:c},{lat:b,lng:d}); }
 function autoScale(pins){ return Math.min(WORLD_SCALE,Math.max(1,spreadKm(pins)/6)); }
@@ -2743,7 +2743,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260926-195424';
+const BUILD='20260927-123911';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2987,7 +2987,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:7,patch:2};
+const VERSION={major:3,minor:7,patch:3};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -5135,7 +5135,7 @@ function paintRing(){
   const w=$('ringWrap'); if(!w) return;
   w.hidden=!on; if(!on) return;
   const c=circleNow(); if(!c) return;
-  $('ring').style.setProperty('--ringsz',(CIRCLE_FRAC*100)+'%');
+  $('ring').style.width=(c.px*2)+'px';   // exactly the circle being scored, never a different one
   $('ringLbl').innerHTML=`${fmtDist(c.w)} across · <b>${circleScore(c.w).toLocaleString()}</b> if you're in it`;
   state.guess={lat:c.lat,lng:c.lng,r:c.r,w:c.w};
   const gb=$('guessBtn'); if(gb.disabled&&!amOut()){ gb.disabled=false; }
