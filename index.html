@@ -67,7 +67,7 @@
   .lockup b{font-size:28px;font-weight:800;letter-spacing:-.6px;text-shadow:0 2px 12px rgba(0,0,0,.4)}
   .hero h1{margin:0 0 10px;font-size:clamp(34px,5.5vw,60px);font-weight:800;letter-spacing:-1.5px;line-height:1.02;text-shadow:0 2px 18px rgba(0,0,0,.45);max-width:720px}
   .hero p{margin:0;font-size:17px;max-width:560px;color:rgba(255,255,255,.9);text-shadow:0 1px 8px rgba(0,0,0,.5);line-height:1.5}
-  .live{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:9px 14px;border-radius:99px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);width:max-content;max-width:100%}
+  .live{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:9px 14px;border-radius:99px;background:rgba(0,0,0,.6);font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);width:max-content;max-width:100%}
   .live:hover{background:rgba(0,0,0,.6)}
   .live:disabled{cursor:default;background:rgba(0,0,0,.55)}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,75,75,.7)}70%{box-shadow:0 0 0 8px rgba(255,75,75,0)}100%{box-shadow:0 0 0 0 rgba(255,75,75,0)}}
@@ -471,7 +471,7 @@
   .floater{position:absolute;left:50%;top:-6px;transform:translateX(-50%);color:var(--green-dark);font-weight:800;font-size:15px;pointer-events:none;animation:floatup 1.3s ease-out forwards}
   @keyframes floatup{0%{opacity:0;transform:translate(-50%,10px)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-34px)}}
   .round-intro{position:absolute;inset:0;z-index:8;display:flex;align-items:center;justify-content:center;pointer-events:none}
-  .round-intro div{padding:14px 32px;border-radius:14px;background:rgba(21,34,25,.82);color:#fff;font-size:30px;font-weight:800;letter-spacing:-.5px;backdrop-filter:blur(4px);animation:intro 1.1s cubic-bezier(.2,.9,.3,1) forwards}
+  .round-intro div{padding:14px 32px;border-radius:14px;background:rgba(21,34,25,.9);color:#fff;font-size:30px;font-weight:800;letter-spacing:-.5px;animation:intro 1.1s cubic-bezier(.2,.9,.3,1) forwards}
   .round-intro div span{color:#9fe0b8;font-weight:600}
   .round-intro div small{display:block;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#9fe0b8;text-align:center;margin-bottom:2px}
   @keyframes intro{0%{opacity:0;transform:scale(.8) translateY(10px)}15%{opacity:1;transform:none}75%{opacity:1;transform:none}100%{opacity:0;transform:scale(1.05) translateY(-8px)}}
@@ -505,7 +505,7 @@
   .dmult{flex:none;padding:5px 10px;border-radius:99px;background:#fff4d6;color:#7a5200;font-weight:800;font-size:13px;letter-spacing:.02em}
   .dmult.hot{background:#e63946;color:#fff;animation:pop .5s}
   @media (max-width:720px){ .dside{min-width:0} .dside .dn{max-width:70px} }
-  .blindhint{position:absolute;left:50%;top:84px;transform:translateX(-50%);z-index:8;padding:9px 16px;border-radius:99px;background:rgba(21,34,25,.85);color:#fff;font-weight:700;font-size:13.5px;backdrop-filter:blur(4px);white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+  .blindhint{position:absolute;left:50%;top:84px;transform:translateX(-50%);z-index:8;padding:9px 16px;border-radius:99px;background:rgba(21,34,25,.92);color:#fff;font-weight:700;font-size:13.5px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.3)}
   .blindhint b{color:#9fe0b8}
   #game.blind-eyes .mappanel,#game.blind-eyes #guessbar{display:none}
   #game.blind-map .pano,#game.blind-map #pix{visibility:hidden}
@@ -596,6 +596,9 @@
   .mappanel{position:absolute;right:0;bottom:0;z-index:7;width:340px;height:270px;border-radius:var(--radius) 0 0 0;overflow:hidden;opacity:.62;
     background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:opacity .18s,width .18s ease-out,height .18s ease-out}
   .mappanel.open,.mappanel.pinned{opacity:1}
+  /* The round result has its own map, so the little one behind the wash is just clutter. Faded
+     rather than hidden, so Leaflet keeps its size and the next round opens at the right zoom. */
+  #game.behind .mappanel,#game.behind .ctl,#game.behind .compass{opacity:0;pointer-events:none}
   .mappanel.open{width:min(1000px,100vw);height:min(720px,calc(100vh - 90px))}
   /* On a desktop the panel leaves a strip down the right edge, so Google's own compass and zoom stay visible and turn with you. */
   @media (min-width:821px){ .mappanel{right:64px;border-radius:var(--radius) var(--radius) 0 0} #game.blind-map .mappanel{right:0;border-radius:0} }
@@ -665,7 +668,7 @@
   #result,#final{background:var(--bg);display:flex;flex-direction:column;z-index:10}
   /* The round result sits over the round itself: the street stays behind a dark green wash, the map is a framed
      rectangle in the middle, and the numbers read white. The end-of-game screen keeps the light card look. */
-  #result{background:rgba(8,26,16,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overflow:auto;align-items:center;padding:18px 20px 40px;color:#fff}
+  #result{background:rgba(8,26,16,.9);overflow:auto;align-items:center;padding:18px 20px 40px;color:#fff}
   #result .rtitle{width:min(1000px,100%);text-align:center;font-size:30px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:6px 0 14px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,.18);text-shadow:0 2px 12px rgba(0,0,0,.5);flex:none}
   #result .rmap{flex:none;width:min(1000px,100%);height:min(48vh,520px);border-radius:18px;overflow:hidden;border:2px solid rgba(255,255,255,.28);box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 6px rgba(31,157,85,.18)}
   #result .rpanel{background:transparent;border:0;width:min(1000px,100%);padding:20px 0 0;gap:10px}
@@ -988,7 +991,7 @@
   .polrow b.ok{color:var(--green-dark)} .polrow b.no{color:var(--red)}
   .polrow .bl{color:var(--muted);font-size:13px}
   .polrow .yours{font-size:12px;color:var(--red);background:var(--red-soft);border-radius:99px;padding:2px 8px}
-  #waitOverlay{position:absolute;inset:72px 0 0 0;z-index:8;display:flex;align-items:center;justify-content:center;background:rgba(21,34,25,.55);backdrop-filter:blur(3px)}
+  #waitOverlay{position:absolute;inset:72px 0 0 0;z-index:8;display:flex;align-items:center;justify-content:center;background:rgba(21,34,25,.72)}
   #waitOverlay .wbox{background:var(--raise);border-radius:16px;padding:24px 30px;text-align:center;box-shadow:var(--shadow);min-width:260px}
   #waitOverlay .wbox b{font-size:20px;display:block;margin-bottom:6px}
   #waitOverlay .wlist{display:flex;flex-direction:column;gap:6px;margin-top:12px;text-align:left}
@@ -1075,7 +1078,7 @@
   .btn-secondary{border:1.5px solid var(--line)}
   .card{border:1.5px solid var(--line);border-radius:18px;box-shadow:0 4px 0 rgba(15,64,36,.05),0 14px 34px rgba(15,64,36,.10)}
   html[data-theme="dark"] .card{box-shadow:0 4px 0 rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.45)}
-  .acctchip{background:var(--green);color:#fff;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.35);box-shadow:0 3px 0 var(--edge-primary),0 10px 24px rgba(0,0,0,.28);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,background .15s}
+  .acctchip{background:var(--green);color:#fff;border:1.5px solid rgba(255,255,255,.35);box-shadow:0 3px 0 var(--edge-primary),0 10px 24px rgba(0,0,0,.28);transition:transform .14s cubic-bezier(.2,1.5,.4,1),box-shadow .14s,background .15s}
   .acctchip:hover{transform:translateY(-1px);background:var(--green-dark);border-color:rgba(255,255,255,.55);box-shadow:0 4px 0 var(--edge-primary),0 12px 26px rgba(0,0,0,.3)}
   .acctchip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--edge-primary)}
   .acctchip .gear{opacity:1}
@@ -2736,7 +2739,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260925-133917';
+const BUILD='20260926-182726';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2980,7 +2983,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:7,patch:0};
+const VERSION={major:3,minor:7,patch:1};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -4978,6 +4981,7 @@ function restoreScreen(){
   } }catch(e){}
 }
 function show(id){ for(const s of SCREENS) $(s).hidden = s!==id; if(KEEP_SCREENS.includes(id)) setTimeout(saveScreen,0); if(id==='game'||id==='menu') confettiStop();
+  $('game').classList.toggle('behind',id==='result');
   if(id==='result'){ $('game').hidden=false; const m=modeOf(state.mode); $('rTitle').textContent=`Round ${state.round}`+(mp.role&&m.duel?` · damage ×${duelMult(state.round)}`:(state.totalRounds<99?` of ${state.totalRounds}`:'')); }   // the street stays behind the wash
   document.body.classList.toggle('in-game',id==='game'); if(id!=='final'){ $('shareBox').hidden=true; $('shareCard').hidden=true; } }
 
