@@ -588,7 +588,11 @@
 
   /* Circle mode: a fixed ring over the guess map. It never changes size on screen, so zooming is
      the only thing that changes how much ground it covers. */
-  .ringwrap{position:absolute;inset:0;z-index:8;pointer-events:none;display:grid;place-items:center}
+  /* Leaflet's map pane sits at 400 and the guess map does not start a stacking context of its own,
+     so anything below that is painted over by the tiles. The ring lived at 8 and only showed in the
+     gaps while tiles were still loading, which is why it flashed past while the map moved. 650 puts
+     it over the map and under Leaflet's controls, which stay clickable. */
+  .ringwrap{position:absolute;inset:0;z-index:650;pointer-events:none;display:grid;place-items:center}
   .ringwrap .gring{width:120px;aspect-ratio:1;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.4),0 0 0 9999px rgba(8,24,16,.15);position:relative}
   .ringwrap .gring::after{content:'';position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.5)}
   .ringlbl{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;background:rgba(8,24,16,.82);color:#fff;font-weight:800;font-size:12.5px;padding:5px 11px;border-radius:99px;white-space:nowrap}
@@ -2743,7 +2747,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260927-123911';
+const BUILD='20260927-124647';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -2987,7 +2991,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:7,patch:3};
+const VERSION={major:3,minor:7,patch:4};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
