@@ -879,7 +879,7 @@
   .setup-wrap{max-width:960px;margin:0 auto}
   .brand-row .lockup{color:var(--text)}
   #game.gray .pano,#game.gray #pix{filter:grayscale(1)}
-  #bettray{position:absolute;left:16px;bottom:72px;z-index:7;width:480px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 18px 16px;opacity:.6;transition:opacity .18s}
+  #bettray{position:absolute;left:16px;bottom:72px;z-index:7;width:530px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 18px 16px;opacity:.6;transition:opacity .18s}
   #bettray:hover,#bettray:focus-within{opacity:1}
   #bettray .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
   #bettray .bank{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
@@ -889,7 +889,7 @@
   .chips{display:flex;gap:7px;margin-top:10px;align-items:center;flex-wrap:wrap}
   .chip-btn{width:50px;height:50px;border-radius:50%;border:4px dashed rgba(255,255,255,.85);box-shadow:0 2px 4px rgba(0,0,0,.35),inset 0 0 0 3px rgba(0,0,0,.15);color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center;text-shadow:0 1px 2px rgba(0,0,0,.5);transition:transform .1s}
   .chip-btn:hover{transform:translateY(-3px)} .chip-btn:active{transform:scale(.94)}
-  .chip-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+  .chip-btn:disabled{opacity:.42;filter:saturate(.55);cursor:not-allowed;transform:none}
   /* The house ladder, 1 to a million. Each one only appears once your bankroll can cover it. */
   .chip-btn.c1{background:#f1f3f5;color:#333;text-shadow:none;border-color:#c8ccd0} .chip-btn.c5{background:#d7263d} .chip-btn.c25{background:#1f9d55} .chip-btn.c100{background:#222} .chip-btn.c500{background:#6f42c1}
   .chip-btn.c1k{background:#e0a800;color:#3a2a00;text-shadow:none;border-color:#fff3cd} .chip-btn.c5k{background:#b5651d}
@@ -899,6 +899,17 @@
   .betacts button{padding:8px 12px;border-radius:8px;background:var(--sunk);font-size:12px;font-weight:700}
   .betacts button.allin{background:#fff4d6;color:#7a5200;margin-left:auto}
   .potchips{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px;min-height:14px}
+  /* A phone has no room for eleven full-size chips above the map, so they shrink and the tray sits
+     tight to the top of the screen instead of the bottom. */
+  @media (max-width:820px){
+    #bettray{left:8px;right:8px;width:auto;max-width:none;top:60px;bottom:auto;padding:10px 12px 12px}
+    #bettray .bank b{font-size:20px}
+    .chips{gap:5px;margin-top:7px}
+    .chip-btn{width:38px;height:38px;border-width:3px;font-size:10px}
+    .betacts{margin-top:7px}
+    .betacts button{padding:7px 10px}
+    .potchips{margin-top:6px;min-height:10px}
+  }
   .potchips i{width:12px;height:12px;border-radius:50%;border:2px dashed rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.4)}
   #guessbar{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;z-index:8;width:min(720px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px 20px 16px;opacity:.72;transition:opacity .18s}
   #guessbar:hover,#guessbar:focus-within{opacity:1}
@@ -2771,7 +2782,7 @@ const trueIcon =L.divIcon({className:'',html:'<div class="marker-pin big marker-
 
 /* ---------- State ---------- */
 const $=id=>document.getElementById(id);
-const BUILD='20260927-175521';
+const BUILD='20260927-180230';
 const state={ mode:'classic', chain:[], nomove:false, lock:false, region:{type:'all',value:null}, daily:null, bank:1000, bet:0, pick:null, choice:null, timeLimit:60, totalRounds:5, round:0, score:0, results:[], locs:[], guess:null, timer:null, timeLeft:0, locked:false, fitDone:false, saved:false };
 let guessMap, guessMarker=null, resultMap, finalMap, resultLayer=null, finalLayer=null;
 function modeLabel(){ const m=modeOf(state.mode); const nm=m.custom&&state.custom?state.custom.name:m.name; return `${state.mode!=='classic'?nm+' · ':''}${state.totalRounds} round${state.totalRounds===1?'':'s'} · ${state.timeLimit?state.timeLimit+'s':'no limit'}`; }
@@ -3015,7 +3026,7 @@ window.addEventListener('pagehide',()=>{ try{ lbReconcile(false); stPublish(); }
           branding, 3 is the social game, duos, challenges, custom maps, streaks, Learn.
    MINOR  a release that added a capability: a batch of modes, the global leaderboards, the daily drop.
    PATCH  fixes and polish since the last one. */
-const VERSION={major:3,minor:7,patch:7};
+const VERSION={major:3,minor:7,patch:8};
 const verString=()=>`v${VERSION.major}.${VERSION.minor}.${VERSION.patch}`;
 
 /* ---------- Sound. Everything is synthesised, so there are no files to load. ---------- */
@@ -5642,10 +5653,10 @@ const CHIPS=[[1,'c1','1'],[5,'c5','5'],[25,'c25','25'],[100,'c100','100'],[500,'
 function renderBet(){
   $('bankLbl').textContent=state.bank.toLocaleString(); $('betLbl').textContent=state.bet.toLocaleString();
   const row=$('chipRow');
-  const show=CHIPS.filter(c=>c[0]<=Math.max(500,state.bank));   // a chip you could never cover is just clutter
-  const want=show.map(c=>c[0]).join(',');
-  if(row.dataset.set!==want){ row.dataset.set=want;
-    row.innerHTML=show.map(([v,cls,lbl])=>`<button class="chip-btn ${cls}" data-v="${v}">${lbl}</button>`).join(''); }
+  // The whole ladder is on the table from the first round, greyed until you can cover it, so you can
+  // see what a good run is worth playing for.
+  if(!row.dataset.set){ row.dataset.set='1';
+    row.innerHTML=CHIPS.map(([v,cls,lbl])=>`<button class="chip-btn ${cls}" data-v="${v}">${lbl}</button>`).join(''); }
   row.querySelectorAll('.chip-btn').forEach(b=>{ b.disabled=state.locked||state.bet+(+b.dataset.v)>state.bank; });
   const cls={}; for(const [v,c] of CHIPS) cls[v]=c;
   let rest=state.bet; const parts=[]; for(const [v] of CHIPS.slice().reverse()){ while(rest>=v&&parts.length<60){ parts.push(cls[v]); rest-=v; } }
